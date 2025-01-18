@@ -1,0 +1,5224 @@
+.. _apis:
+
+APIs
+====
+
+Programmatic control of RDFox® can be gained remotely via a RESTful API exposed
+through an HTTP endpoint or in-memory via Java.
+
+This section describes the functionality provided in both APIs for managing the
+different information elements of the system. This section should be understood
+as a reference for the JAVA and REST APIs in RDFox, and it requires
+understanding of the structure of RDFox as described in :numref:`servers`.
+
+.. _APIs-java-basics:
+
+Basics of the Java API
+----------------------
+
+The Java API is available within Java processes that have JRDFox.jar loaded
+(see :numref:`software-archive`).
+
+Starting and Stopping the Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Java applications must start the RDFox server before they can connect to it.
+Only one server can be started per process. The Java API exports the
+`RDFoxServer <./_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html>`_
+class which has several methods for managing the server's lifecycle. The
+following examples show how to use this class to start a server so that it is
+ready to create connections, and to shut it down once finished with.
+
+When a server should be persistent, its server directory must be initialized
+for the desired :ref:`persistence option <persistence-options>` before the
+server can be started. This is shown below. For in-memory servers, this step
+should be skipped.
+
+.. code:: java
+
+   String serverDirectory = ...;
+   String persistenceEncryptionKey = ...;
+   Map<String, String> parameters = new HashMap<String, String>();
+   parameters.put("persistence", "file");
+   RDFoxServer.initialize(serverDirectory, persistenceEncryptionKey, parameters);
+
+The parameters passed to the ``initialize(...)`` method will be written to the
+:ref:`server parameters file <server-parameters-file>` within the server
+directory and will therefore apply to every subsequent server session that uses
+the directory, unless the file is edited or the parameters in the file
+overridden by the arguments passed to ``start(...)``.
+
+The server can now be started, as shown in the code below. For in-memory
+servers (with no persistence), the ``server-directory`` parameter may be
+omitted.
+
+.. code:: java
+
+   Map<String, String> parameters = new HashMap<String, String>();
+   parameters.put("server-directory", serverDirectory);
+   RDFoxServer.start(parameters);
+
+Newly created servers do not contain any roles so, before any connection can be
+made, the server's first role must be created using the ``RDFoxServer``'s
+``createFirstRole(...)`` API. The first role automatically receives privileges
+to perform any operation on the server, including the creation of additional
+roles and modification of their privileges. The following code demonstrates how
+to create the first role.
+
+.. code:: java
+
+   if (RDFoxServer.getNumberOfRoles() == 0) {
+       String roleName = ...;
+       String password = ...;
+       RDFoxServer.createFirstRole(roleName, password);
+   }
+
+The server is now ready to accept connections.
+
+When RDFox is no longer needed by the application, the server can be stopped
+which will remove all data stores from memory. Stopping the server will fail
+while any connections to it or one of its data stores remain open.
+
+.. code:: java
+
+   RDFoxServer.stop();
+
+Connections
+~~~~~~~~~~~
+
+Once the RDFox server is started (see the previous section), Java client code
+must obtain a :ref:`connection <connections>` to the server or one of its data
+stores in order call the APIs described in this chapter. A connection
+encapsulates the identity of the object being connected to, as well as the
+credentials of the user making the connection. The following example
+demonstrates a typical life cycle of a connection.
+
+.. code:: java
+
+   String roleName = ...;
+   String password = ...;
+   ServerConnection sConn = RDFoxServer.newServerConnection(roleName, password);
+   // Use the server connection...
+   String dataStoreName = ...;
+   DataStoreConnection dsConn = sConn.newDataStoreConnection(dataStoreName);
+   // Use the data store connection...
+   dsConn.close();
+   sConn.close();
+
+Both server and data store connections must be closed after use in order to
+release system resources. There are no requirements that a server connection
+must be closed after a data store connection — that is, both connections are
+independent.
+
+For convenience, one can connect to a data store directly.
+
+.. code:: java
+
+   String serverURL = ...;
+   String dataStoreName = ...;
+   String roleName = ...;
+   String password = ...;
+   DataStoreConnection dsConn = RDFoxServer.newDataStoreConnection(dataStoreName, roleName, password);
+   // Use the data store connection...
+   dsConn.close();
+
+All connections are single-threaded --- that is, they can safely be used only
+from one thread at a time. Using the same connection from multiple threads
+results in undefined behavior and can lead to a system crash (although the
+server itself will not be corrupted provided that the containing process
+survives the crash). To use RDFox concurrently, one should use a distinct
+connection per execution thread.
+
+RDFox provides various APIs for adding and deleting facts and rules. All
+updates are performed within the context of a transaction, which ensures that
+either all changes are performed as a unit, or no changes are performed at all.
+The transaction API is described in more detail in
+:numref:`APIs-working-with-transactions`.
+
+Adding or deleting facts or rules might require adjusting the inferred facts.
+In most cases, RDFox achieves this by using highly optimized *incremental
+reasoning* algorithms, whose aim is to update the derived facts while
+minimizing the amount of work. This process is automatically initiated before a
+query is evaluated in a transaction; thus, each query evaluated in a
+transaction always sees the results of prior updates made on the transaction.
+To promote performance, incremental reasoning is initiated only when a query is
+issued or a transaction is committed; thus, if several updates are issued
+before a transaction is committed, incremental reasoning is run only once.
+
+It is generally good practice to add all rules before the facts, or to add
+rules and facts in an arbitrary order but grouped in a single transaction. This
+will usually increase the performance of the first reasoning operation.
+
+Basics of the RESTful API
+-------------------------
+
+The RESTful API is available whenever the RDFox Endpoint is listening. Please
+refer to :numref:`rdfox-endpoint` for details of how to configure, start and
+stop the endpoint.
+
+The endpoint provides access to one RDFox server via the following API keys.
+
+::
+
+   /                                   : management of the server (GET/PATCH)
+       /authentication                 : discover configured authentication schemes (GET)
+           /login                      :
+               /cancel                 : cancel a login attempt (POST)
+               /complete               : complete a login attempt (POST)
+               /initiate               : initiate a login attempt (GET/POST)
+           /logout                     : log out of a session (POST)
+           /self                       : determine authentication status (GET)
+       /commands                       : remote submission of shell commands (POST)
+       /connections                    : management of server connections (GET/POST)
+           /<SRVCONN>                  : management of a server connection (GET/PATCH/DELETE)
+       /datastores                     : listing available data stores (GET)
+           /<DSTRNAME>                 : management of a data store (GET/PATCH/POST/DELETE)
+               /commitprocedure        : (EXPERIMENTAL) management of a data store's commit procedure (GET/PUT)
+               /connections            : management of data store connections (GET/POST)
+                   /<DSCONN>           : management of a data store connection (GET/PATCH/DELETE)
+                       /cursors        : management of transaction cursors (GET/POST)
+                           /<CURSID>   : management of a cursor (GET/PATCH/DELETE)
+                       /transaction    : management of the connection transaction (GET/PATCH)
+               /content                : data store content (GET/PATCH/PUT/POST/DELETE)
+               /datasources            : listing available data sources (GET)
+                   /<DSRCNAME>         : management of a data source (GET/POST/DELETE)
+                       /tables         : listing available data source tables (GET)
+                           /<DTNAME>   : information about a data source table (GET)
+                               /data   : sampling facts of a data source table (GET)
+               /deltaqueries           : management of delta queries (GET)
+                   /<DQNAME>           : management of a delta query (GET/POST/DELETE/PATCH)
+               /deltaqueryanswers      : management of delta query answers (GET/DELETE)
+                   /content            : retrieves the content of a delta query answer (GET)
+               /explanation            : explanation of the reasoning process (GET)
+               /info                   : retrieving information about a data store (GET)
+               /operations             : invocation of data store operations (POST)
+               /prefixes               : prefixes of the data store (GET/PUT/PATCH)
+               /properties             : management of the data store properties (GET/PATCH)
+               /sparql                 : data store SPARQL endpoint (GET/POST)
+               /stats                  : listing the available statistics (GET/PUT)
+                   /<STNAME>           : management of the statistics (GET/PUT/POST/DELETE)
+               /tupletables            : listing available tuple tables (GET)
+                   /<TTNAME>           : management of a tuple table (GET/POST/DELETE)
+       /health                         : checking that the endpoint is healthy (GET)
+       /password                       : changing the password of the authenticated role (PUT)
+       /requests                       : listing running requests (GET)
+           /<REQID>                    : management of a particular request (GET/DELETE)
+       /roles                          : listing roles (GET)
+           /<ROLENAME>                 : management of a role (POST/DELETE)
+               /privileges             : management of a role's privileges (GET/PATCH)
+               /memberships            : management of a role's memberships (GET/PATCH)
+               /members                : listing a role's members (GET)
+      /shells                          : management of shells (GET/POST)
+           /<SHELL>                    : management of a shell (GET/PATCH/DELETE)
+
+
+.. _REST-authentication:
+
+Authentication
+~~~~~~~~~~~~~~
+
+The following sections describe the authentication mechanisms and related APIs
+supported by the RDFox endpoint.
+
+Authentication Mechanisms
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following sections describe various mechanisms supported by the RDFox
+endpoint for authenticating REST requests.
+
+In most cases, requests that attempt to use more than one of these mechanisms
+will be rejected by the endpoint. This avoids the need to define a precedence
+between the authentication schemes to determine what happens when different
+mechanisms would lead to a different authentication outcome for the same
+request. An exception to this rule is made for the proprietary ``RDFox``
+authentication scheme (see :numref:`REST-rdfox-authentication`) which may be
+used on a connection that is already authenticated using a client certificate
+(see :numref:`REST-client-certificates`).
+
+.. warning::
+
+   To protect against unauthorized disclosure of authentication secrets such as
+   passwords or bearer tokens, RDFox REST authentication should always be used
+   with Transport Layer Security (TLS) or restricted to localhost. See the
+   ``channel`` variable and related variables in :numref:`endpoint-parameters`
+   for details of how to set up TLS.
+
+.. _REST-http-authentication-schemes:
+
+Standard HTTP Authentication Schemes
+""""""""""""""""""""""""""""""""""""
+
+The RESTful API supports various standard HTTP authentication schemes in
+accordance with `rfc7235 <https://datatracker.ietf.org/doc/html/rfc7235>`__.
+Under this standard, authentication information is included in each request via
+the ``Authorization`` header. The structure of the header is as follows:
+
+::
+
+   Authorization: <auth-scheme> <authorization-parameters>
+
+When this header is present, the endpoint will attempt to match
+``<auth-scheme>`` to one the RDFox server's configured authentication managers.
+If no match is found, the request is rejected with status code ``401 -
+Unauthorized``; otherwise, the ``<authorization-parameters>`` are passed to the
+matching authentication manager for verification. For more detail on the
+process of authentication, see :numref:`authentication-managers`. The table
+below shows the supported schemes and the corresponding authentication manager
+name for use with the ``authentication-managers`` :ref:`server parameter
+<authentication-managers-server-param>`.
+
+.. table ::
+   :align: center
+   :widths: 5,15
+
+   +--------------+------------------------------------------------+
+   |  Scheme      |  Authentication Manager Name                   |
+   +==============+================================================+
+   | ``Basic``    | :ref:`role-name+password <role-name+password>` |
+   +--------------+------------------------------------------------+
+   | ``Bearer``   | :ref:`oidc <oidc>`                             |
+   +--------------+------------------------------------------------+
+
+
+Clients can discover the list of standard HTTP authentication schemes
+configured at a particular RDFox server by sending a ``GET`` request with path
+``/authentication`` to the server's endpoint. The response is written as the
+output of a SPARQL query that returns one answer per enabled authentication
+manager with variable ``?SchemeName`` bound to the scheme name supported by the
+manager. Two additional variables include more information about the scheme.
+
+
+.. table ::
+   :align: center
+   :widths: 10,40
+
+   +------------------------------+-------------------------------------------------------------------------------------+
+   |  Variable Name               |  Description                                                                        |
+   +==============================+=====================================================================================+
+   | ``CredentialsSupported``     | Whether the client can provide credentials in the ``Authorization`` header or not.  |
+   |                              | Possible values are ``true`` or ``false``.                                          |
+   +------------------------------+-------------------------------------------------------------------------------------+
+   | ``SessionType``              | Support for session-based authentication (:numref:`REST-sessions`).                 |
+   |                              | Possible values are:                                                                |
+   |                              |                                                                                     |
+   |                              | ``"interactive-login"`` - sessions are supported, requiring an initial call         |
+   |                              | to ``/login/initiate`` before the call to ``/login/complete``.                      |
+   |                              |                                                                                     |
+   |                              | ``"direct-login"`` - sessions are supported, requiring a call                       |
+   |                              | to ``/login/complete`` with no initial call to ``/login/initiate``.                 |
+   |                              |                                                                                     |
+   |                              | ``"none"`` - sessions are not supported, for example when the ``oidc``              |
+   |                              | authentication manager is configured without a ``client-secret`` (in which case the |
+   |                              | ``Bearer`` scheme can only be used with the ``Authorization`` header).              |
+   +------------------------------+-------------------------------------------------------------------------------------+
+
+
+This is demonstrated in the following example.
+
+**Request**
+
+.. code:: http
+
+   GET /authentication HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Date: Wed, 20 Nov 2024 21:14:26 GMT
+   Server: RDFox Endpoint
+   Content-Type: text/tab-separated-values; charset=UTF-8
+   Transfer-Encoding: chunked
+   
+   ?SchemeName ?CredentialsSupported   ?SessionType
+   "Basic"  true  "direct-login"
+   "Bearer" true  "interactive-login"
+   
+There is no equivalent of this API in Java.
+
+.. _REST-sessions:
+
+Session-Based Authentication
+""""""""""""""""""""""""""""
+
+This section describes how to begin and end sessions with the RDFox endpoint
+and also includes details about the encryption of session tokens.
+
+Beginning a new session (logging in) is achieved by making a successful login
+completion API call using one of the server's configured authentication
+managers (see the ``authentication-managers`` :ref:`server parameter
+<server-parameters>`). When using the ``oidc`` authentication manager, it is
+necessary to first initiate the login process with a separate login initiation
+API call.
+
+Login initiation is performed by sending a ``POST`` request to path
+``/authentication/login/initiate`` with an ``authentication-scheme`` query
+parameter specifying one of the standard HTTP authentication schemes listed in
+:numref:`REST-http-authentication-schemes` and a set of key-value pairs encoded
+in the request body according to the ``application/x-www-form-urlencoded``
+format. The table below links to the relevant documentation section for each
+authentication scheme.
+
+.. table ::
+   :align: center
+   :widths: 5,15
+
+   +-----------------------------+---------------------------------+-----------------------------------------------------+
+   | Authentication Manager      | Supported Authentication Scheme | Documentation Section for Session Support           |
+   +=============================+=================================+=====================================================+
+   | ``role-name+password``      | ``Basic``                       | :numref:`role-name+password-session-authentication` |
+   +-----------------------------+---------------------------------+-----------------------------------------------------+
+   | ``oidc``                    | ``Bearer``                      | :numref:`oidc-session-authentication`               |
+   +-----------------------------+---------------------------------+-----------------------------------------------------+
+
+The request must not have any associated authentication information (e.g., no
+``Authorization`` header, client certificate, existing session, or login
+state). Upon success, RDFox will return a ``200 OK`` response with a
+``Location`` header specifying the next URL to use in the login process, a
+temporary cookie containing the encrypted login state, and a response body also
+containing the login state. This step is demonstrated by the following example.
+
+**Request**
+
+.. code:: http
+
+   POST /authentication/login/initiate?authentication-scheme=bearer HTTP/1.1
+   Host: localhost
+   Content-Length: 51
+   Content-Type: application/x-www-form-urlencoded
+
+   completion-uri=https%3A%2F%2Fexample.com%2Fcallback
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Date: Wed, 23 Oct 2024 19:17:49 GMT
+   Server: RDFox Endpoint
+   Set-Cookie: RDFox-LoginID=fffffffff; Path=/; HttpOnly; SameSite=Strict; Secure
+   Location: https://login.example.com/authorize?response_type=code...
+   Content-Length: 24
+   
+   ffffffffffffffffffffffff
+
+If the client wants to cancel the login attempt after an
+``authentication/login/initiate`` call, the client should send a ``POST``
+request to the ``/authentication/login/cancel`` endpoint. The request must
+contain the ``RDFox-LoginID`` cookie received in the initiation response in a
+``Cookie`` header. The request must not have an ``Authorization`` header or a
+client certificate. Upon success, RDFox will return a ``204 No Content``
+response with a ``Set-Cookie`` header unsetting the temporary ``RDFox-LoginID``
+cookie. The client may want to cancel the login process for several reasons,
+such as, if an error was encountered during the login process with the OIDC
+provider and they want to reset the login process. This step is demonstrated in
+the following example.
+
+**Request**
+
+.. code:: http
+
+   POST /authentication/login/cancel HTTP/1.1
+   Host: localhost
+   Cookie: RDFox-LoginID=fffffffff
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No content
+   Date: Mon, 02 Dec 2024 10:56:32 GMT
+   Server: RDFox Endpoint
+   Set-Cookie: RDFox-LoginID=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict;
+
+After receiving the initiation response, the client should then follow the URL
+returned in the ``Location`` header to proceed with the login. If the user
+agent is a web browser, the browser will automatically handle the redirection.
+
+Login completion is performed by sending a ``POST`` request to path
+``/authentication/login/complete`` with an ``authentication-scheme`` query
+parameter specifying one of the standard HTTP authentication schemes listed in
+:ref:`REST-http-authentication-schemes`. If the completion call is part of a
+login attempt that began with a login initiation call, the request must use the
+same value for the ``authentication-scheme`` query parameter, and must include
+the ``RDFox-LoginID`` cookie received in the initiation response in a
+``Cookie`` header. Additionally, the request must include the authentication
+parameters required by the associated authentication manager as key-value pairs
+encoded in the request body according to the
+``application/x-www-form-urlencoded`` format.
+
+Upon success, RDFox will return a ``204 No Content`` response with
+``Set-Cookie`` headers unsetting the temporary ``RDFox-LoginID`` cookie and
+setting the longer-lived ``RDFox-SID`` cookie to the new session token. This
+cookie can be used to authenticate subsequent requests to the server.
+
+The following example demonstrates the completion of the login attempt that was
+initiated in the previous example.
+
+**Request**
+
+.. code:: http
+
+   POST /authentication/login/complete?authentication-scheme=bearer HTTP/1.1
+   Host: localhost
+   Cookie: RDFox-LoginID=fffffffff
+   Content-Length: 48
+   Content-Type: application/x-www-form-urlencoded
+
+   code=CCCCCCCCCCCC&state=ffffffffffffffffffffffff&completion-uri=https%3A%2F%2Fexample.com%2Fcallback
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+   Date: Wed, 23 Oct 2024 19:37:30 GMT
+   Server: RDFox Endpoint
+   Set-Cookie: RDFox-LoginID=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict
+   Set-Cookie: RDFox-SID=AAAAAAAAAAAA; Path=/; HttpOnly; SameSite=Strict; Secure
+
+The session token should be included as a cookie on subsequent requests. At any
+point, the server may decide to refresh the session token, in which case
+response will contain an ``RDFox-SID`` cookie with a new refresh token value.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/DS1 HTTP/1.1
+   Host: localhost
+   Cookie: RDFox-SID=AAAAAAAAAAAA
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Date: Wed, 23 Oct 2024 19:39:22 GMT
+   Server: RDFox Endpoint
+   Set-Cookie: RDFox-SID=BBBBBBBBBBBB; Path=/; HttpOnly; SameSite=Strict
+
+   <response to the GET request>
+
+To end a session (log out), the client should send a ``POST`` request to the
+``/authentication/logout`` to destroy any server-side session state and unset
+the session cookie. This is demonstrated in the following example.
+
+**Request**
+
+.. code:: http
+
+   POST /authentication/logout HTTP/1.1
+   Host: localhost
+   Cookie: RDFox-SID=BBBBBBBBBBBB
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+   Date: Wed, 23 Oct 2024 19:39:22 GMT
+   Server: RDFox Endpoint
+   Set-Cookie: RDFox-SID=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict
+
+Session tokens contain information encrypted with a server-side key. For this
+reason, using the session-based authentication mechanisms described in this
+section requires ``libcrypto`` from the `OpenSSL <https://www.openssl.org/>`__
+package (see :numref:`third-party-software` for more detail). The key and
+algorithm to encrypt and decrypt session tokens may be specified explicitly via
+the ``session.encryption.key`` and ``session.encryption.algorithm``
+:ref:`server parameters <server-parameters>` or via the
+``persistence.encryption.key`` and ``persistence.encryption.algorithm``
+parameters. If no key is specified by the above parameters, a key is randomly
+generated and used for the server session. This means that session tokens are
+invalidated when the server is restarted and users will be forced to log in
+again. This option requires 
+
+.. _REST-client-certificates:
+
+Authentication with Client Certificates
+"""""""""""""""""""""""""""""""""""""""
+
+When using TLS, the RDFox endpoint will request a certificate from the client
+during the handshake if the ``request-client-certificates`` :ref:`endpoint
+parameter <endpoint-parameters>` is set to ``true``. The client is free to
+ignore this request and continue with the handshake without providing a
+certificate, in which case the TLS session will be established with no
+associated authentication information. If the client does provide a
+certificate, the certificate will be verified against the loaded trust anchors
+(sometimes referred to as "root certificates"). If verification fails, the
+transport layer connection will be closed immediately. Otherwise, the TLS
+session is established with authentication information extracted from the
+certificate. Specifically, the first common name (CN) and the list of
+organizational units (OUs) for the certificate's subject, as well as the
+notBefore and notAfter date-times are extracted.
+
+When an HTTP request requiring authentication is received within an established
+TLS session, and there is no ``RDFox`` authentication token, the TLS session
+will be inspected to see if it has any associated authentication information.
+If so, and the information includes one or more organizational units, the
+endpoint will compile the privileges for the certificate subject as an external
+agent, as described in :numref:`effective-privileges-external-agent`, passing
+the list of organizational units as the list of roles. If no organizational
+units are present, the endpoint will instead attempt to complete the
+authentication process using :ref:`direct role retrieval
+<direct-role-retrieval>`, passing the common name as the role name.
+
+Verification of certificates is performed using the default trust anchors for
+the OpenSSL library in use. An additional certificate can be supplied via the
+``trusted-root-certificate`` or ``trusted-root-certificate-file`` parameter.
+When verification of a client certificate fails and the connection is
+immediately closed, the verification error message will be logged in the
+``x-protocol-error`` field of Extended Log Format (ELF) logger, if it is in
+use.
+
+.. note::
+
+   RDFox does not support checking of certificate revocation lists (CRLs).
+
+.. _REST-rdfox-authentication:
+
+RDFox Authentication
+""""""""""""""""""""
+
+For each named object managed by the endpoint such as connections and shells,
+the endpoint generates a matching authentication token that can be used to
+authenticate requests to use or managing that object. This is described in more
+detail in both :numref:`REST-explicit-connection-management` and
+:numref:`REST-explicit-shell-management`.
+
+.. _REST-guest-role:
+
+Anonymous Requests and the ``guest`` role
+"""""""""""""""""""""""""""""""""""""""""
+
+Upon receiving a REST request with no ``Authorization`` header or
+TLS-authenticated role name, the RDFox endpoint will attempt to authenticate as
+role ``guest``. If this authentication succeeds, the endpoint will then
+continue processing the request using the resulting :ref:`connection
+<connections>`. The level of access to an RDFox server available via anonymous
+(i.e. unauthenticated) requests can therefore be controlled by granting the
+appropriate privileges to the ``guest`` role or, in the case that all requests
+should be authenticated, ensuring that ``guest`` is not one of the server's
+roles.
+
+Retrieving the Current Authentication Status
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In some cases, it is useful for client applications to know which agent is
+currently authenticated and how. This can be determined by sending a ``GET``
+request to path ``/authentication/self``. If no agent is authenticated on the
+connection, a ``401 Unauthorized`` response is returned. Otherwise, the
+response is written as the output of a SPARQL query that binds the variable
+``?agent-name`` to the name of the agent, variable ``?agent-type`` to the type
+of the agent (either ``role`` or ``external-agent``), and variable
+``?authentication-route`` to the authentication mechanism that was used (one of
+``authorization-header``, ``session-cookie``, ``tls-certificate``, ``guest``).
+
+**Request**
+
+.. code:: http
+
+   GET /authentication/self HTTP/1.1
+   Host: localhost:12110
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Date: Mon, 21 Oct 2024 14:17:11 GMT
+   Server: RDFox Endpoint
+   Content-Type: text/tab-separated-values; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   ?Property	?Value
+   "agent-name"	"guest"
+   "agent-type"	"role"
+   "authentication-route"	"guest"
+
+As HTTP is a stateless protocol, the authentication status returned by the
+above API call is only correct for the request itself. It is therefore
+essential that any client presenting a "logged in" state to an end user based
+on the information returned by the above API, ensures that calls it makes to
+the other APIs documented on this page are sent with the same authentication
+information.
+
+Suppressing the WWW-Authenticate response header
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In accordance with `rfc7235 <https://datatracker.ietf.org/doc/html/rfc7235>`__, RDFox includes a 
+``WWW-Authenticate`` header, detailing available authentication options, in any ``401 (Unauthorized)``
+response. A REST client may prevent RDFox including this header in such a response by including
+the header ``RDFox-Suppress-Basic-WWW-Authenticate: true`` in the request. 
+
+
+.. _APIs-treating-get-results-as-answers-to-sparql-queries:
+
+Treating ``GET`` Results as Answers to SPARQL Queries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many RESTful API calls return information about various parts of the data
+store. For example, one can list all data stores in a server, all data sources
+in a data store, and so on. In order to avoid introducing additional formats,
+the output of all such requests are formatted as answers to certain SPARQL
+queries. (This does not mean that such a query can be evaluated through a
+SPARQL endpoint; rather, it only means that the same result format is reused to
+represent query results.)
+
+Answers of such queries can be serialized using any of the supported query
+answer formats (see :numref:`query-answer-formats`) apart from
+``application/sparql-results+resourceid``.
+
+Content negotiation determines the format to be used, as usual in the `SPARQL
+1.1 protocol <http://www.w3.org/TR/sparql11-protocol/>`__. The examples in this
+document use the CSV format for simplicity. All such calls accept an optional
+parameter with name ``filter``, whose value must be a SPARQL 1.1 ``FILTER``
+expression. If a filter expression is specified, it is evaluated for each
+answer in the list, and only those answers on which the expression returns
+``true`` are returned.
+
+.. _REST-implicit-connections-and-transactions:
+
+RESTful Connections and Transactions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Just like in the Java API, each RESTful API request is also evaluated within a
+context of a server or a data store :ref:`connection <connections>`. The
+RESTful endpoint provides two ways of associating a connection with each
+request.
+
+- If no connection management headers are present in the HTTP request, each
+  request will be evaluated in the context of a fresh connection. This provides
+  users with a convenient way of using the RESTful API without any complication
+  with connection management, which is arguably not natural in a connectionless
+  protocol such as HTTP.
+
+- By including a ``connection`` HTTP request parameter, users can specify that
+  the request should be evaluated within a specific connection. In such a case,
+  a connection can be understood as a session: creating a connection requires
+  checking the caller's credentials, and subsequent requests on this connection
+  are performed with the credentials associated with the connection. Moreover,
+  connections can be used to support user-controlled transactions. Finally, the
+  RESTful API provides calls for managing server and data store connections.
+
+Most RESTful API calls are evaluated inside a read-only or a read/write
+transaction, which is started implicitly whenever the underlying connection is
+not already associated with a transaction. Depending on the workload, starting
+a transaction may take a long period of time. In order to prevent API calls
+from being blocked indefinitely, the RESTful API will cancel a request and
+report an error if the transaction cannot be acquired within a predetermined
+time period (which is currently hard-coded to two seconds).
+
+.. _REST-explicit-connection-management:
+
+Explicit Connection Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``/connections`` key can be used to manage server connections, and the
+``/datastores/<DSTRNAME>/connections`` key is used to manage connections to
+data store ``<DSTRNAME>``. Both provide exactly the same API, so all examples
+in the rest of this section are presented for the latter connection type. All
+examples assume that a data store called ``myStore`` has been created in the
+server.
+
+The following request creates a connection to data store called ``myStore``.
+The connection is identified by a identifier, which is returned in the
+``Location`` response header. The newly created connection is associated with
+the role specified in the request; that is, if provided, the ``Authorization``
+header specifies the role name and password, and otherwise the guest role is
+used. The response will also contain a ``RDFox-Authentication-Token`` header,
+which will contain another random value that should be used for authentication
+on the connection as described below; since this value is used for
+authentication, measures should be taken to keep it secret.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/connections HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 Created
+   RDFox-Authentication-Token: 11111222223333344444
+   Location: /datastores/myStore/connections/01234567890123456789
+
+Any RESTful API request that requires a data store connection can now be
+performed on a specific connection by including the connection ID as the value
+of the ``connection`` request parameter. For example, the following request
+will import the data into the data store using the connection created above.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content?connection=01234567890123456789 HTTP/1.1
+   Host: localhost
+
+   [The facts/rules to be added in a format supported by RDFox]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [Response body as usual]
+
+All such requests are performed with the role associated with the connection.
+RDFox provides two ways of making sure that such requests are indeed issued by
+the appropriate user.
+
+- One can use basic authentication to supply a role name and password. For the
+  request to succeed, the role name must match the name of the role logged into
+  the connection, and the password must be valid for the role at the time the
+  request is serviced.
+
+- Alternatively, one can use RDFox authentication scheme by including the
+  header ``Authorization: RDFox <token>``, where ``<token>`` is the
+  authentication token returned when the connection was created. For example,
+  the above request can be issued as follows:
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content?connection=01234567890123456789 HTTP/1.1
+   Host: localhost
+   Authorization: RDFox 11111222223333344444
+
+   [The facts/rules to be added in a format supported by RDFox]
+
+Created connections can be managed using the
+``/datastores/<DSTRNAME>/connections/<DSCONN>`` key. A ``GET`` request on the
+connection provides information about the connection. The response is written
+as the output of a SPARQL query that binds the variable ``?Property`` to the
+property name, variable ``?Value`` to the property value, and variable
+``?Mutable`` to ``true`` if the value of the property can be changed and to
+``false`` otherwise. At present, ``role-name`` is the only property associated
+with the connection, and its value reflects the name of the role associated
+with the connection.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/connections/01234567890123456789 HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value,Mutable
+   role-name,guest,false
+
+A connection can be deleted using a ``DELETE`` request.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/connections/01234567890123456789 HTTP/1.1
+   Host: localhost
+   Authorization: RDFox 11111222223333344444
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+A ``PATCH`` request can be used to interrupt another request currently running
+on the connection, or to duplicate the connection. The type of request is
+specified in the ``operation`` request parameter. When checking the role
+password, the request body specifies the password of the new role. The
+remaining connection operations accept no parameters and the request body must
+be empty.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/connections/01234567890123456789?operation=interrupt HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/connections/01234567890123456789?operation=duplicate HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+   Location: /datastores/myStore/connections/98765432109876543210
+
+Finally, ``GET`` on ``/datastores/myStore/connections`` lists the connections
+to data store ``myStore``. The response is written as the output of a SPARQL
+query that binds the variable ``?Name`` to the connection identifier.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/connections HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name
+   01234567890123456789
+   98765432109876543210
+
+Server connections are managed in exactly the same way.
+
+Connections and Concurrency
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Access to connections in the RESTful API is serialized: if two requests
+attempts to access the same connection, one of request will fail in order to
+safeguard the integrity of the RDFox server. To use RDFox concurrently from
+multiple requests, one should use distinct connections. Without explicit
+connection management, this is automatically achieved by creating a temporary
+connection to service each request.
+
+Connection Expiry
+^^^^^^^^^^^^^^^^^
+
+Since the RESTful API is connectionless, there is no way to associate a data
+store or server connection with a physical network connection to the server. In
+order to avoid situations where a connection is created but never deleted, the
+RESTful API will delete a connection if it has not been used (i.e., no HTTP
+request accessed it) for a period longer than the value of the
+``object-keep-alive-time`` endpoint parameter. That is, a connection will remain
+valid for at least that much time (but it may actually remain valid slightly
+longer).
+
+Management of RESTful Requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most requests running on the RESTful endpoint are assigned a request ID for the
+duration of the request's execution. This ID can be used to inspect and cancel
+the request. The ID is assigned in one of the following two ways.
+
+- If no request ID is specified by the user, RDFox will use a unique ID for
+  each such request.
+
+- Users can associate a request with an ID using the ``RDFox-Request-ID``
+  header. In this way, the ID is known to the user and so the user can cancel
+  the request without having to first identify the request in the list of
+  running requests. RDFox *will not* check that the ID used by the user is
+  unique: if two requests are submitted with the same ID, both physical HTTP
+  requests will be considered part of one logical request. This can be useful
+  in applications: if several physical HTTP requests should be cancelled as a
+  unit, using the same request ID for all of them simplifies cancellation
+  logic. Thus, users should use a method with high entropy (such as GUIDs) to
+  generate unique request IDs.
+
+The following example illustrates how to associate a user-generated request ID
+with a request to the RDFox endpoint.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/sparql?query=SELECT+%3FX+%3FY+%3FZ+WHERE+{+%3FX+%3FY+%3FZ+} HTTP/1.1
+   Host: localhost
+   RDFox-Request-ID: fe12f5fb-068e-4c4f-aee5-9799a3b230b0
+
+The ``/requests`` key provides a method for inspecting and cancelling running
+requests. In particular, ``GET`` on ``/requests`` lists the requests running on
+the server. The response is written as the output of a SPARQL query that binds
+the variables ``?RequestID``, ``?StartTime``, ``?RoleName``, ``?Method``, and
+``?Target`` to the request ID, the start time of the request, the name of the
+role that submitted the request, and the HTTP method and target, respectively.
+
+**Request**
+
+.. code:: http
+
+   GET /requests HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   RequestID,StartTime,RoleName,Method,Target
+   fe12f5fb-068e-4c4f-aee5-9799a3b230b0,guest,POST,/datastores/myStore/sparql?query=SELECT+%3FX+%3FY+%3FZ+WHERE+{+%3FX+%3FY+%3FZ+}
+   ...
+
+Information about a particular request can be obtained by ``GET`` on
+``/requests/<REQID>``. The response is written as the output of a SPARQL query
+that binds the variables ``?Property`` and ``?Value`` for various properties
+and values, respectively, of the request. If several physical HTTP requests
+with the same ID are running, information about all of them is returned.
+
+**Request**
+
+.. code:: http
+
+   GET /requests/fe12f5fb-068e-4c4f-aee5-9799a3b230b0 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   request-id,fe12f5fb-068e-4c4f-aee5-9799a3b230b0
+   start-time,2023-06-16T17:06:00+01:00
+   role-name,guest
+   method,POST
+   target,/datastores/myStore/sparql?query=SELECT+%3FX+%3FY+%3FZ+WHERE+{+%3FX+%3FY+%3FZ+}
+
+Finally, ``DELETE`` with a particular request ID cancels all physical HTTP
+requests associated with the same ID.
+
+**Request**
+
+.. code:: http
+
+   DELETE /requests/fe12f5fb-068e-4c4f-aee5-9799a3b230b0 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+Cancelling running requests is a complex asynchronous operation that is
+provided on a best effort basis. RDFox will try its best to cancel a running
+request, but it cannot provide hard guarantees that cancellation will be
+immediate, or in fact that it will succeed eventually.
+
+Request management operations are subject to access control rules that are
+described in :numref:`request-access-control`. Each operation mentioned in this
+section is performed against the subset of all requests that the role is
+authorised for. For example, when listing requests, all requests (if any) will
+be included into the list that the role has the read privilege for.
+
+Managing Servers
+----------------
+
+This section describes the API calls responsible for managing an RDFox server.
+
+Retrieving Server Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves standard properties of a server. The response
+is written as the output of a SPARQL query that binds the variable
+``?Property`` to the property name, variable ``?Value`` to the property value,
+and variable ``?Mutable`` to ``true`` if the value of the property can be
+changed and to ``false`` otherwise. The names of all properties specified at
+the time the server was created are prefixed with ``parameters.`` so that they
+can be identified in the output.
+
+**Request**
+
+.. code:: http
+
+   GET / HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value,Mutable
+   version,5.7,false
+   git-SHA,74840e53a04b64af24538483163d3aabb7a04c7e,false
+   max-memory,100000000,true
+   available-memory,80000000,false
+   num-threads,8,true
+   parameters.max-memory,100000000,false
+
+The Java API provides various getter functions on ``ServerConnection`` to
+retrieve the properties of a server.
+
+**Java API**
+
+.. code:: java
+
+   int numThreads = sConn.getNumberOfThreads();
+   // ...
+
+Setting Server Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request updates the server properties using the values specified
+in the request. Only properties names returned in a ``GET`` call from the
+previous section are supported, and only mutable properties can be changed.
+
+**Request**
+
+.. code:: http
+
+   PATCH /?operation=set&num-threads=5 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+The Java API provides various setter functions on ``ServerConnection`` to set
+the properties of a server.
+
+**Java API**
+
+.. code:: java
+
+   int numberOfThreads = ...;
+   sConn.setNumberOfThreads(numberOfThreads);
+
+.. _APIs-checking-server-integrity:
+
+Checking Server Integrity
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request checks the integrity of the server in the same was as the
+:ref:`checkintegrity-command` command. The number of errors of the same type to
+report can be determined using the optional ``max-errors-of-same-type`` query
+parameter. In order to allow clients to track the progress, the response is
+continuously streamed to the clients. Furthermore, since the HTTP status code
+must be produced before the response body, the HTTP status code is always ``200
+OK``. If the check fails and trailers are enabled, the trailer will contain the
+``RDFox-Final-Status-Code`` field with the code ``500``.
+
+**Request**
+
+.. code:: http
+
+   PATCH /?operation=check-integrity&max-errors-of-same-type=25 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/plain; charset=UTF-8
+
+   Running the server integrity check.
+   ...
+
+**Java API**
+
+.. code:: java
+
+   boolean errorsDetected = sConn.checkIntegrity(25, outputStream);
+
+Managing Data Stores
+--------------------
+
+This section describes the API calls responsible for managing data stores of an
+RDFox server.
+
+Listing Available Data Stores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the list of data stores available at a server.
+The response is written as an output of a SPARQL query that, for each data
+store, binds variable ``?Name`` to the name of the data store. Variables
+``?UniqueID``, ``?Persistent``, ``?Online``, and ``?Parameters`` are also returned.
+However, these variables are optional, and are bound only if the user has read
+privilege over the data store in question (otherwise returning ``UNDEF``).
+If the user does have the necessary privileges, the ``?UniqueID`` variable
+is bound to the data store unique ID, the ``?Persistent`` variable is bound to a
+boolean value indicating whether the data store is persistent, the ``?Online``
+variable is bound to a boolean value indicating whether the data store is online,
+and variable ``?Parameters`` is bound to a string containing the data store parameters.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name,UniqueID,Persistent,Online,Parameters
+   DataStore1,01234567890123456789,false,true,init-resource-capacity=16384&max-data-pool-size=10000000&max-resource-capacity=1000000&max-tuple-capacity=1000000&type=parallel-nn
+   DataStore2,98765432109876543210,false,true,type=parallel-nn
+   DataStore3,,,,
+
+**Java API**
+
+.. code:: java
+
+   HashMap<String, Optional<DataStoreInfo>> dataStoreInfos = sConn.listDataStores();
+
+Listing Data Store Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the parameters of a single data store that were
+determined at data store creation. The response is written as an output of a
+SPARQL query that binds the variable ``?Property`` to the property name, and
+variable ``?Value`` to the property value. The names of all data store
+parameters (see :numref:`data-store-parameters`) are prefixed with
+``parameters.`` so that they can be identified in the output.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/DataStore1 HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   name,TestDataStore
+   unique-id,01234567890123456789
+   persistent,false
+   online,true
+   parameters.init-resource-capacity,16384,false
+   parameters.max-data-pool-size,10000000,false
+   parameters.max-resource-capacity,1000000,false
+   parameters.max-tuple-capacity,1000000,false
+   parameters.type,parallel-nn,false
+
+**Java API**
+
+.. code:: java
+
+   DataStoreInfo dataStoreInfo = sConn.describeDataStore("DataStore1");
+
+Creating a Data Store
+~~~~~~~~~~~~~~~~~~~~~
+
+The following request creates a new data store. The data store name and any
+optional data store parameters are specified as part of the request URL. The
+location of the new store is returned in the ``Location`` header.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore?type=parallel-nn&key1=val1&key2=val2 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 CREATED
+   Location: /datastores/myStore
+
+**Java API**
+
+.. code:: java
+
+   Map<String, String> parameters = new HashMap<String, String>();
+   parameters.put("key1", "val1");
+   parameters.put("key2", "val2");
+   sConn.createDataStore("myStore", "parallel-nn", parameters);
+
+Deleting a Data Store
+~~~~~~~~~~~~~~~~~~~~~
+
+The following request deletes a data store.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   sConn.deleteDataStore("myStore");
+
+Deleting a data store invalidates all connections to it — that is, any request
+made on the connection will result in an error. However, all connections to the
+deleted data store must still be explicitly closed in order to release all
+system resources.
+
+.. _APIs-bringing-a-data-store-offline-online:
+
+Bringing a Data Store Offline/Online
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request brings a data store offline. The response is written as
+an output of a SPARQL query that binds the variable ``?OfflineRequestResult``
+to a String. A value of ``"success"`` indicates that the data store was
+successfully brought offline, while a value of ``"already-offline"`` indicates
+that the data store was already offline. A value of
+``"failed-due-to-active-connections"`` indicates that the data store was not
+brought offline as there are one or more data store connections currently open
+to this data store.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore?operation=bring-offline HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   OfflineRequestResult
+   "success"
+
+**Java API**
+
+In the Java API, the possible responses are represented as as an enumeration
+``OfflineRequestResult`` with values ``SUCCESS``, ``ALREADY_OFFLINE``, and
+``FAILED_DUE_TO_ACTIVE_CONNECTIONS``.
+
+.. code:: java
+
+   OfflineRequestResult result = sConn.bringDataStoreOffline("myStore");
+
+The following request brings a data store online. The response is written as an
+output of a SPARQL query that binds the variable ``?WasOffline`` to a Boolean
+value specifying whether the data store was offline.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore?operation=bring-online HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   WasOffline
+   false
+
+**Java API**
+
+.. code:: java
+
+   boolean wasOffline = sConn.bringDataStoreOnline("myStore");
+
+Querying Data Store State
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves information about the state of a data store.
+The response is written as an output of a SPARQL query that binds the variable
+``?Property`` to the property name, and variable ``?Value`` to the property
+value.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/DataStore1/info HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   data-store-version,42
+   requires-incremental-reasoning,true
+
+**Java API**
+
+.. code:: java
+
+   long dataStoreVersion = dsConn.getDataStoreVersionAfterLastOperation();
+   bool requiresIncrementalReasoning = dsConn.requiresIncrementalReasoning();
+
+Querying Diagnostic Information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+RDFox can report extensive diagnostic information about its internal
+components, which is often useful during performance tuning and debugging.
+Please note that this call is intended for diagnostic purposes only. The
+information provided is determined by RDFox internals and is likely to change
+in future versions of RDFox. Thus, applications should not rely on this
+information being stable. Retrieval of diagnostic information cannot be 
+performed as part of an explicit transaction.
+
+Diagnostic information can be retrieved at the level of the server (by querying
+the ``/`` key) or for a specific data store (by querying the ``/info`` subkey
+of the respective data store). In either case, the ``component-info`` request
+parameter can be specified with values ``short`` or ``extended`` to determine
+whether a shortened or an extended report should be returned. The result is
+organized in a tree of hierarchical components. The component at the root of
+this tree represents either the server or a data store (depending on which
+component the information was requested for), and contains a number of
+subcomponents that represent various parts of the root component. For example,
+the information returned for a data store contains a subcomponent for each
+tuple table, a subcomponent for each registered data source, and so on. The
+information returned for the server contains the information for all of the
+server's data stores. The state of each component in the tree is described
+using a list of property/value pairs, where values can be strings or numeric
+values.
+
+To output this complex data structure, the RESTful API converts the component
+tree into a list as follows. Each component in the tree is assigned an integer
+component ID using depth-first traversal (with root being assigned ID one).
+Then, the tree is serialized as a result of a query containing three variables.
+In each result to the query, variable ``?ComponentID`` contains the ID of the
+component, variable ``?Property`` contains the name of the property describing
+the component with the ID stored in ``?ComponentID``, and variable ``?Value``
+represents the property value. For each component, the result contains a row
+with ``?Property="Component name"`` and where ``?Value`` contains the name of
+the component. Finally, for each component other than the root, the result
+contains a row with ``?Property="Parent component ID"`` and where ``?Value``
+contains the ID of the parent component.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/DataStore1/info?component-info=extended HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   ComponentID,Property,Value
+   1,Component name,RDFStore
+   1,Name,DataStore1
+   1,Unique ID,0123456789
+   1,Data store version,2
+   1,End resource ID,1000000
+   1,Persistent,no
+   1,Requires incremental reasoning,no
+   ... etc ...
+   2,Component name,Data store parameters
+   2,Parent component ID,1
+   2,init-resource-capacity,16384
+   2,max-data-pool-size,10000000
+   2,max-resource-capacity,1000000
+   2,max-tuple-capacity,1000000
+   2,type,parallel-nn
+   ... etc ...
+
+In the above example, diagnostic information is requested for data store
+``myStore``. The root result is component with ID ``1`` that represents the
+data store. Properties such as ``Name``, ``Unique ID``, and so on provide
+information about the data store. Component with ID ``2`` is a subcomponent of
+the data store. It provides information about the data store parameters, such
+as ``init-resource-capacity``, ``max-data-pool-size``, and so on.
+
+**Java API**
+
+.. code:: java
+
+   ComponentInfo componentInfo = sConn.getComponentInfo(true);
+   ... or ...
+   ComponentInfo componentInfo = dsConn.getComponentInfo(true);
+
+.. _REST-invoking-data-store-operations:
+
+Invoking Data Store Operations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``POST`` request on the ``operations`` key can be used to invoke an
+operation on a data store. The query parameter ``operation`` should be set to
+one of the operation values shown below.
+
+.. table::
+   :widths: 10,50
+
+   +---------------------------------+---------------------------------------------------------------------+
+   |           Operation             |                            Description                              |
+   +=================================+=====================================================================+
+   | ``clear``                       | Removes all facts, axioms, and/or rules from the                    |
+   |                                 | data store. Equivalent to the shell command :ref:`clear-command`.   |
+   |                                 | Query parameters ``data-store-properties``, ``prefixes``,           |
+   |                                 | ``facts``, ``axioms``, ``rules``, ``commit-procedure`` and          |
+   |                                 | ``delta-queries`` determine what parts of the data store are to be  |
+   |                                 | cleared.                                                            |
+   +---------------------------------+---------------------------------------------------------------------+
+   | ``clear-rules-explicate-facts`` | Clears all rules and makes all facts explicit. Equivalent to the    |
+   |                                 | shell command :ref:`clear rules-explicate-facts <clear-command>`.   |
+   +---------------------------------+---------------------------------------------------------------------+
+   | ``compact``                     | Compacts all facts in the data store, reclaiming the space used     |
+   |                                 | by the deleted facts in the process and persistent storage.         |
+   |                                 | Please refer to :numref:`compaction-dead-fact-removal` for details. |
+   |                                 | Compaction cannot be performed as part of an explicit transaction.  |
+   +---------------------------------+---------------------------------------------------------------------+
+   | ``recompile``                   | Recompiles the rules and commit procedure in the current data       |
+   |                                 | store according to the current statistics. Equivalent to the        |
+   |                                 | shell command :ref:`recompile-command`.                             |
+   +---------------------------------+---------------------------------------------------------------------+
+   | ``recompute-materialization``   | Performs a full, from-scratch materialization within the data       |
+   |                                 | store. Equivalent to the shell command :ref:`remat-command`.        |
+   +---------------------------------+---------------------------------------------------------------------+
+   | ``update-materialization``      | Explicitly updates the set of materialized facts in the data        |
+   |                                 | store. Unlike ``recompute-materialization``, this option will use   |
+   |                                 | incremental reasoning unless it is the first time reasoning has     |
+   |                                 | run within the data store. Since materialization is updated         |
+   |                                 | automatically when a transaction is committed, this command         |
+   |                                 | should be used only inside transactions.                            |
+   |                                 | Equivalent to the shell command :ref:`mat-command`.                 |
+   +---------------------------------+---------------------------------------------------------------------+
+
+For example, clearing prefixes and facts can be achieved as follows.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/operations?operation=clear&prefixes&facts=true HTTP/1.1
+   Host: localhost
+   Accept: */*
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.clear(DataStorePart.PREFIXES | DataStorePart.FACTS);
+
+As another example, clearing rules and explicating facts can be achieved as follows.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/operations?operation=clear-rules-explicate-facts HTTP/1.1
+   Host: localhost
+   Accept: */*
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.clearRulesExplicateFacts();
+
+.. _APIs-managing-properties:
+
+Managing Data Store Properties
+------------------------------
+
+As explained in :numref:`servers`, each data store keeps track of a number of
+data store properties that govern data store operation. The set of different
+properties is fixed for each RDFox version, and the value of each property can
+be managed as explained in this section.
+
+Retrieving Data Store Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves all properties of a data store. The response is
+written as an output of a SPARQL query that binds the variable ``?Property`` to
+the name of each property and the variable ``?Value`` to the corresponding
+property value.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/properties HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   auto-update-statistics-mode,balanced
+   base-iri,https://rdfox.com/default-base-iri/
+   errors-in-bind,standard-compliant
+   invalid-literal-policy,error
+   max-backward-chaining-depth,unbounded
+   max-threads-used,all-available
+   property-paths-cardinality,standard-compliant
+   query-planning-algorithms,equality-optimization rewriting greedy-reordering sip-optimization
+   query-validation,strict
+   user-blank-node-import-policy,keep-unchanged
+
+**Java API**
+
+.. code:: java
+
+   Map<String, String> dataStoreProperties = dsConn.getDataStoreProperties();
+   String baseIRI = dsConn.getDataStoreProperty("base-iri");
+   ...
+
+Changing Data Store Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request changes properties of a data store. As shown, it is
+possible to set several properties in a single request. The response is written
+as an output of a SPARQL query that binds the variable ``?Property`` to the
+name of each property whose change was requested and the variable ``?Change``
+to a Boolean value indicating whether the value was actually changed (i.e., it
+was different from the current property value).
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/properties?base-iri=http%3A%2F%2Fexample.com%2F&max-threads-used=2 HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Changed
+   max-threads-used,true
+   base-iri,true
+
+**Java API**
+
+.. code:: java
+
+   dsConn.setDataStoreProperty("base-iri", "http://example.com/");
+   dsConn.setDataStoreProperty("max-threads-used", "2");
+
+.. _APIs-data-store-prefixes:
+
+Managing Data Store Prefixes
+----------------------------
+
+As explained in :numref:`servers`, each data store keeps track of a base IRI
+and a set of prefixes, which provide the defaults for content import/export and
+query evaluation operations. The base IRI is a data store property and is
+managed as explained in :numref:`APIs-managing-properties`. In contrast, data
+store prefixes are managed as explained in this section.
+
+Retrieving Prefixes
+~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the prefixes of a data store. The response is
+written as an output of a SPARQL query that binds the variable ``?PrefixName``
+to the prefix name and variable ``?PrefixIRI`` to the prefix IRI.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/prefixes HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   PrefixName,PrefixIRI
+   :,http://example.com/
+   owl:,http://www.w3.org/2002/07/owl#
+   rdf:,http://www.w3.org/1999/02/22-rdf-syntax-ns#
+   ... etc ...
+
+**Java API**
+
+.. code:: java
+
+   Prefixes prefixes = dsConn.getPrefixes();
+
+Setting Prefixes in Bulk
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request replaces the prefixes of the data store with the ones
+specified in the request. The request content can be any of the formats
+supported by RDFox that contains just the prefixes (and no facts, rules, or
+axioms).
+
+**Request**
+
+.. code:: http
+
+   PUT /datastores/myStore/prefixes HTTP/1.1
+   Host: localhost
+
+   @prefix p: <http://new.prefix/> .
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   Prefixes prefixes = ...;
+   dsConn.setPrefixes(prefixes);
+
+Setting One Prefix
+~~~~~~~~~~~~~~~~~~
+
+One prefix of the data store can be set using a ``PATCH`` request with the
+``operation=set`` request parameter. The prefix name and prefix IRIs are
+specified using the ``prefix-name`` and ``prefix-iri`` request parameters,
+respectively. The response is written as an output of a SPARQL query that binds
+the variable ``?Changed`` to the Boolean value reflecting whether the set of
+data store prefixes was changed or not.
+
+
+The following request sets the prefix name ``pn:`` to the prefix IRI
+``http://example.com/``.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/prefixes?operation=set&prefix-name=pn:&prefix-iri=http%3A%2F%2Fexample.com%2F HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Changed
+   true
+
+**Java API**
+
+.. code:: java
+
+   Prefixes prefixes = ...;
+   boolean changed = dsConn.setPrefix("pn:", "http://example.com/");
+
+Unsetting One Prefix
+~~~~~~~~~~~~~~~~~~~~
+
+One prefix of the data store can be unset using a ``PATCH`` request with the
+``operation=unset`` request parameter. The prefix name is specified using the
+``prefix-name``request parameter. The response is written as an output of a
+SPARQL query that binds the variable ``?Changed`` to the Boolean value
+reflecting whether the set of data store prefixes was changed or not.
+
+
+The following request unsets the prefix name ``pn:``.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/prefixes?operation=unset&prefix-name=pn: HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Changed
+   true
+
+**Java API**
+
+.. code:: java
+
+   Prefixes prefixes = ...;
+   boolean changed = dsConn.unsetPrefix("pn:");
+
+
+.. _APIs-data-store-delta-queries:
+
+Managing Delta Queries
+----------------------
+
+As explained in :numref:`servers`, each data store may have a number of delta
+queries registered with it. Delta queries are used to capture changes to the
+data store content. The following sections show how delta queries can be
+managed programmatically.
+
+Listing Delta Queries
+~~~~~~~~~~~~~~~~~~~~~
+
+The request below retrieves the list of delta queries registered with the data
+store. The response is provided as an output of a SPARQL query that, for each
+delta query, binds variable ``?Name`` to the name of the delta query, variable
+``?UniqueID`` to the delta query unique ID, ``?Query`` to the SPARQL query of
+the delta query, ``?FormatName`` to the format of the delta query results,
+``?SnapshotsMaxSize`` to the maximum number of results in a snapshot,
+``?DeletionsMaxSize`` to the maximum number of results in a deletion,
+``?AdditionsMaxSize`` to the maximum number of results in an addition,
+``?LastDataStoreVersionWithSnapshot`` to the most recent data store version for
+which a snapshot has been computed, ``?LastDataStoreVersionWithDeletion`` to
+the most recent data store version which deleted one or more results, and
+``?LastDataStoreVersionWithAddition`` to the most recent data store version
+which added one or more results.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/deltaqueries HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name,UniqueID,Query,FormatName,SnapshotsMaxSize,DeletionsMaxSize,AdditionsMaxSize,LastDataStoreVersionWithSnapshot,LastDataStoreVersionWithDeletion,LastDataStoreVersionWithAddition
+   DeltaQuery1,18348114304957473860,SELECT * WHERE { ?s ?p ?o },text/csv,none,unlimited,1000,9,10,-1
+   DeltaQueryForS,16729953247409408432,SELECT * WHERE { ?s ?s ?s },text/csv,1001,none,none,-1,-1,-1
+
+**Java API**
+
+.. code:: java
+
+   HashMap<String, Optional<DeltaQueryInfo>> deltaQueryInfos = dsConn.listDeltaQueries();
+
+Listing Delta Query Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The request below retrieves the properties of a single delta query that were
+determined at delta query creation. The response is written as the output of
+a SPARQL query that binds the variable ``?Property`` to the property name,
+and variable ``?Value`` to the property value.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/deltaqueries/DeltaQuery1 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   name,DeltaQuery1
+   unique-id,18348114304957473860
+   query,SELECT * WHERE { ?s ?p ?o }
+   format-name,text/csv
+   snapshots-max-size,none
+   deletions-max-size,unlimited
+   additions-max-size,1000
+   last-data-store-version-with-snapshot,9
+   last-data-store-version-with-deletion,10
+   last-data-store-version-with-addition,-1
+
+**Java API**
+
+.. code:: java
+
+   DeltaQueryInfo deltaQueryInfo = dsConn.describeDeltaQuery("DeltaQuery1");
+
+Registering a Delta Query
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request creates a new delta query. The delta query name is
+specified as part of the request URL. The ``query`` must be provided, either as
+a parameter in the request URL or in the request body (with the
+``Content-Type`` header set to ``application/sparql-query``). The
+``format-name`` must be provided as a URL parameter, and the
+``snapshots-max-size``, ``deletions-max-size`` and ``additions-max-size`` delta
+query parameters may be provided as URL parameters, otherwise taking the
+default value of ``unlimited``.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/TestDataStore/deltaqueries/DeltaQueryName?format-name=text%2Fcsv&deletions-max-size=none&additions-max-size=1000 HTTP/1.1
+   Host: localhost
+
+   SELECT * WHERE { ?S ?P ?O }
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 Created
+
+**Java API**
+
+.. code:: java
+
+   dsConn.registerDeltaQuery("DeltaQueryName", "SELECT * WHERE { ?S ?P ?O }", "text/csv", Integer.MAX_VALUE, 0, 1000);
+
+Deregistering a Delta Query
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request deregisters a delta query.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/deltaqueries/DeltaQueryName HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.deregisterDeltaQuery("DeltaQueryName");
+
+
+Setting the Delta Query Evaluation Mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request sets the evaluation mode of a delta query to snapshot,
+thus triggering the computation of a snapshot for the delta query.
+
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/deltaqueries/DeltaQueryName?evaluation-mode=snapshot HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.setDeltaQueryEvaluationMode("DeltaQueryName", DeltaQueryEvaluationMode.SNAPSHOT);
+
+
+Listing Delta Query Answers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The request below retrieves the list of delta query answers. There are four
+optional parameters: ``delta-query-name``, ``from``, ``to``, and ``type`` which
+can be used to restrict the results to only include delta query answers that
+match the specified delta query name, data store version range, and delta query
+answer type, respectively. The response is written as an output of a SPARQL
+query that, for each answer to the delta query, binds variable
+``?DeltaQueryName`` to the name of the delta query, ``?DataStoreVersion`` to the
+data store version at which the delta query was evaluated, ``?AnswerType`` to
+either ``snapshot``, ``deletion`` or ``addition`` depending on the type of
+answer this is, ``?Path`` to the path of the delta query answer, and
+``?FormatName`` to the format of the delta query results.
+
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/deltaqueryanswers?type=snapshot HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   DeltaQueryName,DataStoreVersion,AnswerType,Path,FormatName
+   DeltaQuery1,1,snapshot,17982538506969064140/delta-query-answers/00000000000000000001_18245535438306272199/00000000000000000001.snapshot.18245535438306272199,text/csv
+   DeltaQuery2,5,snapshot,17982538506969064140/delta-query-answers/00000000000000000002_18245535438306272199/00000000000000000005.snapshot.18245535438306272199,text/csv
+
+**Java API**
+
+.. code:: java
+
+   dsConn.listDeltaQueryAnswers(Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(DeltaQueryAnswerType.SNAPSHOT));
+
+
+Retrieving a Delta Query Answer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The request below retrieves an individual delta query answer. The response is provided
+in the format type specified at delta query creation.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/deltaqueryanswers/content?delta-query-name=DeltaQuery1&type=snapshot&version=1 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   ?s,?p,?o
+   <http://example.com/s>,<http://example.com/p>,<http://example.com/o>
+
+**Java API**
+
+.. code:: java
+
+    dsConn.exportDeltaQueryAnswer(outputStream, "DeltaQuery1", 1, DeltaQueryAnswerType.SNAPSHOT);
+
+
+Deleting Delta Query Answers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The request shows how to delete delta query answers. There are four optional
+parameters: ``name``, ``from``, ``to``, and ``type`` which can be used to
+restrict the deletion to only include delta query answers that match the
+specified delta query name, data store version range, and delta query answer
+type, respectively. In the example below, we delete the snapshots of all
+queries produced up to data store version 4.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/deltaqueryanswers?to=4&type=snapshot HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   ?NumberOfDeletions
+   1
+
+
+**Java API**
+
+.. code:: java
+
+   dsConn.deleteDeltaQueryAnswers(Optional.empty(), Optional.empty(), Optional.of(4), Optional.of(DeltaQueryAnswerType.SNAPSHOT));
+
+
+.. _APIs-data-store-commit-procedure:
+
+Managing the Commit Procedure
+-----------------------------
+
+As explained in :numref:`servers`, each data store may have a SPARQL update
+associated with it for the purposes of capturing additional explicit facts as
+part of each transaction. The following sections show how a data store's commit
+procedure can be managed programatically.
+
+Retrieving the Commit Procedure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The request below retrieves the commit procedure of the data store. If no
+commit procedure is set on the data store, a ``204`` status code is returned,
+otherwise the status code is ``200`` and the commit procedure is returned in
+the body as shown below.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/commitprocedure HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: application/sparql-update; charset=UTF-8
+   Content-Length: 88
+
+   INSERT { ?S :actionTakenAt ?now } WHERE { ?S rdf:type :NewAction . BIND(NOW() AS ?now) }
+
+**Java API**
+
+.. code:: java
+
+   String commitProcedure = dsConn.getCommitProcedure();
+
+Setting a Commit Procedure
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A data store's commit procedure can be set using a ``PUT`` request with the
+desired SPARQL update in the body, as shown below. The response is written as an
+output of a SPARQL query that binds the variable ``?Changed`` to the Boolean
+value reflecting whether the data store's commit procedure was changed or not.
+
+**Request**
+
+.. code:: http
+
+   PUT /datastores/myStore/commitprocedure HTTP/1.1
+   Host: localhost
+   Content-Type: application/sparql-update
+   Content-Length: 81
+
+   INSERT { ?S :actionTakenAt ?now } WHERE { ?S a :NewAction . BIND(NOW() AS ?now) }
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   Changed
+   false
+
+**Java API**
+
+.. code:: java
+
+   boolean changed = dsConn.setCommitProcedure("INSERT { ?S :actionTakenAt ?now } WHERE { ?S a :NewAction . BIND(NOW() AS ?now) }");
+
+
+.. _APIs-managing-content:
+
+Managing Data Store Content
+---------------------------
+
+The facts, rules, and axioms are collectively called the *content* of the data
+store, and they can be managed using ``/content`` key. All modification is
+transactional --- that is, a transaction is started before the call and it is
+committed (if modification is successful) or rolled back (if there is an error)
+before the call returns. All reasoning (if any is needed) is performed before
+the transaction is committed.
+
+The formats that RDFox supports for encoding triples and/or rules are described
+in :numref:`data-store-content-formats` and are identified using MIME types.
+RDFox can usually detect the format of input data, so the ``Content-Type``
+specification in update requests can generally be omitted. However, if the
+``Content-Type`` header is present, it must match the type of the content or
+the update is rejected.
+
+The ``/content`` key essentially provides two ways to manage data store
+content, which are selected as specified below.
+
+* If exactly one ``default`` or ``graph`` query parameter is present, then the
+  ``/content`` key follows the `SPARQL 1.1 Graph Store HTTP Protocol
+  <http://www.w3.org/TR/sparql11-http-rdf-update/>`__ and provides
+  functionality for managing triples in either the default graph or in exactly
+  one named graph. The use of this protocol is described in more detail in
+  :numref:`sparql-graph-protocol`.
+
+* If neither ``default`` not ``graph`` query parameters are present, then the
+  ``/content`` key follows the *RDFox Update Protocol*. This protocol can
+  manage all parts of the data store content (i.e., facts, axioms, and/or
+  rules), as well as import data into several named graphs in one request. The
+  RDFox protocol is described in more detail in
+  :numref:`RDFox-update-protocol`.
+
+.. _sparql-graph-protocol:
+
+Using the SPARQL 1.1 Graph Store HTTP Protocol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `SPARQL 1.1 Graph Store HTTP Protocol
+<http://www.w3.org/TR/sparql11-http-rdf-update/>`__ protocol provides means for
+the management of a single RDF graph. The ``/content`` key uses this protocol
+whenever exactly one ``default`` or ``graph`` request parameter is specified.
+The ``default`` request parameter specifies that the request is to operate on
+the default graph; moreover, the value of the ``graph`` request parameter
+specifies the IRI of a named graph that is subject to a graph update.
+
+Since the SPARQL 1.1 Graph Store HTTP Protocol operates on a single graph, all
+content submitted to the ``/content`` key must encode a set of triples that are
+used to update the specified graph; thus, the content is allowed to follow
+``text/turtle``, ``application/n-triples``, and ``text/x.gen-turtle`` MIME
+types. Consequently, this protocol cannot update several graphs at once using
+the TriG format, and it cannot be used to manage rules and axioms. This is in
+contrast to the RDF protocol (see :numref:`RDFox-update-protocol`), which can
+provide more flexibility. RDFox does not implement the ``PATCH`` verb of the
+SPARQL 1.1 Graph Store HTTP Protocol because the standard does not specify
+exactly the semantics of such operations. Finally, the Java API does not
+support the operations of the Graph Store HTTP Protocol directly; however, all
+operations can be easily implemented by means of other operations described
+elsewhere in this document.
+
+Retrieving a Graph
+^^^^^^^^^^^^^^^^^^
+
+The following request retrieves the content of the default graph. Such a
+request supports the same parameters as the corresponding request of the RDFox
+protocol; please refer to :numref:`RDFox-update-protocol-GET` for more
+information.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/content?default HTTP/1.1
+   Host: localhost
+   Accept: text/turtle; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [Triples of the default graph serialized according to the Turtle 1.1 specification]
+
+Adding Triples to a Graph
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following request adds triples incrementally to a named graph
+``http://example.com/``.
+
+.. code:: http
+
+   POST /datastores/myStore/content?graph=http%3A%2F%2Fexample.com%2F HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [Triples serialized according to the Turtle 1.1 specification]
+
+Replacing a Graph
+^^^^^^^^^^^^^^^^^
+
+The following request replaces all triples in a named graph
+``http://example.com/`` with the triples specified in the request body.
+
+.. code:: http
+
+   PUT /datastores/myStore/content?graph=http%3A%2F%2Fexample.com%2F HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [Triples serialized according to the Turtle 1.1 specification]
+
+Deleting a Graph
+^^^^^^^^^^^^^^^^
+
+The following request deletes all triples in a named graph
+``http://example.com/``.
+
+.. code:: http
+
+   DELETE /datastores/myStore/content?graph=http%3A%2F%2Fexample.com%2F HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+Note that RDFox does not maintain named graphs as distinct entities, and so the
+notion of whether a data store contains a named graph or not is ill-defined;
+consequently, RDFox will never return ``404 Not Found`` error code for this
+request. This is consistent with the evaluation of a ``DELETE ... WHERE ...``
+statement, which achieves the same effect.
+
+.. _RDFox-update-protocol:
+
+RDFox Update Protocol
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``/content`` key implements the RDFox Update Protocol when neither
+``default`` nor ``graph`` request parameters are present.
+
+.. _RDFox-update-protocol-GET:
+
+Retrieving Data Store Content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following request retrieves the content of the data store. The media type
+specified using the ``Accept`` header determines which subset of the store is
+retrieved. For example, a request to output data store content using the Turtle
+format (MIME type ``text/turtle``) retrieves all triples from the default
+graph, whereas a request to output the content using the Datalog format (MIME
+type ``application/x.datalog``) retrieves all rules and no triples. Parameters
+that customize the export operation can be specified in the query string of the
+request URI.
+
+When retrieving facts in the ``application/n-triples``, ``text/turtle``,
+``application/n-quads``, or ``application/trig`` formats, the only supported
+parameter is ``fact-domain``, and its value is the fact domain
+(:numref:`{number} <fact-domains>`) that determines which facts are exported.
+The default fact domain is ``explicit``.
+
+When retrieving rules in the ``application/x.datalog`` format, the supported
+parameters are ``rule-domain``, whose value identifies the rule domain
+(:numref:`{number} <rules>`) being exported, and ``fact-domain``, whose value
+identifies the domain for facts in tuple tables other than ``DefaultTriples``
+and ``Quads`` that are to be exported. If the ``fact-domain`` parameter is
+absent, no facts are exported (i.e., only rules are exported). The default
+value of ``rule-domain`` is ``user``; moreover, the ``fact-domain`` parameter
+is absent by default.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/content?fact-domain=all HTTP/1.1
+   Host: localhost
+   Accept: text/turtle; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [The content of the store formatted according to the Turtle 1.1 standard]
+
+**Java API**
+
+.. code:: java
+
+   OutputStream output = ...;
+   Map<String, String> parameters = ...;
+   dsConn.exportData(output, "text/turtle", parameters);
+
+.. _APIs-adding-data:
+
+Incrementally Adding Data Store Content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``PATCH`` request can be used to incrementally add content to a data store.
+The query parameter ``operation`` should be set to ``add-content``. The type of
+content added is determined in the following way:
+
+- If the ``Content-Type`` header is absent, then the type of content is
+  inferred automatically from the supplied content.
+
+- If the ``Content-Type`` header is present, then the supplied request body
+  must be of that type, or the request is rejected.
+
+- If the ``Content-Type`` header has value ``text/uri-list``, then the body of
+  the request is interpreted as a newline-delimited list of IRIs specifying the
+  location of the content to be added. RDFox will add the content by
+  dereferencing the listed IRIs. At least one IRI must be present; moreover, if
+  more than one IRI is specified, all IRIs are imported in parallel. If the
+  proprietary header ``Imported-Content-Type`` is present, then the content of
+  all IRIs in the list must be of that type, or the request is rejected.
+  Otherwise, the type for each IRI will be inferred automatically.
+
+Query parameter ``default-graph`` can be used to specify the name of the
+default graph. That is, if this parameter is specified, then triples that would
+normally be imported into the default graph will instead be imported into the
+graph with the specified name. See also the description of the target default
+graph parameter for import operations in :numref:`import-parameters`.
+
+RDFox will provide information about this operation as follows.
+
+- If the ``Accept`` header identifies a SPARQL answer format, then the response
+  body is structured as an answer to a SPARQL query with variables ``?Type``,
+  ``?Line``, ``?Column``, ``?Description``, and ``?Value``. For each error or
+  warning, an answer is emitted where the value of ``?Type`` identifies the
+  notification type (e.g., ``"error"`` or ``"warning"``, but other notification
+  types are possible too), the values of ``?Line`` and ``?Column`` may identify
+  the place in the input where the error was detected, and the value of
+  ``?Description`` describes the error or warning. Moreover, the following
+  answers will summarize information about the importation:
+
+  - For each prefix definition encountered during importation, one answer will
+    be emitted where the value of ``?Type`` is ``"prefix"``, the value of
+    ``?Description`` is the prefix name (which ends with ``:``), and ``the
+    value of ?Value`` is the prefix URI. This allows the client to retrieve the
+    prefixes from the submitted input.
+
+  - An answer with ``?Type`` equal to ``"information"``, ``?Description`` equal
+    to ``"#aborted"``, and ``?Value`` a Boolean value specifies whether the
+    import was aborted prematurely.
+
+  - Answers with ``?Type`` equal to ``"information"``, ``?Description`` equal
+    to ``"#errors"`` and ``"#warnings"``, and ``?Value`` integers specify the
+    number of errors and warnings, respectively, encountered during import.
+
+  - Answers with ``?Type`` equal to ``"information"``, ``?Description`` equal
+    to ``"#processed-facts"`` and ``"#changed-facts"``, and ``?Value`` integers
+    specify the number of facts processed in the input and facts actually added
+    to or deleted from the data store, respectively.
+
+  - Answers with ``?Type`` equal to ``"information"``, ``?Description`` equal
+    to ``"#processed-rules"`` and ``"#changed-rules"``, and ``?Value`` integers
+    specify the number of rules processed in the input and rules actually added
+    to or deleted from the data store, respectively.
+
+  - Answers with ``?Type`` equal to ``"information"``, ``?Description`` equal
+    to ``"#processed-axioms"`` and ``"#changed-axioms"``, and ``?Value``
+    integers specify the number of axioms processed in the input and axioms
+    actually added to or deleted from the data store, respectively.
+
+- If the ``Accept`` header is either absent or has value ``text/plain``, then
+  the ``Content-Type`` header of the response is then set to ``text/plain``,
+  and the response body contains a human-readable description of the same
+  information as in the previous case.
+
+RDFox also uses a proprietary header ``Notify-Immediately`` to determine how to
+return information about the operation to the client, which also determines the
+status codes used.
+
+-  If the request does not include the ``Notify-Immediately`` header, then the
+   entire request is processed before the response is returned to the client.
+   The response will indicate success or failure by using one of the following
+   status codes (which are compatible with the `SPARQL 1.1 Graph Store HTTP
+   Protocol <http://www.w3.org/TR/sparql11-http-rdf-update/>`__):
+
+   -  ``400 Bad Request`` indicates that at least one error has been
+      encountered,
+
+   -  ``204 No Content`` indicates that no additional information is provided
+      so the response body is empty, and
+
+   -  ``200 OK`` indicates that no errors have been encountered, but the
+      response body contains additional information (which can be information
+      about warnings, or summary information in the extended format).
+
+-  If the request includes the ``Notify-Immediately: true`` header, then
+   notifications about errors and warnings are sent to the client as soon as
+   they are available, possibly even before the client has finished sending the
+   request body, thus allowing the client to take appropriate action early on.
+   For example, a client may decide to stop sending the rest of the request
+   body after receiving an error. This option increases the flexibility of the
+   RESTful API, but at the expense of added complexity.
+
+   -  The client must keep reading the notifications while it is still sending
+      the request body. In particular, the notification produced and sent
+      eagerly by RDFox can fill the TCP/IP buffers on the sender and receiver
+      side, in which case RDFox will wait for client to read the notifications
+      and thus free the buffers. But then, if the client is not reading the
+      notifications, a deadlock will occur where the client is waiting for
+      RDFox to process the request content, and RDFox is waiting for the client
+      to read the notifications.
+
+   -  If a warning is generated before an error, RDFox must start producing
+      the response without knowing whether the entire operation will succeed
+      (i.e., errors can be generated later during the process). In such
+      situations, RDFox uses the ``202 Accepted`` status code in the response
+      to indicate that the status of the operation is not yet know. In such
+      situations, the operation succeeds if and only if the response body
+      contains no errors.
+
+The following is an example of a successful request to incrementally add data
+store content.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/content?operation=add-content HTTP/1.1
+   Host: localhost
+
+   [The facts/rules to be added in a format supported by RDFox]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   prefix: pref: = http://www.test.com/test#
+   information: #aborted = false
+   information: #errors = 0
+   information: #warnings = 0
+   information: #processed-facts = 9
+   information: #changed-facts = 8
+   information: #processed-rules = 0
+   information: #changed-rules = 0
+   information: #processed-axioms = 0
+   information: #changed-axioms = 0
+
+The following is an example of an unsuccessful request where errors are
+returned in text format.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/content?operation=add-content HTTP/1.1
+   Host: localhost
+
+   a b c .
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 400 Bad Request
+   Content-Type: text/plain; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   XX
+   error: line 1: column 3: Resource expected.
+   information: #aborted = false
+   information: #errors = 1
+   information: #warnings = 0
+   information: #processed-facts = 0
+   information: #changed-facts = 0
+   information: #processed-rules = 0
+   information: #changed-rules = 0
+   information: #processed-axioms = 0
+   information: #changed-axioms = 0
+
+   0
+
+The following is an example of a request where errors are returned in a SPARQL
+answer format.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/content?operation=add-content HTTP/1.1
+   Content-Type: text/csv
+
+   @prefix pref: <http://www.test.com/test#> .
+   pref:a pref:b pref:c .
+   a b c .
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 400 Bad Request
+   Content-Type: text/csv; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   XX
+   Type,Line,Column,Description,Value
+   error,3,3,Resource expected.,
+   prefix,,,pref:,http://www.test.com/test#
+   information,,,#aborted,false
+   information,,,#errors,1
+   information,,,#warnings,0
+   information,,,#processed-facts,1
+   information,,,#changed-facts,1
+   information,,,#processed-rules,0
+   information,,,#changed-rules,0
+   information,,,#processed-axioms,0
+   information,,,#changed-axioms,0
+
+   0
+
+In the Java API, notifications are received by passing an instance implementing
+the ``ImportNotificationMonitor`` interface.
+
+**Java API**
+
+.. code:: java
+
+   InputStream input = ...;
+   ImportNotificationMonitor importNotificationMonitor = ...;
+   ImportResult result = dsConn.importData(UpdateType.ADD, input, "", importNotificationMonitor);
+
+Adding Content and Updating Prefixes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When incrementally adding content to a data store, it is possible to instruct
+RDFox to set the data store prefixes to the final set of prefixes after import.
+The request for doing so is the same as in :numref:`APIs-adding-data`, with the
+difference that the ``operation`` request parameter needs to be set to
+``add-content-update-prefixes``. This can be useful because the prefixes
+included in the content then do not need to be explicitly provided in further
+API calls to RDFox. In the Java API, this option is specified using the
+``ADDITION_UPDATE_PREFIXES`` update type.
+
+
+Incrementally Deleting Data Store Content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following request incrementally deletes content from a data store. The
+request and response formats follow the same structure as in the case of
+incremental addition however the ``operation`` query parameter should be set to
+``delete-content``. Query parameter ``default-graph`` can be used to
+specify the name of the default graph in the same way as in incremental
+addition.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/content?operation=delete-content HTTP/1.1
+   Host: localhost
+
+   [The facts/rules to be deleted in a format supported by RDFox]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   prefix: pref: = http://www.test.com/test#
+   information: #aborted = false
+   information: #errors = 0
+   information: #warnings = 0
+   information: #processed-facts = 9
+   information: #changed-facts = 9
+   information: #processed-rules = 0
+   information: #changed-rules = 0
+   information: #processed-axioms = 0
+   information: #changed-axioms = 0
+
+**Java API**
+
+.. code:: java
+
+   InputStream input = ...;
+   ImportNotificationMonitor importNotificationMonitor = ...;
+   ImportResult result = dsConn.importData(UpdateType.DELETE, input, importNotificationMonitor);
+
+Deleting All Data Store Content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Parts of a data store can be deleted in one request using a ``DELETE`` request.
+Such a request must contain at least one of the ``facts``, ``axioms``, or
+``rules`` request parameters, which specify which parts of the data store
+should be cleared. Such an operation is equivalent to a ``clear`` operation on
+the data store.
+
+The following request clears all facts and axioms in the data store.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/content?facts=true&axioms HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.clear(DataStorePart.FACTS | DataStorePart.AXIOMS);
+
+.. _RDFox-update-protocol-PUT:
+
+Replacing All Data Store Content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Parts of a data store can be replaced in one request using a ``PUT`` request.
+Such a request must contain at least one of the ``facts``, ``axioms``, or
+``rules`` request parameters. A ``PUT`` request is equivalent to a ``DELETE``
+request with the same request parameters followed by an importation of the
+specified content. Query parameter ``default-graph`` can be used to specify the
+name of the default graph in the same way as in incremental addition. Depending
+on a specific combination of parameters, such a request can be more efficient
+than an incremental deletion of existing content and incremental addition of
+new content.
+
+The following request replaces the rules in the data store with the rules
+specified in the request body.
+
+**Request**
+
+.. code:: http
+
+   PUT /datastores/myStore/content?rules HTTP/1.1
+   Host: localhost
+
+   [The rules in a format supported by RDFox]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+The Java API does not have a separate ‘replace content’ primitive.
+
+Adding/Deleting OWL Axioms From Triples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As explained in :numref:`owl_support`, RDFox can be instructed to analyze the
+triples of one named graph, parse them into a set of OWL axioms, and add these
+axioms to another named graph. An analogous operation can be used to remove the
+axioms from a named graph. The named graph being analyzed and the named graph
+to which the axioms are added may, but need not be the same.
+
+In the RESTful API, the operation is invoked using the ``PATCH`` verb. The
+source and destination graphs are specified using the ``source-graph`` and
+``destination-graph`` query parameters, respectively. If either of the two
+parameters is omitted, the default graph is used as a default. The
+``operation`` query parameter can be set to ``add-axioms`` or
+``delete-axioms``. Finally, the ``assertions`` query parameter can be set to
+``true``, in which case ABox assertions are extracted as well, or to ``false``,
+in which case only the TBox (i.e., schema) axioms are extracted. For example,
+the following request imports the axioms from triples in named graph called
+``SG`` and stores the axioms into the named graph called ``DG``.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/content?operation=add-axioms&source-graph=SG&destination-graph=DG HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   XX
+   information,,,#processed-axioms,2
+   information,,,#changed-axioms,2
+
+   0
+
+**Java API**
+
+.. code:: java
+
+   dsConn.importAxiomsFromTriples("SG", false, "DG", UpdateType.ADDITION);
+
+
+.. _APIs-data-sources:
+
+Managing Data Sources
+---------------------
+
+RDFox can access external data stored in different kinds of data sources.
+Currently, a data source can be a CSV/TSV file, a PostgreSQL database, ODBC
+database, or an Apache Solr index. For an overview of how RDFox manages data
+sources, see :numref:`data-sources`.
+
+All modification functions described in this sections are not transactional:
+they are applied immediately, and in fact their invocation fails if the
+connection has an active transaction. Consequently, there is no way to rollback
+the effects of these functions.
+
+Listing the Registered Data Sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the list of data sources registered with a data
+store. The response is written as an output of a SPARQL query that, for each data
+source, binds variable ``?Name`` to the name of the data source. Variables ``?Type``
+, ``?Parameters``, and ``?NumberOfTables`` are also returned. However, these variables
+are optional, and are bound only if the user has read privilege over the data source
+in question (otherwise returning ``UNDEF``). If the user does have the
+necessary privileges, the ``?Type`` variable is bound to the data source type,
+variable ``?Parameters`` to a string describing the data source parameters
+(with all key-value pairs concatenated as in a query string), and variable
+``?NumberOfTables`` to the number of tables in the data source.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/datasources HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name,Type,Parameters,NumberOfTables
+   F1,PostgreSQL,connection-string=postgresql://user:pw@localhost:5432/DB,2
+   DBpedia,DelimitedFile,"file=/table.csv&delimiter=,",1
+   anotherDB,,,
+   [...]
+
+**Java API**
+
+.. code:: java
+
+   HashMap<String, Optional<DataSourceInfo>> dataSourceInfos = dsConn.listDataSources();
+
+Retrieving Information About a Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves information about a data source. The response
+is written as an output of a SPARQL query that binds variables ``?Property``
+and ``?Value``. What exact properties and values are supported depends on the
+data source. The names of all parameters specified at the time the tuple table
+was created are prefixed with ``parameters.``
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/datasources/mySource HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   name,mySource
+   type,PostgreSQL
+   tables,3
+   ... etc ...
+
+The ``DataSourceInfo`` class encapsulates information about a data source in
+the Java API. Instances of this class are immutable.
+
+**Java API**
+
+.. code:: java
+
+   DataSourceInfo dataSourceInfo = dsConn.describeDataSource("mySource");
+
+Registering a Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request registers a new data source. The data source name and any
+optional data source parameters are encoded in the URI. Data source registration
+cannot be performed as part of an explicit transaction.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/datasources/mySource?type=PostgreSQL&key1=val1&key2=val2 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 CREATED
+   Location: /datastores/myStore/datasources/mySource
+
+**Java API**
+
+.. code:: java
+
+   Map<String, String> parameters = new HashMap<String, String>();
+   parameters.put("key1", "val1");
+   parameters.put("key2", "val2");
+   dsConn.registerDataSource("mySource", "PostgreSQL", parameters);
+
+Deregistering a Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request deregisters a data source. The request succeeds if no
+tuple tables are mounted on the data source. Thus, to delete a data source, one
+must first delete all rules mentioning any tuple tables of the data source, and
+then delete all tuple tables mounted from the data source. Data source 
+deregistration cannot be performed as part of an explicit transaction.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/datasources/mySource HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.deregisterDataSource("mySource");
+
+Listing the Data Source Tables of a Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the list of data source tables of a data
+source. The response is written as an output of a SPARQL query that binds
+variable ``?Name`` to the name of a data source table, variable
+``?NumberOfColumns`` to the number of columns in the table, and variable
+``?Columns`` to a percent-encoded string describing the table columns using the
+form ``name1=dt1&name2=dt2&...`` where ``namei`` is the column name, and
+``dti`` is the column datatype.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/datasources/mySource/tables HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name,NumberOfColumns,Columns
+   drivers,2,id=integer&name=string
+   constructors,3,key=integer&name=string&address=string
+
+**Java API**
+
+.. code:: java
+
+   List<DataSourceTableInfo> dataSourceTableInfos = dsConn.listDataSourceTables("mySource");
+
+Retrieving Information About a Data Source Table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves information about a data source table. The
+response is written as an output of a SPARQL query that binds variable
+``?Column`` to the integer referencing a column of a data source, variable
+``?Name`` to the column name, and variable ``?Datatype`` to the name of the
+RDFox datatype that best corresponds to the datatype of the the column in the
+data source.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/datasources/mySource/tables/drivers HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Column,Name,Datatype
+   1,id,http://www.w3.org/2001/XMLSchema#name
+   2,first_name,http://www.w3.org/2001/XMLSchema#string
+   3,last_name,http://www.w3.org/2001/XMLSchema#string
+   ... etc ...
+
+The ``DataSourceTableInfo`` class encapsulates information about a data source
+table in the Java API. Instances of this class are immutable.
+
+**Java API**
+
+.. code:: java
+
+   DataSourceTableInfo dataSourceTableInfo = dsConn.describeDataSourceTable("mySource", "drivers");
+
+Sampling a Data Source Table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves a sample of data from a data source table. The
+response is written as an output of a SPARQL query that binds the variable
+corresponding to column names to the values in the columns. The ``limit=n``
+request parameter would determine how many rows are to be returned. RDFox
+supports a configurable, system-wide maximum limit on the number of returned
+rows, which can be used to avoid accidentally requesting large portions of a
+data source. The main purpose of this API is not to provide access to the data,
+but only provide a sample of the data so that clients can see roughly what the
+source contains and then mount the corresponding tuple table.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/datasources/mySource/tables/drivers/data?limit=20 HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   id,first_name,last_name
+   1,Ayrton,Senna
+   2,Michael,Schumacher
+   ... etc ...
+
+Data from data source tables is returned using cursors in the Java API. These
+cursors are always full — that is, all relevant data is retrieved before the
+call finishes. The result is unaffected by the transaction that may be
+associated with the connection: RDFox does not support transactions over data
+sources.
+
+**Java API**
+
+.. code:: java
+
+   Cursor data = dsConn.getDataSourceTableData("mySource", "drivers", 20);
+
+.. _APIs-tuple-tables:
+
+Managing Tuple Tables
+---------------------
+
+Both types of tuple tables are managed using the same API, which is described
+in this section. All modification functions described in this sections are not
+transactional: they are applied immediately, and in fact their invocation fails
+if the connection has an active transaction. Consequently, there is no way to
+rollback the effects of these functions.
+
+Listing the Available Tuple Tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the list of tuple tables currently available in
+a data store. The response is written as an output of a SPARQL query that, for each
+tuple table, binds variable ``?Name`` to the name of the tuple table. Variables ``?Type``
+, ``?ID``, ``?MinArity``, and ``?MaxArity`` are also returned. However, these variables
+are optional, and are bound only if the user has read privilege over the tuple table in
+question (otherwise returning ``UNDEF``). If the user does have the necessary privileges,
+the ``?Type`` variable is bound to a string reflecting the type of the tuple table,
+variable ``?ID`` to a unique integer ID of the tuple table, while variables ``?MinArity``
+and ``?MaxArity`` to the minimum and maximum numbers of arguments of atoms that refer to
+the tuple table.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/tupletables HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name,Type,ID,MinArity,MaxArity
+   DefaultTriples,memory,1,3,3
+   Quads,,,,
+   [...]
+
+**Java API**
+
+.. code:: java
+
+   HashMap<String, Optional<TupleTableInfo>> tupleTableInfos = dsConn.listTupleTables();
+
+Retrieving Information About a Tuple Table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves information about a tuple table. The response
+is written as an output of a SPARQL query that binds variables ``?Property``
+and ``?Value``. The exact properties and values are determined by the tuple
+table type.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/tupletables/myTable HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   name,DefaultTriples
+   type,memory
+   ID,1
+   min-arity,3
+   max-arity,3
+   ... etc ...
+
+The ``TupleTableInfo`` class encapsulates information about a tuple table in
+the Java API. Instances of this class are immutable.
+
+**Java API**
+
+.. code:: java
+
+   TupleTableInfo tupleTableInfo = dsConn.describeTupleTable("myTable");
+
+Creating a Tuple Table
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following request creates a new tuple table, which can be either an
+in-memory tuple table or a tuple table backed by a data source. Creating a
+tuple table requires specifying the table name via the query string of the URI.
+Optional tuple table parameters can also be provided in this way. For more
+details see :numref:`tuple-tables`. Tuple table creation cannot be 
+performed as part of an explicit transaction.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/tupletables/myTable?key1=val1&key2=val2 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 CREATED
+   Location: /datastores/myStore/tupletables/myTable
+
+**Java API**
+
+.. code:: java
+
+   Map<String, String> parameters = new HashMap<String, String>();
+   parameters.put("key1", "val1");
+   parameters.put("key2", "val2");
+   dsConn.createTupleTable("myTable", parameters);
+
+Deleting a Tuple Table
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following request deletes a tuple table, which can be either an in-memory
+tuple table or a tuple table backed by a data source. The request succeeds only
+if a tuple table is not used in a rule currently loaded in the data store.
+Tuple table deletion cannot be performed as part of an explicit transaction.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/tupletables/myTable HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.deleteTupleTable("myTable");
+
+Managing Statistics
+-------------------
+
+Like most databases, RDFox needs in its operation various statistics about the
+data it contains. These are mainly used for query planning: when determining
+how to efficiently evaluate a query, RDFox consults information gathered from
+the data in a data store in order to estimate which query evaluation plan is
+more likely to be efficient. These statistics can be managed explicitly through
+the core and REST APIs. Configuring the available statistics is largely of
+interest for system administrator. Moreover, after large updates (e.g., after a
+large amount of data is added to the system), it is advisable to update the
+statistics — that is, to request RDFox to recompute all summaries from the data
+currently available in the system.
+
+Listing the Available Statistics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves the list of statistics currently available in a
+data store. The response is written as an output of a SPARQL query that binds
+variable ``?Name`` to the name of the statistics, and variable ``?Parameters``
+to a string describing the data source parameters (with all key-value pairs
+concatenated as in a query string).
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/stats HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Name,Parameters
+   column-counts,
+   [...]
+
+**Java API**
+
+.. code:: java
+
+   List<StatisticsInfo> statisticsInfos = dsConn.listStatistics();
+
+Retrieving Information About Statistics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request retrieves information about statistics. The response is
+written as an output of a SPARQL query that binds variables ``?Property`` and
+``?Value``. The exact properties and values are determined by the statistics.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/stats/column-counts HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   name,column-counts
+
+The ``statisticsInfo`` class encapsulates information about the statistics in
+the Java API. Instances of this class are immutable.
+
+**Java API**
+
+.. code:: java
+
+   StatisticsInfo statisticsInfo = dsConn.describestatistics("column-counts");
+
+Creating Statistics
+~~~~~~~~~~~~~~~~~~~
+
+The following request creates new statistics. Request parameters that customize
+the newly created object can be specified via the query string of the request
+URI. The location of the new statistics is returned in the ``Location`` header.
+Creation of statistics cannot be performed as part of an explicit transaction.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/stats/column-counts HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 CREATED
+   Location: /datastores/myStore/stats/column-counts
+
+**Java API**
+
+.. code:: java
+
+   Map<String, String> parameters = new HashMap<String, String>();
+   dsConn.createStatistics("column-counts", parameters);
+
+Deleting Statistics
+~~~~~~~~~~~~~~~~~~~
+
+The following request deletes the statistics with the given name.
+Deletion of statistics cannot be performed as part of an explicit transaction.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/stats/column-counts HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   dsConn.deleteStatistics("column-counts");
+
+Updating Statistics
+~~~~~~~~~~~~~~~~~~~
+
+The following request updates all statistics currently present in the data
+store.
+
+**Request**
+
+.. code:: http
+
+   PUT /datastores/myStore/stats HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   StatisticsInfo statisticsInfo = dsConn.updateStatistics();
+
+The following request updates only the statistics with the given name.
+
+**Request**
+
+.. code:: http
+
+   PUT /datastores/myStore/stats/column-counts HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+   StatisticsInfo statisticsInfo = dsConn.updateStatistics("column-counts");
+
+
+.. _APIs-evaluating-queries:
+
+Evaluating Queries
+------------------
+
+The ``/sparql`` key exposes a `SPARQL 1.1 endpoint
+<http://www.w3.org/TR/sparql11-protocol/>`__ implemented exactly as in the
+specification. Both ``GET`` and ``POST`` request methods are supported.
+Moreover, ``SELECT/ASK`` and ``CONSTRUCT`` query operations, and
+``DELETE/INSERT`` update operations, are supported. Query evaluation in RDFox
+can be influenced using a number of parameters, which can be specified via the
+query string of the URI. The answer to the SPARQL query is encoded according to
+the required format, and a request fails if the format does not match the query
+type (e.g., if a request specifies a ``SELECT`` query and the Turtle answer
+format).
+
+The ``base`` query parameter can be used to specify an IRI that will be used as
+the default base IRI when processing the query.
+
+In order to prevent the RDFox endpoint from hanging for a long time, query
+evaluation requests can be subjected to time limits. Endpoint configuration
+options ``query-time-limit`` and ``allow-query-time-limit-override`` and
+RDFox-proprietary HTTP header ``Query-Time-Limit`` can be used to configure
+these limits, and they are described in :numref:`endpoint-parameters`.
+
+The following is an example of a query request.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/sparql?query=SELECT+%3FX+%3FY+%3FZ+WHERE+{+%3FX+%3FY+%3FZ+} HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   X,Y,Z
+   [...result of the query...]
+
+**Java API**
+
+.. code:: java
+
+   Map<String, String> compilationParameters = new HashMap<String, String>();
+   // SPARQL evaluation supports a bunch of parameters that govern how
+   // SPARQL statements are compiled.
+   compilationParameters.set(..., ...);
+   // SPARQL evaluation can return either a set of results (in the case of
+   // SELECT/ASK/CONSTRUCT queries) or nothing (in the case of UPDATEs).
+   // It seems useful to have an API that can evaluate any SPARQL string,
+   // regardless of whether it contains a query or update. Therefore, the
+   // following function requires two parameters:
+   //
+   // * an output stream to which answers are written (if there are any),
+   // * the name of a SPARQL answer format.
+   //
+   OutputStream output = ...;
+   dsConn.evaluateStatement("SELECT ?S ?P ?O WHERE { ?S ?P ?O }", compilationParameters, output, "text/csv");
+
+SPARQL supports pagination of query results using ``OFFSET`` and ``LIMIT``
+query clauses; however, evaluating the same query while varying its
+``OFFSET/LIMIT`` clauses may be inefficient because the query in each request
+is evaluated from scratch.
+
+In the RESTful API, including the ``offset=m;limit=n`` parameters into a query
+request has the same effect as adding the ``OFFSET m LIMIT n`` clauses to the
+query. However, doing the former can be more efficient when
+
+-  a user makes a query request with ``offset=m1;limit=n1``,
+-  the same user makes another request for exactly the same query (i.e., a
+   query that is character-for-character identical as the previous one) with
+   ``offset=m2;limit=n2`` where ``m2 = m1 + n1 + 1``, and
+-  the data store has not been updated between these two requests.
+
+RDFox provides no hard efficiency guarantees, but will try to process
+requests containing ``offset=m;limit=n`` as efficiently as possible.
+Therefore, applications should use this approach to result pagination
+whenever possible. The ``endpoint.object-keep-alive-time`` option specifies
+the rough amount of time between two such requests for the same query
+during which RDFox will aim to speed up query evaluation.
+
+SPARQL queries can be long in some applications, so sending the same query
+multiple times can be a considerable source of overhead. In such cases,
+applications can consider using cursors (See :numref:`APIs-cursors`), where a
+query is submitted for execution just once.
+
+.. _APIs-working-with-transactions:
+
+Working with Transactions
+-------------------------
+
+Transactions in the Java API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the Java API, each transaction is associated with one data store connection.
+The ``DataStoreConnection`` class provides ``beginTransaction()``,
+``commitTransaction()``, and ``rollbackTransaction()`` functions, which
+respectively start, commit, and roll back a transaction.
+
+If no transaction is associated with a connection, then data store modification
+functions and query evaluation functions start a transaction that is committed
+or rolled back before the function finishes. In contrast, if a transaction is
+started on a connection when a modification/query function is called, then the
+operation is evaluated within the context of that transaction.
+
+A transaction remains open in the Java API as long as it is not explicitly
+committed or rolled back. Closing a connection with a running transaction will
+rollback the transaction first.
+
+Data store connections are single-threaded objects: attempting to use the same
+object in parallel from multiple threads will result in unpredictable behavior
+and is likely to crash the system. (However, the same data store connection
+object can be used from different threads at distinct time points — that is,
+there is no affinity between connection objects and threads.) In order to
+access RDFox concurrently, one should use distinct connections, each running a
+separate transaction.
+
+.. _REST-transactions:
+
+Transactions in the RESTful API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The RESTful API follows the same principles and associates transactions with
+data store connections. To use transactions in the RESTful API, one must 
+explicitly create a connection (see
+:numref:`REST-explicit-connection-management`). To start, commit, or rollback a
+transaction, one can issue a ``PATCH`` request to the
+``/datastores/<DSTRNAME>/connections/<DSCONN>/transaction`` key with the
+``operation`` request parameter set to ``begin-read-only-transaction``,
+``begin-read-write-transaction``, ``commit-transaction``, or
+``rollback-transaction``. After this, any operation evaluated on this
+connection (which can be achieved by including the ``connection`` request
+parameter) will be evaluated inside the transaction associated with the
+connection.
+
+For example, the following sequence of requests creates a connection to the
+``myStore`` data store, starts a read/write transaction on the new connection,
+imports data twice, and commits the transaction. Please note that, although the
+transaction has been committed, the connection persists after the last request.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/connections HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 Created
+   Location: /datastores/myStore/connections/01234567890123456789
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/connections/01234567890123456789/transaction?operation=begin-read-write-transaction HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content?connection=01234567890123456789 HTTP/1.1
+   Host: localhost
+
+   [First batch of facts/rules]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [Response body as usual]
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content?connection=01234567890123456789 HTTP/1.1
+   Host: localhost
+
+   [Second batch of facts/rules]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [Response body as usual]
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/connections/01234567890123456789/transaction?operation=commit-transaction HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+At any point, one can see whether a connection is associated with a transaction
+as follows. The response is written as the output of a SPARQL query that binds
+the variable ``?Property`` to the property name, variable ``?Value`` to the
+property value, and variable ``?Mutable`` to ``true`` if the value of the
+property can be changed and to ``false`` otherwise.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/connections/01234567890123456789/transaction HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value,Mutable
+   transaction-state,read-write,false
+   transaction-requires-rollback,false,false
+   last-transaction-data-store-version,5,false
+
+.. _APIs-cursors:
+
+Cursors
+-------
+
+As already mentioned in :numref:`APIs-evaluating-queries`, RDFox supports
+efficient APIs for paginating query results using cursors, which provide a view
+into the results of a query evaluated on a ‘frozen’ snapshot of data. The
+concept of cursors is used in slightly different ways in the Core and the
+RESTful APIs, so this section discusses first the former and then the latter.
+
+Cursors in the Java API
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Java API uses cursors to provide access to answers to queries. A cursor
+goes through the following life cycle.
+
+- When a cursor is created, it is in an *unopened* state.
+
+- Before it is used, a cursor must be opened, which positions the cursor on the
+  first answer tuple, or at the answer end if there are no answer tuples.
+  Opening the cursor returns the multiplicity of the current answer, or zero if
+  there are no answers.
+
+- Advancing a cursor returns the multiplicity of the next row. Cursors cannot
+  go backwards --- all movement is forward.
+
+- A cursor can at any point be reopened, in which case the query underlying the
+  cursor is reevaluated afresh. By creating cursors for queries that are
+  evaluated many times, applications can speed up query processing by avoiding
+  the overhead of parsing and compiling the query in each request.
+
+- When a cursor is no longer needed, it must be closed so that any resources
+  associated with it can be released. This must be done even when cursors are
+  read to the end. In Java, the ``Cursor`` class implements the
+  ``AutoCloseable`` interface so that it can be used in a try-with-resources
+  statement.
+
+The reason why rows have multiplicities is because SPARQL has bag semantics, and
+if an answer contains the same tuple ``n`` times, it can be more efficient to
+return the tuple once and say that the tuple’s multiplicity is ``n``. The Java
+API supports cursors for ``SELECT/ASK`` and ``CONSTRUCT`` queries. A cursor for
+a ``CONSTRUCT`` query behaves as a cursor for a ``SELECT/ASK`` query returning
+variables ``?S``, ``?P``, and ``?O`` for each constructed triple.
+
+Each cursor is associated with a data store connection that it is created on.
+Moreover, all operations on a cursor are evaluated in the context of a
+connection transaction. For example, if a transaction is running on the
+connection when a cursor is opened, then opening the cursor is performed within
+this transaction. Moreover, if no transaction is running on the connection when
+a cursor is opened, a temporary read-only transaction is started, the cursor is
+opened, and the transaction is rolled back. A cursor is advanced analogously,
+possibly starting a temporary transaction each time it is advanced.
+
+The use of temporary transactions opens a potential consistency problem, which
+is illustrated by the following sequence of actions.
+
+- Create a cursor on a connection not associated with a transaction.
+
+- Open a cursor (which implicitly creates a temporary transaction for the
+  duration of the operation).
+
+- Modify the content on the data store using a different connection. Since the
+  cursor's connection is not associated with a transaction, modification is
+  possible, and it can affect the results of the query produced by the cursor.
+
+- Advance the cursor. At this point, RDFox will detect that the data store has
+  changed since the cursor was opened, and, to inform the user of this fact, it
+  would throw ``StaleCursorException``. In this way, RDFox prevents users from
+  possibly overlooking the effects of updates applied to the data store while
+  the cursor is being used. Please note that RDFox will throw
+  ``StaleCursorException`` even if the update does not affect the cursor's
+  result --- that is, RDFox's consistency mechanism is pessimistic.
+
+Please note that ``StaleCursorException`` can happen only if the cursor uses
+temporary transactions in open and advance. In other words, the the cursor is
+opened and advanced within a single, uninterrupted transaction, then
+``StaleCursorException`` cannot happen.
+
+Cursors are typically used in the Java API as follows.
+
+::
+
+   Map<String, String> parameters = new HashMap<String, String>();
+   // Initialize parameters that govern query evaluation.
+   parameters.set(..., ...);
+   // Create the cursor.
+   Cursor crs = dsConn.createCursor("SELECT ?X ?Y ?Z WHERE { ?X ?Y ?Z }", parameters);
+   for (long multiplicity = crs.open(); multiplicity != 0; multiplicity = crs.advance()) {
+       // Read the current answer
+   }
+   crs.close();
+
+Cursors in the RESTful API
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The RESTful API supports efficient query result pagination using the
+``offset=m;limit=n`` request parameters (see
+:numref:`APIs-evaluating-queries`). However, this style of result pagination
+requires resending the same query in each request, which can be inefficient.
+Moreover, applications relying on the RESTful API might also benefit from
+precompiling common queries into cursors that are managed explicitly.
+
+To support such use cases, the RESTful API supports explicit cursor management
+that mimics the Java cursor API. Each cursor is identified by an ID exposed
+under the ``/datastores/<DSTRNAME>/connections/<DSCONN>/cursors`` key; note
+that this arrangement reflects the fact that each cursor is associated with a
+specific data store connection. When a data store connection is deleted, all
+cursors associated with the connection are deleted as well. Each cursor exposed
+by the RESTful API maintains its position, and there is an API allowing users
+to query the current cursor position.
+
+Listing Available Cursors
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following request retrieves the list of cursors available on a server
+transaction. The response is written as an output of a SPARQL query that binds
+variable ``?CursorID`` to the cursor ID.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/connections/01234567890123456789/cursors HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   CursorID
+   CRS101
+   CRS102
+
+Creating a Cursor
+^^^^^^^^^^^^^^^^^
+
+A cursor is created by submitting the query to the ``/cursors`` key using the
+``POST`` method of the `SPARQL 1.1 Protocol
+<http://www.w3.org/TR/sparql11-protocol/>`__. The location of the new cursor is
+returned in the ``Location`` header.
+
+The ``base`` query parameter can be used to specify an IRI that will be used as
+the default base IRI when processing the query.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/connections/01234567890123456789/cursors HTTP/1.1
+   Host: localhost
+   Content-Type: application/sparql-query
+   Content-Length: 34
+
+   SELECT ?X ?Y ?Z WHERE { ?X ?Y ?Z }
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 CREATED
+   Location: /datastores/myStore/connections/01234567890123456789/cursors/CRS101
+
+Opening and Advancing a Cursor
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A ``PATCH`` request on the cursor opens or advances the cursor; to distinguish
+the two, the ``operation`` request parameter must be included with value
+``open`` or ``advance``. Moreover, request can include ``limit=n`` parameter
+determining how many rows should be returned; if this parameter is absent, all
+remaining rows are returned. Parameter ``limit=0`` can be used to specify that
+no answers should be returned (and so the request just validates the cursor).
+The request updates the cursor position and so such a request is not
+idempotent; consequently, the request method is ``PATCH``. In all such cases,
+the request must specify an ``Accept`` header to determine the format of the
+returned data. Different requests on the same cursor can request different
+result formats.
+
+**Request**
+
+.. code:: http
+
+   PATCH /datastores/myStore/connections/01234567890123456789/cursors/CRS101?operation=open&limit=10 HTTP/1.1
+   Host: localhost
+   Accept: text/csv
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
+   [The first 10 answers to the query in CSV format]
+
+Retrieving Cursor Information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following request retrieves information about a specific cursor. The
+response is written as an output of a SPARQL query that binds variable
+``?Property`` to the name of a cursor property, and variable ``?Value`` to
+property value.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/connections/01234567890123456789/cursors/CRS101 HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   ID,CRS1
+   position,10
+
+Deleting a Cursor
+^^^^^^^^^^^^^^^^^
+
+The following request closes/deletes the cursor.
+
+**Request**
+
+.. code:: http
+
+   DELETE /datastores/myStore/connections/01234567890123456789/cursors/CRS101 HTTP/1.1
+   Host: localhost
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+.. _APIs-explaining-reasoning:
+
+Explaining Fact Derivation
+--------------------------
+
+RDFox allows clients to supply a fact and retrieve an explanation of how a fact
+is derived from the facts explicitly given in the input using rules. An
+explanation consists of one or more chains of rule applications that derive the
+target fact.
+
+In the RESTful API, an explanation of how a fact is derived can be retrieved
+using the ``/explanation`` key. This key takes the following request parameters.
+
+- The mandatory ``fact`` request parameter specifies the fact for which the
+  explanation is to be produced. The fact should be written using the standard
+  Datalog syntax. IRIs in the fact can be abbreviated using the prefixes of the
+  data store.
+
+- The optional ``type`` parameter specifies the type of explanation that is to
+  be retrieved.
+
+  - The value of ``shortest`` specifies that one shortest explanation should be
+    returned. That is, the explanation shows one shortest way in which the
+    specified fact can be derived from the facts explicitly given in the input
+    using rules. This is the default value for the ``type`` parameter.
+
+  - The value of ``to-explicit`` specifies that all possible ways to derive the
+    specified fact from explicit facts should be returned.
+
+  - The value of ``exhaustive`` specifies that all possible ways to derive the
+    specified fact should be returned. This option differs from ``to-explicit``
+    and ``shortest`` in that, if explicit facts are also derived by rules,
+    these inferences are explained as well; in contrast, with ``to-explicit``
+    and ``shortest``, the explicit facts are not further explained.
+
+
+- The optional ``max-distance-from-root`` numeric parameter can be used to
+  specify the depth to which an explanation should be explored. That is, facts
+  that require more than this number of rule applications are not explained
+  themselves. This parameter can be used to limit the size of the explanation
+  produced by RDFox. If a value for this parameter is not specified, the
+  maximum depth is unlimited.
+
+- The optional ``max-rule-instances-per-fact`` numeric parameter can be used to
+  specify maximum number of ways of deriving a single fact that RDFox should
+  explore. This parameter can be used to limit the size of the explanation
+  produced by RDFox. If a value for this parameter is not specified, the
+  maximum depth is unlimited.
+
+The Java API takes the same parameters, but coded as method arguments. The
+resulting explanation is serialized as a JSON object using the format discussed
+below. The IRIs of facts and constants in the output are serialized using the
+prefixes of the data store. In the RESTful API, the content type of the output
+is set to ``application/x.explanation+json``.
+
+The output format is described using the following example. Let us assume that
+a data store contains the following triples.
+
+::
+
+   :a :R :b .
+   :a :R :c .
+   :a rdf:type :B .
+   :a rdf:type :D .
+
+Moreover, let us assume that the data store contains the following rules.
+
+::
+
+   :A[?X] :- :R[?X,?Y] .
+   :A[?X] :- :B[?X], NOT :C[?X] .
+   :B[?X] :- :D[?X] .
+
+Clearly, fact ``:A[:a]`` is derived in this data store using the following
+three rule instances:
+
+::
+
+   :A[:a] :- :R[:a,:b] .
+   :A[:a] :- :R[:a,:c] .
+   :A[:a] :- :B[:a], NOT :C[:a] .
+
+Moreover, fact ``:B[:a]`` is explicitly given in the input, but it is also
+derived by the following rule instance.
+
+::
+
+   :B[:a] :- :D[:a] .
+
+When asked to produce a shortest explanation for fact ``:A[:a]``, RDFox might
+return the following JSON object.
+
+::
+
+     { "prefixes": {
+        ":": "http://example.com/",
+        "owl:": "http://www.w3.org/2002/07/owl#",
+        "rdf:": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfox:": "https://rdfox.com/vocabulary#",
+        "rdfs:": "http://www.w3.org/2000/01/rdf-schema#",
+        "sh:": "http://www.w3.org/ns/shacl#",
+        "swrl:": "http://www.w3.org/2003/11/swrl#",
+        "swrlb:": "http://www.w3.org/2003/11/swrlb#",
+        "xsd:": "http://www.w3.org/2001/XMLSchema#" },
+      "complete": true,
+      "facts": {
+        "0": {
+          "fact": ":A[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "derived",
+          "distance-from-root": 0,
+          "proof-height": 1,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": 0,
+          "rule-instances": [
+            { "rule": ":A[?X] :- :B[?X], NOT :C[?X] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-Tup
+    leTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-Variable\">?X</span>]</span>, <span class=\"RDFox-Negation\">NOT <span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:C</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span><
+    /span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox
+    -TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-IRI\">:a</span>]</span>, <span class=\"RDFox-Negation\">NOT <span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:C</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span></span>
+     .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "1", null ] } ] },
+        "1": {
+          "fact": ":B[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] }
+    } }
+
+
+Each explanation consists of a number of facts, each of which is identified by
+a numeric identified. The ``facts`` JSON objects contains all facts indexed by
+their key. The facts with the zero identifier is the root of the explanation
+--- that is, this is the fact for which the explanation was requested. Each
+fact has the following properties.
+
+- The ``fact`` key contains the fact using Datalog syntax. Each argument is
+  encoded in the same way as a binding object in the
+  ``application/x.sparql-results+json-abbrev`` query answer format.
+
+- The ``fact-structured`` key contains the fact using Datalog syntax with
+  structural annotations.
+
+- The ``type`` key describes the kind of fact: ``explicit`` mean that the fact
+  was explicitly given in the input; ``derived`` means that the fact was not
+  explicitly given in the input but was derived by one or more rules; and
+  ``false`` means that the fact is neither explicitly given nor derived. The
+  value of ``false`` is possible only for the root fact.
+
+- The ``distance-from-root`` key specifies how far a particular fact is from
+  the root: this value is zero for the root fact, the facts that are used to
+  derive the root fact have distance one, and so on.
+
+- The ``proof-height`` key specifies the least number of rule applications
+  needed to derive a fact. This number is zero for explicit facts, it is one
+  for facts derived from the explicit facts using one rule application, and so
+  on. The value of this key can be ``null`` when the ``max-distance-from-root``
+  and ``max-rule-instances-per-fact`` parameters prevent RDFox from exploring
+  all rule instances necessary to identify the shortest proof.
+
+- The ``rule-instances-complete`` key contains a Boolean value specifying
+  whether RDFox has explored all rule instances that derive this fact. In
+  particular, this value will be ``false`` if the value of
+  ``distance-from-root`` is larger than the ``max-distance-from-root``
+  parameter, or if more than ``max-rule-instances-per-fact`` rule instances
+  derive the fact.
+
+- The ``rule-instances`` key contains an array of rule instances that derive
+  the given fact. Each rule instance is a JSON object with the structure
+  specified below.
+
+- The ``shortest-proof-rule-instance`` key contains a numeric zero-based index
+  of the rule instance from the ``rule-instances`` that belongs to a shortest
+  proof for this fact. The value of this key can be ``null`` when the
+  ``max-distance-from-root`` and ``max-rule-instances-per-fact`` parameters
+  prevent RDFox from exploring all rule instances necessary to identify the
+  shortest proof.
+
+Each rule instance is encoded as a JSON object with the following structure.
+
+- The ``rule`` key contains the rule written using Datalog syntax. Any IRI
+  inside the rule is serialized using the prefixes used in the request.
+
+- The ``rule-structured`` key contains the rule written using Datalog syntax
+  with structural annotations.
+
+- The ``grounded-rule-structured`` key contains the rule instance written using
+  Datalog syntax with structural annotations.
+
+- The ``head-atom-index`` key contains the index of the head atom of the rule
+  that participated in the inference. That is, fact that mentions this rule
+  instance is derived by the head atom of the rule with the specified index.
+
+- The ``body-facts`` key contains an array of IDs of facts that are matched to
+  the body formulas of the rule in the inference. In our example, there is one
+  instance of rule ``:A[?X] :- :B[?X], NOT :C[?X] .`` that contains ``[ "1",
+  null ]`` as the value for ``body-facts``, which should be interpreted as
+  follows. The first element of the array is ``"1"``, which means that the
+  first formula in the rule body is an atom that is matched to a fact whose ID
+  ``1``. The second element of the array is ``null``, which means that the
+  second formula in the rule body is not an atom and is thus not directly
+  matched to facts.
+
+Since only a shortest explanation is required, the above JSON object presents
+just one way to derive fact ``:A[:a]``. Note that several rule instances derive
+this fact in the same number of steps, but RDFox selects just one of them.
+
+With the ``to-explicit`` option, RDFox produces the following explanation. The
+structure of the JSON object is the same as before, but all possible ways to
+derive ``:A[:a]`` from explicit facts are shown. Note, however, that fact
+``:B[:a]`` is not further explained since it is an explicit fact.
+
+::
+
+    { "prefixes": {
+        ":": "http://example.com/",
+        "owl:": "http://www.w3.org/2002/07/owl#",
+        "rdf:": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfox:": "https://rdfox.com/vocabulary#",
+        "rdfs:": "http://www.w3.org/2000/01/rdf-schema#",
+        "sh:": "http://www.w3.org/ns/shacl#",
+        "swrl:": "http://www.w3.org/2003/11/swrl#",
+        "swrlb:": "http://www.w3.org/2003/11/swrlb#",
+        "xsd:": "http://www.w3.org/2001/XMLSchema#" },
+      "complete": true,
+      "facts": {
+        "0": {
+          "fact": ":A[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "derived",
+          "distance-from-root": 0,
+          "proof-height": 1,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": 1,
+          "rule-instances": [
+            { "rule": ":A[?X] :- :R[?X, ?Y] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span cl
+    ass=\"RDFox-Variable\">?X</span>, <span class=\"RDFox-Variable\">?Y</span>]</span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<spa
+    n class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:b</span>]</span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "1" ] },
+            { "rule": ":A[?X] :- :R[?X, ?Y] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span cl
+    ass=\"RDFox-Variable\">?X</span>, <span class=\"RDFox-Variable\">?Y</span>]</span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<spa
+    n class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:c</span>]</span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "2" ] },
+            { "rule": ":A[?X] :- :B[?X], NOT :C[?X] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<s
+    pan class=\"RDFox-Variable\">?X</span>]</span>, <span class=\"RDFox-Negation\">NOT <span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:C</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span
+    >[<span class=\"RDFox-IRI\">:a</span>]</span>, <span class=\"RDFox-Negation\">NOT <span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:C</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "3", null ] } ] },
+        "1": {
+          "fact": ":R[:a, :b]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:b</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] },
+        "2": {
+          "fact": ":R[:a, :c]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:c</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] },
+        "3": {
+          "fact": ":B[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] }
+    } }
+
+With the ``exhaustive`` option, RDFox produces the following explanation. The
+main difference to the previous case is that fact ``:B[:a]`` is explained even
+though it is explicitly given in  the input.
+
+::
+
+    { "prefixes": {
+        ":": "http://example.com/",
+        "owl:": "http://www.w3.org/2002/07/owl#",
+        "rdf:": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfox:": "https://rdfox.com/vocabulary#",
+        "rdfs:": "http://www.w3.org/2000/01/rdf-schema#",
+        "sh:": "http://www.w3.org/ns/shacl#",
+        "swrl:": "http://www.w3.org/2003/11/swrl#",
+        "swrlb:": "http://www.w3.org/2003/11/swrlb#",
+        "xsd:": "http://www.w3.org/2001/XMLSchema#" },
+      "complete": true,
+      "facts": {
+        "0": {
+          "fact": ":A[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "derived",
+          "distance-from-root": 0,
+          "proof-height": 1,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": 1,
+          "rule-instances": [
+            { "rule": ":A[?X] :- :R[?X, ?Y] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span cl
+    ass=\"RDFox-Variable\">?X</span>, <span class=\"RDFox-Variable\">?Y</span>]</span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<spa
+    n class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:b</span>]</span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "1" ] },
+            { "rule": ":A[?X] :- :R[?X, ?Y] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span cl
+    ass=\"RDFox-Variable\">?X</span>, <span class=\"RDFox-Variable\">?Y</span>]</span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<spa
+    n class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:c</span>]</span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "2" ] },
+            { "rule": ":A[?X] :- :B[?X], NOT :C[?X] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<s
+    pan class=\"RDFox-Variable\">?X</span>]</span>, <span class=\"RDFox-Negation\">NOT <span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:C</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:A</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span
+    >[<span class=\"RDFox-IRI\">:a</span>]</span>, <span class=\"RDFox-Negation\">NOT <span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:C</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "3", null ] } ] },
+        "1": {
+          "fact": ":R[:a, :b]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:b</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] },
+        "2": {
+          "fact": ":R[:a, :c]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-R-o\"><span class=\"RDFox-IRI\">:R</span>[<span class=\"RDFox-IRI\">:a</span>, <span class=\"RDFox-IRI\">:c</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] },
+        "3": {
+          "fact": ":B[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 1,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [
+            { "rule": ":B[?X] :- :D[?X] .",
+              "rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-Variable\">?X</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:D</span>[<s
+    pan class=\"RDFox-Variable\">?X</span>]</span></span> .</span>",
+              "grounded-rule-structured": "<span class=\"RDFox-Rule\"><span class=\"RDFox-Rule-head\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:B</span>[<span class=\"RDFox-IRI\">:a</span>]</span></span> :- <span class=\"RDFox-Rule-body\"><span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:D</span
+    >[<span class=\"RDFox-IRI\">:a</span>]</span></span> .</span>",
+              "head-atom-index": 0,
+              "body-facts": [ "4" ] } ] },
+        "4": {
+          "fact": ":D[:a]",
+          "fact-structured": "<span class=\"RDFox-TupleTableAtom-s-rdftype-o\"><span class=\"RDFox-IRI\">:D</span>[<span class=\"RDFox-IRI\">:a</span>]</span>",
+          "type": "explicit",
+          "distance-from-root": 2,
+          "proof-height": 0,
+          "rule-instances-complete": true,
+          "shortest-proof-rule-instance": null,
+          "rule-instances": [ ] }
+    } }
+
+Handling Concurrent Updates
+---------------------------
+
+Many applications of RDFox need to gracefully handle concurrent updates by
+different users. Although RDFox provides transactions to ensure consistency of
+parallel updates, such a construct may be insufficient in examples such as the
+following.
+
+- A graph-like vizualisation of an RDF dataset may initially show just a handful
+  of RDF resources, and allow users to interactively explore and expand the
+  neighborhood of each resource. Clearly, it is desirable to show to each user a
+  consistent view of the data at any given point in time. However, opening a
+  read-only transaction for the duration of each user's interaction is
+  ill-advised as it would prevent the data store from being updated. Instead,
+  the application might want to detect when the underlying data has changed and
+  notify the user and/or refresh the view appropriately.
+
+- A common pattern to updating data in applications involves reading current
+  data, showing the data to the user and allowing them to make changes, and
+  then writing the data back to the data store. Such operations involves user
+  interaction, which can take significant time. As a result, it is usually not
+  desirable to wrap the entire operation in a read/write transaction. Instead,
+  many applications use ‘optimistic’ concurrency control, where the update
+  succeeds only if the data store was not updated since the data was shown to
+  the user; otherwise, the entire process is restarted.
+
+This section describes aspects of the RDFox API that aim to address these two
+problems.
+
+.. _APIs-detecting-updates:
+
+Detecting Updates
+~~~~~~~~~~~~~~~~~
+
+Each data store is associated with a 20-digit ID that, at any point in time,
+uniquely identifies a data store in the server. Also, RDFox aims to assign
+different unique IDs to data stores created at different point in time.
+
+Each data store also maintains a *data store version*, which is a positive
+integer. Each time a data store is updated, the version of the data store is
+incremented.
+
+Jointly, a data store unique ID and a data store version identify a particular
+state of a data store. That is, if these values are the same between two API
+calls, then we know that the data store has not been updated. The converse does
+not hold necessarily: even if an update request fails, the version may be
+incremented before the failure is detected. Nevertheless, differing unique ID
+and/or versions between two API calls indicate with a high degree of
+probability that the data store has been updated.
+
+Java API
+^^^^^^^^
+
+The ``DataStoreConnection`` class in Java API provides a ``getUniqueID()`` and
+``getDataStoreVersion()`` methods that allow users to retrieve the unique ID
+and the data store version, respectively. Moreover, the
+``getLastTransactionDataStoreVersion()`` method returns the version of the data
+store at the point the last transaction was successfully evaluated on this
+connection (or ``0`` if no transaction has been evaluated on this connection).
+Thus, by recording the unique ID and the data store version and comparing them
+with the values in subsequent requests, an application can detect that a data
+store has been updated. Note that the unique ID of a data store never changes
+during the lifetime of a data store. Moreover, each data store connection is
+associated with just one data store, and so a unique ID can never change on one
+connection.
+
+.. _REST-detecting-updates:
+
+RESTful API
+^^^^^^^^^^^
+
+The RESTful API exposes these pieces of information as ETags, which are strings
+of the form ``"uniqueID-version"``. For HTTP requests operating on a data store
+or any of its parts, the response will contain a header of the form ``ETag:
+"uniqueID-version"`` indicating the version of the data store upon request's
+completion. The following example illustrates this on the example of data
+importation.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content HTTP/1.1
+   Host: localhost
+
+   [The facts/rules to be added in a format supported by RDFox]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   ETag: "01234567890123456789-2"
+
+   [Response body as usual]
+
+In HTTP, an ETag is considered specific to each resource. In RDFox, however,
+the same ETag is generated for all resources of a particular data store. Thus,
+in the above example, ETag ``"01234567890123456789-2"`` applies not only to
+resource ``/datastores/myStore/content``, but also to ``/datastores/myStore``
+and every resource underneath (such as, say,
+``/datastores/myStore/content/tupletables``). In other words, importing the
+data into the data store using ``/datastores/myStore/content`` changes the
+ETags of all parts of the data store.
+
+In HTTP, it is customary to return an ETag only on successful responses. In
+RDFox, however, an ETag will be returned even in some error responses. This is
+in order to keep the user informed about the current data store version as much
+as possible. Specifically, most requests are processed as follows.
+
+- A request is first checked to conform to the RESTful API syntax. For example,
+  some requests must specify certain request parameters, some requests may not
+  admit a request body, and so on. In most cases, an ETag will not be sent if a
+  request cannot be validated properly. The rationale behind this is that
+  syntactically malformed requests do not match to well-defined RDFox
+  operations.
+
+- A request is then submitted for execution. If this step fails (e.g., because
+  the data in an update request is malformed), an ETag will in most cases be
+  sent in the error response. The rationale behind this is that the request
+  matches to well-defined RDFox operations, and so knowing the current data
+  store version might actually be used to recover from failure.
+
+Since RDFox forms ETags by combining the data store's unique ID and version
+number, neither of which change during the lifetime of a read/write transaction,
+returning ETags while such a transaction remains open would lead to the same
+ETag value being returned for consecutive requests even if the response body
+were different. Such behavior would violate the basic principles of ETags. To
+avoid this, RDFox does not send ETags in response to requests that use a data
+store connection with an open read/write transaction. The exception to this rule
+is when the request has closed the transaction either by committing it or
+rolling it back. See :numref:`REST-transactions` for details of how transactions
+are managed in the RESTful API.
+
+Conditional Requests
+~~~~~~~~~~~~~~~~~~~~
+
+RDFox can evaluate all operations conditionally --- that is, an operation
+succeeds only if the data store unique ID and version match specific values
+before the request is processed. Note that a naive solution, where a user reads
+and compares the data store version before each request, is incorrect: a data
+store version can change in the interval between the user reading the version
+and issuing the request. RDFox addresses this by integrating these checks with
+its transaction processing.
+
+Java API
+^^^^^^^^
+
+To support version checking, the ``DataStoreConnection`` class in Java API
+provides the ``setNextOperationMustMatchDataStoreVersion()`` and
+``setNextOperationMustNotMatchDataStoreVersion()`` methods. Both methods take
+an integer argument, which configure the connection to expect or not expect a
+specific version on the next operation. Please note that version validation is
+not done in these methods themselves; rather, the version is validated on the
+next operation executed that uses the connection. If the validation fails, the
+request will throw a ``DataStoreVersionDoesNotMatchException`` or
+``DataStoreVersionMatchesException``.
+
+.. code:: java
+
+   DataStoreConnection dsConn = ...
+   // Use the data store connection...
+   ...
+   // Save the data store version after the last transaction.
+   long savedDataStoreVersion = dsConn.getDataStoreVersionAfterLastOperation();
+   // Use the data store connection some more...
+   ...
+   // Configure the connection to expect savedDataStoreVersion in next transaction.
+   // The following call will not check the version!
+   dsConn.setNextOperationMustMatchDataStoreVersion(savedDataStoreVersion);
+   // The following call fails if the version at the point of execution is
+   // different from savedDataStoreVersion.
+   dsConn.importData(...);
+   // The following switches data store validation off.
+   dsConn.setNextOperationMustMatchDataStoreVersion(0);
+
+Once an expected version has been set on the connection, the value remains
+active until ``setNextOperationMustMatchDataStoreVersion()`` is called with
+argument ``0``. Moreover, if the connection is configured to expect a
+particular version and a data store update is successful, the data store
+version will be incremented and the resulting value will be set as the next
+expected data store version. In this way, users can process subsequent updates
+on the connection without having to update an expected version.
+
+The ``setNextOperationMustNotMatchDataStoreVersion()`` method is analogous, but
+it configures the connection to not accept a specific version. This can be
+used, for example, to avoid reevaluating a complex query unless the data store
+*has* changed. Successful updates will not change this parameter of the
+connection.
+
+RESTful API
+^^^^^^^^^^^
+
+In the RESTful API, conditional requests are supported using standard HTTP
+``If-Match`` and ``If-None-Match`` headers. Specifically, if a request contains
+an ``If-Match`` header with a particular ETag, the request will succeed only if
+the version of the data store matches the ETag when the request is executed.
+This is illustrated by the following example, where the request (presumably)
+fails because of a version mismatch.
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content HTTP/1.1
+   Host: localhost
+   If-Match: "01234567890123456789-2"
+
+   [The facts/rules to be added in a format supported by RDFox]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 412 Precondition Failed
+   ETag: "01234567890123456789-5"
+   Content-Type: text/plain; charset=UTF-8
+   Content-Length: XX
+
+   DataStoreVersionDoesNotMatchException: Data store version is 5, which is different from the expected version 2.
+
+Note that the response in the above example contains the current ETag of the
+data store. Thus, an application can try to use this ETag in any subsequent
+request, which will succeed only if the data store has not been modified in the
+meanwhile.
+
+The ``If-None-Match`` header is analogous, but it ensures that the request
+succeeds only if the version is different from the given one. This is
+illustrated by the following request.
+
+**Request**
+
+.. code:: http
+
+   GET /datastores/myStore/sparql?query=SELECT+%3FX+%3FY+%3FZ+WHERE+{+%3FX+%3FY+%3FZ+} HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+   If-None-Match: "01234567890123456789-5"
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 304 Not Modified
+   ETag: "01234567890123456789-5"
+   Content-Type: text/plain; charset=UTF-8
+   Content-Length: XX
+
+   DataStoreVersionMatchesException: Data store version is equal to 5.
+
+Conditional requests in RDFox differ from HTTP in the following minor ways.
+
+- ETags are opaque values in HTTP that must match exactly. RDFox, however,
+  allows for partial matches. In particular, the value of ``If-Match`` and
+  ``If-None-Match`` headers can have the form ``"uniqueID-version"`` where
+  ``uniqueID`` and ``version`` can either be specific values or the wildcard
+  character ``*``. Thus, ``"01234567890123456789-*"`` matches any data store
+  whose unique ID is ``01234567890123456789``, regardless of the current data
+  store version. Analogously, ``"*-5"`` matches any data store whose version is
+  ``5``, and ``"*-*"`` matches any data store.
+
+- HTTP allows one to specify more than one ETag in the ``If-Match`` or
+  ``If-None-Match`` headers. However, RDFox will reject such requests: the
+  allowed values for these headers are ``*`` (which means ‘match any’ in HTTP)
+  or a single ETag (possibly containing wildcard characters as explained above).
+
+Conditional requests may not be used in combination with explicitly opened
+read/write transactions for the same reason that ETags are not included in
+responses under such circumstances (see :numref:`REST-detecting-updates`).
+
+.. _APIs-managing-roles:
+
+Managing Roles
+--------------
+
+This section describes the API calls responsible for managing the roles defined
+within an RDFox server. For an introduction to RDFox's access control model see
+:numref:`access-control`.
+
+Listing Roles
+~~~~~~~~~~~~~
+
+The following request retrieves the list of roles defined within the server.
+The response is written as an output of a SPARQL query that binds variable
+``?Name`` to the names of the available roles.
+
+**Request**
+
+.. code:: http
+
+    GET /roles HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Name
+    admin
+    group
+    user1
+
+**Java API**
+
+.. code:: java
+
+    List<String> roleNames = sConn.listRoles();
+
+Creating a Role
+~~~~~~~~~~~~~~~
+
+The following request creates a new role. The role name is specified as part of
+the request URL and the password or Argon2i password hash as a ``text/plain``
+body. The ``password-specification-type`` query parameter can be used to
+specify whether the role should be created using a password (if the parameter
+is not specified or set to ``password``), an Argon2i password hash (if the
+parameter is set to ``password-hash``), or should have no password at all (if
+the parameters is set to ``none``).The location of the new role is returned in
+the ``Location`` header.
+
+**Request**
+
+.. code:: http
+
+    POST /roles/user2 HTTP/1.1
+    Host: localhost
+    Content-Type: text/plain
+    Content-Length: 14
+
+    user2's secret
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 201 Created
+    Location: /roles/user2
+
+**Java API**
+
+.. code:: java
+
+    sConn.createRole("user2", "user2's secret");
+
+Deleting a Role
+~~~~~~~~~~~~~~~
+
+The following request deletes a role.
+
+**Request**
+
+.. code:: http
+
+    DELETE /roles/user2 HTTP/1.1
+    Host: localhost
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+    sConn.deleteRole("user2");
+
+
+.. _APIs-list-role-information:
+
+Listing Role Information
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request lists information about an existing role. The response is
+written as an output of a SPARQL query that returns one answer per property of
+the role. For each answer, the variable ``?Name`` contains a name of the
+parameter and the variable ``?Value`` holds its value.
+
+**Request**
+
+.. code:: http
+
+   GET /roles/admin HTTP/1.1
+   Host: localhost
+   Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Content-Type: text/csv; charset=UTF-8
+
+   Property,Value
+   name,admin
+   password-hash,"$argon2i$v=19$m=208651,t=3,p=16$xNWat7TDiKEGGU2W66u/Pw$h9ObPGi855ypuDBI7Nr2zeWAa6f2VBmIrFRs32gEXHY"
+
+**Java API**
+
+.. code:: java
+
+    String passwordHash = sConn.getRolePasswordHash("user1");
+
+Listing Privileges
+~~~~~~~~~~~~~~~~~~
+
+The following request lists the privileges of an existing role. The response is
+written as an output of a SPARQL query that returns one answer per resource
+specifier over which the role has any privileges. For each answer, the variable
+``?AllowedAccessTypes`` contains a comma-separated list of access types the
+role is allowed to perform over the resources specified by the resource
+specifier in the ``?ResourceSpecifier`` variable.
+
+**Request**
+
+.. code:: http
+
+    GET /roles/user1/privileges HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    ResourceSpecifier,AllowedAccessTypes
+    >datastores,"read,write"
+    |roles,read
+
+**Java API**
+
+.. code:: java
+
+    Map<String, Byte> privileges = sConn.listPrivileges("user1");
+
+Granting Privileges to a Role
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request grants the ``read`` and ``write`` privileges over the
+data store list to an existing role.
+
+**Request**
+
+.. code:: http
+
+    PATCH /roles/user1/privileges?operation=grant&resource-specifier=%7Cdatastores&access-types=read,write HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Changed
+    true
+
+**Java API**
+
+.. code:: java
+
+    boolean changed = sConn.grantPrivileges("user1", "|datastores", (byte)(ServerConnection.ACCESS_TYPE_READ | ServerConnection.ACCESS_TYPE_WRITE));
+
+Revoking Privileges from a Role
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following request revokes the ``write`` privilege over the data store list
+from an existing role.
+
+**Request**
+
+.. code:: http
+
+    PATCH /roles/user1/privileges?operation=revoke&resource-specifier=%7Cdatastores&access-types=write HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Changed
+    true
+
+**Java API**
+
+.. code:: java
+
+    boolean changed = sConn.revokePrivileges("user1", "|datastores", (byte)(ServerConnection.ACCESS_TYPE_WRITE));
+
+Listing Memberships
+~~~~~~~~~~~~~~~~~~~
+
+The following request lists the roles of which the specified role is a member.
+The response is written as an output of a SPARQL query that binds variable
+``?Name`` to the names of the role's super roles.
+
+**Request**
+
+.. code:: http
+
+    GET /roles/user1/memberships HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Name
+    group
+
+**Java API**
+
+.. code:: java
+
+    List<String> memberships = sConn.listRoleMemberships("user1");
+
+Granting Memberships
+~~~~~~~~~~~~~~~~~~~~
+
+The following request grants membership of the role ``group`` to an existing
+role.
+
+**Request**
+
+.. code:: http
+
+    PATCH /roles/user1/memberships?operation=grant&super-role-name=group HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Changed
+    true
+
+**Java API**
+
+.. code:: java
+
+    boolean changed = sConn.grantRole("user1", "group");
+
+Revoking Memberships
+~~~~~~~~~~~~~~~~~~~~
+
+The following request revokes membership of the role ``group`` from an existing
+role.
+
+**Request**
+
+.. code:: http
+
+    PATCH /roles/user1/memberships?operation=revoke&super-role-name=group HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Changed
+    true
+
+**Java API**
+
+.. code:: java
+
+    boolean changed = sConn.revokeRole("user1", "group");
+
+Listing Members
+~~~~~~~~~~~~~~~
+
+The following request lists the roles which are members of the specified role.
+The response is written as an output of a SPARQL query that binds variable
+``?Name`` to the names of the role's members.
+
+**Request**
+
+.. code:: http
+
+    GET /roles/group/members HTTP/1.1
+    Host: localhost
+    Accept: text/csv; charset=UTF-8
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 200 OK
+    Content-Type: text/csv; charset=UTF-8
+
+    Name
+    user1
+
+**Java API**
+
+.. code:: java
+
+    List<String> members = sConn.listRoleMembers("user1");
+
+Changing Passwords
+~~~~~~~~~~~~~~~~~~
+
+The following request sets the password for the authenticated role. The request
+body must contain the old and the new passwords separated by a single ``\n``
+(CR) character.
+
+**Request**
+
+.. code:: http
+
+    PUT /password HTTP/1.1
+    Host: localhost
+    Authorization: Basic dXNlcjE6dXNlcjE=
+    Content-Type: text/plain
+    Content-Length: 20
+
+    user1's old password
+    user1's new password
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 204 No Content
+
+**Java API**
+
+.. code:: java
+
+    sConn.changeRolePassword("user1's old password", "user1's new password");
+
+.. _REST-endpoint-health:
+
+Checking Endpoint Health
+------------------------
+
+The following request may be used to test that the endpoint is healthy (able to
+respond to requests). Note that no authorization is required, irrespective of
+the server's access control policy.
+
+**Request**
+
+.. code:: http
+
+    GET /health HTTP/1.1
+
+**Response**
+
+.. code:: http
+
+    HTTP/1.1 204 No Content
+
+There is no equivalent of this API in Java.
+
+Remote Shell Execution
+----------------------
+
+The RESTful API includes support for using the :ref:`RDFox Shell <rdfox-shell>`
+remotely. The rest of this section describes the basic API, whereas
+:numref:`remote-shell-client` describes how to use the RDFox executable as a
+client for these APIs.
+
+Basic Remote Command Execution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To execute a shell script, one may ``POST`` it to the ``/commands`` path and
+read the output of the commands returned in the response body. For example, the
+following request sets the active data store and runs the :ref:`compact
+<compact-command>` command on it.
+
+**Request**
+
+.. code:: http
+
+   POST /commands HTTP/1.1
+   Content-Type: text/plain
+   Content-Length: 22
+
+   active myStore
+   compact
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Server: RDFox Endpoint
+   Content-Type: text/plain; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   Data store connection 'myStore' is active.
+   The current data store was compacted in 0.002000 s.
+
+.. warning::
+
+   Shell commands that require RDFox to access files, such as those that import
+   or export content, redirect shell output or invoke shell scripts, could be
+   used in conjunction with the remote shell API, or other APIs, to probe for
+   the existence of files in the server's file system. To guard against
+   disclosing file and directory names that are unrelated to RDFox's operation
+   in this way, RDFox's core API implementations will only open files whose
+   paths are within the directory specified by the ``sandbox-directory`` server
+   parameter. Administrators should set this parameter to the deepest (that is,
+   furthest from the root) node that contains all of the paths that users of
+   the remote shell or other APIs should be able to access. See
+   :numref:`server-parameters` for more details.
+
+.. _REST-remote-shell-limitations:
+
+Limitations
+^^^^^^^^^^^
+
+The remote shell API does not support commands that prompt for interaction.
+Such commands fall into one of two categories. The first category is commands
+that require confirmation such as ``dstore delete myStore``. These commands can
+be used remotely so long as the keyword ``force`` is appended to prevent them
+from prompting. The second category is commands that prompt for a password.
+Commands in this category cannot be used via the remote shell.
+
+Commands for managing the endpoint (``endpoint`` and ``daemon``) cannot be used
+via the remote shell.
+
+.. _REST-explicit-shell-management:
+
+Explicit Shell Management
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, RDFox will create an instance of the remote shell for each RESTful
+API request sent to the ``/commands`` path. This means that the state
+maintained by a shell instance, such as variables, connections and prefix
+definitions, is discarded at the end of each request. To overcome this and
+allow the shell instance state to be preserved from one call to the next, one
+can explicitly manage remote shell instances and associate them with command
+execution requests. The following sequence of requests demonstrates this.
+First, a new shell is created by submitting an empty ``POST`` request to the
+``/shells`` path:
+
+**Request**
+
+.. code:: http
+
+   POST /shells HTTP/1.1
+   Content-Type: text/plain
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 201 Created
+   RDFox-Authentication-Token: 98765432109876543210
+   Location: /shells/01234567890123456789
+   Content-Length: 0
+
+On success, the URL of the newly created remote shell instance and an
+authentication token specific for the shell instance are returned via the
+``Location`` and ``RDFox-Authentication-Token`` response headers respectively.
+As with :ref:`explicit connection management
+<REST-explicit-connection-management>`, the newly created remote shell instance
+is associated with the role that created it: either the role specified in
+``Authorization`` request header if basic authentication is used, or the guest
+role if the ``Authorization`` request header is missing.
+
+Once created, a remote shell instance may be used in calls to the ``/commands``
+API by specifying the final segment of its URL as the ``shell`` request
+parameter.
+
+Requests to use the remote shell instance must be authorized in one of two
+ways. The first option is to use the standard ``Basic`` authentication scheme
+with the name and password of the role that created the shell instance
+(instances created by the guest role can be used without authentication).
+Alternatively, the authentication token returned in the
+``RDFox-Authentication-Token`` response header can be used as in the following
+example:
+
+**Request**
+
+.. code:: http
+
+   POST /commands?shell=01234567890123456789 HTTP/1.1
+   Content-Type: text/plain
+   Content-Length: 34
+   Authorization: RDFox 98765432109876543210
+
+   set myVariableName myVariableValue
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Server: RDFox Endpoint
+   Content-Type: text/plain; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   myVariableName = "myVariableValue"
+
+By submitting subsequent requests with the same remote shell instance, we see
+that shell state set in one request is still available in subsequent requests:
+
+**Request**
+
+.. code:: http
+
+   POST /commands?shell=01234567890123456789 HTTP/1.1
+   Content-Type: text/plain
+   Content-Length: 22
+   Authorization: RDFox 98765432109876543210
+
+   echo $(myVariableName)
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Server: RDFox Endpoint
+   Content-Type: text/plain; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   myVariableValue
+
+Interrupting Remote Shell Execution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Commands submitted to an explicitly created remote shell instance can be
+interrupted by submitting a ``PATCH`` request to the full URL of the instance
+with the ``operation`` request parameter set to ``interrupt``.
+
+**Request**
+
+.. code:: http
+
+   PATCH /shells/01234567890123456789?operation=interrupt HTTP/1.1
+   Host: localhost:12110
+   Authorization: RDFox 98765432109876543210
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+
+Inspecting the Status of the Remote Shell Instance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests to the ``/commands`` API that are correctly formatted and carry valid
+credentials will always receive a ``200 OK`` response code, irrespective of
+errors arising from command execution. Clients can, however, receive additional
+information about the status of the shell at the end of each request through
+HTTP trailers. To opt-in to receive trailers, clients must add the ``TE:
+trailers`` request header. RDFox will then transmit trailers including the
+``RDFox-Shell-Status`` trailer:
+
+**Request**
+
+.. code:: http
+
+   POST /commands?shell=01234567890123456789 HTTP/1.1
+   Content-Type: text/plain
+   Content-Length: 4
+   TE: trailers
+
+   quit
+
+**Response (with raw response body)**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Trailer: RDFox-Final-Status-Code, RDFox-Error, RDFox-Shell-Status
+   Content-Type: text/plain; charset=UTF-8
+   Transfer-Encoding: chunked
+
+   0
+   RDFox-Shell-Status: quit
+   RDFox-Final-Status-Code: 200
+   RDFox-Error: ""
+
+The possible values for the ``RDFox-Shell-Status`` trailer are as follows:
+
+``running``
+  The remote shell instance is running and available for further requests.
+
+``quit``
+  The remote shell instance has exited and is not available for any further
+  requests. This status is returned when the shell has exited due to the
+  commands in the request (as in the example above) and when an
+  implicitly-created shell has successfully executed all of the commands in the
+  request it was created for.
+
+``aborted-duplicate``
+  Execution of the commands in the request was aborted due to an attempt to
+  create a resource with a name that is already in use. The remote shell
+  instance has exited and is not available for any further requests. This
+  status will only be returned when the ``on-error`` variable of the shell is
+  set to ``stop``. See :numref:`shell-error-handling` for more details of how
+  errors are handled by the shell.
+
+``aborted-non-duplicate``
+  Execution of the commands in the request was aborted due to an error other
+  than an attempt to create a resource with a name that is already in use. The
+  remote shell instance has exited and is not available for any further
+  requests. This status will only be returned when the ``on-error`` variable of
+  the shell is set to ``stop`` or ``continue-if-exists``. See
+  :numref:`shell-error-handling` for more details of how errors are handled by
+  the shell.
+
+Deletion of Remote Shell Instances
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Remote shell instances created using the ``/shells`` path will be automatically
+garbage collected by the endpoint once they have been unused for the endpoint's
+``object-keep-alive-time`` (see :numref:`endpoint-parameters`). Alternatively,
+they may be deleted explicitly as demonstrated by the following request:
+
+**Request**
+
+.. code:: http
+
+   DELETE /shells/01234567890123456789 HTTP/1.1
+   Host: localhost:12110
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 204 No Content

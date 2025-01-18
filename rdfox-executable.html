@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>18. RDFox Executable &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="19. RDFox Endpoint" href="rdfox-endpoint.html" />
+    <link rel="prev" title="17. Javadoc" href="javadoc.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">18. RDFox Executable</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sandbox">18.1. <code class="docutils literal notranslate"><span class="pre">sandbox</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analyze">18.2. <code class="docutils literal notranslate"><span class="pre">analyze</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#init">18.3. <code class="docutils literal notranslate"><span class="pre">init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upgrade">18.4. <code class="docutils literal notranslate"><span class="pre">upgrade</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#daemon">18.5. <code class="docutils literal notranslate"><span class="pre">daemon</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#shell">18.6. <code class="docutils literal notranslate"><span class="pre">shell</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#remote">18.7. <code class="docutils literal notranslate"><span class="pre">remote</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#service">18.8. <code class="docutils literal notranslate"><span class="pre">service</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">18. </span>RDFox Executable</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="rdfox-executable">
+<span id="id1"></span><h1><span class="section-number">18. </span>RDFox Executable<a class="headerlink" href="#rdfox-executable" title="Permalink to this headline">¶</a></h1>
+<p>The RDFox® executable is a command-line tool that can be used to initialize and
+launch local RDFox servers, manage background RDFox services, and connect to
+remote RDFox servers for shell access. These capabilities are provided by a
+number of different modes of operation, each of which is documented in the
+following sub-sections. In each case the purpose, syntax, and functionality of
+the mode in question are explained and examples of its use are provided.</p>
+<p>In what follows, the placeholder <code class="docutils literal notranslate"><span class="pre">&lt;serverParameter&gt;</span></code> is used to denote one
+the server parameters described in <a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a>,
+<code class="docutils literal notranslate"><span class="pre">&lt;endpointParameter&gt;</span></code> is used to denote one of the endpoint parameters
+described in <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>, <code class="docutils literal notranslate"><span class="pre">&lt;role&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;password&gt;</span></code> are
+used to denote a role name and corresponding password, <code class="docutils literal notranslate"><span class="pre">&lt;root&gt;</span></code> is used to
+denote the root directory for the RDFox shell, and <code class="docutils literal notranslate"><span class="pre">&lt;command&gt;</span></code> is used to
+denote one of the RDFox shell commands described in <a class="reference internal" href="rdfox-shell.html#shell-commands"><span class="std std-numref">Section 15.2</span></a>.
+All modes that accept <code class="docutils literal notranslate"><span class="pre">-role</span></code> and <code class="docutils literal notranslate"><span class="pre">-password</span></code> options, also allow the role
+and password to be specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_ROLE</span></code> and <code class="docutils literal notranslate"><span class="pre">RDFOX_PASSWORD</span></code>
+environment variables instead. When both the command line option and the
+corresponding environment variable are specified, the command line option takes
+precedence.</p>
+<p>Several modes set a default value for the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> server parameter
+if it is not specified explicitly. This is <code class="docutils literal notranslate"><span class="pre">$HOME/.RDFox</span></code> on Linux and macOS
+and <code class="docutils literal notranslate"><span class="pre">$LOCALAPPDATA\RDFox</span></code> on Windows.</p>
+<div class="section" id="sandbox">
+<h2><span class="section-number">18.1. </span><code class="docutils literal notranslate"><span class="pre">sandbox</span></code><a class="headerlink" href="#sandbox" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sandbox</span></code> mode is provided to allow users to quickly start in-memory RDFox
+servers for command line and, optionally, REST interaction, with defaults
+suitable for testing and development. The syntax for this mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-&lt;serverParameter&gt; &lt;value&gt; ...] [-&lt;endpointParameter&gt; &lt;value&gt; ...] [-role &lt;role&gt;] [-password &lt;password&gt;] sandbox [&lt;root&gt; [&lt;command&gt; ...]]
+</pre></div>
+</div>
+<p>This instantiates an in-memory RDFox server with an interactive shell and the
+following server parameters, which are aimed at making it convenient for use in
+development and testing:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter is left unset to guarantee that RDFox
+servers launched in this mode cannot affect any persisted settings or
+content.</p></li>
+<li><p>Filesystem sandboxing is disabled by setting the <code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code>
+parameter to the empty string. This ensures that the server can access any
+files on the host system (subject to the OS’s file permissions).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code> parameter is set to include all supported URL
+schemes so that the server can load resources with any of these schemes.</p></li>
+</ul>
+<p>In addition the role and password are both defaulted to <code class="docutils literal notranslate"><span class="pre">guest</span></code>. This allows
+full control of the system via the REST API without authentication, if the
+endpoint is later started with the shell command <code class="docutils literal notranslate"><span class="pre">endpoint</span> <span class="pre">start</span></code>. To allow
+flexibility, the role and password can be set explicitly along with any server
+parameters other than those mentioned above, and all endpoint parameters. The
+syntax also accepts a list of RDFox shell commands to be executed before the
+command prompt is returned for interaction. These are specified after the
+<code class="docutils literal notranslate"><span class="pre">sandbox</span></code> mode specifier and a root directory for the shell.</p>
+<div class="example docutils container">
+<p><strong>Example: Launching in Sandbox Mode</strong></p>
+<p>The easiest way to launch RDFox in sandbox mode is to run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox sandbox
+</pre></div>
+</div>
+<p>It is often convenient to write an RDFox shell script to save typing.
+Assuming it’s saved with name <code class="docutils literal notranslate"><span class="pre">start.rdfox</span></code>, the above command can be
+extended to run this script as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox sandbox . start
+</pre></div>
+</div>
+</div>
+<p>The shell can be closed by issuing the <code class="docutils literal notranslate"><span class="pre">quit</span></code> command.</p>
+</div>
+<div class="section" id="analyze">
+<span id="exe-mode-analyze"></span><h2><span class="section-number">18.2. </span><code class="docutils literal notranslate"><span class="pre">analyze</span></code><a class="headerlink" href="#analyze" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">analyze</span></code> mode is used to check whether a directory is ready to be used as an
+RDFox server directory with the current version of the executable. The syntax
+for this mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-server-directory &lt;value&gt;] analyze
+</pre></div>
+</div>
+<p>This mode will print an error and return a non-zero exit code if the specified
+server directory does not exist. Otherwise, it will print a message detailing
+one of the following outcomes and return a zero exit code:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the directory requires initialization using <code class="docutils literal notranslate"><span class="pre">init</span></code> mode,</p></li>
+<li><p>the directory is initialized but requires upgrading using <code class="docutils literal notranslate"><span class="pre">upgrade</span></code> mode,
+or</p></li>
+<li><p>the directory is ready to be used as a server directory with <code class="docutils literal notranslate"><span class="pre">shell</span></code> and
+<code class="docutils literal notranslate"><span class="pre">daemon</span></code> modes.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="init">
+<span id="exe-mode-init"></span><h2><span class="section-number">18.3. </span><code class="docutils literal notranslate"><span class="pre">init</span></code><a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">init</span></code> mode initializes a persistent RDFox server. The syntax for this mode
+is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-&lt;serverParameter&gt; &lt;value&gt; ...] [-&lt;endpointParameter&gt; &lt;value&gt; ...] [-temp-role |[-role &lt;role&gt;] [-password &lt;password&gt;]] init [&lt;root&gt; [&lt;command&gt; ...]]
+</pre></div>
+</div>
+<p>If the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter is not specified in the command, the
+default value for the OS user account is used (see above). If the
+<code class="docutils literal notranslate"><span class="pre">persistence</span></code> parameter is not specified, or it is specified with value
+<code class="docutils literal notranslate"><span class="pre">off</span></code> the process will return an error.</p>
+<p>A role and password are required by this mode in order to create the first
+server role. If either are absent from both the command arguments and
+environment variables, and the <code class="docutils literal notranslate"><span class="pre">-temp-role</span></code> option is not specified, RDFox
+will prompt for the missing values. If the <code class="docutils literal notranslate"><span class="pre">-temp-role</span></code> option is specified,
+a temporary role will be created with a random name and password and installed
+as the first server role. The temporary role will be removed before the command
+completes. This option is provided for cases when the complete access control
+configuration will be established via the shell commands given at the end of
+the command line, for example when initializing a server with content and
+settings <a class="reference internal" href="rdfox-shell.html#transcribe-command"><span class="std std-ref">transcribed</span></a> from another server.</p>
+<p>At this point, all of the specified server and endpoint parameters are recorded
+in <a class="reference internal" href="servers.html#server-parameters-file"><span class="std std-ref">server</span></a> and <a class="reference internal" href="rdfox-endpoint.html#specifying-endpoint-parameters"><span class="std std-ref">endpoint</span></a> parameters files in the server directory.
+Next, the server’s data store catalog persistence is initialized and after that
+the server’s access control configuration is initialized using the specified
+role and password. If any of the three role manager configuration parameters
+relating to password hashing (see
+<a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a>) is zero, access control
+initialization will include a step to automatically determine suitable values
+for all three. This usually takes a few seconds but occasionally takes several
+tens of seconds. Finally, if the command line includes any shell commands these
+are executed.</p>
+<p>In the case of any error, including errors raised by shell commands, any
+changes to the file system are rolled back and the process returns a non-zero
+exit code. In the case of a successful initialization, the process returns
+zero.</p>
+<p>The server can now be launched in <code class="docutils literal notranslate"><span class="pre">daemon</span></code> or <code class="docutils literal notranslate"><span class="pre">shell</span></code> modes.</p>
+<div class="example docutils container">
+<p><strong>Example: Initializing a Persistent Server on Linux</strong></p>
+<p>The following Bash-compatible script can be used to initialize a persistent
+server with no data stores on Linux:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>export RDFOX_PASSWORD=&quot;******&quot;
+RDFox -server-directory /var/lib/RDFox -persistence file -role admin init
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="upgrade">
+<span id="exe-mode-upgrade"></span><h2><span class="section-number">18.4. </span><code class="docutils literal notranslate"><span class="pre">upgrade</span></code><a class="headerlink" href="#upgrade" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">upgrade</span></code> mode upgrades a server directory from an earlier persistence
+version to the current persistence version. The syntax for this mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-server-directory &lt;value&gt;] [-persistence.encryption.key &lt;value&gt;] upgrade
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="persistence.html#persistence-upgrade"><span class="std std-numref">Section 13.1.2</span></a> for general considerations around upgrade.</p>
+</div>
+<div class="section" id="daemon">
+<span id="exe-mode-daemon"></span><h2><span class="section-number">18.5. </span><code class="docutils literal notranslate"><span class="pre">daemon</span></code><a class="headerlink" href="#daemon" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode launches an in-memory or persistent RDFox server for REST
+interaction only, with defaults suitable for production. The syntax for this
+mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-&lt;serverParameter&gt; &lt;value&gt; ...] [-&lt;endpointParameter&gt; &lt;value&gt; ...] [-role &lt;role&gt;] [-password &lt;password&gt;] daemon [&lt;root&gt; [&lt;command&gt; ...]]
+</pre></div>
+</div>
+<p>If the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter is not specified in the command, the
+default value for the OS user account is used (see above). To launch a
+persistent server in this mode, the server directory must first have been
+initialized using <code class="docutils literal notranslate"><span class="pre">init</span></code> mode (see the preceding section). To launch an
+in-memory server, the <code class="docutils literal notranslate"><span class="pre">persistence</span></code> server parameter must be left unspecified
+or set to <code class="docutils literal notranslate"><span class="pre">off</span></code> (in either the command line arguments or server parameters
+file).</p>
+<p>A role and password are required by this mode only if the server is in-memory
+only (not persistent). If either the role of the password is absent from the
+command arguments and environment variables, RDFox will exit with an error.</p>
+<p>At this point, the server is started and any persisted data stores loaded. If
+the command line includes any shell commands (in-memory servers only), an RDFox
+shell is created to run them and then immediately closed. Finally the endpoint
+is started. The process will run until it receives <code class="docutils literal notranslate"><span class="pre">SIGINT</span></code> or <code class="docutils literal notranslate"><span class="pre">SIGTERM</span></code>
+which will cause the endpoint to shutdown, disconnecting all clients
+gracefully. Note that, on Unix Systems, <code class="docutils literal notranslate"><span class="pre">SIGINT</span></code> can be sent to a process
+attached to a terminal by pressing Ctrl-C.</p>
+<div class="example docutils container">
+<p><strong>Example: Launching a Daemon Process</strong></p>
+<p>The following Bash-compatible command line can be used to start a daemon
+mode process for REST access to the server initialized in the <code class="docutils literal notranslate"><span class="pre">init</span></code> mode
+example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox -server-directory /var/lib/RDFox daemon
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="shell">
+<h2><span class="section-number">18.6. </span><code class="docutils literal notranslate"><span class="pre">shell</span></code><a class="headerlink" href="#shell" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">shell</span></code> mode launches an in-memory or persistent RDFox server for command
+line and, optionally, REST interaction, with defaults suitable for production.
+The syntax for this mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-&lt;serverParameter&gt; &lt;value&gt; ...] [-&lt;endpointParameter&gt; &lt;value&gt; ...] [-role &lt;role&gt;] [-password &lt;password&gt;] shell [&lt;root&gt; [&lt;command&gt; ...]]
+</pre></div>
+</div>
+<p>If the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter is not specified in the command, the
+default value for the OS user account is used (see above). To launch a
+persistent server in this mode, the server directory must first have been
+initialized using <code class="docutils literal notranslate"><span class="pre">init</span></code> mode (see the preceding section). To launch an
+in-memory server, the <code class="docutils literal notranslate"><span class="pre">persistence</span></code> server parameter must be left unspecified
+or set to <code class="docutils literal notranslate"><span class="pre">off</span></code> (in either the command line arguments or server parameters
+file).</p>
+<p>A role and password are required by this mode in order to create the first
+server role for an in-memory server, and to login to the shell for both
+in-memory and persistent servers. If either the role or the password is absent
+from the command arguments and environment variables RDFox will prompt for the
+missing values to be given interactively.</p>
+<p>At this point, the server is started and any persisted data stores loaded. An
+RDFox shell is then created and the user is logged in with the supplied
+credentials. If the command line includes any shell commands, these are
+executed by the shell before the command prompt is returned for user
+interaction. The shell can be closed by issuing the <code class="docutils literal notranslate"><span class="pre">quit</span></code> command.</p>
+<div class="example docutils container">
+<p><strong>Example: Launching a Local Shell</strong></p>
+<p>The following command line can be used to launch a local shell connected to
+the server initialized in the <code class="docutils literal notranslate"><span class="pre">init</span></code> mode example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox -server-directory /var/lib/RDFox shell
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="remote">
+<span id="remote-shell-client"></span><h2><span class="section-number">18.7. </span><code class="docutils literal notranslate"><span class="pre">remote</span></code><a class="headerlink" href="#remote" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">remote</span></code> mode launches a client for the remote shell API to provide command
+line interaction with an RDFox server. The server’s endpoint must be running
+and reachable from the host running the <code class="docutils literal notranslate"><span class="pre">remote</span></code> mode process. The syntax for
+this mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox [-&lt;remoteShellParameter&gt; &lt;value&gt; ...] [-role &lt;role&gt;] [-password &lt;password&gt;] remote &lt;server-url&gt; [&lt;command&gt; ...]
+</pre></div>
+</div>
+<p>The resulting process will call the remote shell API of the server at
+<code class="docutils literal notranslate"><span class="pre">&lt;server-url&gt;</span></code> to instantiate a remote shell instance, which will be used to
+run any commands supplied on the command line, and then prompt for further
+commands to run.</p>
+<p>The remote shell client can be configured with zero or more parameters, each of
+which is specified as a key-value pair of the form <code class="docutils literal notranslate"><span class="pre">-&lt;remoteShellParameter&gt;</span>
+<span class="pre">&lt;value&gt;</span></code>. The following table describes all available remote shell parameters.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 22%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">channel-timeout</span></code></p></td>
+<td><p>A duration of <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">s</span></code> or more
+specified as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>.</p></td>
+<td><p>Determines the length of time the remote
+shell client will wait for I/O. The
+default value is <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> so that
+commands that don’t produce output for
+long periods do not timeout.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connect-timeout</span></code></p></td>
+<td><p>A duration of <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">s</span></code> or more
+specified as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>.</p></td>
+<td><p>Determines the length of time the remote
+shell client will wait for a connection
+to the server. The default value is
+<code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">s</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">credentials</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the client certificate and private
+key, and the intermediate certificates as a
+verbatim string in PEM format. The string must
+contain the client’s private key, the client’s
+certificate, and zero or more intermediate
+certificates. See also the documentation for the
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-ref">endpoint parameter</span></a>
+with the same name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">credentials-file</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the name of the file whose content
+contains the credentials. The file content must
+have the same format as the <code class="docutils literal notranslate"><span class="pre">credentials</span></code>
+parameter.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">credentials-passphrase</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Provides the passphrase that can be used to
+decrypt the credentials in case they are
+encrypted. This parameter is optional.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">min-secure-protocol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ssl3</span></code>, <code class="docutils literal notranslate"><span class="pre">tls1</span></code>, <code class="docutils literal notranslate"><span class="pre">tls11</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tls12</span></code>, or <code class="docutils literal notranslate"><span class="pre">tls13</span></code></p></td>
+<td><p>Determines the minimum protocol version that
+the client should use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">trusted-root-certificate</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>See documentation for the
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-ref">endpoint parameter</span></a>
+with the same name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">trusted-root-certificate-file</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>See documentation for the
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-ref">endpoint parameter</span></a>
+with the same name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verify-server-certificates</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Determines whether the remote shell
+client will attempt to verify the
+server’s certificate. The default value
+is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A role name and password are required at startup. RDFox will first look for the
+arguments <code class="docutils literal notranslate"><span class="pre">-role</span> <span class="pre">&lt;role&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">-password</span> <span class="pre">&lt;password&gt;</span></code>. If one or both of
+these options is missing, RDFox will next inspect the <code class="docutils literal notranslate"><span class="pre">RDFOX_ROLE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RDFOX_PASSWORD</span></code> environment variables respectively. If after this one or
+both variables remain unset, RDFox will prompt for the missing information.</p>
+<p>When invoked from the remote shell, commands will operate in exactly the same
+way as if they were invoked from the local shell (<code class="docutils literal notranslate"><span class="pre">shell</span></code> and <code class="docutils literal notranslate"><span class="pre">sandbox</span></code>
+modes) save for the exceptions documented in
+<a class="reference internal" href="apis.html#rest-remote-shell-limitations"><span class="std std-numref">Section 16.20.1.1</span></a>. Interruptible operations may be
+interrupted with Ctrl-C just as in local shells.</p>
+<p>File paths embedded within commands are always interpreted with respect to the
+server’s file system. The remote shell client does not provide any way of using
+the client’s file system (unless the client is running on the same host as the
+server).</p>
+<p>Uniquely, as <code class="docutils literal notranslate"><span class="pre">remote</span></code> mode does not create an RDFox server instance, no
+license key is required to use the RDFox executable in this mode.</p>
+<div class="example docutils container">
+<p><strong>Example: Launching a Remote Shell</strong></p>
+<p>To connect to a server reachable at <a class="reference external" href="http://example.com:12110">http://example.com:12110</a>, run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox remote http://example.com:12110
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="service">
+<h2><span class="section-number">18.8. </span><code class="docutils literal notranslate"><span class="pre">service</span></code><a class="headerlink" href="#service" title="Permalink to this headline">¶</a></h2>
+<p>Manages RDFox as a background service. On UNIX platforms The syntax for this
+mode is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox service install [user | system] [-&lt;serverParameter&gt; &lt;value&gt; ...] [-&lt;endpointParameter&gt; &lt;value&gt; ...] [daemon [&lt;root&gt; [&lt;command&gt; ...]]]
+RDFox service uninstall [user | system]
+</pre></div>
+</div>
+<p>On Windows, the syntax is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox service install [system] [-&lt;serverParameter&gt; &lt;value&gt; ...] [-&lt;endpointParameter&gt; &lt;value&gt; ...] [daemon [&lt;root&gt; [&lt;command&gt; ...]]]
+RDFox service {uninstall | start | stop | reload} [system]
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">install</span></code> sub-command installs RDFox as a background service either for
+the current user or for the system. On Windows, only system services are
+supported. On macOS and Linux, the service is installed for the current user if
+<code class="docutils literal notranslate"><span class="pre">system</span></code> is not specified explicitly. Installing the service for the system
+requires root or administrative privileges. On all platforms, arguments after
+the optional <code class="docutils literal notranslate"><span class="pre">user</span></code> / <code class="docutils literal notranslate"><span class="pre">system</span></code> specification will be included in the
+command to launch instances of the service. These must form a valid prefix for
+a <code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode command (see <a class="reference internal" href="#exe-mode-daemon"><span class="std std-numref">Section 18.5</span></a>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">uninstall</span></code> sub-command uninstalls the service, again requiring root or
+administrator privileges in the case of system services.</p>
+<p>On Windows, the <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>, and <code class="docutils literal notranslate"><span class="pre">reload</span></code> sub-commands can be used to
+start, stop, and reload the service respectively. On macOS and Linux,
+instructions for managing the service are printed to the console when the
+service is installed.</p>
+<div class="example docutils container">
+<p><strong>Example: Installing and Uninstalling a System-Wide RDFox Service</strong></p>
+<p>To install RDFox as a system service using the server initialized in the
+<code class="docutils literal notranslate"><span class="pre">init</span></code> mode example, run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox service install system -server-directory /var/lib/RDFox
+</pre></div>
+</div>
+<p>Read the instructions printed to the console for how to start, stop, and
+reload the service. To uninstall the service, run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox service uninstall system
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="javadoc.html" class="btn btn-neutral float-left" title="17. Javadoc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rdfox-endpoint.html" class="btn btn-neutral float-right" title="19. RDFox Endpoint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>23. Release Notes &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="24. Acknowledgments" href="acknowledgments.html" />
+    <link rel="prev" title="22. RDFox Docker Images" href="docker.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">23. Release Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#experimental-features">23.1. Experimental features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#releases">23.2. Releases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">23. </span>Release Notes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="release-notes">
+<span id="id1"></span><h1><span class="section-number">23. </span>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="experimental-features">
+<h2><span class="section-number">23.1. </span>Experimental features<a class="headerlink" href="#experimental-features" title="Permalink to this headline">¶</a></h2>
+<p>From time to time, RDFox® releases may include experimental features not
+intended for use in production. In these cases, the affected APIs will
+clearly be labeled “EXPERIMENTAL” meaning that they may change or
+disappear entirely without notice in later versions. Further, Oxford
+Semantic Technologies offers no support for any API labeled in this
+way.</p>
+<p>If you have feedback or questions regarding any feature of RDFox,
+whether experimental or not, we would be grateful to hear it via any of
+the normal channels.</p>
+</div>
+<div class="section" id="releases">
+<h2><span class="section-number">23.2. </span>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>Release 7.3 (TBD)</dt><dd><ul class="simple">
+<li><p>The RDFox Console has a new login experience with support for both
+password-based and OpenID Connect authentication (RD-1620). See
+<a class="reference internal" href="access-control.html#authentication-managers"><span class="std std-numref">Section 12.3</span></a> for details of how to configure
+authentication.</p></li>
+<li><p>The ‘delta queries’ feature (See <a class="reference internal" href="transactions.html#delta-queries"><span class="std std-numref">Section 11.7</span></a>) used to track
+changes to a knowledge graph is no longer experimental (RD-2062).</p></li>
+<li><p>The dictionary that stores the resources in a data store has been optimized
+to reduce memory usage (RD-1971). The observed reductions depend heavily on
+the data set but from our testing 5% is typical and reductions of over 10%
+have been observed.</p></li>
+<li><p>New Triple and Quad table types (<code class="docutils literal notranslate"><span class="pre">triple-table-pi</span></code>, <code class="docutils literal notranslate"><span class="pre">quad-table-lg-pi</span></code>
+and <code class="docutils literal notranslate"><span class="pre">quad-table-sg-pi</span></code>) have been added. The new table types use smaller
+indexes and thus consume less memory than their full indexing counterparts
+(RD-1968). The existing <code class="docutils literal notranslate"><span class="pre">triple-table</span></code>, <code class="docutils literal notranslate"><span class="pre">quad-table-lg</span></code> and
+<code class="docutils literal notranslate"><span class="pre">quad-table-sg</span></code> table types have been renamed to <code class="docutils literal notranslate"><span class="pre">triple-table-fi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">quad-table-lg-fi</span></code> and <code class="docutils literal notranslate"><span class="pre">quad-table-sg-fi</span></code> respectively.</p></li>
+<li><p>Added an API call and shell command to check the integrity of the server
+(RD-1962). See <a class="reference internal" href="apis.html#apis-checking-server-integrity"><span class="std std-numref">Section 16.3.3</span></a> and
+<a class="reference internal" href="rdfox-shell.html#checkintegrity-command"><span class="std std-numref">Section 15.2.5</span></a>.</p></li>
+<li><p>Added API support for session-based authentication (RD-1811). See
+<a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.2.1.1.2</span></a>.</p></li>
+<li><p>Added support for authenticating external agents with client certificates
+(RD-2026). See <a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a>.</p></li>
+<li><p>Added new <code class="docutils literal notranslate"><span class="pre">DAY_OF_THE_WEEK()</span></code> function returning the weekday
+number (RD-2063). See <a class="reference internal" href="querying.html#built-in-functions"><span class="std std-numref">Section 9.2</span></a>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> server parameter can now be set to the empty
+string to explicitly specify that no server directory should be used. This
+is useful for launching in-memory daemon processes.</p></li>
+<li><p>Non-printable characters and UNICODE surrogates can no longer be used in
+names (e.g. data store names, role names, etc.) (RD-1954, RD-1964). As part
+of this change, RDFox now also validates that the UTF-8 encoding of such
+names is valid.</p></li>
+<li><p>The Console’s download feature now supports downloading result sets of
+arbitrary size (RD-1961). Downloading, very large result sets may require
+an increase in the value configured for the <code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> endpoint
+parameter (see <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p></li>
+<li><p>Fixed an issue where RDFox shell variables could be expanded to multiple
+arguments/tokens within a single command (RD-1951).</p></li>
+<li><p>Fixed an issue where RDFox could spuriously report an out of memory error
+when servicing multiple concurrent REST requests (RD-2035).</p></li>
+<li><p>Fixed a crash when attempting to set the <code class="docutils literal notranslate"><span class="pre">persistence</span></code> data store
+parameter to a value other than <code class="docutils literal notranslate"><span class="pre">off</span></code> when the server has no server
+directory (RD-2081).</p></li>
+<li><p>Fixed an apparent hang when certain operations were performed on a data
+store whose <code class="docutils literal notranslate"><span class="pre">max-threads-used</span></code> property was set to a value greater than
+the number of server threads (RD-2079).</p></li>
+<li><p>Fixed a hang when casting some <code class="docutils literal notranslate"><span class="pre">xsd:float</span></code> and <code class="docutils literal notranslate"><span class="pre">xsd:double</span></code> values to
+<code class="docutils literal notranslate"><span class="pre">xsd:decimal</span></code>. It only affects non-zero values that should be rounded to
+zero (RD-2099).</p></li>
+<li><p>Fixed an issue in JRDFox where exceptionally large individual results (e.g.
+strings longer than 15000 characters), could cause a hang (RD-2100).</p></li>
+<li><p>Fixed an issue with the persistence of data stores loaded from one of the
+two binary formats. (RD-2115).</p></li>
+</ul>
+</dd>
+<dt>Release 7.2c (8th January 2024)</dt><dd><ul class="simple">
+<li><p>Fixed a crash affecting some queries with <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> expressions inside
+<code class="docutils literal notranslate"><span class="pre">OPTIONAL</span></code> (RD-2094).</p></li>
+<li><p>Fixed an issue where a rolling back a transaction in which a delta query
+was registered could lead to incorrect delta query answers.</p></li>
+</ul>
+</dd>
+<dt>Release 7.2b (28th November 2024)</dt><dd><ul class="simple">
+<li><p>Fixed a crash when reporting errors from a multi-threaded import operation
+(RD-2069). This issue can only occur when the target data store has its
+<code class="docutils literal notranslate"><span class="pre">invalid-literal-policy</span></code> property set to <code class="docutils literal notranslate"><span class="pre">as-string</span></code> or
+<code class="docutils literal notranslate"><span class="pre">as-string-silent</span></code>.</p></li>
+<li><p>Fixed a crash when evaluating SPARQL updates with attached query monitor
+(RD-2049).</p></li>
+<li><p>Fixed an issue with presenting incorrect information about rules and axioms
+after loading a data store from a binary format (RD-2050, RD-2034).</p></li>
+<li><p>Fixed an issue with timezone conversions (<code class="docutils literal notranslate"><span class="pre">TO_TIMEZONE</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fn:adjust-dateTime-to-timezone</span></code>, <code class="docutils literal notranslate"><span class="pre">fn:adjust-date-to-timezone</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">fn:adjust-time-to-timezone</span></code>) where the resulting value could incorrectly
+account for the existing timezone of the provided time/datetime (RD-2055).</p></li>
+<li><p>Fixed an issue with the persistence of resource specifiers ending
+<code class="docutils literal notranslate"><span class="pre">|namedgraphs|*</span></code> (RD-2059). The fault led to these specifiers being
+persisted as if they ended <code class="docutils literal notranslate"><span class="pre">|namedgraphs|UNDEF</span></code>. After a restart, this
+would result in the role to which the privilege was granted, and all of its
+member roles, being unable to run any SPARQL query involving named graphs.
+See the instructions associated with the release for details of how to
+recover servers affected by this issue.</p></li>
+<li><p>Ensured delta queries cannot be registered with an invalid answer format.
+(RD-1957).</p></li>
+</ul>
+</dd>
+<dt>Release 7.2a (28th October 2024)</dt><dd><ul class="simple">
+<li><p>Fix a crash when multiplying large XSDDecimal (RD-1997)</p></li>
+<li><p>Fix a correctness issue when evaluating filter expressions nested in
+<code class="docutils literal notranslate"><span class="pre">(NOT)</span> <span class="pre">EXISTS</span></code> (RD-1998)</p></li>
+<li><p>Delta queries:</p>
+<ul>
+<li><p>Fix an issue in which delta query answers were not deleted on query
+deregistration (RD-1952)</p></li>
+<li><p>Added the ability for delta queries to take empty snapshots (RD-1955)</p></li>
+<li><p>Fix a crash when registering certain delta queries with <code class="docutils literal notranslate"><span class="pre">DISTINCT</span></code>
+(RD-2017)</p></li>
+<li><p>Fix an issue with loading data stores from binary formats when they have
+registered delta queries (RD-2027)</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt>Release 7.2 (22nd August 2024)</dt><dd><ul class="simple">
+<li><p>The RDFox Console has been redesigned to improve usability (RD-1755).</p></li>
+<li><p>Added an EXPERIMENTAL feature to track changes to a knowledge graph known
+as ‘delta queries’ (RD-1744). See <a class="reference internal" href="transactions.html#delta-queries"><span class="std std-numref">Section 11.7</span></a>.</p></li>
+<li><p>Added support for upgrading persistent servers to the persistence format of
+the current RDFox version (RD-1868). See <a class="reference internal" href="persistence.html#persistence-upgrade"><span class="std std-numref">Section 13.1.2</span></a>. The
+upgrade feature is currently unable to upgrade data stores that have had a
+data source registered since the most recent snapshot. This can be worked
+around by deregistering all data sources and then compacting in the lower
+RDFox version, before attempting the upgrade.</p></li>
+<li><p>Compaction now automatically recovers disk space in all cases (RD-1844).
+The <code class="docutils literal notranslate"><span class="pre">delete-redundant-files</span></code> parameter of the operation has been removed.</p></li>
+<li><p>Roles can now be created without passwords (RD-1815). See
+<a class="reference internal" href="apis.html#apis-managing-roles"><span class="std std-numref">Section 16.18</span></a> for details of the APIs for creating roles
+and <a class="reference internal" href="rdfox-shell.html#role-command"><span class="std std-numref">Section 15.2.39</span></a> for how to create roles in the RDFox shell.</p></li>
+<li><p>Improved the automatic management of database connections in PostgreSQL
+and ODBC data sources (RD-1873).</p></li>
+<li><p>Attempting to bring a data store offline now returns an enum, indicating
+whether the operation was successful, the data store was already offline,
+or that the data store was in use and could not be brought offline
+(RD-1773).</p></li>
+<li><p>The server directories of persistent servers must now always be initialized
+before a server can be started. In versions 7.0 and 7.1, explicit
+initialization was only required for servers managed using the RDFox
+executable but now servers managed via RDFox’s Java API must also be
+initialized. As part of this change, the <code class="docutils literal notranslate"><span class="pre">ConnectionFactory</span></code> class from
+the <code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client</span></code> package has been replaced by the
+new <code class="docutils literal notranslate"><span class="pre">RDFoxServer</span></code> class which exposes methods to support analyzing,
+initializing, starting, and stopping RDFox servers. See
+<a class="reference internal" href="apis.html#apis-java-basics"><span class="std std-numref">Section 16.1</span></a>.</p></li>
+<li><p>The Java API method <code class="docutils literal notranslate"><span class="pre">getVersion()</span></code> has been replaced with
+<code class="docutils literal notranslate"><span class="pre">getRDFoxVersion()</span></code>, and the method <code class="docutils literal notranslate"><span class="pre">getGitSHA()</span></code> has been replaced with
+<code class="docutils literal notranslate"><span class="pre">getRDFoxGitSHA()</span></code>. This change was made to avoid confusion with the newly
+introduced <code class="docutils literal notranslate"><span class="pre">getServerVersion()</span></code> method in the <code class="docutils literal notranslate"><span class="pre">ServerConnection</span></code> .</p></li>
+<li><p>The following server parameters renames have been applied:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">file-system-poll-interval</span></code>        -&gt; <code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">license-content</span></code>                  -&gt; <code class="docutils literal notranslate"><span class="pre">license.content</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">license-file</span></code>                     -&gt; <code class="docutils literal notranslate"><span class="pre">license.file</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">notifications-address</span></code>            -&gt; <code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption-algorithm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption-key</span></code>       -&gt; <code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code></p></li>
+</ul>
+</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">role-manager</span></code> option for the <code class="docutils literal notranslate"><span class="pre">authentication-managers</span></code> server
+parameter has been renamed to <code class="docutils literal notranslate"><span class="pre">role-name+password</span></code>.</p></li>
+<li><p>The lowest supported version of macOS has been increased from <cite>10.14</cite> to
+<cite>10.15</cite>.</p></li>
+<li><p>The base layer for the official Docker images has been updated from Ubuntu
+22.04 to Ubuntu 24.04.</p></li>
+<li><p>The mechanism for loading console extensions, such as faceted search has
+been retired (RD-1755).</p></li>
+<li><p>Fixed a flaw in access control where properties of a resource that would
+not be accessible to an agent trying to read the resource directly were
+returned to the agent when listing all resources of that type (RD-1799).
+This affected data stores, data sources, and tuple tables. List operations
+for these resources will now return the names of all items, but additional
+properties will only be returned for those individuals where the agent
+holds read privileges.</p></li>
+<li><p>Fixed an issue with parameter handling in the <code class="docutils literal notranslate"><span class="pre">importaxioms</span></code> shell
+command (RD-1801).</p></li>
+<li><p>Fixed an issue with the <code class="docutils literal notranslate"><span class="pre">import</span></code>, <code class="docutils literal notranslate"><span class="pre">importaxioms</span></code>, and <code class="docutils literal notranslate"><span class="pre">info</span></code> shell
+commands where the provided named graph was not being resolved against the
+base IRI (RD-1790).</p></li>
+<li><p>Fixed an issue with the reasoning profiler where rule deletion may lead to
+a crash (RD-1782).</p></li>
+<li><p>Fixes to the executable’s <code class="docutils literal notranslate"><span class="pre">init</span></code> mode to ensure that:</p>
+<ul>
+<li><p>the process either succeeds or leaves the filesystem unchanged (RD-1792)</p></li>
+<li><p>errors returned by any included shell commands cause the process to
+return a non-zero exit code (RD-1802).</p></li>
+</ul>
+</li>
+<li><p>Addressed issues in the reasoning profiler:</p>
+<ul>
+<li><p>Fixed a bug where printing intermediate logs could cause a crash (RD-1812).</p></li>
+<li><p>Corrected the miss-ordering of plans (RD-1852).</p></li>
+</ul>
+</li>
+<li><p>Fixed a bug where every role was counted as being a member of itself,
+allowing the roles registered as externally authenticatable or grantable
+to be passed directly by the identity provider (RD-1921).</p></li>
+</ul>
+</dd>
+<dt>Release 7.1b (26th July 2024)</dt><dd><ul class="simple">
+<li><p>Eliminated all security vulnerabilities currently known to AWS ECR’s
+scanner from the Docker images by rebuilding with the latest Ubuntu 22.04
+base image.</p></li>
+<li><p>Fixed an issue where restoring a change in which a rule was deleted, on an
+instance persisted with the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence type, could cause
+the in-memory data store to become corrupted (RD-1869).</p></li>
+<li><p>Fixed a crash that could occur when an explanation was requested for a
+malformed fact (RD-1886).</p></li>
+<li><p>Added calls to <code class="docutils literal notranslate"><span class="pre">malloc_trim</span></code> after compaction and data store deletion
+(Linux only). This is to ensure that memory freed by the RDFox program code
+is returned to the OS. We believe this is only needed because of a bug in
+<code class="docutils literal notranslate"><span class="pre">glibc</span></code> (reported <a class="reference external" href="https://sourceware.org/bugzilla/show_bug.cgi?id=14827">here</a>).</p></li>
+</ul>
+</dd>
+<dt>Release 7.1a (10th May 2024)</dt><dd><ul class="simple">
+<li><p>Added server parameters specifying the time, memory, and parallelism costs
+of Argon2i password hashing (RD-1797). Setting all three during server
+initialization bypasses RDFox’s automatic determination of these
+parameters. See <a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a>.</p></li>
+<li><p>Fixed a bug in compaction where resources that were only mentioned in rules
+were lost from the dictionary, leading those rules to potentially derive
+invalid facts in the place of correct facts (RD-1794).</p></li>
+<li><p>Fixed a bug where shutting down the RDFox server explicitly using the Java
+or C APIs while one or more data stores were offline would result in a
+crash (RD-1785).</p></li>
+</ul>
+</dd>
+<dt>Release 7.1 (11th April 2024)</dt><dd><ul class="simple">
+<li><p>Added support for OpenID Connect authentication (RD-1713). See
+<a class="reference internal" href="access-control.html#oidc"><span class="std std-numref">Section 12.3.2</span></a>.</p></li>
+<li><p>Added new JRDFox API methods to support import and export of data in
+an encrypted format (RD-1746). New cipher streams were also added to the
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.io</span></code> package, to support reading and
+writing of this encrypted data.</p></li>
+<li><p>A new icon is displayed in the Console’s data store selector with the
+names of data stores that were created with certain data store parameters
+(<a class="reference internal" href="data-stores.html#data-store-parameters"><span class="std std-numref">Section 5.4.1</span></a>). The icon appears if one or more of
+the parameters that affect the semantics of the data store, namely
+<code class="docutils literal notranslate"><span class="pre">equality</span></code>, <code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code> and <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code>,
+is set to a value other than its default value. A tool tip on the new
+icon displays these customizations.</p></li>
+<li><p>Improved the evaluation of queries and rules that refer to named graphs
+(RD-1756).</p></li>
+<li><p>The icons next to individual IRIs and blank nodes in the Console’s
+query results table now only appear if that resource is the
+subject or object of a triple in the current data store. In previous
+versions the icon would appear even if the resource was only present as
+a predicate and therefore did not correspond to a starting point for
+the Explore mode (RD-1728).</p></li>
+<li><p>Optimized the operation to recompute materialization (as invoked by the
+<a class="reference internal" href="rdfox-shell.html#remat-command"><span class="std std-ref">remat</span></a> command) to avoiding triggering an unnecessary
+incremental reasoning phase before the full rematerialization.</p></li>
+<li><p>Optimized the clearing of rules and axioms so that, when the clear operation
+leaves the rule index empty, no reasoning is run.</p></li>
+<li><p>Changed the explanation format in the REST API and fixed an issue with the
+explain visualization of ground rules that use aggregation or negation.</p></li>
+<li><p>Creating a data source tuple table now requires a read privilege over the
+data source (RD-1749).</p></li>
+<li><p>The tuple table creation parameter <code class="docutils literal notranslate"><span class="pre">dataSourceName</span></code> has been deprecated
+and replaced with <code class="docutils literal notranslate"><span class="pre">data-source-name</span></code> (RD-1764). See
+<a class="reference internal" href="data-sources.html#creating-data-source-tuple-tables"><span class="std std-numref">Section 7.2</span></a> and sub-sections thereof.</p></li>
+<li><p>The proprietary built-in <code class="docutils literal notranslate"><span class="pre">ROLE</span></code> function has been renamed to <code class="docutils literal notranslate"><span class="pre">AGENT</span></code>
+(RD-1713).</p></li>
+<li><p>The proprietary <code class="docutils literal notranslate"><span class="pre">x-role-name</span></code> field in the Extended Log Format (ELF) has
+been renamed to <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code> (RD-1713).</p></li>
+<li><p>The check password operation on connections, which was exposed in REST and
+Java, has been removed (RD-1713).</p></li>
+<li><p>The tuple table creation parameter <code class="docutils literal notranslate"><span class="pre">dataSourceName</span></code> has been deprecated
+and replaced with <code class="docutils literal notranslate"><span class="pre">data-source-name</span></code> (RD-1764). See
+<a class="reference internal" href="data-sources.html#creating-data-source-tuple-tables"><span class="std std-numref">Section 7.2</span></a> and sub-sections thereof.</p></li>
+<li><p>The Java API methods <code class="docutils literal notranslate"><span class="pre">getRoleName()</span></code> (present on both server and data
+store connections) has been replaced with <code class="docutils literal notranslate"><span class="pre">getAgentName()</span></code> (RD-1713).</p></li>
+<li><p>Fixed a bug where TriG exports from data stores with the
+<code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> parameter contained plain triples duplicating those
+in all named graphs (RD-1727).</p></li>
+</ul>
+</dd>
+<dt>Release 7.0a (31st January 2024)</dt><dd><ul class="simple">
+<li><p>Fixed a crash after a rollback of a read-write transaction that adds new resources (RD-1722).</p></li>
+<li><p>Open the correct type of transaction in the <code class="docutils literal notranslate"><span class="pre">explain</span></code> shell command (RD-1721).</p></li>
+</ul>
+</dd>
+<dt>Release 7.0 (9th January 2024)</dt><dd><ul class="simple">
+<li><p>RDFox now features improved concurrency management, where a writer never
+blocks readers (RD-1451).</p></li>
+<li><p>RDFox servers now support encryption of all persisted data (RD-1641). See
+the <code class="docutils literal notranslate"><span class="pre">persistence.encryption-key</span></code> and <code class="docutils literal notranslate"><span class="pre">persistence.encryption-algorithm</span></code>
+server parameters in <a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a>.</p></li>
+<li><p>The RDFox endpoint and remote shell client now support authentication using
+client certificates (RD-1635). See the new <code class="docutils literal notranslate"><span class="pre">request-client-certificates</span></code>
+and <code class="docutils literal notranslate"><span class="pre">trusted-root-certificate</span></code> parameters to the endpoint in
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a> and the available parameters for the remote
+shell client in <a class="reference internal" href="rdfox-executable.html#remote-shell-client"><span class="std std-numref">Section 18.7</span></a>.</p></li>
+<li><p>Data stores with persistence enabled can now be brought offline in order to
+free up memory, and brought back online when they are needed again
+(RD-1650). See <a class="reference internal" href="rdfox-shell.html#dstore-command"><span class="std std-numref">Section 15.2.17</span></a> for details of how to do this in
+the shell and <a class="reference internal" href="apis.html#apis-bringing-a-data-store-offline-online"><span class="std std-numref">Section 16.4.5</span></a> for how
+to do it programmatically. The newly-introduced server parameter
+<code class="docutils literal notranslate"><span class="pre">all-data-stores-online-on-startup</span></code> can be set to <code class="docutils literal notranslate"><span class="pre">false</span></code> to start the
+server with all data stores initially offline.</p></li>
+<li><p>RDFox now supports installation as a background service via the new
+<code class="docutils literal notranslate"><span class="pre">service</span></code> executable mode (RD-1662). In support of this change a second
+new executable mode, <code class="docutils literal notranslate"><span class="pre">init</span></code> has been added to handle initialization of
+server directories, including writing configuration files and initializing
+persistence. See <a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a> for instructions on how to use
+all modes of the RDFox executable.</p></li>
+<li><p>The RDFox Update Protocol now supports selective replacement of data store
+content (e.g., replacing just the rules in one RESTful API call); see
+<a class="reference internal" href="apis.html#rdfox-update-protocol-put"><span class="std std-numref">Section 16.9.2.6</span></a>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">/content</span></code> key now implements the <a class="reference external" href="http://www.w3.org/TR/sparql11-http-rdf-update/">SPARQL 1.1 Graph Store HTTP
+Protocol</a> fully, as well
+as a proprietary RDFox Update Protocol (see
+<a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.9</span></a>).</p></li>
+<li><p>RDFox now supports automatic compaction and automatic dead fact removal to
+help reclaim memory and minimise restart times after facts are deleted from
+a data store (see <a class="reference internal" href="data-stores.html#compaction-dead-fact-removal"><span class="std std-numref">Section 5.2.4</span></a>).</p></li>
+<li><p>Introduced the notion of <em>data store properties</em> that represent various
+aspects of the configuration of a data store. Many configuration options
+(e.g., <code class="docutils literal notranslate"><span class="pre">import.invalid-literal-policy</span></code>) that were immutable in earlier
+versions are now exposed as mutable data store properties (see
+<a class="reference internal" href="data-stores.html#data-store-properties"><span class="std std-numref">Section 5.4.2</span></a>).</p></li>
+<li><p>Assorted improvements to the RDFox Console SPARQL editor (RD-1577).</p></li>
+<li><p>Added sampling information to the query and reasoning profilers (RD-1617).
+See <a class="reference internal" href="querying.html#query-monitoring"><span class="std std-numref">Section 9.6</span></a> and <a class="reference internal" href="reasoning.html#reasoning-monitoring"><span class="std std-numref">Section 10.9</span></a> for
+instructions on how to use these tools.</p></li>
+<li><p>Added an endpoint configuration parameter <code class="docutils literal notranslate"><span class="pre">lock-timeout</span></code> that controls
+how long the endpoint will wait to obtain a lock on a data store (RD-1685).
+See the full description in <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> data store parameter is no longer EXPERIMENTAL.
+The console has been updated to allow the parameter to be set and to
+work with data stores that have a value for the parameter (RD-1595).</p></li>
+<li><p>When using the RESTful API, data store operations such as clearing,
+compacting, etc., are now invoked by sending <code class="docutils literal notranslate"><span class="pre">POST</span></code> requests to path
+<code class="docutils literal notranslate"><span class="pre">/datastores/&lt;DSTRNAME&gt;/operations</span></code> rather than to
+<code class="docutils literal notranslate"><span class="pre">/datastore/&lt;DSTRNAME&gt;</span></code>. See
+<a class="reference internal" href="apis.html#rest-invoking-data-store-operations"><span class="std std-numref">Section 16.4.8</span></a> for the complete list of
+operations available using the new path (RD-1640).</p></li>
+<li><p>The server parameters <code class="docutils literal notranslate"><span class="pre">persist-roles</span></code> and <code class="docutils literal notranslate"><span class="pre">persist-ds</span></code>, which formerly
+controlled persistence of roles and data stores respectively, have been
+replaced by a single parameter <code class="docutils literal notranslate"><span class="pre">persistence</span></code> which controls persistence
+of all server content. The data store parameter <code class="docutils literal notranslate"><span class="pre">persist-ds</span></code> has been
+renamed to <code class="docutils literal notranslate"><span class="pre">persistence</span></code> to match.</p></li>
+<li><p>The server parameters file name has changed from <code class="docutils literal notranslate"><span class="pre">parameters</span></code> to
+<code class="docutils literal notranslate"><span class="pre">server.params</span></code> and an equivalent file for endpoint parameters has been
+introduced with name <code class="docutils literal notranslate"><span class="pre">endpoint.params</span></code>.</p></li>
+<li><p>CORS support in the RDFox endpoint has been improved to allow authenticated
+cross-origin requests for all origins or a list of specific origins
+(RD-1687). See the <code class="docutils literal notranslate"><span class="pre">access-control-allow-origin</span></code> endpoint parameter in
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>.</p></li>
+<li><p>Added extensions to the aggregate functions <code class="docutils literal notranslate"><span class="pre">MIN</span></code> and <code class="docutils literal notranslate"><span class="pre">MAX</span></code> (RD-1680).
+See the full list of aggregate functions in <a class="reference internal" href="querying.html#aggregate-functions"><span class="std std-numref">Section 9.3</span></a>.</p></li>
+<li><p>Added support for version 3 of OpenSSL libraries and discontinued support
+for lower versions (RD-1637).</p></li>
+<li><p>Parameters for setting the search paths for specific dynamic libraries
+(specifically the endpoint parameters <code class="docutils literal notranslate"><span class="pre">openSSL.crypto-lib</span></code> and
+<code class="docutils literal notranslate"><span class="pre">openSSL.ssl-lib</span></code>, and the <code class="docutils literal notranslate"><span class="pre">driver</span></code> and <code class="docutils literal notranslate"><span class="pre">driver-manager</span></code> data source
+parameters) have been replaced with equivalent environment variables. See
+<a class="reference internal" href="features-and-requirements.html#third-party-software"><span class="std std-numref">Section 2.4.1.2</span></a>.</p></li>
+<li><p>Deprecated the <code class="docutils literal notranslate"><span class="pre">base</span></code> command in favor of <code class="docutils literal notranslate"><span class="pre">dsprop</span></code>.</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">daemon</span></code> shell command. The <code class="docutils literal notranslate"><span class="pre">daemon</span></code> executable mode is
+still supported.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">clear</span></code> command, when run without arguments, now clears all parts of
+the data store (SUP-186).</p></li>
+<li><p>The proprietary Extended Log Format (ELF) property name
+<code class="docutils literal notranslate"><span class="pre">x-socket-exception</span></code> has been replaced by <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>.</p></li>
+<li><p>Removed optimised handling of equality (i.e., <code class="docutils literal notranslate"><span class="pre">owl:sameAs</span></code>) and replaced
+it by an explicit axiomatisation using rules.</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">chase</span></code> option for the <code class="docutils literal notranslate"><span class="pre">equality</span></code> data store parameter.</p></li>
+<li><p>Renamed the shell variables <code class="docutils literal notranslate"><span class="pre">reason.profiler-entries</span></code> and
+<code class="docutils literal notranslate"><span class="pre">reason.profiler-logPlans</span></code> to <code class="docutils literal notranslate"><span class="pre">reason.profiler.entries</span></code> and
+<code class="docutils literal notranslate"><span class="pre">reason.profiler.log-plans</span></code>, respectively.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rdfox-init</span></code> Docker images no longer copy a parameters file into the
+server directory. Instead, all server and endpoint parameters which should
+be saved to the server directory being initialized should be specified in
+the command arguments (RD-1668).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">rdfox</span></code> Docker images no longer set the <code class="docutils literal notranslate"><span class="pre">request-logger</span></code> endpoint
+parameter by default (RD-1668).</p></li>
+<li><p>Fixed a bug in the evaluation of SPARQL queries with graph clauses
+(RD-1657).</p></li>
+</ul>
+</dd>
+<dt>Release 6.3b (24th October 2023)</dt><dd><ul class="simple">
+<li><p>Fixed a crash when using Solr data sources, which was introduced in v6.3
+(RD-1618).</p>
+<ul>
+<li><p>Setting the Solr data source parameter <code class="docutils literal notranslate"><span class="pre">connection-keep-alive</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>
+now disables the caching of connections to the Apache Solr server.</p></li>
+</ul>
+</li>
+<li><p>Fix a bug that introduced spurious triples when rules containing atoms with
+repeated variables were added incrementally on a server with more than one
+thread (SUP-180).</p></li>
+<li><p>Fixed a crash in compaction on stores with rules imported by
+<cite>importaxtioms</cite> (SUP-182).</p></li>
+<li><p>Other small fixes and optimizations in the engine.</p></li>
+</ul>
+</dd>
+<dt>Release 6.3a (9th August 2023)</dt><dd><ul class="simple">
+<li><p>Fixed a crash when explaining facts derived by rules containing <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>
+atoms (RD-1589).</p></li>
+<li><p>Fixed a bug which caused incorrect answers to be returned for some queries
+with <code class="docutils literal notranslate"><span class="pre">FILTER</span> <span class="pre">EXISTS</span></code> or <code class="docutils literal notranslate"><span class="pre">FILTER</span> <span class="pre">NOT</span> <span class="pre">EXISTS</span></code> clauses (SUP-176).</p></li>
+<li><p>Fixed a bug in the <code class="docutils literal notranslate"><span class="pre">equality-optimization</span></code> planning algorithm which
+caused incorrect answers to be returned for some queries that bind a
+variable to the value of another variable (RD-1588).</p></li>
+<li><p>Fixed a bug in argument handling for shell scripts where invoking one
+script from another could incorrectly delete the positional arguments from
+the context of the calling script (RD-1599).</p></li>
+<li><p>Other fixes in the engine and console.</p></li>
+</ul>
+</dd>
+<dt>Release 6.3 (26th July 2023)</dt><dd><ul class="simple">
+<li><p>Added an “Explain” mode to the RDFox Console to graphically depict and
+explore the explanation of a derived fact. This may be accessed from the
+mode selector at the top right of the Console, or from a context menu on an
+edge representing a derived fact in the Explore mode. See
+<a class="reference internal" href="reasoning.html#explanation-in-web-console"><span class="std std-numref">Section 10.8.2</span></a>.</p></li>
+<li><p>Added support for listing, inspecting and cancelling RESTful requests
+running on the RDFox endpoint.</p></li>
+<li><p>The compact operation now compacts the dictionary to recover memory and
+resource ID space.</p></li>
+<li><p>Added an EXPERIMENTAL facility to specify a SPARQL update to be run on the
+closure of each data store transaction. See <a class="reference internal" href="transactions.html#commit-procedure"><span class="std std-numref">Section 11.6</span></a>.</p></li>
+<li><p>Added an EXPERIMENTAL data store parameter to specify a named graph to act
+as the default graph. See <a class="reference internal" href="data-stores.html#default-graph-name-parameter"><span class="std std-numref">Section 5.4.1.1</span></a>.</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">sequential</span></code> data store type. Since all remaining data store
+types now support concurrent access, the JRDFox API
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.isConcurrent</span></code> has
+also been removed.</p></li>
+<li><p>Renamed all APIs and commands for triggering recompilation of a data
+store’s rules from <code class="docutils literal notranslate"><span class="pre">recompileRules</span></code> (or similar) to <code class="docutils literal notranslate"><span class="pre">recompile</span></code> and
+extended the implementation to also recompile any <a class="reference internal" href="transactions.html#commit-procedure"><span class="std std-ref">commit procedure</span></a>.</p></li>
+<li><p>Changed all APIs and commands for setting a data store’s base IRI to return
+a boolean indicating whether the value changed or not.</p></li>
+<li><p>SPARQL FROM statements now compute the multiset union of triples in the
+selected named graphs as was the case prior to v6.0.</p></li>
+<li><p>Fixed bug where compacting a <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> data store could lead to
+persistence of transient dictionary resources, preventing the sequence from
+being loaded by other replicas (RD-1546).</p></li>
+<li><p>Fixed a bug where new versions of data stores and role managers were not
+loaded after a commit failed due to lagging replication (RD-1499).</p></li>
+<li><p>Fixed the datalog parser in JRDFox to accept aggregate rules without <cite>ON</cite>
+clauses (RD-1511).</p></li>
+<li><p>Fixed handling of <code class="docutils literal notranslate"><span class="pre">BASE</span></code> directives in Turtle and TriG inputs (RD-1489).</p></li>
+<li><p>Fixed a bug with serialization of axioms in deltas. The bug would be
+encountered in transactions were axioms were added to and removed from the
+same named graph (SUP-175).</p></li>
+<li><p>Fixed the TLS v1.3 client implementation to include the Server Name
+Indication (SNI) extension in the handshake (RD-1528).</p></li>
+<li><p>Fixed a crash in query answering affecting queries with <cite>EXISTS</cite> under <cite>BIND</cite>
+(RDF-1554).</p></li>
+<li><p>Fixed the rejection of certain queries that use <cite>EXISTS</cite> (RDF-1554).</p></li>
+</ul>
+</dd>
+<dt>Release 6.2 (29th March 2023)</dt><dd><ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">remote</span></code> mode of the RDFox executable now supports cookies so that it
+can be used with high availability RDFox services where the load balancer
+supports sticky sessions (RD-1459).</p></li>
+<li><p>Fixed an issue where the same sequence of blank node identifiers was
+repeated in each persistence session, potentially leading to properties
+being added to existing rather than new nodes (RD-1485).</p></li>
+<li><p>Fixed an issue where the values for the <code class="docutils literal notranslate"><span class="pre">Date</span></code> header in HTTP responses
+from the RDFox endpoint were local times rather than GMT (RD-1486).</p></li>
+</ul>
+</dd>
+<dt>Release 6.1 (22nd March 2023)</dt><dd><ul class="simple">
+<li><p>The RDFox Console now supports large numbers of named graphs through the
+following changes:</p>
+<ul>
+<li><p>“Add content” and “Delete content” menus support named graph searching.</p></li>
+<li><p>Named graphs can be created as part of the “Add content” action.</p></li>
+<li><p>If there are more named graphs in the datastore than can be listed, the
+“Explore” mode named graph selector now provides a search interface.</p></li>
+</ul>
+</li>
+<li><p>Added access control for named graphs. See
+<a class="reference internal" href="access-control.html#named-graph-access-control"><span class="std std-numref">Section 12.1.6.2.2</span></a>.</p></li>
+<li><p>All APIs (Java, C and REST) that returned or resolved dictionary resource
+IDs have been removed, as has the <code class="docutils literal notranslate"><span class="pre">lookup</span></code> shell command.</p></li>
+<li><p>Resource names of the form <code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|dictionary</span></code> are
+no longer supported.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">import.invalid-literal-policy</span></code> was renamed to
+<code class="docutils literal notranslate"><span class="pre">invalid-literal-policy</span></code> and is now applicable to queries and updates.
+See <a class="reference internal" href="data-stores.html#invalid-literal-policy-property"><span class="std std-numref">Section 5.4.2.5</span></a>.</p></li>
+<li><p>Added variants of the <code class="docutils literal notranslate"><span class="pre">SHACL</span></code> and <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code> tuple tables that
+provide access to the default graph. See <a class="reference internal" href="tuple-tables.html#shacl-tuple-table"><span class="std std-numref">Section 6.5.2</span></a> and
+<a class="reference internal" href="tuple-tables.html#dependency-graph-tuple-table"><span class="std std-numref">Section 6.5.3</span></a> respectively.</p></li>
+<li><p>The clear operation (invoked, for example, by the <code class="docutils literal notranslate"><span class="pre">clear</span></code> shell command)
+no longer clears the data store’s prefixes or resets its base IRI. The same
+operation did take these actions in RDFox v6.0 (only) however the online
+help and published documentation did not mention this behavior (SUP-157).</p></li>
+<li><p>RDFox servers now perform the initial restoration of content persisted with
+the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option as part of the start operation
+rather than in the background. This is consistent with the behavior when
+using the <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence option. For the RDFox executable, the
+endpoint (<code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode) or shell (<code class="docutils literal notranslate"><span class="pre">shell</span></code> and <code class="docutils literal notranslate"><span class="pre">sandbox</span></code> modes) are
+started after the server start operation has completed.</p></li>
+<li><p>Optimized the evaluation of queries that bind variables to RDF terms or
+other variables.</p></li>
+<li><p>Fixed validation of endpoint parameters to allow <code class="docutils literal notranslate"><span class="pre">openSSL.crypto-lib</span></code> and
+<code class="docutils literal notranslate"><span class="pre">openSSL.ssl-lib</span></code> parameters to be set (RD-1423).</p></li>
+<li><p>Fixed the <code class="docutils literal notranslate"><span class="pre">ResourceValue.getResource(...).toResource()</span></code> method in JRDFox
+to return objects of type IRI and blank node when returning IRIs and blank
+nodes</p></li>
+<li><p>Fixed an issue with evaluation of queries that have unbound variables in
+their selection (RD-1436).</p></li>
+<li><p>Fixed return code from <code class="docutils literal notranslate"><span class="pre">oxfordsemantic/rdfox-init</span></code> images when an error
+stops execution of an <code class="docutils literal notranslate"><span class="pre">initialize.rdfox</span></code> script (RD-1472).</p></li>
+<li><p>Fixed the escaping of <code class="docutils literal notranslate"><span class="pre">xsd:AnyURI</span></code> values in N-Triples and N-Quads query
+answer and export formats.</p></li>
+<li><p>Fixed a crash in <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence when UDP notifications are
+configured (RD-1479).</p></li>
+<li><p>The following changes were made to the class
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.StatementResult</span></code>:</p>
+<ul>
+<li><p>The methods <code class="docutils literal notranslate"><span class="pre">getNumberOfTuples()</span></code> and <code class="docutils literal notranslate"><span class="pre">getTotalNumberOfTuples()</span></code> have
+been replaced with <code class="docutils literal notranslate"><span class="pre">getNumberOfQueryAnswers()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">getTotalNumberOfQueryAnswers()</span></code> respectively.</p></li>
+<li><p>The following new public methods have been added:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">boolean</span> <span class="pre">getStatementTypeSupportsUserQuery()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boolean</span> <span class="pre">getStatementTypeSupportsDeletions()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">getNumberOfAttemptedDeletions()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">getNumberOfDeletions()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boolean</span> <span class="pre">getStatementTypeSupportsInsertions()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">getNumberOfAttemptedInsertions()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">getNumberOfInsertions()</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt>Release 6.0 (23rd November 2022)</dt><dd><ul class="simple">
+<li><p>A new persistence type, <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>, has been added to facilitate
+high-availability deployments. See <a class="reference internal" href="persistence.html#file-sequence-persistence"><span class="std std-numref">Section 13.2.1.2</span></a>.</p></li>
+<li><p>Improved the handling of large numbers of named graphs.</p>
+<ul>
+<li><p>Named graphs are no longer stored in individual tuple tables of type
+<code class="docutils literal notranslate"><span class="pre">named-graph</span></code>, but are instead stored in a single tuple table called
+<code class="docutils literal notranslate"><span class="pre">Quads</span></code>. See <a class="reference internal" href="tuple-tables.html#in-memory-tuple-tables"><span class="std std-numref">Section 6.4</span></a>. This reduces the memory
+overheads per named graph and removes the practical limits on the number
+of named graphs in a data store.</p></li>
+<li><p>Graph names are no longer restricted to IRIs. RDFox now accepts arbitrary
+RDF terms as graph names in RDF data, SPARQL queries, datalog rules and
+relevant REST/Java/C APIs.</p></li>
+<li><p>The shell commands <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">axioms</span></code>, <code class="docutils literal notranslate"><span class="pre">import</span></code> and <code class="docutils literal notranslate"><span class="pre">importaxioms</span></code>,
+accept graph names specified either as IRIs or as strings containing the
+Turtle encoding of RDF terms.</p></li>
+<li><p>The REST parameters <code class="docutils literal notranslate"><span class="pre">default-graph</span></code>, <code class="docutils literal notranslate"><span class="pre">source-graph</span></code> and
+<code class="docutils literal notranslate"><span class="pre">target-graph</span></code> replace the old parameters <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code>,
+<code class="docutils literal notranslate"><span class="pre">source-graph-name</span></code> and <code class="docutils literal notranslate"><span class="pre">target-graph-name</span></code>, respectively. When
+specified, they should contain the Turtle encoding of an RDF term.</p></li>
+<li><p>The new data store parameter <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code> determines the type of
+the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table.</p></li>
+<li><p>The rule language has been extended with <em>named graph atoms</em> for
+referring to triples in named graphs. See <a class="reference internal" href="reasoning.html#named-graph-atom"><span class="std std-numref">Section 10.4.1.2</span></a>.</p></li>
+</ul>
+</li>
+<li><p>Each data store is now associated with a base IRI and a set of prefixes
+that are assumed to be implicitly present in all API calls. All RDFox APIs
+have been extended to support management of this information (see
+<a class="reference internal" href="apis.html#apis-data-store-prefixes"><span class="std std-numref">Section 16.6</span></a>). New data stores are populated with a
+set of default prefixes and the default base IRI
+<code class="docutils literal notranslate"><span class="pre">https://rdfox.com/default-base-iri/</span></code>. RDFox shell instances no longer
+maintain a base IRI nor a set of prefixes and the <code class="docutils literal notranslate"><span class="pre">base</span></code>, <code class="docutils literal notranslate"><span class="pre">prefix</span></code> and
+<code class="docutils literal notranslate"><span class="pre">prefixes</span></code> shell commands have been repurposed to operate on the
+corresponding properties of the data store instead. Finally, the RDFox
+Console has been extended with interfaces to display and modify data store
+prefixes and to display IRIs in their prefixed form wherever this makes
+sense.</p></li>
+<li><p>The executable and dynamic-link library for macOS and Windows are now
+code-signed. For macOS, these items are also notarized by Apple.</p></li>
+<li><p>The REST APIs and RDFox executable mode related to remote shell execution,
+which were introduced as EXPERIMENTAL features in v5.6, are now supported.</p></li>
+<li><p>The following types of in-memory tuple tables have been added to RDFox:
+<code class="docutils literal notranslate"><span class="pre">unary-table</span></code>, <code class="docutils literal notranslate"><span class="pre">binary-table</span></code>, <code class="docutils literal notranslate"><span class="pre">triple-table</span></code>, <code class="docutils literal notranslate"><span class="pre">quad-table-lg</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">quad-table-sg</span></code>. The tuple table type <code class="docutils literal notranslate"><span class="pre">named-graph</span></code> has been removed.</p></li>
+<li><p>Data store types have been changed to <code class="docutils literal notranslate"><span class="pre">sequential</span></code>, <code class="docutils literal notranslate"><span class="pre">parallel-nn</span></code>,
+<code class="docutils literal notranslate"><span class="pre">parallel-nw</span></code> and <code class="docutils literal notranslate"><span class="pre">parallel-ww</span></code>. Data store type <code class="docutils literal notranslate"><span class="pre">seq</span></code> has been
+replaced with <code class="docutils literal notranslate"><span class="pre">sequential</span></code>, while data store types <code class="docutils literal notranslate"><span class="pre">par-complex-*</span></code> and
+<code class="docutils literal notranslate"><span class="pre">par-simple-*</span></code> have been replaced with <code class="docutils literal notranslate"><span class="pre">parallel-*</span></code>.</p></li>
+<li><p>Tuple table names are no longer IRIs but strings, similar to data store
+names and data source names. The following tuple tables are available after
+data store creation: <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code>, <code class="docutils literal notranslate"><span class="pre">Quads</span></code>, <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code>,
+<code class="docutils literal notranslate"><span class="pre">SHACL</span></code> and <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>. The <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code> SPARQL extension for
+referencing tuple tables has changed to reflect the new type of tuple table
+names. See <a class="reference internal" href="querying.html#querying-tuple-tables"><span class="std std-numref">Section 9.4</span></a>.</p></li>
+<li><p>Axiom management is now authorized using the resource specifier
+<code class="docutils literal notranslate"><span class="pre">|datastores|{datastore-name}|axioms</span></code>.</p></li>
+<li><p>The RDF namespace used for system components that have IRIs has changed
+from <code class="docutils literal notranslate"><span class="pre">http://oxfordsemantic.tech/RDFox#</span></code> to
+<code class="docutils literal notranslate"><span class="pre">https://rdfox.com/vocabulary#</span></code> and the default prefix <code class="docutils literal notranslate"><span class="pre">rdfox:</span></code> has
+been updated to reflect this.</p></li>
+<li><p>The compact operation now accepts a boolean option indicating whether
+redundant files should be deleted to reclaim disk space.</p></li>
+<li><p>The APIs for granting and revoking privileges or memberships no longer
+produce errors if the system is already in the desired state. This was also
+the case in v5.6 and earlier however these operations now return a boolean
+indicating whether a change was made or not.</p></li>
+<li><p>When setting server properties via REST, the <code class="docutils literal notranslate"><span class="pre">operation</span></code> request
+parameter must now be specified with value <code class="docutils literal notranslate"><span class="pre">set</span></code>.</p></li>
+<li><p>Fixed a bug in the usage of the <code class="docutils literal notranslate"><span class="pre">SHACL</span></code> and <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code>
+tuple tables in complex SPARQL queries.</p></li>
+<li><p>SPARQL FROM statements now compute the set union of triples in the selected
+named graphs, as per the specification, instead of the multiset union.</p></li>
+<li><p>The data store and in-memory tuple table parameters
+<code class="docutils literal notranslate"><span class="pre">init-triple-capacity</span></code> and <code class="docutils literal notranslate"><span class="pre">max-triple-capacity</span></code> have been replaced
+with <code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code> and <code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code> respectively.</p></li>
+<li><p>The default library names for the <code class="docutils literal notranslate"><span class="pre">libcrypto</span></code> and <code class="docutils literal notranslate"><span class="pre">libssl</span></code> dynamic
+libraries on macOS have been updated from <code class="docutils literal notranslate"><span class="pre">libcrypto.dylib</span></code> to
+<code class="docutils literal notranslate"><span class="pre">libcrypto.1.1.dylib</span></code> and from <code class="docutils literal notranslate"><span class="pre">libssl.dylib</span></code> to <code class="docutils literal notranslate"><span class="pre">libssl.1.1.dylib</span></code>
+respectively.</p></li>
+<li><p>Improvements have been made to the syntax highlighting and autocompletion
+of keywords in the Console’s “SPARQL” Mode.</p></li>
+<li><p>Bug fixes to the Console’s “Explore” mode include a fix to the layout
+controls and Reset button to address an issue where a second automated
+graph layout could not be initiated.</p></li>
+<li><p>The lowest supported version of Windows is now Windows 10.</p></li>
+<li><p>The lowest support versions of Linux are Ubuntu 18.04 and Amazon Linux 2.</p></li>
+<li><p>The JSON format for serializing explanations has been revised.</p></li>
+<li><p>The following changes have been made to the <code class="docutils literal notranslate"><span class="pre">oxfordsemantic/rdfox-init</span></code>
+Docker image:</p>
+<ul>
+<li><p>Server parameters can now be specified in a file instead of via the
+command line only.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">persist-roles</span></code> or <code class="docutils literal notranslate"><span class="pre">persist-ds</span></code> server parameters are no longer
+defaulted to <code class="docutils literal notranslate"><span class="pre">file</span></code> and must be explicitly specified (either in the
+command arguments or in a parameters file).</p></li>
+<li><p>The images no longer invoke RDFox when the server directory has already
+been initialized. Because of this, <code class="docutils literal notranslate"><span class="pre">initialize.rdfox</span></code> scripts are no
+longer executed with the <code class="docutils literal notranslate"><span class="pre">continue-if-exists</span></code> error policy.</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt>Release 5.7 (10th August 2022)</dt><dd><ul class="simple">
+<li><p>Updated the JSON explanation format to serialise facts as objects, rather
+than strings.</p></li>
+<li><p>Improved the memory usage of main memory tuple tables.</p></li>
+<li><p>Support for the SecureTransport framework on macOS (previously selected
+with parameter value <code class="docutils literal notranslate"><span class="pre">secure-transport</span></code>) was dropped. OpenSSL is now
+required to use TLS on macOS.</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">clear</span> <span class="pre">facts-keep-rules</span></code> operation.</p></li>
+<li><p>Provided the APIs for changing the maximum allowed memory use of the
+server at runtime, without having to restart the server.</p></li>
+<li><p>Performance improvements and bug fixes to the Console.</p></li>
+<li><p>The following changes have been made to the configuration of RDFox servers:</p>
+<ul>
+<li><p>When a server is created without an explicit <code class="docutils literal notranslate"><span class="pre">server-directory</span></code>
+parameter, no server directory will be used. In previous versions the
+server used a default location in the OS user’s home directory when the
+parameter was not specified explicitly.</p></li>
+<li><p>In addition to the existing mechanisms for supplying them, server
+parameters may now be loaded from a file in the server directory. See
+<a class="reference internal" href="servers.html#server-parameters-file"><span class="std std-numref">Section 4.3.1</span></a> for details.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">shell</span></code>, <code class="docutils literal notranslate"><span class="pre">daemon</span></code> and <code class="docutils literal notranslate"><span class="pre">sandbox</span></code> modes of the RDFox executable
+no longer have any associated defaults for the <code class="docutils literal notranslate"><span class="pre">persist-roles</span></code> or
+<code class="docutils literal notranslate"><span class="pre">persist-ds</span></code> server parameters. Instead, <code class="docutils literal notranslate"><span class="pre">shell</span></code> and <code class="docutils literal notranslate"><span class="pre">daemon</span></code> modes
+default the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter to the same location as was
+previously used when this parameter was not set explicitly.</p></li>
+</ul>
+</li>
+<li><p>The modification of access control settings has been decoupled from the
+modification of server content. This has the following consequences:</p>
+<ul>
+<li><p>Roles are no longer automatically granted privileges over the resources
+that they create.</p></li>
+<li><p>Privileges specific to a resource (such as a data store, data source,
+tuple table or role) are no longer deleted when the resource is deleted.
+This, incidentally, fixes an issue introduced in RDFox v5.5 which
+prevented privileges specific to a data store persisting across sessions
+(RD-1306).</p></li>
+</ul>
+</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">sandbox</span></code> mode of the RDFox executable now sets server parameter
+<code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code> to the empty string to disable file system
+sandboxing.</p></li>
+</ul>
+</dd>
+<dt>Release 5.6 (13th May 2022)</dt><dd><ul class="simple">
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">getAnswerVariableName()</span></code> method to the <code class="docutils literal notranslate"><span class="pre">Cursor</span></code> interface in
+JRDFox.</p></li>
+<li><p>Fixed a bug where anonymous variables (called <code class="docutils literal notranslate"><span class="pre">__AVAR__n</span></code>) introduced
+internally during compilation would be returned in <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span></code> queries
+(RD-1242).</p></li>
+<li><p>Parameters specifying durations may now be specified with an optional unit
+of either <code class="docutils literal notranslate"><span class="pre">s</span></code> or <code class="docutils literal notranslate"><span class="pre">ms</span></code>. If no unit is specified, the integer part is
+interpreted as a number of whole seconds.</p></li>
+<li><p>Introduced an EXPERIMENTAL extension of the REST API that allows remote
+execution of shell commands and an accompanying new mode for the RDFox
+executable, <code class="docutils literal notranslate"><span class="pre">remote</span></code>.</p></li>
+<li><p>Added shell command <code class="docutils literal notranslate"><span class="pre">rwtest</span></code> to test reading and writing in data stores.</p></li>
+<li><p>Improved the performance of reasoning with rules that reference the
+<code class="docutils literal notranslate"><span class="pre">rdfox:SKOLEM</span></code> built-in tuple.</p></li>
+<li><p>Fixed a bug with the creation of data stores in the Console. If the server
+is configured to persist data stores to files by default, an option in the
+Advanced Settings dialog is provided to prevent a newly created data store
+from being persisted. This setting had no effect.</p></li>
+<li><p>Improvements to the Console’s “Explore” mode:</p>
+<ul>
+<li><p>A new “Highlight reasoning” control has been added to the toolbar.
+Relationships between entities that only exist as a consequence of rules
+may be displayed in a different colour to those relationships that are
+explicit within the RDF data.</p></li>
+<li><p>The context menu on nodes has been enhanced with a control to copy the
+associated RDF entity.</p></li>
+<li><p>A new context menu has been added to edges, with controls to delete the
+edge, copy the IRI of the edge’s predicate, or copy the associated fact.</p></li>
+<li><p>The zoom and pan controls have been moved to the bottom right corner of
+the canvas.</p></li>
+<li><p>The performance of visualizing small subgraphs of very large data stores
+has been improved.</p></li>
+</ul>
+</li>
+<li><p>Fixed the following issues in the Console’s “SPARQL” mode:</p>
+<ul>
+<li><p>The editor inserted spaces in place of Tab characters inconsistently.</p></li>
+<li><p>The line and column number of a SPARQL error were omitted from the error
+message.</p></li>
+</ul>
+</li>
+<li><p>Fixed the following issues in the Console’s “Explore” mode:</p>
+<ul>
+<li><p>A relationship between the same pair of entities in multiple named graphs
+was incorrectly visualized.</p></li>
+<li><p>A warning (that the visualized graph may be inconsistent with the current
+state of the RDFox data store) was incorrectly dismissed.</p></li>
+<li><p>On visualizing a set of query results consisting of over one hundred
+individuals, the set of connections between the visualized nodes may have
+been incomplete.</p></li>
+<li><p>Edges representing blank nodes (in generalized RDF data stores where
+blank nodes may be used as predicates) were labelled incorrectly.</p></li>
+<li><p>Long string literals, particularly those containing a language tag, were
+incorrectly visualized in some browsers.</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt>Release 5.5 (7th March 2022)</dt><dd><ul>
+<li><p>Introduced the following changes to the monitoring of importation, querying
+and reasoning in the CLI:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Added an import monitor called <code class="docutils literal notranslate"><span class="pre">progress</span></code>, which outputs information
+at the specified <code class="docutils literal notranslate"><span class="pre">log-frequency</span></code>.</p></li>
+<li><p>Renamed the <code class="docutils literal notranslate"><span class="pre">stats</span></code> query monitor to <code class="docutils literal notranslate"><span class="pre">profile</span></code> and changed it to
+print information at the specified <code class="docutils literal notranslate"><span class="pre">log-frequency</span></code>.</p></li>
+<li><p>Added a reasoning monitor called <code class="docutils literal notranslate"><span class="pre">profile</span></code>, which (periodically)
+outputs reasoning statistics on per rule or rule plan basis.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Fixed an issue with the handling of XSDDateTime and XSDDuration values.</p></li>
+<li><p>Fixed an issue with escaping of whitespaces in IRIs (RD-1213).</p></li>
+<li><p>Fixed a bug that could cause the endpoint to crash when a request is
+aborted with an error (e.g., due to timeout) and another request is issued
+afterwards.</p></li>
+<li><p>Fixed a bug that prevented tuple tables/named graphs from being deleted.</p></li>
+<li><p>Fixed a bug in the evaluation of property paths for which the source and
+target need to match.</p></li>
+<li><p>Fixed a bug that could cause <code class="docutils literal notranslate"><span class="pre">MIN</span></code> and <code class="docutils literal notranslate"><span class="pre">MAX</span></code> aggregate functions to
+yield undeterministic behavior when applied to IRIs.</p></li>
+<li><p>Added command <code class="docutils literal notranslate"><span class="pre">unset</span></code> to unset shell variables.</p></li>
+<li><p>Added shell variable <code class="docutils literal notranslate"><span class="pre">on-error</span></code> to configure the behavior of the shell
+when an error is encountered.</p></li>
+<li><p>Companion Docker images now return a non-zero return code if an error is
+encountered while running any mounted <code class="docutils literal notranslate"><span class="pre">initialize.rdfox</span></code> script, except
+if the error is due to an attempt to create a resource with a name that is
+already in use.</p></li>
+<li><p>The proprietary <code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+json-abbrev</span></code> and
+<code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+resourceid</span></code> formats for SPARQL results were
+modified.</p></li>
+<li><p>Fixed a bug with the TopK iterator.</p></li>
+<li><p>Extended the endpoint with support for explaining reasoning.</p></li>
+<li><p>Changed the available fact domains to <code class="docutils literal notranslate"><span class="pre">explicit</span></code>, <code class="docutils literal notranslate"><span class="pre">derived</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">all</span></code>.</p></li>
+<li><p>Provided a proprietary extension of SPARQL that allows finding out whether
+a fact is explicitly given in the input or is derived by a rule.</p></li>
+<li><p>Changed the <code class="docutils literal notranslate"><span class="pre">auto-update-statistics</span></code> data store option.</p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code> server option.</p></li>
+<li><p>Fixed a bug in the initialization of data source tuple tables for
+<code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code> sources.</p></li>
+<li><p>Improved the performance of the Console’s visualization of query answers.</p></li>
+<li><p>Improved the Console’s visualization and exploration of large graphs of
+query answers and of large data stores.</p></li>
+<li><p>Improved the Console’s exploration of reflexive properties.</p></li>
+<li><p>Improved display of progress and error states in the Console’s “Explore”
+mode.</p></li>
+<li><p>Fixed a bug in the Console editor that caused some SPARQL keywords within
+string literals to be interpreted as commands.</p></li>
+<li><p>The JRDFox methods of the
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection</span></code> with names
+beginning <code class="docutils literal notranslate"><span class="pre">getTransactionMust</span></code> and <code class="docutils literal notranslate"><span class="pre">setTransactionMust</span></code> were renamed to
+instead begin <code class="docutils literal notranslate"><span class="pre">getNextOperationMust</span></code> and <code class="docutils literal notranslate"><span class="pre">setNextOperationMust</span></code>
+respectively.</p></li>
+<li><p>The JRDFox method
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.getLastTransactionDataStoreVersion</span></code>
+was renamed
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.getDataStoreVersionAfterLastOperation</span></code>.</p></li>
+<li><p>The HTTP method required for opening and advancing cursors was changed from
+<code class="docutils literal notranslate"><span class="pre">POST</span></code> to <code class="docutils literal notranslate"><span class="pre">PATCH</span></code>.</p></li>
+<li><p>ETags are no longer sent while read/write transactions are open on a data
+store and the <code class="docutils literal notranslate"><span class="pre">If-Match</span></code> and <code class="docutils literal notranslate"><span class="pre">If-None-Match</span></code> headers can no longer be
+used in combination with a data store connection while a read/write
+transaction is open on the connection.</p></li>
+<li><p>The version of a data store now changes only when a non-empty read/write
+transaction is committed. Previously, the version was incremented when any
+read/write transaction was begun.</p></li>
+</ul>
+</dd>
+<dt>Release 5.4 (25th October 2021)</dt><dd><ul class="simple">
+<li><p>Fixed bug that prevented <code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> and
+<code class="docutils literal notranslate"><span class="pre">allow-query-time-limit-override</span></code> from being modified when launching
+<code class="docutils literal notranslate"><span class="pre">daemon</span></code> processes.</p></li>
+<li><p>Fix bug that caused process error messages not to be written to standard
+error.</p></li>
+</ul>
+</dd>
+<dt>Release 5.3 (21st October 2021)</dt><dd><ul class="simple">
+<li><p>Moved to a two-part version number format.</p></li>
+<li><p>Replaced server parameter <code class="docutils literal notranslate"><span class="pre">log-calls</span></code> with <code class="docutils literal notranslate"><span class="pre">api-log</span></code> which has the same
+effect.</p></li>
+<li><p>Added server parameter <code class="docutils literal notranslate"><span class="pre">api-log.directory</span></code> to configure the root
+directory for API logs.</p></li>
+<li><p>Implemented recording of inputs imported by the system as an extension of
+the existing API logging feature. Recording can be limited or disabled with
+new parameter <code class="docutils literal notranslate"><span class="pre">api-log.input-recording-limit</span></code>.</p></li>
+<li><p>API logging now captures details of exceptions and operation durations to
+the log.</p></li>
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">prefixes</span></code> command to support listing and clearing the shell’s
+prefixes as well as restoring the default prefixes.</p></li>
+<li><p>Added a proprietary <code class="docutils literal notranslate"><span class="pre">MUL</span></code> aggregate function that multiplies its
+arguments.</p></li>
+<li><p>The web console is no longer EXPERIMENTAL.</p></li>
+<li><p>Fixed the spelling of JRDFox API
+<code class="docutils literal notranslate"><span class="pre">ConnectionFactory.getNumberOfLocaServerRoles</span></code> to
+<code class="docutils literal notranslate"><span class="pre">ConnectionFactory.getNumberOfLocalServerRoles</span></code>.</p></li>
+<li><p>Added new endpoint parameters <code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> and
+<code class="docutils literal notranslate"><span class="pre">allow-query-time-limit-override</span></code>.</p></li>
+</ul>
+</dd>
+<dt>Release 5.2.1 (29th June 2021)</dt><dd><ul class="simple">
+<li><p>Fixed a crash when importing malformed imports.</p></li>
+</ul>
+</dd>
+<dt>Release 5.2.0 (24th June 2021)</dt><dd><ul class="simple">
+<li><p>Introduced support for <code class="docutils literal notranslate"><span class="pre">using-graph-uri</span></code> and <code class="docutils literal notranslate"><span class="pre">using-named-graph-uri</span></code>
+when evaluating updates in the SPARQL endpoint.</p></li>
+<li><p>Changed the <code class="docutils literal notranslate"><span class="pre">keep-alive-timeout</span></code> endpoint option to
+<code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code> in order to unify this with a similar option
+for the Solr data source.</p></li>
+<li><p>Added support for property paths in SHACL validation. Integrated SHACL
+validation with equality reasoning. Added an optional column to the
+built-in table <code class="docutils literal notranslate"><span class="pre">rdfox:SHACL</span></code> that specifies the fact domain of the
+validated data.</p></li>
+<li><p>Fixed a bug with large incremental additions and deletions of rules
+(RD-1069).</p></li>
+<li><p>Fixed a bug where property paths would be evaluated incorrectly in queries
+containing  two or more <code class="docutils literal notranslate"><span class="pre">FROM</span></code> clauses (RD-1091).</p></li>
+<li><p>Upgraded the <code class="docutils literal notranslate"><span class="pre">import</span></code> command to accept IRIs as well as file paths.</p></li>
+<li><p>Ensure that relative IRIs entered into the shell are expanded against the
+shell’s base IRI.</p></li>
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">base</span></code> command to print or set the shell’s base IRI.</p></li>
+<li><p>Added the tuple table <code class="docutils literal notranslate"><span class="pre">rdfox:DependencyGraph</span></code>, which can be used to
+analyze the dependency graphs of Datalog programs.</p></li>
+</ul>
+</dd>
+<dt>Release 5.1.0 (7th May 2021)</dt><dd><ul class="simple">
+<li><p>Modified handling of aggregate functions with empty <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> as
+described in <a class="reference external" href="https://afs.github.io/sparql-agg-group-empty">this blog post</a>.</p></li>
+<li><p>Server and data store connections used by the RDFox shell can now be
+managed explicitly via the new commands <code class="docutils literal notranslate"><span class="pre">srvconn</span></code> and <code class="docutils literal notranslate"><span class="pre">dsconn</span></code>.</p></li>
+<li><p>As part of the above change, the <code class="docutils literal notranslate"><span class="pre">role</span> <span class="pre">switch</span></code> command was removed.</p></li>
+<li><p>Added new shell command <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> for evaluating general SPARQL
+<cite>statements</cite> where a statement is either an update or a query.</p></li>
+<li><p>Fixed a bug where the <code class="docutils literal notranslate"><span class="pre">answer</span></code> command would accept SPARQL updates as
+well as queries. The command now accepts only queries.</p></li>
+<li><p>Fixed a bug which prevented <code class="docutils literal notranslate"><span class="pre">update</span></code> commands using the <code class="docutils literal notranslate"><span class="pre">!</span></code> symbol from
+executing.</p></li>
+<li><p>Fixed a bug where destructive operations in the shell would be executed
+even if the user did not confirm them (SUP-123).</p></li>
+<li><p>The methods for saving a data store in binary format were moved from
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.ServerConnection</span></code> to
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection</span></code>.</p></li>
+<li><p>Correctness fix to reasoning in a rare multithreaded situation (SUP-128).</p></li>
+<li><p>Added new endpoint parameters <code class="docutils literal notranslate"><span class="pre">channel-timeout</span></code>, <code class="docutils literal notranslate"><span class="pre">keep-alive-timeout</span></code>
+and <code class="docutils literal notranslate"><span class="pre">max-idle-connections</span></code>.</p></li>
+<li><p>The endpoint parameters <code class="docutils literal notranslate"><span class="pre">sweep-period</span></code> and <code class="docutils literal notranslate"><span class="pre">sweeps-to-reclaim</span></code> were
+replaced with the single parameter <code class="docutils literal notranslate"><span class="pre">object-keep-alive-time</span></code>.</p></li>
+</ul>
+</dd>
+<dt>Release 5.0.0 (24th March 2021)</dt><dd><ul class="simple">
+<li><p>Added native support for Apple Silicon.</p></li>
+<li><p>Implemented support for SPARQL 1.1 property paths.</p></li>
+<li><p>Upgraded <code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code> and <code class="docutils literal notranslate"><span class="pre">solr</span></code> data source tuple tables to use the
+data types inferred from the source tables, where appropriate.</p></li>
+<li><p>Renamed the ODBC data source parameter <code class="docutils literal notranslate"><span class="pre">name-quote</span></code> to
+<code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code>.</p></li>
+<li><p>Added HTTP request logging for the RDFox endpoint controlled by new
+endpoint parameters <code class="docutils literal notranslate"><span class="pre">request-logger</span></code> and <code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code>.</p></li>
+<li><p>Introduced the built-in table <code class="docutils literal notranslate"><span class="pre">rdfox:SHACL</span></code> for performing RDF constraint
+validation with the language <cite>SHACL</cite>.</p></li>
+<li><p>Reworked the OWL support by removing the <code class="docutils literal notranslate"><span class="pre">owl-in-rdf-support</span></code> option and
+adding the explicit APIs for importing OWL axioms into a named graph
+(RD-879).</p></li>
+<li><p>Added an EXPERIMENTAL C API. Header files are located within the
+<code class="docutils literal notranslate"><span class="pre">include</span></code> directory within the RDFox distribution.</p></li>
+<li><p>A bug was fixed where the specified default graph was not always taken into
+account during importation of RDF data.</p></li>
+<li><p>Improved the performance of answering queries that combine LIMIT and ORDER
+BY to compute the top K results.</p></li>
+<li><p>Improved the evaluation of queries that combine ORDER BY and DISTINCT (SUP
+118).</p></li>
+</ul>
+</dd>
+<dt>Release 4.2.0 (20th January 2021)</dt><dd><ul class="simple">
+<li><p>Integration with AWS Marketplace.</p></li>
+<li><p>Images in the <code class="docutils literal notranslate"><span class="pre">oxfordsemantic/rdfox-init</span></code> repository now accept a subset
+of RDFox’s supported command line parameters to use when initializing new
+server directories.</p></li>
+<li><p>Add a health check to the REST API.</p></li>
+<li><p>Shell command <code class="docutils literal notranslate"><span class="pre">dstore</span> <span class="pre">create</span></code> now returns an error if there is an
+existing data store with the specified name.</p></li>
+<li><p>Replace the shell commands <code class="docutils literal notranslate"><span class="pre">load</span></code> and <code class="docutils literal notranslate"><span class="pre">save</span></code> with corresponding
+subcommands to the <code class="docutils literal notranslate"><span class="pre">dstore</span></code> command.</p></li>
+<li><p>Delete previously deprecated shell commands <code class="docutils literal notranslate"><span class="pre">drop</span></code>, <code class="docutils literal notranslate"><span class="pre">explicate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">init</span></code> and <code class="docutils literal notranslate"><span class="pre">updatestats</span></code>.</p></li>
+<li><p>Fix bug where HTTPS server certificates were not verified. This affected
+SPARQL LOAD and solr data sources.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">verify-server-certificates</span></code> parameter for solr data sources.</p></li>
+<li><p>The shell command <code class="docutils literal notranslate"><span class="pre">clear</span></code>, as well as the <code class="docutils literal notranslate"><span class="pre">delete</span></code> subcommand of the
+<code class="docutils literal notranslate"><span class="pre">dstore</span></code>, <code class="docutils literal notranslate"><span class="pre">role</span></code> and <code class="docutils literal notranslate"><span class="pre">tupletable</span></code> commands, now require the user to
+confirm the operation unless <code class="docutils literal notranslate"><span class="pre">force</span></code> is specified as the final argument
+to the command.</p></li>
+<li><p>Corrected a bug in the planning of rules where valid rules were rejected
+(RD-944).</p></li>
+</ul>
+</dd>
+<dt>Release 4.1.0 (30th November 2020)</dt><dd><ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">CONSTRAINT_VIOLATION</span></code> built-in was removed.</p></li>
+<li><p>A bug in the XML and JSON query answer formats was corrected where
+undefined variable would be serialized as <code class="docutils literal notranslate"><span class="pre">UNDEF</span></code> (instead of simply
+omitting their value).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> built-in function was removed, and instead the
+<code class="docutils literal notranslate"><span class="pre">rdfox:SKOLEM</span></code> built-in tuple table was introduced.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">internal:triple</span></code> tuple table was renamed into
+<code class="docutils literal notranslate"><span class="pre">rdfox:DefaultTriples</span></code>.</p></li>
+<li><p>All of SPARQL 1.1 Update has been implemented (i.e., <code class="docutils literal notranslate"><span class="pre">LOAD</span></code>, <code class="docutils literal notranslate"><span class="pre">CREATE</span></code>,
+<code class="docutils literal notranslate"><span class="pre">DROP</span></code>, etc.).</p></li>
+<li><p>Added a number of built-in operators and functions, particularly numeric
+and date/time computation functions. For example, dates can now be
+subtracted to obtain a duration.</p></li>
+</ul>
+</dd>
+<dt>Release 4.0.0 (2nd October 2020)</dt><dd><ul class="simple">
+<li><p>Added a data source type <code class="docutils literal notranslate"><span class="pre">solr</span></code> for integrating with Apache Solr.</p></li>
+<li><p>Added the option to treat negation in SWRL as nonmonotonic negation.</p></li>
+<li><p>Validate parameters passed after the <code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode specifier in an RDFox
+executable command.</p></li>
+<li><p>Add a new proprietary built-in, <code class="docutils literal notranslate"><span class="pre">CONSTRAINT_VIOLATION</span></code>, to make blank
+node identifiers for constraint violations.</p></li>
+<li><p>The default setting for the endpoint parameter <code class="docutils literal notranslate"><span class="pre">min-secure-protocol</span></code> is
+now <code class="docutils literal notranslate"><span class="pre">tls12</span></code>.</p></li>
+<li><p>Corrected a bug in the reasoning algorithms where incrementally adding
+rules would sometimes produce incorrect results (RD-858).</p></li>
+<li><p>Restoring persisted data stores uses multiple threads and can be
+significantly faster than previous versions of RDFox.</p></li>
+<li><p>Persisted data store file format uses compression to reduce disk usage.</p></li>
+<li><p>Internal rules to transitively close class hierarchies have been updated to
+exclude blank nodes (SUP-95).</p></li>
+<li><p>Explicating facts is disallowed in combination with OWL support as that
+would keep increasing the set of axioms in the store (SUP-95).</p></li>
+<li><p>Named graphs can now be updated through <code class="docutils literal notranslate"><span class="pre">DELETE</span></code>/<code class="docutils literal notranslate"><span class="pre">INSERT</span></code> queries.</p></li>
+<li><p>The proprietary syntax for referencing tuple tables in SPARQL queries was
+changed (e.g., atom that used to be written as <code class="docutils literal notranslate"><span class="pre">:A(?X,?Y)</span></code> now needs to
+be written as <code class="docutils literal notranslate"><span class="pre">TT</span> <span class="pre">:A</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">}</span></code>).</p></li>
+<li><p>The license can now be passed in using environment variables
+<code class="docutils literal notranslate"><span class="pre">RDFOX_LICENSE_CONTENT</span></code> and <code class="docutils literal notranslate"><span class="pre">RDFOX_LICENSE_FILE</span></code>.</p></li>
+<li><p>Add new shell command <code class="docutils literal notranslate"><span class="pre">daemon</span></code>. This permanently switches RDFox into
+daemon mode.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">import.rename-blank-nodes</span></code> data store option was removed, and
+<code class="docutils literal notranslate"><span class="pre">import.rename-user-blank-nodes</span></code> data store option was added.</p></li>
+<li><p>Adds an additional mode to the EXPERIMENTAL web console. The connections
+between the entities in a data store may be visually explored, with either
+a single individual or the result of a query as a starting point.</p></li>
+<li><p>Added Transcribe command allow server state to be saved and potentially
+imported into another instance.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">-temp-role</span></code> command line option.</p></li>
+<li><p>Roles can be created using a password hash. The password hash of existing
+role can be obtained programmatically or via the shell.</p></li>
+<li><p>Allow forward slashes to be used for file paths in Windows.</p></li>
+<li><p>Fixed a problem that could sometimes cause a crash when evaluating
+<code class="docutils literal notranslate"><span class="pre">FILTER</span></code> and <code class="docutils literal notranslate"><span class="pre">BIND</span></code> expressions that compare integers and floating
+point numbers (SUP-96).</p></li>
+<li><p>Fixed a problem on Windows where one could start two endpoint processes on
+the same port (RD-592).</p></li>
+</ul>
+</dd>
+<dt>Release 3.1.1 (27th July 2020)</dt><dd><ul class="simple">
+<li><p>Fix bug where RDFox fails to start with a “unable to locate incompleted
+replace information” error on Windows.</p></li>
+</ul>
+</dd>
+<dt>Release 3.1.0 (7th July 2020)</dt><dd><ul class="simple">
+<li><p>Fixed a bug where RDFox would crash when a data store is restored from
+binary files and another operation (on a different data store) is running
+in parallel</p></li>
+<li><p>Fix bug where RDFox would crash when the server was configured with data
+store persistence, but a data store without persistence is deleted (SUP-83)</p></li>
+<li><p>Fix bug where RDFox would crash if the <cite>NOW()</cite> built-in function was
+written in lowercase (RD-777)</p></li>
+<li><p>Fix bug where blank nodes were serialized incorrectly in the N-Triples and
+N-Quads formats (SUP-81)</p></li>
+<li><p>Add a mechanism to constrain data store content using Datalog.</p></li>
+<li><p>Add support for SWRL.</p></li>
+</ul>
+</dd>
+<dt>Release 3.0.1 (12th May 2020)</dt><dd><ul class="simple">
+<li><p>Fix bug where RDFox fails to start with a file in use error on Windows.</p></li>
+<li><p>Fix bug that causes RDFox to end if the terminal window is resized or a
+screen session is reconnected during login prompt.</p></li>
+<li><p>Fix bug where data store snapshot files are not deleted when data stores
+are deleted.</p></li>
+<li><p>Fix bug that caused RDFox to hang or crash if an attempt is made to import
+invalid data.</p></li>
+<li><p>Allow Ctrl+C to interrupt <cite>import</cite> operations.</p></li>
+<li><p>Allow Ctrl+C to interrupt loading of persisted data stores during restart.</p></li>
+</ul>
+</dd>
+<dt>Release 3.0.0 (7th May 2020)</dt><dd><ul class="simple">
+<li><p>The term ‘user’ is replaced by the term ‘role’ in all JRDFox APIs related
+to authentication. For example
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.getUserName()</span></code> is
+replaced by
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.getRoleName()</span></code>.</p></li>
+<li><p>When creating server connections for the first time via JRDFox APIs, the
+default role name and password are now “guest” and “guest”.</p></li>
+<li><p>All references to the namespace <code class="docutils literal notranslate"><span class="pre">org.semanticweb.owlapi</span></code> have been
+removed from the JRDFox code base and the owlapi-*.jar file is no longer
+included in the RDFox distribution. Consequently the following features are
+no longer available:</p>
+<ul>
+<li><p>the overload of
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.importData</span></code> that
+accepted an <code class="docutils literal notranslate"><span class="pre">org.semanticweb.owlapi.model.OWLOntology</span></code></p></li>
+<li><p>the command line facility to generate a Datalog program from an OWL
+ontology</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt>Release 2.1.1 (14th November 2019)</dt><dd><ul class="simple">
+<li><p>Correct the behavior of <code class="docutils literal notranslate"><span class="pre">COUNT(?v)</span></code> and <code class="docutils literal notranslate"><span class="pre">COUNT(*)</span></code>.</p></li>
+</ul>
+</dd>
+<dt>Release 2.1.0 (18th October 2019)</dt><dd><ul class="simple">
+<li><p>owl-in-rdf-support is no longer EXPERIMENTAL.</p></li>
+<li><p>The JRDFox features that make use of owlapi-*.jar (one of the
+DataStoreConnection importData methods, and the GetRules utility) are now
+deprecated. This dependency will be removed in a future release of RDFox.
+Import of OWL documents (in Functional Style and Turtle syntaxes) will
+continue to be supported by the remaining importData methods.</p></li>
+</ul>
+</dd>
+<dt>Release 2.0.1 (23rd September 2019)</dt><dd><ul class="simple">
+<li><p>Fix bug where a crash may occur when the Java or REST interfaces are used
+to import large data sets (RD-531).</p></li>
+</ul>
+</dd>
+<dt>Release 2.0.0 (4th September 2019)</dt><dd><ul class="simple">
+<li><p>The MIME types for the RDFox-proprietary SPARQL answer formats have been
+consolidated to us the <code class="docutils literal notranslate"><span class="pre">x.</span></code> subtype tree</p></li>
+<li><p>New proprietary SPARQL answer formats have been added that abbreviate IRI
+prefixes in the result</p></li>
+<li><p>The binary answer format has been changed</p></li>
+<li><p>Renamed the parameters for obtaining diagnostic information in the REST API</p></li>
+<li><p>Added calls to all APIs for retrieving server-level diagnostic information</p></li>
+<li><p>Removed the query domain parameter in all APIs for exporting data and added
+the ability to pass in arbitrary key-value pairs</p></li>
+<li><p>Adapted the syntax of the <code class="docutils literal notranslate"><span class="pre">export</span></code> command to support the change from the
+previous item</p></li>
+<li><p>Optimized the shell interface by not requiring file names to be enclosed in
+quotes</p></li>
+<li><p>Embedded an experimental HTML application which is served from <code class="docutils literal notranslate"><span class="pre">/console</span></code>
+when the endpoint is running</p></li>
+<li><p>Only add the <code class="docutils literal notranslate"><span class="pre">Access-Control-Allow-Origin</span></code> header to HTTP responses if
+the user has configured the allowed origin</p></li>
+<li><p>Added support for importing from files containing axioms represented in OWL
+2 functional-style syntax.</p></li>
+<li><p>Added experimental support for OWL 2 axioms translated from imported RDF
+data.</p></li>
+<li><p>SPARQL query evaluation has been reworked to improve performance and
+eliminate errors in the returned solution for a small number of query
+types.</p></li>
+</ul>
+</dd>
+<dt>Release 1.6.0 (15th May 2019)</dt><dd><ul class="simple">
+<li><p>RDFox and JRDFox now require a license file</p></li>
+<li><p>Improved support for <code class="docutils literal notranslate"><span class="pre">xsd:decimal</span></code> on Windows</p></li>
+</ul>
+</dd>
+<dt>Release 1.5.0 (17th April 2019)</dt><dd><ul class="simple">
+<li><p>RESTful API supports the HTTP X-HTTP-Method-Override request parameter to
+allow HTTP PATCH requests to be made from client code that does not
+directly support PATCH (e.g. Java HttpURLConnection)</p></li>
+<li><p>Improved support for <code class="docutils literal notranslate"><span class="pre">xsd:decimal</span></code> on macOS and Linux</p></li>
+</ul>
+</dd>
+<dt>Release 1.4.0 (20th March 2019)</dt><dd><ul class="simple">
+<li><p>Added support for the following SPARQL 1.1 functions:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">NOW()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UUID()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STRUUID()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAND()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MD5()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHA1()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHA256()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHA384()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHA512()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IRI()</span></code></p></li>
+</ul>
+</li>
+<li><p>RDFox now retains the datatypes of literals in the input — that is,
+<code class="docutils literal notranslate"><span class="pre">xsd:int</span></code> is no longer normalized to <code class="docutils literal notranslate"><span class="pre">xsd:integer</span></code>, and similarly for
+other derived datatypes (RD-194)</p></li>
+<li><p>Added initial support for <code class="docutils literal notranslate"><span class="pre">xsd:decimal</span></code> (RD-162)</p></li>
+<li><p>Performance improvements in the evaluation of most built-in functions
+(RD-196)</p></li>
+<li><p>Import options <code class="docutils literal notranslate"><span class="pre">rename-blank-nodes-on-import</span></code> and
+<code class="docutils literal notranslate"><span class="pre">convert-unknown-datatypes-to-strings</span></code> were replaced with options
+<code class="docutils literal notranslate"><span class="pre">import.rename-blank-nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">import.invalid-literal-policy</span></code>
+described in <a class="reference internal" href="data-stores.html#data-store-parameters"><span class="std std-numref">Section 5.4.1</span></a></p></li>
+<li><p>Shell variables containing backslash characters are now correctly expanded
+on the command line (RD-219)</p></li>
+<li><p>There is no restriction on the number of files that can be imported on a
+single line in the shell (RD-89)</p></li>
+</ul>
+</dd>
+<dt>Release 1.3.3 (8th February 2019)</dt><dd><ul class="simple">
+<li><p>SSL/TLS for the RESTful API using openSSL (Windows, macOS, Linux) and
+Secure Transport (macOS only)</p></li>
+<li><p>Fixed a bug where sending <code class="docutils literal notranslate"><span class="pre">Content-Type:</span> <span class="pre">0</span></code> with <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> requests was
+incorrectly detected as having a body</p></li>
+<li><p>Extracted the data store statistics into separate data structures that can
+be administered using the various APIs (RD-27); thus, there is now a way to
+update the statistics using the REST API</p></li>
+<li><p>Repurposed the <code class="docutils literal notranslate"><span class="pre">stats</span></code> shell command to manage statistics, and deprecated
+the <code class="docutils literal notranslate"><span class="pre">updatestats</span></code> command in favor of <code class="docutils literal notranslate"><span class="pre">stats</span> <span class="pre">update</span></code></p></li>
+<li><p>Introduced the <code class="docutils literal notranslate"><span class="pre">info</span></code> shell command that merges the functionality of the
+old <code class="docutils literal notranslate"><span class="pre">stats</span></code> command, the <code class="docutils literal notranslate"><span class="pre">rulestats</span></code> command, and the <code class="docutils literal notranslate"><span class="pre">ruleplan</span></code>
+command; added the option to print summary of the information about a data
+store; removed the <code class="docutils literal notranslate"><span class="pre">rulestats</span></code> and <code class="docutils literal notranslate"><span class="pre">ruleplan</span></code> commands</p></li>
+<li><p>Fixed a bug where tuple tables imported from a data source could have
+repeated column names</p></li>
+<li><p>Extended the OWL translator to support datatypes and datatype restrictions
+according to the OWL 2 RL specification (RD-53)</p></li>
+<li><p>Improved handling of out-of-memory exceptions (RD-50)</p></li>
+<li><p>Improved handling of situations when the capacity of a data store is
+exceeded (RD-90)</p></li>
+<li><p>Fixed a bug where parallel import of Turtle files would sometimes slow down
+or even crash after loading some number of files</p></li>
+<li><p>Improved the performance of importing large numbers of <code class="docutils literal notranslate"><span class="pre">xsd:float</span></code> and
+<code class="docutils literal notranslate"><span class="pre">xsd:double</span></code> values</p></li>
+<li><p>Fixed the bug where incrementally added rules sometimes were not handled
+correctly (RD-120)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OFFSET</span></code> and <code class="docutils literal notranslate"><span class="pre">LIMIT</span></code> can not occur in a SPARQL query in an arbitrary
+order</p></li>
+<li><p>The RDFox command line supports common line editing functions including
+arrow-key navigation and command history on platforms where this was
+previously unavailable (macOS and Linux)</p></li>
+<li><p>Commands used when starting RDFox have been revised (now <code class="docutils literal notranslate"><span class="pre">shell</span></code> or
+<code class="docutils literal notranslate"><span class="pre">daemon</span></code>) and options have been added to enable logging of API calls and
+to set a maximum allowable memory size.</p></li>
+<li><p>Added support for cryptographic hash functions MD5, SHA1, SHA256, SHA384
+and SHA512 in rules and queries</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UCASE()</span></code> and <code class="docutils literal notranslate"><span class="pre">LCASE()</span></code> functions are Unicode aware and use the
+unconditional case mappings as defined by the Unicode Standard 11.0 (RD-8)</p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">REGEX()</span></code> and <code class="docutils literal notranslate"><span class="pre">REPLACE()</span></code> SPARQL 1.1 functions (RD-5)</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="docker.html" class="btn btn-neutral float-left" title="22. RDFox Docker Images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acknowledgments.html" class="btn btn-neutral float-right" title="24. Acknowledgments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

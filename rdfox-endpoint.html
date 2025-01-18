@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>19. RDFox Endpoint &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="20. Logging" href="logging.html" />
+    <link rel="prev" title="18. RDFox Executable" href="rdfox-executable.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">19. RDFox Endpoint</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#starting-and-stopping-the-endpoint">19.1. Starting and Stopping the Endpoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#endpoint-parameters">19.2. Endpoint Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#specifying-endpoint-parameters">19.2.1. Specifying Endpoint Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changing-endpoint-parameters">19.2.2. Changing Endpoint Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">19. </span>RDFox Endpoint</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="rdfox-endpoint">
+<span id="id1"></span><h1><span class="section-number">19. </span>RDFox Endpoint<a class="headerlink" href="#rdfox-endpoint" title="Permalink to this headline">¶</a></h1>
+<p>The RDFox® Endpoint provides REST access to the process’s RDFox server (see
+<a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>) and also serves the HTML, JavaScript and other static
+assets for the  RDFox Console. For a description of the RDFox REST API, see
+<a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a>.</p>
+<div class="section" id="starting-and-stopping-the-endpoint">
+<h2><span class="section-number">19.1. </span>Starting and Stopping the Endpoint<a class="headerlink" href="#starting-and-stopping-the-endpoint" title="Permalink to this headline">¶</a></h2>
+<p>The endpoint can be started in the following ways:</p>
+<ul class="simple">
+<li><p>By launching the RDFox process in <code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode (see
+<a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a>).</p></li>
+<li><p>By issuing <code class="docutils literal notranslate"><span class="pre">endpoint</span> <span class="pre">start</span></code> within the RDFox shell (see
+<a class="reference internal" href="rdfox-shell.html#endpoint-command"><span class="std std-numref">Section 15.2.19</span></a>). When started in this manner, the endpoint
+accesses the same <a class="reference external" href="servers">RDFox server</a> as the shell, so the effects of
+any commands that affect the state of the server (e.g., <code class="docutils literal notranslate"><span class="pre">dstore</span> <span class="pre">create</span></code>)
+will be immediately visible on the endpoint.</p></li>
+</ul>
+<p>Starting the endpoint requires that at least one authentication mechanism is
+configured. In practice this requires that the <a class="reference internal" href="access-control.html#authentication-managers"><span class="std std-ref">authentication manager</span></a> server parameter is not empty, or the
+<code class="docutils literal notranslate"><span class="pre">request-client-certificates</span></code> endpoint parameter is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>The endpoint can be stopped in the shell by issuing <code class="docutils literal notranslate"><span class="pre">endpoint</span> <span class="pre">stop</span></code>. Processes
+running in <code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode (where there is no active instance of the shell) can
+be stopped by sending them a <code class="docutils literal notranslate"><span class="pre">SIGINT</span></code> (for example with Ctrl-C) or <code class="docutils literal notranslate"><span class="pre">SIGTERM</span></code>
+signal.</p>
+</div>
+<div class="section" id="endpoint-parameters">
+<span id="id2"></span><h2><span class="section-number">19.2. </span>Endpoint Parameters<a class="headerlink" href="#endpoint-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The configuration of the endpoint is determined by the parameters below.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">port</span></code> determines the port at which the endpoint is started. The port can
+be specified as a verbatim port number or as a <a class="reference external" href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml">TCP service name</a>. The default is <code class="docutils literal notranslate"><span class="pre">12110</span></code>. For legacy reasons, the port
+can also be specified using <code class="docutils literal notranslate"><span class="pre">service-name</span></code>; moreover, if both options are
+present, then <code class="docutils literal notranslate"><span class="pre">port</span></code> takes precedence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num-http-workers</span></code> determines the number of threads that the endpoint will
+use to process RESTful requests. The default value is one less than the
+number of logical processors of the machine on which RDFox is run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">channel-timeout</span></code> determines the length of time that the endpoint will wait
+for I/O while servicing HTTP(S) requests. That is, if the endpoint tries to
+read from or write to the TCP connection, the respective I/O will wait for
+for the specified duration before giving up. This option ensures endpoint
+resilience in the face of slow or buggy HTTP(S) clients. See
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a> for the accepted values for this parameter.
+The <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> setting may be used but should be reserved for those cases
+where there are valid reasons for I/O operations to take a long time and
+clients are known to be correct. The default value is <code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max-idle-connections</span></code> determines the maximum number of connections to the
+server that can be idle at any point in time. Once this limit is exceeded,
+RDFox endpoint will close all idle connections (even those that have been
+idle for less than <code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code>) in order to free resources
+and thus provide uninterrupted service to users. For this option to be
+effective, it should be set to some value lower than the maximum number of
+file descriptors for the RDFox process. On Window, the default value for this
+parameter is 1024. On Linux and macOS, the default value is set to 90% of the
+maximum number of file descriptors for the server process.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code> determines the maximum time that an HTTP
+connection will be kept open between requests. That is, if a client opens a
+TCP connection to the endpoint and makes a request, the server will wait for
+the specified amount of time to receive another request on this connection;
+if no request is issued in the specified time, the server will close the
+connection. See <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a> for the accepted values for
+this parameter. The <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> setting may not be used. The value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
+means that the server should close the TCP connection after every request.
+The default value is <code class="docutils literal notranslate"><span class="pre">90</span> <span class="pre">s</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">listening-backlog</span></code> determines the <a class="reference external" href="https://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/023/2333/2333s2.html">TCP listening backlog</a>
+for the socket accepting the connection. The default value is 10.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">receive-buffer</span></code> and <code class="docutils literal notranslate"><span class="pre">send-buffer</span></code> determine the sizes in bytes of the
+receive and send buffers for the sockets servicing the requests. The default
+values are zero, which means that the system will determine the buffer sizes
+depending on the properties of the connection. For more information, please
+refer to the <a class="reference external" href="http://man7.org/linux/man-pages/man7/socket.7.html">SO_RCVBUF and SO_SNDBUF</a> socket options.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lock-timeout</span></code> specifies the maximum time the endpoint will wait to obtain
+a lock on a data store. If the lock cannot be obtained within the specified
+time, the endpoint will return HTTP status <code class="docutils literal notranslate"><span class="pre">423</span> <span class="pre">-</span> <span class="pre">Locked</span></code>. See
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a> for the accepted values for this parameter
+which include the value <code class="docutils literal notranslate"><span class="pre">unlimited</span></code>. The default value for this parameter
+is <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">s</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">object-keep-alive-time</span></code> specifies the time for which the endpoint will
+keep cached cursors, connections or shells between requests. During its
+operation, the endpoint retains certain objects between requests either for
+performance reasons (e.g., the endpoint may cache cursors of partially
+evaluated queries) or to ensure its operation (e.g., the endpoint will
+maintain named server and data store connections). In order to prevent these
+objects from accumulating indefinitely, the endpoint will delete each object
+after it has not been used for the specified amount of time. See
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a> for the accepted values for this parameter.
+The <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> setting may not be used. The default value for this
+parameter is <code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">access-control-allow-origin</span></code> configures the RDFox endpoint for
+<em>Cross-Origin Resource Sharing</em> (CORS). When this option is set, RDFox will
+include, in response to CORS requests, all the headers necessary to allow
+cross-origin usage of the REST API by the specified origin or origins. The
+value <code class="docutils literal notranslate"><span class="pre">*</span></code> can be set to allow use of the REST API by <em>any</em> origin.
+Otherwise the value should be a space-delimited list of origins such as
+<code class="docutils literal notranslate"><span class="pre">&quot;https://example.org</span> <span class="pre">http://localhost:8080&quot;</span></code> to allow requests from just
+those origins. When this option is unset (the default), RDFox will not add
+any CORS headers to its responses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">protocol</span></code> determines which network layer protocol the endpoint will use.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">IPv4</span></code> means the endpoint will use Internet Protocol version 4.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IPv6</span></code> means the endpoint will use Internet Protocol version 6.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IPv6-v4</span></code> means the endpoint will use Internet Protocol version 6 if
+possible or Internet Protocol version 4 if not. This is the default value.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The following parameters determine the TLS configuration for the endpoint.</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">channel</span></code> determines the connection type that the endpoint should use.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unsecure</span></code> disables TLS, meaning that the endpoint will listen for
+HTTP connections (only). This is the default value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ssl</span></code> means the endpoint will listen for HTTPS connections (only).
+This option requires the <a class="reference external" href="https://www.openssl.org/">OpenSSL</a>
+package. See <a class="reference internal" href="features-and-requirements.html#third-party-software"><span class="std std-numref">Section 2.4.1.2</span></a> for more detail.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">credentials</span></code> specifies the server certificate and private key, and the
+intermediate certificates as a verbatim string in PEM format. The string
+must contain the server’s private key, the server’s certificate, and zero
+or more intermediate certificates. For example, this file could look as
+follows:</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre><span></span>-----BEGIN RSA PRIVATE KEY-----
+... server key ...
+-----END RSA PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+... server certificate ...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+... 1st intermediate certificate ...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+... 2st intermediate certificate ...
+-----END CERTIFICATE-----
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">credentials-file</span></code> specifies the name of the file that contains
+the credentials. The file content must have the same format as the
+<code class="docutils literal notranslate"><span class="pre">credentials</span></code> parameter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">credentials-passphrase</span></code> provides the passphrase that can be used to
+decrypt the credentials in case they are encrypted. This parameter is
+optional.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min-secure-protocol</span></code> determines the minimum protocol version that the
+server should use. The allowed values are <code class="docutils literal notranslate"><span class="pre">ssl3</span></code>, <code class="docutils literal notranslate"><span class="pre">tls1</span></code>, <code class="docutils literal notranslate"><span class="pre">tls11</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tls12</span></code>, and <code class="docutils literal notranslate"><span class="pre">tls13</span></code>. The default value is <code class="docutils literal notranslate"><span class="pre">tls12</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">request-client-certificates</span></code> specifies whether the server should
+request client certificates during TLS handshakes. See
+<a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a> for more information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trusted-root-certificate</span></code> specifies a Certificate Authority (CA)
+certificate that should be trusted, in PEM format. This will be used in
+addition to the default trust anchors for the loaded OpenSSL library. See
+<a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a> for more information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trusted-root-certificate-file</span></code> specifies the name of a file that
+contains the trusted root certificate. The file content must have the same
+format as the <code class="docutils literal notranslate"><span class="pre">trusted-root-certificate</span></code> parameter.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The following parameters determine the configuration for HTTP request logging
+(see also <a class="reference internal" href="logging.html#request-logging"><span class="std std-numref">Section 20.2</span></a>).</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">request-logger</span></code> determines how each serviced HTTP request is logged.
+All logging goes to standard output.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">none</span></code> disables request logging. This is the default value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clf</span></code> enables request logging using the <a class="reference external" href="https://www.w3.org/Daemon/User/Config/Logging.html#common-logfile-format">Common Log Format</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elf</span></code> enables request logging using the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">Extended Log Format</a>. The exact content of each
+log entry is determined by the <code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> parameter. Each
+log entry is limited to 10 KiB. Where an entry would exceed this limit,
+the elided fields are indicated with <code class="docutils literal notranslate"><span class="pre">...</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">request-logger.destination</span></code> determines where the request log is
+written.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stdout</span></code> means the request log is written to standard output. This is
+the default value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">directory</span></code> means the request log is written to a file within the
+directory identified by the <code class="docutils literal notranslate"><span class="pre">request-logger.directory</span></code> parameter. The
+file name is determined automatically.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">request-logger.directory</span></code> determines the directory to which the request
+log is written. This parameter has no effect unless
+<code class="docutils literal notranslate"><span class="pre">request-logger.destination</span></code> is set to <code class="docutils literal notranslate"><span class="pre">directory</span></code>. If this parameter
+is unset but the RDFox server associated with the endpoint is configured
+to use a server directory, the logs will be written within the
+<code class="docutils literal notranslate"><span class="pre">request-logs</span></code> subdirectory of the server directory. If a directory is
+required by other settings but no directory is available, the endpoint
+will fail to start.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> determines which fields are logged by the extended
+log format logger. This parameter has no effect unless <code class="docutils literal notranslate"><span class="pre">request-logger</span></code>
+is set to <code class="docutils literal notranslate"><span class="pre">elf</span></code>. The value for this parameter must be a space-delimited
+list of the following field identifiers: <code class="docutils literal notranslate"><span class="pre">date</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code>,
+<code class="docutils literal notranslate"><span class="pre">time-taken</span></code>, <code class="docutils literal notranslate"><span class="pre">c-ip</span></code>, <code class="docutils literal notranslate"><span class="pre">c-port</span></code>, <code class="docutils literal notranslate"><span class="pre">cs({HEADER})</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-bytes</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cs-method</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-query</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-stem</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sc({HEADER})</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-status</span></code>, <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code>,
+<code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>. The identifier <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code> specifies the agent
+name with which the request was made. The identifier <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>
+specifies the textual description of any exception raised due to a
+protocol error while handling an attempted request. All other identifiers
+have the meanings defined in the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">draft specification</a>. The default value for this
+parameter is <code class="docutils literal notranslate"><span class="pre">date</span> <span class="pre">time</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">sc-status</span> <span class="pre">sc-bytes</span>
+<span class="pre">time-taken</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The following parameters determine the configuration for time limits on the
+evaluation of SPARQL queries.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> determines the maximum time that a request for query
+evaluation can take; if a query request is not completed in that time,
+query evaluation will be stopped. See <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a> for
+the accepted values for this parameter. The <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> setting may be
+used. The default value is <code class="docutils literal notranslate"><span class="pre">30</span> <span class="pre">s</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">allow-query-time-limit-override</span></code> is a Boolean value specifying whether a
+query request can override the time limit on query evaluation. If this
+option is set to <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">yes</span></code>, then each query evaluation request
+can use the <code class="docutils literal notranslate"><span class="pre">Query-Time-Limit</span></code> header to specify the query time limit to
+be used for the current request. The value of the <code class="docutils literal notranslate"><span class="pre">Query-Time-Limit</span></code>
+header follows the same syntax as the <code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> endpoint
+parameter. The default value is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="specifying-endpoint-parameters">
+<span id="id3"></span><h3><span class="section-number">19.2.1. </span>Specifying Endpoint Parameters<a class="headerlink" href="#specifying-endpoint-parameters" title="Permalink to this headline">¶</a></h3>
+<p>When the RDFox endpoint is started for a server that is configured to use a
+server directory, it will inspect that directory for a file named
+<code class="docutils literal notranslate"><span class="pre">endpoint.params</span></code> and, if the file is found, attempt to load endpoint
+parameters from it. The format of the file matches that for the server
+parameters file described in <a class="reference internal" href="servers.html#server-parameters-file"><span class="std std-numref">Section 4.3.1</span></a>.</p>
+<p>When launching the endpoint from the RDFox shell, parameters may additionally
+be set using shell variables. In this case, the parameter names should be
+prefixed with <code class="docutils literal notranslate"><span class="pre">endpoint.</span></code>. For example, to launch an endpoint listening on
+port 8080, the user would issue <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">endpoint.port</span> <span class="pre">8080</span></code> before starting the
+endpoint with <code class="docutils literal notranslate"><span class="pre">endpoint</span> <span class="pre">start</span></code>. Parameters specified in this way take
+precedence over those loaded from the endpoint parameters file.</p>
+<p>When launching <code class="docutils literal notranslate"><span class="pre">daemon</span></code> processes, parameters may additionally be specified
+by including them in the command line before the <code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode specifier. In
+this case, the parameter names should be prefixed with a single dash (<code class="docutils literal notranslate"><span class="pre">-</span></code>).
+For example, to set the <code class="docutils literal notranslate"><span class="pre">port</span></code> parameter, the user might issue the following
+command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>RDFox -port 8080 daemon
+</pre></div>
+</div>
+<p>Again, parameters specified in this way take precedence over those loaded from
+the endpoint parameters file.</p>
+</div>
+<div class="section" id="changing-endpoint-parameters">
+<h3><span class="section-number">19.2.2. </span>Changing Endpoint Parameters<a class="headerlink" href="#changing-endpoint-parameters" title="Permalink to this headline">¶</a></h3>
+<p>To change the configuration of the endpoint, the endpoint must be stopped and
+restarted with the updated set of parameters. When the endpoint was started
+from an RDFox shell, this can be achieved by first updating the endpoint
+parameters file and/or relevant shell variables, and then issuing <code class="docutils literal notranslate"><span class="pre">endpoint</span>
+<span class="pre">stop</span></code> followed by <code class="docutils literal notranslate"><span class="pre">endpoint</span> <span class="pre">start</span></code>. When the endpoint was started in
+<code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode, this can be achieved by editing the endpoint parameters file
+and then sending <code class="docutils literal notranslate"><span class="pre">SIGHUP</span></code> to the process. Endpoint parameters that were
+specified on the command line take precedence over those loaded from the
+endpoint parameters file and cannot, therefore be changed in this way. Note
+also that this mechanism is not available on Windows systems which lack support
+for signals.</p>
+<p>In all cases, stopping the endpoint will result in all clients being
+disconnected.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rdfox-executable.html" class="btn btn-neutral float-left" title="18. RDFox Executable" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="logging.html" class="btn btn-neutral float-right" title="20. Logging" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

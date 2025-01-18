@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4. Servers &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="5. Data Stores" href="data-stores.html" />
+    <link rel="prev" title="3. Getting Started" href="getting-started.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Servers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-stores">4.1. Data Stores</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tuple-tables">4.1.1. Tuple Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-sources">4.1.2. Data Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#owl-axioms">4.1.3. OWL Axioms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rules">4.1.4. Rules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rule-domains">4.1.4.1. Rule Domains</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#base-iri-and-prefixes">4.1.5. Base IRI and Prefixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#commit-procedure-experimental">4.1.6. Commit Procedure (EXPERIMENTAL)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delta-queries">4.1.7. Delta Queries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#roles">4.2. Roles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server-parameters">4.3. Server Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-server-parameters-file">4.3.1. The Server Parameters File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specifying-durations">4.3.2. Specifying Durations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">4. </span>Servers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="servers">
+<span id="id1"></span><h1><span class="section-number">4. </span>Servers<a class="headerlink" href="#servers" title="Permalink to this headline">¶</a></h1>
+<p>Each RDFox® instance is associated with a distinct <em>server</em> object, which acts
+as a top-level container for all information stored in the RDFox instance. A
+server’s job is to keep track of global configuration options of the RDFox
+instance, manage <em>data stores</em> that contain various data, and manage <em>roles</em>
+that identify users capable of interacting with the server. A server instance
+is created whenever RDFox is started via the command line or via the Java API;
+in either case, there is a way to specify server options such as the number of
+threads and the maximum amount of memory that the server should use. The list
+of all options is given in <a class="reference internal" href="#server-parameters"><span class="std std-numref">Section 4.3</span></a>.</p>
+<p>The following diagram illustrates the subcomponents of servers, which are used
+to structure the information loaded in the system. The basic idea behind each
+concept is described in the following sections.</p>
+<div class="figure align-center">
+<img alt="RDFoxConcepts" src="_images/RDFoxConcepts.svg" /></div>
+<p>Each server is associated with a <em>server version number</em>, which is incremented
+for every change to the server’s list of data stores. This version number is
+visible in the output of the <code class="docutils literal notranslate"><span class="pre">serverinfo</span></code> shell command and equivalent API
+calls (to see the role manager version number, the extended info must be
+requested).</p>
+<div class="section" id="data-stores">
+<h2><span class="section-number">4.1. </span>Data Stores<a class="headerlink" href="#data-stores" title="Permalink to this headline">¶</a></h2>
+<p>A server is divided into <em>data stores</em>. Each data store is identified by a
+user-defined name that is unique within the server. A data store acts as a
+container for data that logically belongs together. Many applications will use
+one data store to store their data; thus, several applications can share one
+server, while keeping their data separate. Some applications can use more than
+one data store, but it is key to remember that all queries and rules are
+evaluated within the context of a single data store. Thus, all information that
+an application wishes to access in a single query should be loaded into one
+data store.</p>
+<p>RDFox provides many types of data stores, and each type is identified by a
+unique type name (e.g., <code class="docutils literal notranslate"><span class="pre">parallel-nn</span></code>). Data store types differ in their
+maximum capacity, and some support concurrent operations where others do not.
+Moreover, each data store can be customized via a number of parameters; for
+example, a data store can be configured to use the implicit semantics of
+<code class="docutils literal notranslate"><span class="pre">owl:sameAs</span></code> or not. All parameters are specified as a list of key-value
+pairs when the data store is created, and they cannot be changed subsequently.
+Data store types and parameters are described in detail in
+<a class="reference internal" href="data-stores.html#data-stores"><span class="std std-numref">Section 5</span></a>.</p>
+<p>Data stores organize application data using <em>tuple tables</em>. <em>In-memory tuple
+tables</em> are used to store application data, like RDF data, in memory. A data
+store can also reference a number of <em>data sources</em>, which provide access to
+data in formats other than RDF, such as relational databases or CSV files.
+Moreover, a data store can contain OWL axioms and rules, which jointly provide
+inference rules that are to be used for reasoning within a data store. Finally,
+a data store can contain <em>statistics modules</em>, which keep summaries of the data
+loaded in the data store that are useful for query planning.</p>
+<p>Each data store is assigned a <cite>data store ID</cite> that is with high probability
+unique across servers. Clients can use this identifier to ensure that they are
+referring to the same data store in different API calls.</p>
+<p>Each data store is associated with a <em>data store version number</em>, which is
+incremented every time a data store is compacted or a transaction is
+successfully committed on the data store. The data store version number can be
+read using any of the provided APIs.</p>
+<p>A data store can be <cite>online</cite> or <cite>offline</cite>. When online, a data store is loaded
+into RAM and can process requests. In contrast, when offline, a data store
+occupies almost no RAM but also cannot process any requests. When a data store
+is brought online, it is restored from persistence. Thus, only persistent data
+stores can be brought offline: bringing a data store that is not persisted
+offline would result in data loss. A data store can be brought offline only if
+there are no open connections to it.</p>
+<div class="section" id="tuple-tables">
+<h3><span class="section-number">4.1.1. </span>Tuple Tables<a class="headerlink" href="#tuple-tables" title="Permalink to this headline">¶</a></h3>
+<p>A data store can contain several tuple tables, which are containers for actual
+data. The data of a tuple table is a collection of items called <em>facts</em>, and
+each fact can be understood as a list of <em>RDF resources</em> (i.e., IRIs, blank
+nodes, or literals). Facts with just three components are commonly called
+<em>triples</em>, and facts with four components are called <em>quads</em>. Each tuple table
+is identified with a name that must be unique within a data store. Moreover,
+each tuple table has a <em>minimal</em> and <em>maximal arity</em>, which are numbers
+determining the smallest and the largest numbers of RDF resources in a fact
+stored in the tuple table. In most cases, the minimal and maximal arity are the
+same, in which case they are called just <em>arity</em>.</p>
+<p>RDFox uses the very general concept of a tuple table to represent many
+different kinds of data containers.</p>
+<ul class="simple">
+<li><p><em>In-memory tuple tables</em> are used to store application data in memory. The
+<a class="reference external" href="https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/Overview.html#dfn-rdf-dataset">RDF dataset</a>
+of a data store is represented using the in-memory tuple tables
+<code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code>. Further detail on in-memory tuple tables is
+given in <a class="reference internal" href="tuple-tables.html#in-memory-tuple-tables"><span class="std std-numref">Section 6.4</span></a>.</p></li>
+<li><p><em>Built-in tuple tables</em> contain facts that can be useful in various
+applications of RDFox, and they are described in more detail in
+<a class="reference internal" href="tuple-tables.html#built-in-tuple-tables"><span class="std std-numref">Section 6.5</span></a>.</p></li>
+<li><p><em>Data source tuple tables</em> provide a ‘virtual view’ over data in non-RDF data
+sources, such as CSV files, relational databases, or an Apache Solr index.
+Importing external data is explained in detail in <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>.</p></li>
+</ul>
+<p>Each fact in a tuple table is associated with one or more <em>fact domains</em>.
+Intuitively, the domain of a fact reflects how a fact was added to a tuple
+table — that is, whether a fact was explicitly introduced by the user or
+derived through reasoning, and so on. Fact domains are described in more detail
+in <a class="reference internal" href="tuple-tables.html#fact-domains"><span class="std std-numref">Section 6.2</span></a>.</p>
+</div>
+<div class="section" id="data-sources">
+<h3><span class="section-number">4.1.2. </span>Data Sources<a class="headerlink" href="#data-sources" title="Permalink to this headline">¶</a></h3>
+<p>To support accessing data in formats other than RDFox, one or more data sources
+can be registered with a data store. Registering a data source requires
+specifying a number of parameters that govern how the data is accessed. Each
+data source is identified by a name that is unique for the data store. The
+access to the actual data is provided by data source tuple tables, which are
+created by referencing previously registered data sources. The process of
+accessing external data sources is described in more detail in
+<a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>.</p>
+</div>
+<div class="section" id="owl-axioms">
+<span id="axioms"></span><h3><span class="section-number">4.1.3. </span>OWL Axioms<a class="headerlink" href="#owl-axioms" title="Permalink to this headline">¶</a></h3>
+<p>To support reasoning with OWL ontologies, one can import OWL axioms into a data
+store. For example, an OWL axiom can be used to state that the <code class="docutils literal notranslate"><span class="pre">:Professor</span></code>
+class is a subclass of the <code class="docutils literal notranslate"><span class="pre">:Person</span></code> class; if such an axiom is imported into
+a data store, RDFox will automatically infer that each instance of
+<code class="docutils literal notranslate"><span class="pre">:Professor</span></code> is also an instance of <code class="docutils literal notranslate"><span class="pre">:Person</span></code>. RDFox associates a separate
+set of axioms with each named graph, and it provides APIs for adding or
+removing axioms in either the Functional-Style Syntax (FSS) or the RDF-based
+syntax.</p>
+</div>
+<div class="section" id="rules">
+<span id="id2"></span><h3><span class="section-number">4.1.4. </span>Rules<a class="headerlink" href="#rules" title="Permalink to this headline">¶</a></h3>
+<p>To support general reasoning, one can import <em>Datalog</em> rules into a data
+store. Rules can intuitively be understood as “if-then” statements expressing
+general truths about a domain of interest. For example, <code class="docutils literal notranslate"><span class="pre">:Person[?X]</span> <span class="pre">:-</span>
+<span class="pre">:Professor[?X]</span> <span class="pre">.</span></code> is a rule stating that every professor is a person. If such
+a rule is added to a data store, then if the data store also contains triples
+<code class="docutils literal notranslate"><span class="pre">:Peter</span> <span class="pre">rdf:type</span> <span class="pre">:Professor</span> <span class="pre">.</span></code> and <code class="docutils literal notranslate"><span class="pre">:Paul</span> <span class="pre">rdf:type</span> <span class="pre">:Professor</span> <span class="pre">.</span></code>, RDFox
+will automatically derive triples <code class="docutils literal notranslate"><span class="pre">:Peter</span> <span class="pre">rdf:type</span> <span class="pre">:Person</span> <span class="pre">.</span></code> and <code class="docutils literal notranslate"><span class="pre">:Paul</span>
+<span class="pre">rdf:type</span> <span class="pre">:Person</span> <span class="pre">.</span></code>. RDFox also supports <em>incremental reasoning</em>: if triple
+<code class="docutils literal notranslate"><span class="pre">:Paul</span> <span class="pre">rdf:type</span> <span class="pre">:Professor</span> <span class="pre">.</span></code> is removed from the data store, RDFox will
+automatically remove <code class="docutils literal notranslate"><span class="pre">:Paul</span> <span class="pre">rdf:type</span> <span class="pre">:Person</span> <span class="pre">.</span></code>. RDFox provides ways to add
+and remove rules, as well as to retrieve the rules in a data store. The rule
+language of RDFox, the provided reasoning support, and examples of use of
+reasoning in practical applications are discussed in detail in
+<a class="reference internal" href="reasoning.html#reasoning"><span class="std std-numref">Section 10</span></a>.</p>
+<div class="section" id="rule-domains">
+<span id="id3"></span><h4><span class="section-number">4.1.4.1. </span>Rule Domains<a class="headerlink" href="#rule-domains" title="Permalink to this headline">¶</a></h4>
+<p>Each rule in a data store is associated with one or more of the following three
+<em>rule domains</em>.</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">user</span></code> rule domain contains the rules that a user added explicitly,
+either by using the RDFox API or by importing a Datalog document.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">axioms</span></code> rule domain contains rules obtained by translating all OWL
+axioms in the data store (in both axiom domains), thus allowing RDFox to
+perform OWL reasoning. Only axioms that conform to the OWL 2 RL profile are
+translated. Rules in this rule domain cannot be manipulated directly by the
+user; rather, a user can add/remove triples and/or axioms in the <code class="docutils literal notranslate"><span class="pre">user</span></code>
+axiom domain, and RDFox will automatically adjust the rules in the <code class="docutils literal notranslate"><span class="pre">axioms</span></code>
+rule domain.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">internal</span></code> rule domain contains rules that RDFox uses internally. The
+exact internal rules used depend on the data store configuration, and they
+are discussed in more detail in <a class="reference internal" href="reasoning.html#appendix-internal-rule-domain"><span class="std std-numref">Section 10.6.6</span></a>.</p></li>
+</ul>
+<p>A rule can belong to multiple rule domains. For example, a rule could be added
+by the user to the <code class="docutils literal notranslate"><span class="pre">user</span></code> rule domain, and it could also be obtained from OWL
+axioms and thus be added to the <code class="docutils literal notranslate"><span class="pre">axioms</span></code> rule domain.</p>
+</div>
+</div>
+<div class="section" id="base-iri-and-prefixes">
+<span id="id4"></span><h3><span class="section-number">4.1.5. </span>Base IRI and Prefixes<a class="headerlink" href="#base-iri-and-prefixes" title="Permalink to this headline">¶</a></h3>
+<p>Each data store keeps track of a string called <em>base IRI</em>, as well as a mapping
+of strings to strings called <em>prefixes</em>. Both of these two objects can be
+manipulated using RDFox’s APIs. These objects are used when importing data into
+or running queries over a data store. For example, when importing a <a class="reference external" href="https://www.w3.org/TR/turtle/">Turtle 1.1</a> file into a data store, the import process
+will proceed <em>as if</em> the base IRI and prefixes associated with the target data
+store are present before the beginning of the file. Analogously, when
+evaluating a <a class="reference external" href="https://www.w3.org/TR/sparql11-query/">SPARQL 1.1</a> query over
+a data store, the query will be processed <em>as if</em> the base IRI and prefixes
+associated with the target data store are specified before the query text. This
+allows applications to set up a default base IRI and prefixes that are
+implicitly used in all RDFox operations. The following prefix definitions are
+added to new data stores:</p>
+<table class="colwidths-given docutils align-center">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Prefix</p></th>
+<th class="head"><p>Expansion</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owl:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/2002/07/owl#</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rdf:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/1999/02/22-rdf-syntax-ns#</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rdfox:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">https://rdfox.com/vocabulary#</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rdfs:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/2000/01/rdf-schema#</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sh:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/ns/shacl#</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">swrl:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/2003/11/swrl#</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">swrlb:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/2003/11/swrlb#</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">xsd:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://www.w3.org/2001/XMLSchema#</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>All interfaces provide a method for clearing a data store’s prefixes. For
+example, in the shell issuing <code class="docutils literal notranslate"><span class="pre">prefixes</span> <span class="pre">clear</span></code> will clear the prefixes of the
+data store associated with the active data store connection.</p>
+</div>
+<div class="section" id="commit-procedure-experimental">
+<h3><span class="section-number">4.1.6. </span>Commit Procedure (EXPERIMENTAL)<a class="headerlink" href="#commit-procedure-experimental" title="Permalink to this headline">¶</a></h3>
+<p>Each data store may have an associated SPARQL update, known as a <code class="docutils literal notranslate"><span class="pre">commit</span>
+<span class="pre">procedure</span></code>, that is evaluated as part of committing each read/write
+transaction on the store. This can be useful for capturing additional explicit
+facts as part of each transaction. See <a class="reference internal" href="transactions.html#commit-procedure"><span class="std std-numref">Section 11.6</span></a> for more
+details.</p>
+</div>
+<div class="section" id="delta-queries">
+<h3><span class="section-number">4.1.7. </span>Delta Queries<a class="headerlink" href="#delta-queries" title="Permalink to this headline">¶</a></h3>
+<p>For tracking changes to the relevant parts of the knowledge graph, one or more
+SPARQL queries can be registered with a data store. These queries are called
+<strong>delta queries</strong> and are continuously evaluated by RDFox against write
+transactions to identify changes to their results. See <a class="reference internal" href="transactions.html#delta-queries"><span class="std std-numref">Section 11.7</span></a>
+for more details.</p>
+</div>
+</div>
+<div class="section" id="roles">
+<h2><span class="section-number">4.2. </span>Roles<a class="headerlink" href="#roles" title="Permalink to this headline">¶</a></h2>
+<p>A server can contain several <em>roles</em>, each representing an actor (or a type of
+actor) allowed to access a server. Performing actions on a server or its parts
+requires first authenticating as one of that server’s roles. The access control
+model of RDFox is described in detail in <a class="reference internal" href="access-control.html#access-control"><span class="std std-numref">Section 12</span></a>.</p>
+</div>
+<div class="section" id="server-parameters">
+<span id="id5"></span><h2><span class="section-number">4.3. </span>Server Parameters<a class="headerlink" href="#server-parameters" title="Permalink to this headline">¶</a></h2>
+<p>When a server is instantiated, it can be given a number of parameters that
+govern various aspects of the server’s operation. All parameters are specified
+as key-value pairs. When an RDFox instance is created from the command line,
+the server parameters are passed as arguments to the RDFox executable as
+described in <a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a>. If an RDFox instance is started from
+Java, the server parameters can be specified as arguments to the
+<a class="reference external" href="./_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#start(java.util.Map)">RDFoxServer.start(…)</a>
+or <a class="reference external" href="_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#initialize(java.lang.String,java.lang.String,java.util.Map)">RDFoxServer.initialize(…)</a>
+methods. In all cases, when the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter is set, RDFox
+will load additional parameters from a file named <code class="docutils literal notranslate"><span class="pre">server.params</span></code> within the
+server directory, if said file exists. See <a class="reference internal" href="#server-parameters-file"><span class="std std-numref">Section 4.3.1</span></a> for
+details on the format of this file.</p>
+<p>The following table describes all available server parameters, except those
+that control the behavior of authentication managers, which are documented in
+<a class="reference internal" href="access-control.html#authentication-managers"><span class="std std-numref">Section 12.3</span></a>.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 19%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">all-data-stores-online-on-startup</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>If the value is <code class="docutils literal notranslate"><span class="pre">true</span></code>, the server
+will bring all of its data stores online
+at startup, otherwise all data stores
+begin in the offline state. The default
+value is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code></p></td>
+<td><p>a string containing a space-
+separated list of URI schemes</p></td>
+<td><p>Specifies a space-separated list of
+schemes that are allowed to be used
+in the SPARQL 1.1 <code class="docutils literal notranslate"><span class="pre">LOAD</span></code> update
+and to import from IRIs.
+The default value is <code class="docutils literal notranslate"><span class="pre">https</span> <span class="pre">rdfox</span></code>
+(<code class="docutils literal notranslate"><span class="pre">rdfox</span></code> is used to import
+TBoxReasoning as described in
+<a class="reference internal" href="reasoning.html#appendix-internal-rule-domain"><span class="std std-numref">Section 10.6.6</span></a>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">api-log</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code> or <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p>If the value is <code class="docutils literal notranslate"><span class="pre">on</span></code>, all API calls
+are recorded in a script that the shell
+can replay later. The default value is
+<code class="docutils literal notranslate"><span class="pre">off</span></code>. See <a class="reference internal" href="logging.html#api-logging"><span class="std std-numref">Section 20.1</span></a> for
+more information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">api-log.directory</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the directory into which
+API logs will be written. Default is
+directory <code class="docutils literal notranslate"><span class="pre">api-log</span></code> within the
+configured server directory.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">api-log.input-recording-limit</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code>, a positive integer or
+<code class="docutils literal notranslate"><span class="pre">unlimited</span></code></p></td>
+<td><p>Limits the amount of each input that
+is recorded during import operations as
+a part of an API log to the specified
+number of bytes. The value <code class="docutils literal notranslate"><span class="pre">unlimited</span></code>,
+which is the default, signifies that
+each input should be recorded in its
+entirety.</p></td>
+</tr>
+<tr class="row-odd"><td><p id="authentication-managers-server-param"><code class="docutils literal notranslate"><span class="pre">authentication-managers</span></code></p>
+</td>
+<td><p>a comma-separated list of zero
+or more of
+<code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> and
+<code class="docutils literal notranslate"><span class="pre">oidc</span></code></p></td>
+<td><p>Specifies the list of authentication
+managers that should be used by the
+server. Parameters for the
+authentication managers are documented
+in <a class="reference internal" href="access-control.html#authentication-managers"><span class="std std-numref">Section 12.3</span></a> and
+must be specified as server parameters
+with the name of the authentication
+manager and a single dot ‘.’ prefixed,
+e.g. <code class="docutils literal notranslate"><span class="pre">oidc.&lt;parameter-name&gt;</span></code>.</p>
+<p>The default value is <code class="docutils literal notranslate"><span class="pre">role-name+password</span></code>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">delta-queries.answers-directory</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The directory in which the delta query
+answers will be stored.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">delta-queries.encryption.algorithm</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of an encryption algorithm
+supported by the available OpenSSL
+crypto library. If an OpenSSL executable
+is available, a list of the supported
+algorithms can be obtained with command
+<code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">list</span> <span class="pre">-cipher-algorithms</span></code>.
+The default value is <code class="docutils literal notranslate"><span class="pre">AES-256-CBC</span></code>
+but this is only used if the
+<code class="docutils literal notranslate"><span class="pre">delta-queries.encryption.key</span></code> parameter
+is set.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">delta-queries.encryption.key</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>A base64-encoded encryption key. If this
+parameter is set, the server will use it
+to encrypt and decrypt all persisted
+data using the algorithm specified by
+the <code class="docutils literal notranslate"><span class="pre">delta-queries.encryption.algorithm</span></code>
+parameter. The key must meet the
+requirements of the selected algorithm.
+This parameter may alternatively be
+supplied via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_DELTA_QUERIES_ENCRYPTION_KEY</span></code>
+environment variable.
+By default, this parameter is unset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">license.content</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the license content verbatim.
+This parameter is not set by default.
+See <a class="reference internal" href="features-and-requirements.html#rdfox-license-key"><span class="std std-numref">Section 2.4.1.3</span></a> for
+the precedence of license-related
+options.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">license.file</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the path to the license key
+file to use. The default value is
+<code class="docutils literal notranslate"><span class="pre">$HOME/.RDFox/RDFox.lic</span></code> on Linux/Mac,
+and <code class="docutils literal notranslate"><span class="pre">%LOCALAPPDATA%\RDFox\RDFox.lic</span></code>
+on Windows.
+See <a class="reference internal" href="features-and-requirements.html#rdfox-license-key"><span class="std std-numref">Section 2.4.1.3</span></a> for
+the precedence of license-related
+options.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max-memory</span></code></p></td>
+<td><p>an integer</p></td>
+<td><p>Specifies the initial value for the
+maximum of memory (in MB) that the RDFox
+instance should use. The default is 0.9
+times the installed memory.</p></td>
+</tr>
+<tr class="row-even"><td><blockquote>
+<div></div></blockquote>
+<p id="num-threads-server-param"><code class="docutils literal notranslate"><span class="pre">num-threads</span></code></p>
+</td>
+<td><p>an integer</p></td>
+<td><p>Specifies the initial number of threads
+that the system will use for tasks such
+as reasoning and importation. The default
+is the number of logical processors
+available on the machine.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p>If the value is <code class="docutils literal notranslate"><span class="pre">file</span></code> or
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>, the content of the
+server will be incrementally saved
+(persisted) within the server
+directory using the matching persistence
+option. See <a class="reference internal" href="persistence.html#persistence-options"><span class="std std-numref">Section 13.2.1</span></a>
+for an explanation of the available options.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.disk-sector-size</span></code></p></td>
+<td><p>an integer</p></td>
+<td><p>The physical sector size of the disk
+containing the server directory in bytes.
+This parameter is used when the
+<code class="docutils literal notranslate"><span class="pre">persistence</span></code> parameter is set to
+<code class="docutils literal notranslate"><span class="pre">file</span></code> in order to achieve atomicity
+for read/write transactions in data
+stores. The default value is <code class="docutils literal notranslate"><span class="pre">4096</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of the encryption algorithm to use
+to encrypt and decrypt all persisted data.
+The algorithm must be supported by the
+available OpenSSL crypto library. If an
+OpenSSL executable is available, a list of the
+supported algorithms can be obtained with
+command <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">list</span> <span class="pre">-cipher-algorithms</span></code>.
+The default value is <code class="docutils literal notranslate"><span class="pre">AES-256-CBC</span></code>
+but this is only used if the
+<code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code> parameter
+is set.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>A base64-encoded encryption key. If this
+parameter is set, the server will use it
+to encrypt and decrypt all persisted
+data using the algorithm specified by
+the <code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code>
+parameter. The key must meet the
+requirements of the selected algorithm.
+This parameter may alternatively be
+supplied via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_PERSISTENCE_ENCRYPTION_KEY</span></code>
+environment variable.
+By default, this parameter is unset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code></p></td>
+<td><p>a duration of <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">ms</span></code> or more
+specified as described in
+<a class="reference internal" href="#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>.</p></td>
+<td><p>Specifies the interval between successive
+polls of the file system for each
+component configured to use
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence.
+This setting defaults to 60 s and is
+ignored unless <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>
+persistence is in use. See also
+<a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code></p></td>
+<td><p>a hostname and UDP
+port number separated
+separated by a plus
+symbol.</p></td>
+<td><p>Specifies a hostname and UDP port number
+to which other instances should send
+notifications. This setting is ignored
+unless <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence is
+in use. If this parameter is not set,
+the instance will neither listen for nor
+send notifications. See also
+<a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.memory-cost</span></code></p></td>
+<td><p>a non-negative integer</p></td>
+<td><p>See
+<a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.time-cost</span></code></p></td>
+<td><p>a non-negative integer</p></td>
+<td><p>See
+<a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.parallelism</span></code></p></td>
+<td><p>a non-negative integer</p></td>
+<td><p>See
+<a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.externally-authenticatable-role</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>See
+<a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.externally-grantable-role</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>See
+<a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the directory to which RDFox
+should restrict any file system access
+where the path is specified as part of
+an API call or shell command. The
+purpose of this feature is to prevent an
+attacker from probing the host’s
+file system using RDFox. The default
+value is the working directory of the
+RDFox process. Sandboxing of file access
+can be disabled by setting this option
+to the empty string.</p></td>
+</tr>
+<tr class="row-odd"><td><p id="server-directory-server-param"><code class="docutils literal notranslate"><span class="pre">server-directory</span></code></p>
+</td>
+<td><p>a string</p></td>
+<td><p>Specifies the directory to be used for
+persistence of data and as the default
+location for various other files logs. When
+this parameter is not specified or is set to
+the empty string, RDFox will be unable to use
+persistence. See also
+<a class="reference internal" href="persistence.html#server-directory"><span class="std std-numref">Section 13.1</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">session.encryption.algorithm</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of the encryption algorithm to use
+to encrypt and decrypt all session data. The
+algorithm must be supported by the available
+OpenSSL crypto library. If an OpenSSL
+executable is available, a list of the
+supported algorithms can be obtained with
+command <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">list</span> <span class="pre">-cipher-algorithms</span></code>.
+The default value is <code class="docutils literal notranslate"><span class="pre">AES-256-CBC</span></code>
+but this is only used if the
+<code class="docutils literal notranslate"><span class="pre">session.encryption.key</span></code> parameter
+is set.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">session.encryption.key</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>A base64-encoded encryption key. If this
+parameter is set, the server will use it
+to encrypt and decrypt session tokens issued
+from or received by the session-based APIs
+described in <a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.2.1.1.2</span></a>. The
+encryption algorithm is specified by the
+<code class="docutils literal notranslate"><span class="pre">session.encryption.algorithm</span></code> parameter.
+This parameter may alternatively be
+supplied via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_SESSION_ENCRYPTION_KEY</span></code>
+environment variable.
+It has no default value but if it is
+left unset, session encryption will fall back
+first to using the key and algorithm specified
+by the <code class="docutils literal notranslate"><span class="pre">persistence.encryption.*</span></code> options,
+if they are available, and then to using a
+randomly-generated key for the duration of the
+server session.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="the-server-parameters-file">
+<span id="server-parameters-file"></span><h3><span class="section-number">4.3.1. </span>The Server Parameters File<a class="headerlink" href="#the-server-parameters-file" title="Permalink to this headline">¶</a></h3>
+<p>When an RDFox server is configured to use a server directory, it will inspect
+the directory for a file named <code class="docutils literal notranslate"><span class="pre">server.params</span></code> and, if the file is found,
+attempt to load server parameters from it. Parameter values specified
+explicitly by the user (for example via the command line arguments when using
+the RDFox executable) take precedence over values from the parameters file.</p>
+<p>The parameters file must be encoded in UTF-8. Lines with <code class="docutils literal notranslate"><span class="pre">#</span></code> as the first
+non-whitespace character are ignored, as are empty lines. Each (parameter name,
+parameter value) pair must appear on a single line with optional leading
+whitespace followed by the parameter name, more whitespace, the value and
+optional trailing whitespace. Values that contain whitespace must be enclosed in
+double quotes (<code class="docutils literal notranslate"><span class="pre">&quot;</span></code>). Double quotes within values must be escaped as <code class="docutils literal notranslate"><span class="pre">\&quot;</span></code>,
+newlines as <code class="docutils literal notranslate"><span class="pre">\n</span></code>, and backslashes as <code class="docutils literal notranslate"><span class="pre">\\</span></code>.</p>
+<p>The following text block shows an example parameters file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># Use &#39;file&#39; persistence
+persistence              file
+
+# Enable loading of file: and https: URLs only
+allowed-schemes-on-load  &quot;file https&quot;
+
+# Restrict importing, exporting and reading of shell scripts to the ``/data`` directory
+sandbox-directory        /data
+</pre></div>
+</div>
+</div>
+<div class="section" id="specifying-durations">
+<span id="id6"></span><h3><span class="section-number">4.3.2. </span>Specifying Durations<a class="headerlink" href="#specifying-durations" title="Permalink to this headline">¶</a></h3>
+<p>Several parameters of the server and other RDFox components control waiting
+times between actions; in other words, durations. All such duration parameters
+are specified as follows. To specify a finite waiting time, a parameter value
+must contain a non-negative integer followed by an optional space and an
+optional unit specifier. The accepted unit specifiers are <code class="docutils literal notranslate"><span class="pre">ms</span></code>, <code class="docutils literal notranslate"><span class="pre">s</span></code> (the
+default), <code class="docutils literal notranslate"><span class="pre">h</span></code>, and <code class="docutils literal notranslate"><span class="pre">d</span></code>. To specify an infinite waiting time the value can be
+set to the string <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> although this is not accepted for all duration
+parameter names.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="3. Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data-stores.html" class="btn btn-neutral float-right" title="5. Data Stores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

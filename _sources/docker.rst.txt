@@ -1,0 +1,332 @@
+.. _docker:
+
+RDFox Docker Images
+===================
+
+This section documents the official Docker images for RDFox®, which are publicly
+available from Docker Hub repository `oxfordsemantic/rdfox
+<https://hub.docker.com/r/oxfordsemantic/rdfox>`__, and their companion images
+in repository `oxfordsemantic/rdfox-init
+<https://hub.docker.com/r/oxfordsemantic/rdfox-init>`__.
+
+The defaults of the RDFox Docker images are described in the next section,
+followed by a section describing suggested approaches for mounting the RDFox
+license key, server directory and shell root directory. The final section
+provides a selection of example ``docker run`` commands for running the images.
+The only pre-requisite for running these is a Docker installation for your
+platform. See `the official Docker installation page
+<https://docs.docker.com/get-docker/>`_ for instructions.
+
+The documentation assumes familiarity with the basics of Docker in general and
+in particular the different ways of mounting storage into containers with the
+desired container-side permissions.
+
+.. note::
+
+   For readability, short-form (``-v``) mount arguments will be used throughout
+   but readers should be aware that the official Docker documentation recommends
+   the long-form (``--mount``) alternative.
+
+Image Defaults
+--------------
+
+Default values for the images in the `oxfordsemantic/rdfox
+<https://hub.docker.com/r/oxfordsemantic/rdfox>`__ repository are described
+below. It is possible to override all of these defaults but, for simplicity, the
+documentation of each assumes the other defaults are being used.
+
+User
+  The default user within the images is ``rdfox``. This determines the default
+  server directory path within containers as ``/home/rdfox/.RDFox``.
+
+Entrypoint
+  The default entry point for the images is the RDFox executable embedded at
+  container path ``/opt/RDFox/RDFox``. The version of the executable at this
+  path will match the version in the tag for the image.
+
+Command
+  The default command is ``daemon request-logger elf``. This can be overridden
+  with any set of arguments that would be accepted by the RDFox executable (see
+  :numref:`rdfox-executable`).
+
+Working directory
+  The default working directory for the images is ``/data``. This has no impact
+  when starting in daemon mode but will be the default root directory when using
+  the RDFox shell.
+
+Ports
+  The images expose the default port for the RDFox endpoint: 12110.
+
+Required superuser capabilities
+  In the interests of security, images in the `oxfordsemantic/rdfox
+  <https://hub.docker.com/r/oxfordsemantic/rdfox>`__ repository have been
+  designed to run with no superuser capabilities (see `Linux kernel capabilities
+  <https://docs.docker.com/engine/security/security/#linux-kernel-capabilities>`_).
+  The inclusion of the argument ``--cap-drop ALL`` in docker run commands, or
+  the equivalent in other environments, is recommended when launching images in
+  the above repository.
+
+Suggested Mounts
+----------------
+
+The following sections provide suggestions on how to mount the license key, how
+to mount and initialize storage for the server directory and how to mount
+storage for the shell root directory.
+
+Mounting the License Key
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although various solutions to injecting the RDFox license key are possible, the
+recommended approach is to mount a valid, in-date license key file to container
+path ``/opt/RDFox/RDFox.lic``. This will enable the containerized RDFox process
+to locate the license without requiring additional command line arguments whilst
+ensuring that the license key need not be stored within the server directory.
+
+If using the images in Kubernetes, where the RDFox license key may be held as a
+``Secret`` resource, mounting the secret as described above will hide the
+image's entry-point executable, leading to a failure to start. In this
+situation, mapping the secret into the container's environment via variable
+``RDFOX_LICENSE_CONTENT`` is the next most convenient option.
+
+The methods described above work for both `oxfordsemantic/rdfox
+<https://hub.docker.com/r/oxfordsemantic/rdfox>`__ and
+`oxfordsemantic/rdfox-init
+<https://hub.docker.com/r/oxfordsemantic/rdfox-init>`__ images.
+
+Mounting the Server Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When RDFox is configured to persist roles and data stores, it does so inside the
+configured server-directory. As described above, the default server directory
+path for `oxfordsemantic/rdfox
+<https://hub.docker.com/r/oxfordsemantic/rdfox>`__ images is
+``/home/rdfox/.RDFox``. For use cases where persistence is enabled it is
+therefore most convenient to mount storage, whether a host directory or Docker
+volume, to that container path. If for any reason the server directory must be
+mounted to a different container path, the default command for the image must be
+overridden with a valid RDFox command which includes the ``-server-directory``
+parameter specifying the container-side server directory path.
+
+Wherever the storage is mounted, it must be readable and writable by the user
+that launches RDFox within the container (the ``rdfox`` user by default). In
+order to start RDFox in daemon mode without having to supply a role name and
+password, it is also necessary that users have previously initialized access
+control within the server directory (see :numref:`access-control-initialization`
+for more information about initialization). The companion images described in
+the next section can help to prepare new server directories in order to meet all
+of these requirements.
+
+Initializing the Server Directory with a Companion Image
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To simplify the initialization of new server directories, each image in the
+`oxfordsemantic/rdfox <https://hub.docker.com/r/oxfordsemantic/rdfox>`__
+repository has a companion image with a matching tag in the
+`oxfordsemantic/rdfox-init
+<https://hub.docker.com/r/oxfordsemantic/rdfox-init>`__ repository. The purpose
+of these images is to prepare a mounted volume as a server directory for a
+long-lived container that will use the corresponding `oxfordsemantic/rdfox
+<https://hub.docker.com/r/oxfordsemantic/rdfox>`__ image.
+
+Since initialization requires root privileges to ensure the correct file system
+access rights, as well as a plaintext password to initialize RDFox's access
+control system, using a companion image to prepare the server directory for a
+long-lived RDFox container allows the latter to be run in a more secure
+environment. Specifically, the long-lived container can be launched as an
+unprivileged system account (such as the image's default user, ``rdfox``), all
+superuser capabilities can be dropped, and no plaintext password is needed for
+the first RDFox server role.
+
+When run against a completely uninitialized server directory, companion images
+perform the following steps:
+
+#. ensure that the storage is owned by the ``rdfox`` user and is readable and
+   writable by that user
+#. invoke RDFox to initialize access control and, optionally, execute a
+   user-supplied RDFox shell script
+
+Step 1 requires that the container is launched as ``root`` with at least the
+capabilities ``CAP_CHOWN``, ``CAP_SETUID`` and ``CAP_SETGID``. Step 2 requires
+an RDFox license key as well as the name and password of the first role for
+RDFox. These can be supplied using the same command line arguments and
+environment variables as the main `oxfordsemantic/rdfox
+<https://hub.docker.com/r/oxfordsemantic/rdfox>`__ images. 
+
+Companion images accept any valid RDFox ``init``-mode command (see
+:numref:`rdfox-executable`). Alternatively, the ``init`` mode specifier can be
+ommitted. In the latter case, companion images check for a file named
+``initialize.rdfox`` in the container's working directory and, if it exists,
+add it to the RDFox command line to be executed as an :ref:`RDFox shell script
+<shell-script-execution>`. This can help avoid the need to create and configure
+via the REST endpoint later on.
+
+See :numref:`example-docker-run-commands` for an example Docker run command for
+a companion image.
+
+Mounting the Shell Root Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Often, when developing applications for RDFox it is convenient to keep the
+rules, base facts and shell scripts for the application in a single directory.
+When using the RDFox shell in Docker, this directory must be mounted into the
+container's file system with the appropriate permissions to allow the ``rdfox``
+user to read and write as necessary.
+
+Users are free to use either a named volume or a bind mount for the shell root
+directory. Bind mounting a host directory will often be more convenient for this
+purpose however named volumes offer more flexibility to achieve the necessary
+container-side permissions, particularly where the Docker client is on Windows.
+The most convenient target path for the mount is the default working directory
+``/data`` as this is the default value for the shell root variable.
+
+.. _example-docker-run-commands:
+
+Example Docker Run Commands
+---------------------------
+
+The example commands in this section demonstrate how to run RDFox Docker images
+in several different configurations, starting with the simplest possible and
+progressing to more realistic scenarios. With the appropriate substitutions, the
+commands should work on any operating system where the Docker CLI is supported.
+
+In all of the examples, ``<path-to-license-file>`` should be replaced with an
+absolute path to a valid, in-date RDFox license key file.
+
+.. container:: example
+
+   **Example:** *Running Interactively with no Persistence or Endpoint*.
+
+   The simplest possible ``docker run`` command to launch RDFox in a container
+   is:
+
+   .. code:: bash
+
+      docker run -it -v <path-to-license-file>:/opt/RDFox/RDFox.lic oxfordsemantic/rdfox sandbox
+
+   This will start the RDFox shell for interactive usage but is not very useful.
+   First of all, nothing from the session will be persisted since no server
+   directory has been configured. Second, since no storage has been mounted to
+   the ``/data`` path, there is no possibility of importing from or exporting to
+   the host file system from the RDFox shell and we have no access to any shell
+   scripts. Finally, since we did not publish the 12110 port it will be
+   impossible to reach the RDFox endpoint from outside the container even if it
+   is started using ``endpoint start``. Nevertheless, this command may be useful
+   for quickly testing out RDFox functionality on data and rules simple enough
+   to be typed (or pasted) in.
+
+
+.. container:: example
+
+   **Example:** *Initializing a New Server Directory with a Companion Image*.
+
+   The following command creates a Docker volume with name
+   ``rdfox-server-directory`` (assuming no such volume exists already) and uses
+   the latest `oxfordsemantic/rdfox-init
+   <https://hub.docker.com/r/oxfordsemantic/rdfox-init>`__ image to prepare it
+   for use with the latest `oxfordsemantic/rdfox
+   <https://hub.docker.com/r/oxfordsemantic/rdfox>`__ image. Access control
+   will be initialized with the role name in the command and password held in
+   the environment variable ``RDFOX_PASSWORD`` (this must be set in the
+   environment where the command is run).
+
+   .. code:: bash
+
+      docker run --rm -v <path-to-license-file>:/opt/RDFox/RDFox.lic \
+                 -v rdfox-server-directory:/home/rdfox/.RDFox \
+                 -e RDFOX_PASSWORD \
+                 oxfordsemantic/rdfox-init \
+                   -persistence file \
+                   -request-logger elf \
+                   -role admin
+
+   If the resulting container exits cleanly, the ``rdfox-server-directory``
+   volume will be ready for use, as demonstrated in the next example.
+
+
+.. container:: example
+
+   **Example:** *Running in Daemon Mode With Persistence*
+
+   Using volume ``rdfox-server-directory``, prepared as described in the
+   preceding example, a containerized RDFox daemon, reachable at host port
+   ``<host-port>``, can be launched using the following command:
+
+   .. code:: bash
+
+      docker run -d --cap-drop ALL -p <host-port>:12110 \
+                 -v <path-to-license-file>:/opt/RDFox/RDFox.lic \
+                 -v rdfox-server-directory:/home/rdfox/.RDFox \
+                 oxfordsemantic/rdfox
+
+
+.. container:: example
+
+   **Example:** *Running Interactively With Persistence*
+
+   To run interactively users must include the ``-i`` and ``-t`` arguments to
+   docker run and override the default ``daemon`` command with ``shell`` as in
+   the following command.
+
+   .. code:: bash
+
+      docker run -it --cap-drop ALL \
+                 -v <path-to-license-file>:/opt/RDFox/RDFox.lic \
+                 -v <rdfox-server-directory>:/home/rdfox/.RDFox \
+                 -v <shell-root-directory>:/data \
+                 oxfordsemantic/rdfox shell
+
+   When launched this way, RDFox will always prompt for a role name and password
+   which it will use to initialize access control if
+   ``<rdfox-server-directory>`` has not previously been initialized, and in all
+   cases to log into the shell.
+
+.. container:: example
+
+   **Example:** *Running in Daemon Mode With No Persistence*
+
+   To run as a purely in-memory data store, where all interaction will be via
+   the RDFox endpoint, it is possible to supply the name and password of the
+   first role via environment variables in order to initialize access control
+   without any interaction via standard input and output. Assuming variables
+   ``RDFOX_ROLE`` and ``RDFOX_PASSWORD`` have been defined in the environment
+   where the command will run, a containerized RDFox daemon with no persistence,
+   reachable at host port ``<host-port>``, can be launched using the following
+   command:
+
+   .. code:: bash
+
+      docker run -d --cap-drop ALL \
+                 -p <host-port>:12110 \
+                 -v <path-to-license-file>:/opt/RDFox/RDFox.lic \
+                 -e RDFOX_ROLE \
+                 -e RDFOX_PASSWORD \
+                 oxfordsemantic/rdfox \
+                     -persistence off daemon
+
+   The RDFox server started by the above command will contain no data stores
+   initially. These can be created and populated via the REST API however, in
+   some situations, it may be desirable to do this at startup time using an
+   RDFox shell script. Given a startup script ``start.rdfox`` in host directory
+   ``<shell-root-directory>``, a containerized RDFox daemon with no persistence,
+   initialized by the script and reachable at host port ``<host-port>``, can be
+   launched using the following command:
+
+   .. code:: bash
+
+      docker run -d --cap-drop ALL \
+                 -p <host-port>:12110 \
+                 -v <path-to-license-file>:/opt/RDFox/RDFox.lic \
+                 -v <shell-root-directory>:/data \
+                 -e RDFOX_ROLE \
+                 -e RDFOX_PASSWORD \
+                 oxfordsemantic/rdfox \
+                     -persistence off daemon . start
+
+
+Checking the Health of RDFox Containers
+---------------------------------------
+
+Many container orchestration systems require a health check endpoint to
+determine whether a container is healthy. The RDFox endpoint has a dedicated API
+for this purpose at path ``/health``. ``GET`` requests to this path will always
+return ``204 - No Content``. See also :numref:`REST-endpoint-health`.

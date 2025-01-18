@@ -1,0 +1,35 @@
+.. _connections:
+
+Connections
+===========
+
+All core RDFox® functionality is accessed through *connections*. Server
+operations are accessed through *server connections* while data store operations
+are accessed through *data store connections*.
+
+Obtaining an initial server or data store connection requires authenticating as
+one of the server's roles. Thereafter, clients can create additional connections
+using the same role without re-authenticating by duplicating an existing
+connection or by creating data store connections from a server connection.
+
+In general, connections are designed for use from one thread at a time. That
+is, while connections have no affinity to particular threads, calling
+connection methods concurrently from more than one thread will generally result
+in undefined behavior including crashes. Specific exceptions to this rule exist
+to support duplication of connections and the interruption of operations active
+on a particular connection.
+
+.. note::
+
+   A data store cannot be deleted while there are open connections to it. For
+   this reason, and to minimize resource usage, connections should be closed
+   when no longer needed.
+
+While the above characteristics of connections are true regardless of which
+RDFox interface (shell, REST or Java) is being used, each interface has its own
+specific mechanisms for managing connections. For details of connection
+management in the shell see :numref:`connection-management-shell`. For details
+of how connections are created by the endpoint see
+:numref:`REST-implicit-connections-and-transactions` and
+:numref:`REST-explicit-connection-management`. For information about how to
+create connections in Java, see :numref:`APIs-java-basics`.

@@ -1,0 +1,1762 @@
+.. _rdfox-shell:
+
+RDFox Shell
+===========
+
+This section describes the RDFox® shell, a command-line interface to the core
+functionality described in previous sections. It can be used interactively or as
+a script execution environment and can be accessed either remotely or via
+standard input and output of the process containing the RDFox Server.
+
+.. _connection-management-shell:
+
+Connection Management
+---------------------
+
+With the exception of commands that control the behavior of the shell or
+endpoint, each shell command requires either a server or data store
+:ref:`connection <connections>` to do its work. To support this, the shell
+maintains a list of named connections of each type as well as variables to hold
+the names of the active connections.
+
+When a command requiring a server connection is executed, the shell searches
+its list of server connections for a connection with the name held in the
+``active-server-connection`` :ref:`variable <shell-variables>`. If the search
+is successful, the identified connection is used. If not, an error is printed.
+When an instance of the shell is created, an initial server connection named
+``sc1`` is created, using the role name and password provided by the user (see
+:numref:`rdfox-executable`), and made active. Thereafter, command ``srvconn``
+(described in :numref:`srvconn-command`) can be used to manage the shell's
+server connections.
+
+When a command requiring a data store connection is executed, the shell
+searches its list of data store connections for a connection with the name held
+in the ``active-data-store-connection`` :ref:`variable <shell-variables>`. If
+the search is successful, the identified connection is used. If not, the shell
+looks for a data store whose name matches the active data store connection name
+and, if such a data store exists, opens a new connection to it using the active
+server connection. If no such data store exists, an error is printed. The
+command ``dsconn`` (described in :numref:`dsconn-command`) can be used to
+manage the shell's data store connections.
+
+.. _shell-commands:
+
+Shell Commands
+--------------
+
+This section describes the commands that can be used in the shell.
+
+.. note::
+
+   All command syntaxes are described using the following notation:
+
+      - square brackets (``[]``) indicate optional elements,
+      - curly braces (``{}``) indicate mandatory elements,
+      - the pipe character (``|``) is used to separate the accepted
+        alternatives within an optional or mandatory element,
+      - angle brackets (``<>``) indicate argument placeholders,
+      - three repeated dots (``...``) indicate that the preceding element may
+        appear zero or more times.
+
+   When a mandatory element has only one valid value, the curly braces are
+   omitted.
+
+active
+~~~~~~
+
+**Syntax:**
+
+::
+
+   active [<name>]
+
+**Description:** If ``<name>`` is omitted, this command prints the name of the
+active data store connection; otherwise, it sets the active data store
+connection name to ``<name>``. See :numref:`connection-management-shell` for
+details of how the shell manages connections.
+
+answer
+~~~~~~
+
+**Syntax:**
+
+::
+
+   answer {! <query_text> | <file_name> ...}
+
+**Description:** This command evaluates one or more ``SELECT``, ``ASK``, or
+``CONSTRUCT`` queries. A single query can be given explicitly as text after the
+``!`` symbol, or one can specify zero or more file names that contain the
+queries to be evaluated. Each relative ``<file_name>`` (e.g., it does not start
+with ``/`` on Unix-based platforms) is interpreted as relative to the content
+of the ``dir.queries`` :ref:`shell variable <shell-variables>`.
+
+.. container:: example
+
+
+   **Example:** The following command checks whether the ``a1:Org`` class
+   contains any instances.::
+
+      answer ! ask { ?X rdf:type a1:Org }
+
+ask
+~~~
+
+**Syntax:**
+
+::
+
+   ask <remaining_query_text>
+
+**Description:** This command queries the current data store with the specified
+SPARQL query. An ask query tests whether or not a query pattern has a solution.
+
+.. container:: example
+
+   **Example:** The last command of the following script tests whether the
+   specified pattern can be matched in the materialization, and prints out the
+   total number of matched tuples. ::
+
+      dstore create default
+      import "LUBM.ttl"
+      import "LUBM.dlog"
+      prefix a1: <http://lehigh.edu/onto/univ-bench.owl#>
+      set output out
+      ask { ?X rdf:type a1:Org }
+
+begin
+~~~~~
+
+**Syntax:**
+
+::
+
+   begin [read | write | exclusive]
+
+**Description:** This command starts a :ref:`transaction <transactions>` on the
+current data store. The transaction is read-only (if ``read`` parameter is
+specified), read/write (if ``write`` parameter is specified or the parameter
+is omitted), or exclusive (if ``exclusive`` parameter is specified).
+
+.. _checkintegrity-command:
+
+checkintegrity
+~~~~~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   checkintegrity [<max_errors_of_same_type>]
+
+**Description:** This command checks the integrity of the server associated
+with the active server connection and lists any problems identified in the
+internal data structures used by RDFox. No problems should be detected under
+normal operation, so please contact customer support immediately if any
+problems are reported. Since running this command can take significant time,
+progress will be reported periodically as the check progresses through various
+stages. The optional ``<max_errors_of_same_type>`` parameter determines how
+many errors of a particular type should be printed; the default value for this
+parameter is 20. This ensures that the command's output is not overwhelmed by a
+large number of errors that could make the output unreadable.
+
+.. _clear-command:
+
+clear
+~~~~~
+
+**Syntax:**
+
+::
+
+   clear [rules-explicate-facts | {data-store-properties | prefixes | facts | axioms | rules | commit-procedure} ...] [force]
+
+**Description:** This command clears various parts of the data store.
+
+- With ``rules-explicate-facts``, it clears all rules and makes all facts
+  explicit --- that is, it adds all facts from the ``derived`` :ref:`fact
+  domain <fact-domains>` into the ``explicit`` domain. This operation can be
+  used when the facts derived by one set of rules should be fed as input to
+  another set of rules.
+
+- With at least one data store part specified, all specified parts are cleared.
+
+- With no arguments, all parts of the data store are cleared.
+
+All variants of the command will prompt for confirmation unless ``force`` is
+specified.
+
+.. container:: example
+
+   **Example:** After the ``clear rules-explicate-facts`` command of the
+   following script is issued, all facts will become explicit and all rules
+   will be deleted. Therefore, if ``a1:Org[http://www.University389.edu]`` is
+   derived during the materialization, then the first “explain” command will
+   print information about how this fact is derived, whereas the second
+   “explain” command will simply tell the user that the fact is an explicit
+   fact.
+
+   ::
+
+      dstore create default
+      import "LUBM.ttl"
+      import "LUBM.dlog"
+      prefix a1: <http://lehigh.edu/onto/univ-bench.owl#>
+      explain shortest a1:Org[<http://www.University389.edu>]
+      clear rules-explicate-facts
+      explain shortest a1:Org[<http://www.University389.edu>]
+
+.. container:: example
+
+   **Example:** The following command clears prefixes and all facts, but leaves
+   the remaining parts of the data store intact. It also uses ``force`` to
+   avoid the confirmation prompt.
+
+   ::
+
+      clear prefixes facts force
+
+commit
+~~~~~~
+
+**Syntax:**
+
+::
+
+   commit
+
+**Description:** This command commits the :ref:`transaction <transactions>` on
+the active data store connection.
+
+.. _commitproc-command:
+
+commitproc (EXPERIMENTAL)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   commitproc {show | set {! <text> | <file_name>}}
+
+**Description:** This command manages the :ref:`commit procedure
+<commit-procedure>` for the data store.
+
+If the ``show`` argument is supplied, the commit procedure for the current data
+store is printed. If the ``set`` argument is supplied, the data store's commit
+procedure will be set to the SPARQL update identified by the following
+arguments. These can be either a ``!`` symbol followed the SPARQL update as
+explicit text, or the path of a file containing the SPARQL update to be used.
+
+.. _compact-command:
+
+compact
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   compact
+
+**Description:** This command compacts all facts in the data store, reclaiming
+memory and disk space occupied by deleted facts. Data store compaction cannot be
+performed as part of an explicit transaction.
+
+Please refer to :numref:`compaction-dead-fact-removal` for a detailed
+explanation of compaction.
+
+construct
+~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   construct <remaining_query_text>
+
+**Description:** This command queries the current data store with the specified
+`SPARQL <http://www.w3.org/TR/sparql11-query/>`__ ``CONSTRUCT`` query. The
+resulting triples are stored using the ``Turtle`` format.
+
+delete
+~~~~~~
+
+**Syntax:**
+
+::
+
+   delete <remaining_query_text>
+
+**Description:** This command can be used to remove explicit facts from the
+data store based on bindings for a query pattern specified in a where clause.
+
+.. container:: example
+
+   **Example:** The following command removes all facts matching the specified
+   query pattern ``?X a1:headOf ?Y`` from the data store. ::
+
+      delete { ?X a1:headOf ?Y } where { ?X a1:headOf ?Y }
+
+
+.. _deltaquery-command:
+
+deltaquery
+~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+    deltaquery {list | show <name> | register <name> <answer-format> {snapshots-max-size <size> | deletions-max-size <size> | additions-max-size <size>} ... {! <query_text> | <query_path>} | deregister <name> | set-evaluation-mode <name> {snapshot | delta} }
+
+**Description:** Manages the delta queries registered with the current data store.
+
+- Option ``list`` prints the currently registered delta queries.
+
+- Option ``show`` prints information about the delta query <name>.
+
+- Option ``register`` registers a new delta query with the name <name> and the
+  query provided either inline as <query-text> or stored in a file specified by
+  <query_path>. An initial snapshot of the query answers is generated in the
+  transaction that registers the delta query. Additions and deletions are
+  generated in transactions following the query registration. The parameters
+  ``snapshots-max-size``, ``deletions-max-size``, and ``additions-max-size``
+  control the generation of the three types of delta query answers. Allowed
+  values for <size> are ``unlimited`` (default), ``none``, or a non-negative
+  number. The values 'none' and 0 disable the generation of answers for the
+  given type. Answers will be generated in the <answer-format> format.
+
+- Option ``deregister`` deregisters the delta query with name <name>.
+
+- Option ``set-evaluation-mode`` overrides the current evaluation mode of delta
+  query <name>. ``snapshot`` mode ensures that at the end of the current
+  transaction, a snapshot of the query answers is generated. ``delta`` mode
+  ensures that at the end of the current transaction, if the query answers have
+  changed, deltas (additions or deletions) are generated.
+
+
+.. _deltaqueryanswer-command:
+
+deltaqueryanswer
+~~~~~~~~~~~~~~~~
+
+::
+
+    deltaqueryanswer {list {name <name> | from <version> | to <version> | type <answer-type> }... | show <name> <version> <answer-type> | delete {name <name> | from <version> | to <version> | type <answer-type> }...}
+
+**Description** Manages the delta query answers.
+
+- Option ``list`` prints the delta query answers matching the specified
+  criteria. The parameter ``name`` restricts the query name of the returned
+  answers to <name>. The parameters ``from`` and ``to`` restrict the data store
+  version of the returned answers. The allowed values for <version> are
+  non-negative numbers. The parameter ``answer-type`` limits the type of the
+  returned answers. The allowed values are ``snapshot``, ``deletion`` and
+  ``addition``.
+
+- Option ``show`` prints the delta query answer for the specified delta query
+  name, version and answer type.
+
+- Option ``delete`` deletes the delta query answers matching the specified
+  criteria. The subcommand uses the same parameters as ``list``.
+
+
+.. _dsconn-command:
+
+dsconn
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   dsconn {list | active [<name>] | open [name] to <data_store_name> [as <role>] | close [<name>|to <data_store_name>]}
+
+**Description:** Manages data store connections belonging to the current shell.
+See also :numref:`connection-management-shell`.
+
+-  Option ``list`` prints the currently open data store connections.
+
+-  Option ``active`` sets ``<name>`` as the name of the active data store
+   connection if a parameter is provided or prints the name of the active
+   data store connection if not.
+
+-  Option ``open`` opens a new connection to the data store with name
+   ``<data_store_name>``. If the optional ``<name>`` parameter is provided, it
+   is used as the name of the connection, otherwise a name is assigned
+   automatically. If the optional ``<role>`` parameter is supplied, the command
+   will attempt to create the connection as ``<role>``. If no role is
+   specified, the the command will attempt to create the new data store
+   connection from the active server connection.
+
+-  Option ``close`` closes the active data store connection if no argument is
+   given, the data store connection with name ``<name>`` if a single argument
+   is given, or all connections to the data store with name
+   ``<data_store_name>`` if the arguments ``to`` and ``<data_store_name>`` are
+   given in that order.
+
+.. _dsource-command:
+
+dsource
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   dsource {list | show <dsname> | register <dsname> <parameters> | sample <dsname> <table> [<size>] | deregister <dsname>}
+
+**Description:** This command manages the data sources of the current store.
+The command is useful when the user wishes to import and manage data of non-RDF
+formats in RDFox. For an overview of how RDFox manages data sources, see
+:numref:`data-sources`.
+
+- Option ``list`` prints the currently available data sources.
+
+- Option ``show`` shows information about the data source with name
+  ``<dsname>``.
+
+- Option ``register`` registers a new data source with name ``<dsname>``.
+  Information about the data source is specified by the key-value pairs in
+  ``<parameters>``. See :numref:`registering-data-sources` for details of the
+  parameter names and values that can be supplied. Data store registration
+  cannot be performed as part of an explicit transaction.
+
+- Option ``sample`` shows a preview of up to ``<size>``; rows from
+  table ``<table>`` of data source ``<dsname>``.
+
+- Option ``deregister`` deregisters a data source with name ``<dsname>``.
+  Data store deregistration cannot be performed as part of an explicit
+  transaction.
+
+.. _dsprop-command:
+
+dsprop
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   dsprop list | set <property_name> [<property_value>]
+
+**Description:** This command manages the data store properties; see
+:numref:`data-store-properties` for more information about which parameters are
+available and how they affect the operation of a data store.
+
+- Option ``list`` prints the current value of all data store parameters.
+
+- Option ``set`` with no property value prints the current value of the
+  property with the given name.
+
+- Option ``set`` with a property value sets property with the given name to the
+  given value.
+
+.. _dstore-command:
+
+dstore
+~~~~~~
+
+**Syntax:**
+
+::
+
+   dstore {list | show <name> | create <name> [<parameter_key> <parameter_value>] ... | load <name> <file_name> [<parameter_key> <parameter_value>] ... | save <name> <file_name> [raw] | delete <name> [force] | offline <name> | online <name>}
+
+**Description:** This command manages the data stores of the server (see
+:numref:`operations-on-data-stores`).
+
+- Option ``list`` prints the currently available data stores.
+
+- Option ``show`` prints information about a data store with name ``<name>``.
+
+- Option ``create`` adds a new data store with name ``<name>``. One can
+  optionally specify various data store parameters as a list of key-value
+  pairs; see :numref:`data-store-parameters` for the list of supported
+  parameters.
+
+- Option ``load`` creates a new data store with name ``<name>`` using the
+  content of the specified file. If ``<file_name>`` is relative (e.g., it does
+  not start with ``/`` on Unix-based platforms), it is interpreted as relative
+  to the content of the ``dir.stores`` :ref:`shell variable <shell-variables>`.
+  This command can load binary files in both standard and raw formats. In case
+  of the former, one can override the data store parameters by specifying
+  various data store options in the same way as for the ``dstore create``
+  command (but one cannot change the equality mode of the data store).
+
+- Option ``save`` saves the contents of the data store with name ``<name>`` to
+  a binary file. The standard format is used for the output, unless the ``raw``
+  option is specified in which case the raw format is used. If ``<file_name>``
+  is relative (e.g., it does not start with ``/`` on Unix-based platforms), it
+  is interpreted as relative to the content of the ``dir.stores`` :ref:`shell
+  variable <shell-variables>`.
+
+- Option ``delete`` deletes the data store with name ``<name>`` from the
+  server. This option will prompt for confirmation unless ``force`` is
+  specified.
+
+- Option ``offline`` brings the data store with name ``<name>`` offline.
+
+- Option ``online`` brings the data store with name ``<name>`` online.
+
+
+echo
+~~~~
+
+**Syntax:**
+
+::
+
+   echo <token> ...
+
+**Description:** This command prints all tokens given after the command,
+separating them by a single space. All :ref:`variables <shell-variables>`
+occurring in the tokens are expanded as usual, which can be used to print
+useful information.
+
+.. _endpoint-command:
+
+endpoint
+~~~~~~~~
+
+**Syntax:**
+
+::
+
+   endpoint {start | stop | list-requests | show-request <request-ID> | cancel-request <request-ID>}
+
+**Description:** This manages the :ref:`rdfox-endpoint`.
+
+- Option ``start`` starts the endpoint. To override the default value for an
+  endpoint parameter ``<parameter>``, set the desired value into :ref:`shell
+  variable <shell-variables>` ``endpoint.<parameter>`` `before` starting the
+  endpoint. See :numref:`endpoint-parameters` for details of the supported
+  parameters.
+
+- Option ``stop`` stops the endpoint.
+
+- Option ``list-requests`` lists the requests currently running on the endpoint.
+
+- Option ``show-request`` shows information about the request with the given ID.
+
+- Option ``cancel-request`` cancels the request with the given ID.
+
+.. container :: example
+
+   **Example:** The following commands start the RESTful endpoint on port 4567.
+   ::
+
+      set endpoint.port "4567"
+      endpoint start
+
+This command cannot be executed in a remote shell instance.
+
+evaluate
+~~~~~~~~
+
+**Syntax:**
+
+::
+
+   evaluate {! <statement_text> | <file_name> ...}
+
+**Description:** This command evaluates one or more SPARQL statements. A
+statement is either a SPARQL query or a SPARQL update. The statement to be
+evaluated can be given explicitly as text after the ``!`` symbol, or one can
+specify zero or more file names that contain the statements to be evaluated.
+Each relative ``<file_name>`` (e.g., it does not start with ``/`` on Unix-based
+platforms) is interpreted as relative to the content of the ``dir.queries``
+shell variable.
+
+.. container:: example
+
+
+   **Example:** The following command checks whether the ``a1:Org`` class
+   contains any instances.::
+
+      evaluate ! ask { ?X rdf:type a1:Org }
+
+.. container:: example
+
+
+   **Example:** The following command inserts a triple and then, in a separate
+   update, derives a second triple from it. Both updates are applied in a
+   single transaction.::
+
+
+      evaluate ! insert data { <a> a <A> } ; insert { ?a a <B> } where { ?a a <A> }
+
+exec
+~~~~
+
+**Syntax:**
+
+::
+
+   exec [<repeat_number>] <file_name> [<argument>] ...
+
+**Description:** This command repeatedly executes the contents of the specified
+script. If ``<repeat_num>`` is not specified, then the script is executed once.
+All ``<argument>`` tokens are passed to the script as variables ``$(1)``,
+``$(2)``, and so on. If ``<file_name>`` is relative (e.g., it does not start
+with ``/`` on Unix-based platforms), it is interpreted as relative to the
+content of the ``dir.scripts`` :ref:`shell variable <shell-variables>`.
+
+.. container:: example
+
+   **Example:** The following command executes the script stored in file
+   ``testMat.rdfox``. ::
+
+      exec "testMat.rdfox"
+
+.. container:: example
+
+   **Example:** The following scripts accesses arguments passed to it. ::
+
+      dstore create default
+      set output out
+      import "$(1)"
+      import "$(2)"
+      answer "$(3)"
+      import - "$(2)"
+      answer "$(3)"
+      quit
+
+   Assuming that the script is stored in file ``testMat.rdfox``, it can be
+   invoked as follows. ::
+
+      exec "testMat.rdfox" data.ttl program.dlog query.rq
+
+   If a script file has suffix “.rdfox” and is in the directory that the
+   ``dir.scripts`` shell variable points to, then both ``exec`` and the suffix
+   ``.rdfox`` can be omitted. Together with the support for argument passing,
+   this allows the user to group arbitrary commands together in a script and
+   use the name of the script as if it were a new command.
+
+.. container:: example
+
+   **Example:** The following command does the same as the ``exec`` command in
+   the previous example, provided that the script file ``testMat.rdfox`` can be
+   found in the directory specified by the ``dir.scripts`` shell variable. ::
+
+      testMat data.ttl program.dlog query.rq
+
+explain
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   explain [shortest | to-explicit | exhaustive] [<max_depth> [<max_rule_instances>]] <fact>
+
+**Description:** This command explains how a fact has been derived. The fact is
+specified using the Datalog syntax for tuple table atoms (see :numref:`atom`).
+A fact can be derived in more than one way. If ``shortest`` is specified, then
+just one shortest derivation (in terms of height) is printed; if there are
+several derivations of the same height, one is arbitrarily chosen. If
+``to-explicit`` is specified, then all explanations up to explicit facts are
+printed. Finally, if ``exhaustive`` is specified, then all facts are maximally
+explained, including the explicit facts. Finally, ``<max_depth>`` can be
+specified to limit the maximal depth of a proof tree, and
+``<max_rule_instances>`` can be specified to limit the maximal number of rule
+instances in each node of the proof tree.
+
+.. container:: example
+
+   **Example:** The last command of the following script explains how the
+   specified fact was derived (in the shortest way) during the materialization.
+   ::
+
+      dstore create default
+      import "LUBM.ttl"
+      import "LUBM.dlog"
+      prefix a1: <http://lehigh.edu/onto/univ-bench.owl#>
+      explain shortest a1:Org[<http://www.University389.edu>]
+
+.. note::
+
+   Facts in data stores where ``equality`` (see :numref:`equality-parameter`)
+   is set to anything other than ``off`` cannot currently be explained using
+   this command.
+
+.. _export-command:
+
+export
+~~~~~~
+
+**Syntax:**
+
+::
+
+   export <file_name> [<format_name> [<parameter_key> <parameter_value>] ...]
+
+**Description:** This command exports the data in the current store to the
+specified file in the specified format. One can optionally specify a number of
+key-value pairs that customize the export process. The available key-value
+pairs are specific to the answer format. The supported formats are described in
+:numref:`data-store-content-formats`. When exporting to a format that
+stores facts, the only supported parameter is ``fact-domain``, and its value is
+the :ref:`fact domain <fact-domains>` determining which facts get exported.
+This command can also be be used to export the OWL axioms and rules in current
+store, by specifying supported output formats ``text/owl-functional`` and
+``application/x.datalog`` respectively. In the latter case, the ``rule-domain``
+parameter specifies from which domains the rules should be exported, with the
+default being the ``user`` rule domain (:numref:`{number} <rules>`). The
+default format is ``text/turtle`` with parameter ``fact-domain`` equal to
+``explicit``.
+
+If ``<file_name>`` is relative (e.g., it does not start with ``/`` on Unix-based
+platforms), then it is interpreted as relative to the content of the
+``dir.facts`` :ref:`shell variable <shell-variables>` if the selected format
+can store facts, or as relative to the content of the ``dir.dlog`` shell
+variable if the selected format cannot store facts.
+
+.. container:: example
+
+   **Example:** The following command exports all facts from the data store in
+   the ``application/n-triples`` format. ::
+
+      export "output.ttl" "application/n-triples" fact-domain all
+
+.. container:: example
+
+   **Example:** The following command exports the OWL 2 axioms that have been
+   added to the current store. ::
+
+      export "output.fss" "text/owl-functional"
+
+.. container:: example
+
+   **Example:** The following command exports the rules that have been imported
+   by the user i.e. imported into the default “user” rule domain. ::
+
+      export "output.dlog" "application/x.datalog"
+
+.. _grant-command:
+
+grant
+~~~~~
+
+**Syntax:**
+
+::
+
+   grant {privileges <access_types> <resource_specifier> to <role> | role <super_role> to <role>}
+
+**Description:** This command grants privileges and role memberships to roles
+in a server’s role database. The counterpart to this command is
+:ref:`revoke-command`.
+
+-  Option ``privileges`` grants the role ``<role>`` privileges to access the
+   resource(s) matched by ``<resource_specifier>`` in the ways specified by
+   parameter ``<access_types>``. The parameter ``<resource_specifier>`` must be
+   a string meeting the requirements of a resource specifier described in
+   :numref:`resource-specifiers` while the parameter ``<access_types>`` must be
+   a comma-separated list of the elements ``read``, ``write``, ``grant`` and
+   ``full``.
+
+-  Option ``role`` grants membership of the role with name ``<super_role>`` to
+   the role with name ``<role>``. See
+   :numref:`assigning-privileges-via-membership` for more information about
+   role membership.
+
+:numref:`access-control` describes RDFox’s access control model in more detail.
+
+.. container:: example
+
+   **Example:** The following command grants read and write access over the
+   ``family`` data store to the role ``graphuser``. ::
+
+      grant privileges read,write >datastores|family to graphuser
+
+help
+~~~~
+
+**Syntax:**
+
+::
+
+   help [<command_name> ...]
+
+**Description:** When executed without arguments, this command prints the list
+of all available commands. It also prints a reference list of supported formats
+for data store content. When executed with one or more commands, help
+information about each of the specified commands will be printed.
+
+.. _import-command:
+
+import
+~~~~~~
+
+**Syntax:**
+
+::
+
+   import [> <default_graph_name>] [+|+p|-] {! <text> | { <file_name> | <iri> } ...}
+
+**Description:** This command adds the specified items (i.e., facts and/or
+axioms/rules) into the current store (if nothing, ``+``, or ``+p`` is specified)
+, or removes the specified items from the current store (if ``-`` is specified).
+If ``+p`` is specified, then the prefixes of the data store are updated using the
+prefixes in the input(s). The user may choose to specify items in plain text,
+in which case the text follows the ``!`` symbol. Alternatively, the user can
+specify a list of local paths and IRIs from which content should be loaded.
+
+RDFox supports importing triples and rules in `N-Triples
+<http://www.w3.org/TR/n-triples/>`__, `Turtle
+<http://www.w3.org/TR/turtle/>`__, `N-Quads <http://www.w3.org/TR/n-quads/>`__,
+`TriG <https://www.w3.org/TR/trig/>`__, `OWL 2 Functional-Style Syntax
+<https://www.w3.org/TR/owl2-syntax/>`__ and :ref:`Datalog <rdfox-datalog>`
+formats. Option ``>`` can be used to specify the name of a graph that should be
+used as the default graph. The graph name can be either an IRI (e.g.
+``ex:graph``, ``<http://example.com/graph>``) or a string containing the Turtle
+encoding of an RDF term (e.g. ``"ex:graph"``, ``"\"1\"^^xsd:decimal"``,
+``"\"graph\""``, ``"UNDEF"``). The format of the file to import may be
+specified by setting the ``import.format`` :ref:`variable <shell-variables>` to
+the desired format in the shell. Typing ``help`` into the shell prints the list
+of available formats (see :numref:`data-store-content-formats`).
+
+If ``<file_name>`` is relative (e.g., it does not start with ``/`` on
+Unix-based platforms), it is first interpreted as relative to the content of
+the ``dir.facts`` :ref:`shell variable <shell-variables>`, and if no file is
+found then it is interpreted as relative to the content of the ``dir.dlog``
+:ref:`shell variable <shell-variables>`. ``<file_name>`` may be quoted — that
+is, surrounded with single-quotes or double-quotes, if required, for example to
+support filenames containing spaces. IRIs appearing in this list must be
+enclosed in angle brackets.
+
+.. container:: example
+
+   **Example:** The following command adds a rule to the current data store;
+   informally, the rule says that if ``?X`` is a person and ``?X`` likes
+   something, then ``?X`` is a person with hobby. ::
+
+      import ! a1:PHobby[?X]:- a1:Person[?X], a1:like[?X,?Y] .
+
+.. container:: example
+
+   **Example:** The following command adds a fact to the default graph of the
+   current data store. ::
+
+      import ! a1:Person[a1:john] .
+
+.. container:: example
+
+   **Example:** The following command adds a fact to the graph ``a1:G`` in the
+   current data store. Note that the named graph is not specified in the input
+   text; rather, the command itself specifies that ``a1:G`` should be used as
+   the default graph. ::
+
+      import > a1:G ! a1:john a a1:Person .
+
+.. container:: example
+
+   **Example:** The following command adds the data from two local files
+   (``./data.ttl`` and ``./rules.dlog``) and one URL in parallel. ::
+
+      import ./data.ttl <https://www.w3.org/1999/02/22-rdf-syntax-ns> ./rules.dlog
+
+.. _importaxioms-command:
+
+importaxioms
+~~~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   importaxioms [<source_graph_name>] [> <target_graph_name>] [+|-] [assertions]
+
+**Description:** This command parses the triples in the source named graph and
+adds them as OWL axioms in the target named graph. The graph name can be either
+an IRI (e.g. ``ex:graph``, ``<http://example.com/graph>``) or a string
+containing the Turtle encoding of an RDF term (e.g. ``"ex:graph"``,
+``"\"1\"^^xsd:decimal"``, ``"\"graph\""``, ``"UNDEF"``). The value ``"UNDEF"``,
+can be used to refer to the default graph, which is also used when either the
+source or the target is not specified. The axioms can be added (if nothing or
+``+`` is specified) or removed (if ``-`` is specified). Unless ``assertions``
+is specified, the ABox assertions are not parsed.
+
+info
+~~~~
+
+**Syntax:**
+
+::
+
+   info [extended | axioms [<named_graph>] | rulestats [print-rules] [by-body-size] | ruleplans]
+
+**Description:** This command prints various information about a data store.
+The exact information printed is determined by the command options.
+
+-  If no argument is specified, only a short breakdown of memory use and
+   the state of the data store is shown. This option cannot be performed
+   as part of an explicit transaction.
+
+-  If ``extended`` is specified, the summary from the previous item is
+   extended with detailed information about the memory use and the state of
+   various subcomponents of RDFox. This diagnostic information depends on the
+   internal structure of RDFox and is thus not meant to be used by users, it is
+   moreover likely to change in future, and is mainly intended to aid Oxford
+   Semantic Technologies in providing client support. This option cannot be
+   performed as part of an explicit transaction.
+
+-  If ``axioms`` is specified, then the OWL axioms currently loaded in a named
+   graph (if the ``<named_graph>`` parameter is specified) or the default
+   graph (if the ``<named_graph>`` parameter is omitted) are printed.
+
+-  If ``rulestats`` is specified, then statistics (i.e., the numbers of
+   recursive, nonrecursive, and all rules) are printed for each component of
+   the currently loaded Datalog program. The optional argument ``print-rules``
+   determines whether the rules will be printed, and the argument
+   ``by-body-size`` determines whether the rules will be grouped by rule body
+   size (i.e., the number of atoms in the rule body) inside each component.
+
+-  If ``ruleplans`` is specified, then the query plans of the compiled rules
+   are printed. This is mainly used for troubleshooting.
+
+insert
+~~~~~~
+
+**Syntax:**
+
+::
+
+   insert <remaining_query_text>
+
+**Description:** This command adds the explicit facts to the data store based
+on bindings for a query pattern specified in a where clause.
+
+.. container:: example
+
+   **Example:** The following command evaluates ``?X a1:headOf ?Y`` in the data
+   store, and for each value of ``?X`` and ``?Y`` it creates a triple ``?Y
+   a1:hasHead ?X``. ::
+
+      insert { ?Y a1:hasHead ?X } where { ?X a1:headOf ?Y }
+
+.. _mat-command:
+
+mat
+~~~
+
+**Syntax:**
+
+::
+
+   mat
+
+**Description:** This command explicitly updates the set of materialized facts
+in the data store. In normal operation, RDFox will automatically invoke this
+operation as needed so that, when queries are issued, query results correctly
+reflect all additions/deletions of facts/rules to the data store. Hence, this
+command is useful mostly when one must know exactly when materialization is to
+be updated. For example, this can be the case when benchmarking reasoning
+algorithms, or when debugging the reasoning process. Since materialization is
+updated automatically when a :ref:`transaction <transactions>` is committed,
+this command should be used only inside transactions.
+
+.. container:: example
+
+   **Example:** The following sequence of commands starts a transaction,
+   imports facts from the ``testData.ttl`` file, imports rules from the
+   ``testProgram.dlog`` file, and then updates the Materialization. Next, it
+   deletes facts from the ``factsToDelete.ttl`` file, again updates the
+   materialization, and commits the transaction. When ``mat`` is first invoked,
+   the system performs reasoning ‘from scratch’, whereas in the second case it
+   updates the materialization incrementally. ::
+
+      dstore create default
+      begin
+      import "testData.ttl"
+      import "testProgram.dlog"
+      mat
+      import - "factsToDelete.ttl"
+      mat
+      commit
+
+.. _maxmemory-command:
+
+maxmemory
+~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   maxmemory [<bytes>]
+
+**Description:** This command sets the maximum memory that the server is
+allowed to use, or prints the current memory usage if no number is specified.
+
+.. _password-command:
+
+password
+~~~~~~~~
+
+**Syntax:**
+
+::
+
+   password
+
+**Description:** This command initiates an interactive process to change the
+password of the logged-in role.
+
+prefix
+~~~~~~
+
+**Syntax:**
+
+::
+
+   prefix <prefix_name> [<prefix_iri>]
+
+**Description:** This command associates a prefix name with the given prefix
+IRI in the currently active data store, or unsets a prefix name if the prefix
+IRI is not supplied.
+
+.. container:: example
+
+   **Example:** The following command sets prefix ``a1:`` in the currently
+   active data store and then uses it in a ``SELECT`` query. ::
+
+      prefix a1: <http://www.a1.org/a1#>
+      SELECT ?X ?Y WHERE { ?X a1:hasName ?Y }
+
+.. container:: example
+
+   **Example:** The following command unsets prefix ``a1:`` in the currently
+   active data store. ::
+
+      prefix a1:
+
+prefixes
+~~~~~~~~
+
+**Syntax:**
+
+::
+
+   prefixes {list | clear | add-defaults | set [<prefix_name> <prefix_iri>] ...}
+
+**Description:** This command manages the prefixes of the currently active data
+store.
+
+- Option ``list`` prints the prefixes of the currently active data store.
+
+- Option ``clear`` clears the prefixes of the currently active data store.
+
+- Option ``add-defaults`` ensures that the default prefixes are present in the
+  data store, overwriting any conflicting definitions.
+
+- Option ``set`` sets the prefixes of the currently active data store to the
+  explicitly specified list of pairs.
+
+quit
+~~~~
+
+**Syntax:**
+
+::
+
+   quit
+
+**Description:** This command terminates the shell.
+
+When run in a local shell (created by starting the executable in ``shell`` or
+``sandbox`` mode), this command will also cause the process to exit.
+
+Note that it is not possible to cause the server process to exit from a remote
+shell instance.
+
+.. _recompile-command:
+
+recompile
+~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   recompile
+
+**Description:** This command recompiles the rules and commit procedure in the
+current data store according to the current statistics. This can be used after
+the ``stats update`` command so that the rule compilation takes advantage of
+up-to-date statistics.
+
+.. _remat-command:
+
+remat
+~~~~~
+
+**Syntax**
+
+::
+
+   remat
+
+**Description:** This command performs a full, from-scratch materialization
+within the data store. This can be useful to ensure that all derived facts in
+the data store are up-to-date with respect to the data store's :ref:`data
+sources <data-sources>`.
+
+.. _revoke-command:
+
+revoke
+~~~~~~
+
+**Syntax:**
+
+::
+
+   revoke {privileges <access_types> <resource_specifier> from <role> | role <super_role> from <role>}
+
+**Description:** This command revokes privileges and role memberships from
+roles in a server’s role database. The counterpart to this command is
+:ref:`grant-command`.
+
+-  Option ``privileges`` revokes from the role ``<role>`` privileges to access
+   the resource(s) matched by ``<resource_specifier>`` in the ways specified by
+   parameter ``<access_types>``. The parameter ``<resource_specifier>`` must be
+   a string meeting the requirements of a resource specifier described in
+   :numref:`resource-specifiers` while the parameter ``<access_types>`` must be
+   a comma-separated list of the elements ``read``, ``write``, ``grant`` and
+   ``full``.
+
+-  Option ``role`` revokes membership of the role with name ``<super_role>``
+   from the role ``<role>``. See :numref:`assigning-privileges-via-membership`
+   for more information about role membership.
+
+:numref:`access-control` describes RDFox’s access control model in more detail.
+
+.. container:: example
+
+   **Example:** The following command revokes write access over the ``family``
+   data store from the role ``graphuser``. ::
+
+      revoke privileges write >datastores|family from graphuser
+
+.. _role-command:
+
+role
+~~~~
+
+**Syntax:**
+
+::
+
+   role {list | show <name> | member <name> <super_name> | create <name> [hash <password_hash> | no-password] | delete <name> [force]}
+
+**Description:** This command manages the set of :ref:`roles` defined within
+the system.
+
+-  If no argument is specified, the name of the currently active role is shown.
+
+-  Option ``list`` lists the roles defined within the system.
+
+-  Option ``show`` shows the privileges, memberships and members of the role
+   with name ``<name>``.
+
+-  Option ``member`` checks whether the role with name ``<name>`` is a member
+   of the role with name ``<super_name>``, either directly or indirectly.
+
+-  Option ``create`` creates a new role with name ``<name>``. If the ``hash``
+   option is used then the role is created using the given ``<password_hash>``.
+   If the ``no-password`` option is used then the role is created without a
+   password. If neither of those options is used then the user is prompted to
+   enter a new password for the role. A password hash of an existing role can
+   obtained by listing role information using the ``role show`` shell command
+   or programmatically as described in :numref:`APIs-list-role-information`.
+
+-  Option ``delete`` deletes the role with name ``<name>``. This option will
+   prompt for confirmation unless ``force`` is specified.
+
+:numref:`access-control` describes RDFox’s access control model in more detail.
+
+rollback
+~~~~~~~~
+
+**Syntax:**
+
+::
+
+   rollback
+
+**Description:** This command rolls back the currently running
+:ref:`transaction <transactions>`.
+
+root
+~~~~
+
+**Syntax:**
+
+::
+
+   root <directory>
+
+**Description:** This command sets all of the standard shell variables with
+prefix ``dir.`` (see :numref:`shell-variables`), with the exception of
+``dir.executing-script``, to the specified string.
+
+.. _rwtest:
+
+rwtest
+~~~~~~
+
+**Syntax:**
+
+::
+
+   rwtest <min_sleep> <max_sleep> [read-only]
+
+**Description:** This command runs a test of reading from and, optionally,
+writing to the active data store.
+
+The test works by adding and deleting a deterministic progression of RDF graphs
+to and from the data store. When the ``read-only`` flag is omitted each
+iteration of the test loop begins a read/write transaction, deletes the RDF
+graph added in the previous iteration, runs a query to ensure that the deletion
+has fully emptied the store, adds the next RDF graph in the sequence, and
+attempts to commit the transaction. If committing the transaction fails due to
+unapplied transactions from other replicas the transaction is rolled back and
+the next loop iteration begins immediately. When the ``read-only`` flag is
+included the begin, deletion, and query steps are performed in each iteration
+but the addition step is skipped and no attempt to commit the transaction is
+made (the transaction is always rolled back). After the end of each successful
+iteration the test sleeps for a random duration between ``<min_sleep>`` and
+``<max_sleep>`` milliseconds. These parameters can be varied to simulate
+different transaction rates.
+
+The value of the ``log-frequency`` shell variable is a positive integer that
+determines the period (in seconds) at which a report about the test progress is
+printed. The report may be printed to the terminal, redirected to a file, or
+disabled by setting the shell's ``output`` variable to ``out``, the name of the
+desired file, or ``null``, respectively.
+
+The test stops when an error is encountered or it is interrupted (for example
+with Ctrl-C). A final report is produced at this point.
+
+select
+~~~~~~
+
+**Syntax:**
+
+::
+
+   select <remaining_query_text>
+
+**Description:** This command queries the current data store with the specified
+`SPARQL <http://www.w3.org/TR/sparql11-query/>`__ query.
+
+.. container:: example
+
+   **Example:** The following commands load data and run a query. The output of
+   the command will be written into file ``$(dir.output)/results.txt``; note
+   that the value of the :ref:`shell variable <shell-variables>` ``dir.output``
+   must be a valid directory for query evaluation to succeed.
+
+   ::
+
+      dstore create default
+      import "LUBM.ttl" "LUBM.dlog"
+      set output "results.txt"
+      SELECT ?X WHERE { ?X rdf:type <http://lehigh.edu/onto/univ-bench.owl#Org> }
+
+serverinfo
+~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   serverinfo [extended]
+
+**Description:** This command prints various information about the server.
+With 'extended', the output also includes information about all data stores
+currently loaded into the server.
+
+.. _set-command:
+
+set
+~~~
+
+**Syntax:**
+
+::
+
+   set [<name> [<value>]]
+
+**Description:** This command assigns the specified value to the specified
+variable. If no argument is given at all, then all variable-value pairs are
+printed; if the variable is given but the value is not, then the current value
+for the given variable is printed. Issue the ``set`` command with no arguments
+or see :numref:`shell-variables` for details of the available variables.
+
+sleep
+~~~~~
+
+**Syntax:**
+
+::
+
+   sleep <milliseconds>
+
+**Description:** This command makes the system sleep for the specified number
+of milliseconds.
+
+.. _srvconn-command:
+
+srvconn
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   srvconn {list | active [<name>] | open [<name>] [as <role>] | close [<name>]}
+
+**Description:** Manages server connections belonging to the current shell. See
+also :numref:`connection-management-shell`.
+
+-  Option ``list`` prints the currently open server connections.
+
+-  Option ``active`` sets ``<name>`` as the name of the active server
+   connection if a parameter is provided or prints the name of the active
+   server connection if not.
+
+-  Option ``open`` opens a new connection to the local server. If the optional
+   ``<name>`` parameter is provided, it is used as the name of the connection,
+   otherwise a name is assigned automatically. If the optional ``<role>``
+   parameter is provided, the command will attempt to create the connection as
+   ``<role>``. If no role is provided, the command will duplicate the active
+   server connection.
+
+-  Option ``close`` closes the active server connection if no argument is given
+   or the server connection with name ``<name>`` if a single argument is given.
+
+stats
+~~~~~
+
+**Syntax:**
+
+::
+
+   stats {list | show <name> | create <name> [<parameter_key> <parameter_value>] ... | delete <name> [force] | update [<name>]}
+
+**Description:** This command maintains the statistics that RDFox uses
+internally for tasks such as query planning.
+
+-  Option ``list`` prints the currently available statistics.
+
+-  Option ``show`` shows information about the statistics with name ``<name>``.
+
+-  Option ``create`` creates the statistics with name ``<name>``. Information
+   that governs how the statistics are created is specified by the key-value
+   pairs. This operation cannot be performed as part of an explicit transaction.
+
+-  Option ``delete`` deletes the statistics with name ``<name>``. This operation
+   cannot be performed as part of an explicit transaction.
+
+-  Option ``update`` updates all statistics if ``<name>`` is not specified, or
+   it updates the statistics with name ``<name>``. Note that, if
+   ``auto-update-statistics`` option is set to ``true``, then statistics will
+   be updated automatically whenever the number of facts in the system changes
+   by more than 10%.
+
+threads
+~~~~~~~
+
+**Syntax:**
+
+::
+
+   threads [<number_of_threads>]
+
+**Description:** This command sets the number of threads that the server will
+use for tasks such as reasoning or importation of data. The initial value of
+this parameter can be specified using the ``num-threads`` :ref:`server option
+<server-parameters>` at the command line. The default is the number of logical
+processors on the machine.
+
+
+.. _transcribe-command:
+
+transcribe
+~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   transcribe [force] <directory_name> [<data_store_name>]
+
+**Description:** This command saves the RDFox server state to a collection of
+files under a directory named ``<directory_name>``. A file named
+``main_restore.txt`` will be created under the directory ``<directory_name>``
+that can be executed in another instance of RDFox to restore all transcribed
+content.
+
+By default ``transcribe`` will save the content of all data stores that have
+persistence enabled. It is possible to transcribe only certain data stores,
+regardless of whether persistence is enabled or not, by specifying one or more
+data store names as ``<data_store_name>`` parameters.
+
+``transcribe`` is intended to be used to transfer the entire server state to
+another RDFox instance. To prevent changes occurring while the transcribe
+command is running, the normal behavior is to raise an error if the endpoint is
+running. This check can be disabled by using the ``force`` option.
+
+.. container:: example
+
+   **Example**
+
+   To transcribe the content of an existing RDFox instance to a directory named
+   ``save_directory``, log into the existing RDFox shell and execute the
+   following
+
+   ::
+
+      transcribe save_directory
+      quit
+
+   Then invoke another instance of RDFox, typically a newer version, and
+   restore the settings into a new server directory (in this example
+   ``new_server_dir``) as follows.
+
+   .. code:: bash
+
+      ./RDFox -server-directory new_server_dir -temp-role shell save_directory main_restore.txt
+
+tstamp
+~~~~~~
+
+**Syntax:**
+
+::
+
+   tstamp [<variable_name>]
+
+**Description:** This command saves the current time stamp into the variable
+with the specified name. If no variable is specified, the system prints the
+current time stamp.
+
+.. _tupletable-command:
+
+tupletable
+~~~~~~~~~~
+
+**Syntax:**
+
+::
+
+   tupletable {list | show <name> | create <name> [<parameter_key> <parameter_value>] ... | delete <name> [force]}
+
+**Description:** This command manages the :ref:`tuple tables <tuple-tables>` of
+the current store.
+
+-  Option ``list`` prints the currently available tuple tables.
+
+-  Option ``show`` shows information about the tuple table with name ``<name>``.
+
+-  Option ``create`` creates a new tuple table with name ``<name>``.
+   Information about the tuple table is specified by any following key-value
+   pairs. This operation cannot be performed as part of an explicit transaction.
+
+-  Option ``delete`` deletes the tuple table with name ``<name>``. This option
+   will prompt for confirmation unless ``force`` is specified. This operation
+   cannot be performed as part of an explicit transaction.
+
+.. container:: example
+
+   **Example:** The following command creates a tupletable from a ``delimitedFile`` datasource. ::
+
+      tupletable create myTupletable dataSourceName myDataSource columns 3 "1" "https://rdfox.com/examples/entity#{id}" "1.datatype" "iri" "2" "{name}" "3" "{dob}" "3.datatype" "xsd:dateTime" "3.if-empty" "absent"
+
+   **Example:** The following command creates a tupletable from a table in a SQL datasource (either ``PostgreSQL`` or ``ODBC``). ::
+
+      tupletable create myTupletable dataSourceName mySQLdsource table.name salaries columns 2 "1" "https://rdfox.com/examples/entity#{employee_id}" "1.datatype" "iri" "2" "{salary}" "2.datatype" "xsd:decimal" "2.if-empty" "absent"
+
+   **Example:** The following command creates a tupletable from a query in a SQL datasource. ::
+
+      tupletable create myTupletable dataSourceName mySQLdsource query "SELECT ssn.social_security_number AS col1, salaries.salary AS col2 FROM ssn JOIN salaries ON ssn.employee_id = salaries.employee_id" columns 2 "1" "https://rdfox.com/examples/ssn#{col1}" "1.datatype" "iri" "2" "{col2}" "2.datatype" "xsd:decimal" "2.if-empty" "absent"
+
+.. _unset-command:
+
+unset
+~~~~~
+
+**Syntax:**
+
+::
+
+   unset <name>
+
+**Description:** This command unsets the :ref:`variable <shell-variables>` with
+name ``name``.
+
+update
+~~~~~~
+
+**Syntax:**
+
+::
+
+   update {! <update_text> | <file_name> ...}
+
+**Description:** This command evaluates one or more SPARQL updates. The update
+can be either given explicitly as text after the ``!`` symbol, or one can
+specify zero or more file names that contain the updates to be evaluated. If
+``<file_name>`` is relative (e.g., it does not start with ``/`` on Unix-based
+platforms), it is interpreted as relative to the content of the ``dir.queries``
+:ref:`shell variable <shell-variables>`.
+
+.. container:: example
+
+   **Example:** The following command evaluates a SPARQL update. ::
+
+      update ! delete { ?p :givenName 'Bill' } insert { ?p :givenName 'William' } where { ?p :givenName 'Bill' }
+
+.. _shell-variables:
+
+Shell Variables
+---------------
+
+Shell variables can hold string, signed integer, or Boolean values. As well as
+a predefined set of variables that control the behavior of the shell or
+individual commands (see below), users can define their own variables. A shell
+variable called ``var`` can be used in commands in the form ``$(var)``. Shell
+variables can be set using the ``set`` command (:numref:`set-command`) and
+unset using ``unset`` command (:numref:`unset-command`).
+
+Variables that are initially set after starting RDFox, their default values,
+and a summary of each are given in the table below. Similar information for all
+currently set variables may be obtained in the RDFox shell by running the
+``set`` command with no arguments.
+
+
+
+
+.. table ::
+   :widths: 9,10,50
+
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   |     Variable Name                       |     Default Value                                          |      Description                                                                  |
+   +=========================================+============================================================+===================================================================================+
+   | ``active-data-store-connection``        | ``default``                                                | Contains the name of the active data store connection.                            |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``active-server-connection``            | ``sc1``                                                    | Contains the name of the active server connection.                                |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.executing-script``                | (none)                                                     | When executing a script, RDFox sets this variable to the path of the directory    |
+   |                                         |                                                            | that contains the script. This can be used to set the shell root directory so     |
+   |                                         |                                                            | that the script can then use relative file paths.                                 |
+   |                                         |                                                            |                                                                                   |
+   |                                         |                                                            | This variable cannot be set directly.                                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.dlog``                            | ``./``                                                     | Determines the directory for resolving relative file names of datalog programs.   |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.facts``                           | ``./``                                                     | Determines the directory for resolving relative file names of RDF files.          |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.output``                          | ``./``                                                     | Determines the directory for resolving relative file names of output files (as    |
+   |                                         |                                                            | specified by the ``output`` variable).                                            |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.queries``                         | ``./``                                                     | Determines the directory for resolving relative file names of query files.        |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.root``                            | ``./``                                                     | Determines the root directory of the current data set.                            |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.scripts``                         | ``./``                                                     | Determines the directory for resolving relative file names of script files.       |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``dir.stores``                          | ``./``                                                     | Determines the directory for resolving relative file names of binary store files. |
+   |                                         |                                                            | For details on path resolution, see note below table.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``import.format``                       | ``""``                                                     | Determines the format that will be parsed by the import command. Empty string     |
+   |                                         |                                                            | means that RDFox will try to automatically detect the format. For the list of     |
+   |                                         |                                                            | available values see :numref:`data-store-content-formats`.                        |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``import.monitor``                      | ``off``                                                    | Determines whether and how import operations are monitored:                       |
+   |                                         |                                                            | ``off`` (no monitoring) and                                                       |
+   |                                         |                                                            | ``progress`` (report progress during import).                                     |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``log-frequency``                       | ``0``                                                      | Determines the time in seconds during which various logs are produced (see        |
+   |                                         |                                                            | note below table).                                                                |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``on-error``                            | ``continue``                                               | Determines how the shell behaves when a command results in an error:              |
+   |                                         |                                                            | ``continue`` continues to the next command;                                       |
+   |                                         |                                                            | ``continue-if-exists`` continues to the next command if the error is due to an    |
+   |                                         |                                                            | attempt to create a resource (for example a data store or role) that already      |
+   |                                         |                                                            | exists, otherwise stops processing commands;                                      |
+   |                                         |                                                            | ``stop`` stops processing commands.                                               |
+   |                                         |                                                            |                                                                                   |
+   |                                         |                                                            | See also                                                                          |
+   |                                         |                                                            | :numref:`shell-error-handling`.                                                   |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``output``                              | ``null``                                                   | Determines how command results (including queries) are printed:                   |
+   |                                         |                                                            | ``null`` (nothing is printed);                                                    |
+   |                                         |                                                            | ``out``, (to stdout);                                                             |
+   |                                         |                                                            | or a file name.                                                                   |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.answer-format``                 | ``application/x.sparql-results+turtle-abbrev``             | Determines the name of the format used to serialize query answers (see note       |
+   |                                         |                                                            | below table).                                                                     |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.explain``                       | ``false``                                                  | If true, the query plan is printed after compilation.                             |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.fact-domain``                   | ``all``                                                    | Determines the fact domain of the matched tuples:                                 |
+   |                                         |                                                            | ``explicit`` matches the explicitly stated facts;                                 |
+   |                                         |                                                            | ``derived`` matches facts that are not explicitly stated, but are derived by a    |
+   |                                         |                                                            | rule;                                                                             |
+   |                                         |                                                            | ``all`` matches all facts.                                                        |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.monitor``                       | ``off``                                                    | Determines whether and how query evaluation is monitored:                         |
+   |                                         |                                                            | ``off`` (no monitoring);                                                          |
+   |                                         |                                                            | ``profile`` (periodically print query evaluation statistics); and                 |
+   |                                         |                                                            | ``trace`` (print query evaluation trace).                                         |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.profiler.sampling-frequency``   | ``10``                                                     | Determines the sampling frequency in milliseconds of the query profiler.          |
+   |                                         |                                                            | Value of ``0`` disables sampling.                                                 |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.print-options``                 | ``false``                                                  | If true, then query compilation options are printed before queries are evaluated. |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``query.print-summary``                 | ``true``                                                   | If true, then a summary of query evaluation (number of returned tuples and        |
+   |                                         |                                                            | query evaluation time) is printed after a query is evaluated.                     |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``reason.monitor``                      | ``off``                                                    | Determines whether and how reasoning is monitored:                                |
+   |                                         |                                                            | ``off`` (no monitoring);                                                          |
+   |                                         |                                                            | ``summary`` (print changes to triple count);                                      |
+   |                                         |                                                            | ``stats`` (gather statistics);                                                    |
+   |                                         |                                                            | ``progress`` (report progress during reasoning);                                  |
+   |                                         |                                                            | ``profile`` (periodically print rule evaluation statistics); and                  |
+   |                                         |                                                            | ``trace`` (print reasoning trace).                                                |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``reason.profiler.entries``             | ``20``                                                     | Specifies the number of entries reported by the reasoning profiler.               |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``reason.profiler.log-plans``           | ``false``                                                  | Determines whether the reasoning profiler will report statistics about rule plans.|
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``reason.profiler.sampling-frequency``  | ``10``                                                     | Determines the sampling frequency in milliseconds of the reasoning profiler.      |
+   |                                         |                                                            | Value of ``0`` disables sampling.                                                 |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+   | ``version``                             | e.g., ``3.0.0 (96b08d35d74e54c8763c9ef5d6face6800e44397)`` | Contains the current version of RDFox.                                            |
+   +-----------------------------------------+------------------------------------------------------------+-----------------------------------------------------------------------------------+
+
+Note:
+
+-  Additional variables are available to control the RDFox endpoint. See
+   :numref:`endpoint-command` for details.
+-  If a path variable (e.g. ``dir.dlog``, ``dir.facts``, etc.) contains a
+   relative path, then it is resolved against the sandbox directory of the
+   server (see :numref:`server-parameters`) when sandboxing is enabled, and
+   against the working directory of the RDFox process otherwise.
+-  It can be useful to set the ``log-frequency`` variable to a nonzero value
+   *n* when large amounts of data are being imported. This will cause progress
+   to be reported every *n* seconds.
+-  The ``query.answer-format`` variable may be set to any of the values detailed
+   in :numref:`query-answer-formats`, and ``text/turtle`` in the case of queries
+   over exactly three variables called ?S, ?P, and ?O.
+
+.. _shell-script-execution:
+
+Script Execution
+----------------
+
+When RDFox encounters an unrecognized command name, it checks the directories
+identified by the ``dir.scripts`` and ``dir.root`` shell variables (in that
+order) for a file whose name matches the given command `or` the given command
+with the file extension ``.rdfox``. If a file is found, RDFox will attempt to
+interpret it as a shell script.
+
+Shell scripts may use any of the commands available when the shell is running
+interactively and may themselves call other scripts. RDFox will treat anything
+between a ``#`` character and the end of the containing line as a comment.
+
+.. _shell-error-handling:
+
+Error Handling
+--------------
+
+It is possible to control how the shell behaves when errors are encountered.
+When a command results in an error, the details of the error are printed and
+execution of the command is aborted. The ``on-error`` variable controls what
+happens next. If the ``on-error`` policy says that shell execution should
+continue, then control moves to the next line if a script is being executed or
+returns to the command prompt if not. If the ``on-error`` policy says that
+execution should stop, then the remaining commands in the script are skipped
+if a script is being executed or the process exits with a non-zero return code
+if not.
+
+When several levels of script execution are used, with one script invoking
+another and so on, it may be desirable for errors at the lowest level to cause
+the entire process to exit or for the effect of the error to be limited to just
+the level in which it occurs or to one of the intermediate levels. The RDFox
+shell supports this by creating a new scope for the ``on-error`` variable at
+each level of script execution. This ensures that modifications to the
+``on-error`` variable last only for the duration of the given script execution.
+When a subordinate level of execution is aborted due its ``on-error`` policy,
+the ``on-error`` policy of the calling level is consulted to determine whether
+the error should stop execution there too. This continues right up to
+the top level where, as always, an error that stops execution causes the
+process to exit with a non-zero return code.
+
+RDFox recognizes three distinct ``on-error`` policies:
+
+- setting value ``continue`` ensures that execution continues on any error
+- setting value ``continue-if-exists`` ensures that execution stops on any
+  error other than those which are due to attempts to create resources that
+  already exist
+- setting value ``stop`` ensures that execution stops on any error.
+
+The ``continue-if-exists`` policy is useful in scripts for initializing servers
+in automated deployments. In these cases it is important that the process
+should terminate with an error code if any of the commands in the script fails
+so that the calling process knows not to proceed with the subsequent steps of
+the deployment. For this reason the policy ``continue`` is unsuitable. At the
+same time, it is often the case that the script may be executed several times
+on the same server even if it has run successfully in the past. This means that
+the policy ``stop`` is also unsuitable since RDFox treats attempts to create
+resources that already exist as an error. The ``continue-if-exists`` policy
+achieves the desired behavior of continuing if an error occurs because an
+attempt was made to create a resource with a name that is already in use, but
+stopping on any other error.
+
+
+.. note::
+
+   The class of error tolerated by the ``continue-if-exists`` policy indicates
+   only that an attempt to create an instance of a resource that must have a
+   unique name failed because the chosen name was already in use. It is
+   important to be aware that RDFox does not check that the other properties of
+   the existing resource are the same as those of the instance that would have
+   been created.
+
+   For example, imagine a script for initializing a server which contains the
+   following command.
+
+   ::
+
+      dstore create recipes type parallel-nn
+
+   The script may safely be re-run in ``continue-if-exists`` mode since the
+   error raised by RDFox when the above command is re-executed will not cause
+   execution to stop. If at a later date, the number of resources that the data
+   store needs to accommodate grows beyond the capacity of a ``parallel-nn``
+   store (see :numref:`data-store-type`), the above line may be replaced with
+   the following.
+
+   ::
+
+      dstore create recipes type parallel-wn
+
+   Simply re-running the script against the server after this change would not
+   be sufficient to change the type of the data store irrespective of the
+   ``on-error`` setting but doing so under ``continue-if-exists`` will now mask
+   a real problem --- the data store not being of the intended type --- instead
+   of simply allowing execution to continue after an expected name clash. The
+   shell does not provide a way to execute commands conditionally so, in
+   situations such as these, additional manual intervention will be needed.

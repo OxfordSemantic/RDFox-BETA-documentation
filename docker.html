@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>22. RDFox Docker Images &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="23. Release Notes" href="release-notes.html" />
+    <link rel="prev" title="21. High Availability" href="high-availability.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">22. RDFox Docker Images</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#image-defaults">22.1. Image Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#suggested-mounts">22.2. Suggested Mounts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mounting-the-license-key">22.2.1. Mounting the License Key</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mounting-the-server-directory">22.2.2. Mounting the Server Directory</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#initializing-the-server-directory-with-a-companion-image">22.2.2.1. Initializing the Server Directory with a Companion Image</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#mounting-the-shell-root-directory">22.2.3. Mounting the Shell Root Directory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example-docker-run-commands">22.3. Example Docker Run Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-the-health-of-rdfox-containers">22.4. Checking the Health of RDFox Containers</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">22. </span>RDFox Docker Images</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="rdfox-docker-images">
+<span id="docker"></span><h1><span class="section-number">22. </span>RDFox Docker Images<a class="headerlink" href="#rdfox-docker-images" title="Permalink to this headline">¶</a></h1>
+<p>This section documents the official Docker images for RDFox®, which are publicly
+available from Docker Hub repository <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a>, and their companion images
+in repository <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox-init">oxfordsemantic/rdfox-init</a>.</p>
+<p>The defaults of the RDFox Docker images are described in the next section,
+followed by a section describing suggested approaches for mounting the RDFox
+license key, server directory and shell root directory. The final section
+provides a selection of example <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> commands for running the images.
+The only pre-requisite for running these is a Docker installation for your
+platform. See <a class="reference external" href="https://docs.docker.com/get-docker/">the official Docker installation page</a> for instructions.</p>
+<p>The documentation assumes familiarity with the basics of Docker in general and
+in particular the different ways of mounting storage into containers with the
+desired container-side permissions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For readability, short-form (<code class="docutils literal notranslate"><span class="pre">-v</span></code>) mount arguments will be used throughout
+but readers should be aware that the official Docker documentation recommends
+the long-form (<code class="docutils literal notranslate"><span class="pre">--mount</span></code>) alternative.</p>
+</div>
+<div class="section" id="image-defaults">
+<h2><span class="section-number">22.1. </span>Image Defaults<a class="headerlink" href="#image-defaults" title="Permalink to this headline">¶</a></h2>
+<p>Default values for the images in the <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> repository are described
+below. It is possible to override all of these defaults but, for simplicity, the
+documentation of each assumes the other defaults are being used.</p>
+<dl class="simple">
+<dt>User</dt><dd><p>The default user within the images is <code class="docutils literal notranslate"><span class="pre">rdfox</span></code>. This determines the default
+server directory path within containers as <code class="docutils literal notranslate"><span class="pre">/home/rdfox/.RDFox</span></code>.</p>
+</dd>
+<dt>Entrypoint</dt><dd><p>The default entry point for the images is the RDFox executable embedded at
+container path <code class="docutils literal notranslate"><span class="pre">/opt/RDFox/RDFox</span></code>. The version of the executable at this
+path will match the version in the tag for the image.</p>
+</dd>
+<dt>Command</dt><dd><p>The default command is <code class="docutils literal notranslate"><span class="pre">daemon</span> <span class="pre">request-logger</span> <span class="pre">elf</span></code>. This can be overridden
+with any set of arguments that would be accepted by the RDFox executable (see
+<a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a>).</p>
+</dd>
+<dt>Working directory</dt><dd><p>The default working directory for the images is <code class="docutils literal notranslate"><span class="pre">/data</span></code>. This has no impact
+when starting in daemon mode but will be the default root directory when using
+the RDFox shell.</p>
+</dd>
+<dt>Ports</dt><dd><p>The images expose the default port for the RDFox endpoint: 12110.</p>
+</dd>
+<dt>Required superuser capabilities</dt><dd><p>In the interests of security, images in the <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> repository have been
+designed to run with no superuser capabilities (see <a class="reference external" href="https://docs.docker.com/engine/security/security/#linux-kernel-capabilities">Linux kernel capabilities</a>).
+The inclusion of the argument <code class="docutils literal notranslate"><span class="pre">--cap-drop</span> <span class="pre">ALL</span></code> in docker run commands, or
+the equivalent in other environments, is recommended when launching images in
+the above repository.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="suggested-mounts">
+<h2><span class="section-number">22.2. </span>Suggested Mounts<a class="headerlink" href="#suggested-mounts" title="Permalink to this headline">¶</a></h2>
+<p>The following sections provide suggestions on how to mount the license key, how
+to mount and initialize storage for the server directory and how to mount
+storage for the shell root directory.</p>
+<div class="section" id="mounting-the-license-key">
+<h3><span class="section-number">22.2.1. </span>Mounting the License Key<a class="headerlink" href="#mounting-the-license-key" title="Permalink to this headline">¶</a></h3>
+<p>Although various solutions to injecting the RDFox license key are possible, the
+recommended approach is to mount a valid, in-date license key file to container
+path <code class="docutils literal notranslate"><span class="pre">/opt/RDFox/RDFox.lic</span></code>. This will enable the containerized RDFox process
+to locate the license without requiring additional command line arguments whilst
+ensuring that the license key need not be stored within the server directory.</p>
+<p>If using the images in Kubernetes, where the RDFox license key may be held as a
+<code class="docutils literal notranslate"><span class="pre">Secret</span></code> resource, mounting the secret as described above will hide the
+image’s entry-point executable, leading to a failure to start. In this
+situation, mapping the secret into the container’s environment via variable
+<code class="docutils literal notranslate"><span class="pre">RDFOX_LICENSE_CONTENT</span></code> is the next most convenient option.</p>
+<p>The methods described above work for both <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> and
+<a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox-init">oxfordsemantic/rdfox-init</a> images.</p>
+</div>
+<div class="section" id="mounting-the-server-directory">
+<h3><span class="section-number">22.2.2. </span>Mounting the Server Directory<a class="headerlink" href="#mounting-the-server-directory" title="Permalink to this headline">¶</a></h3>
+<p>When RDFox is configured to persist roles and data stores, it does so inside the
+configured server-directory. As described above, the default server directory
+path for <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> images is
+<code class="docutils literal notranslate"><span class="pre">/home/rdfox/.RDFox</span></code>. For use cases where persistence is enabled it is
+therefore most convenient to mount storage, whether a host directory or Docker
+volume, to that container path. If for any reason the server directory must be
+mounted to a different container path, the default command for the image must be
+overridden with a valid RDFox command which includes the <code class="docutils literal notranslate"><span class="pre">-server-directory</span></code>
+parameter specifying the container-side server directory path.</p>
+<p>Wherever the storage is mounted, it must be readable and writable by the user
+that launches RDFox within the container (the <code class="docutils literal notranslate"><span class="pre">rdfox</span></code> user by default). In
+order to start RDFox in daemon mode without having to supply a role name and
+password, it is also necessary that users have previously initialized access
+control within the server directory (see <a class="reference internal" href="access-control.html#access-control-initialization"><span class="std std-numref">Section 12.5.1</span></a>
+for more information about initialization). The companion images described in
+the next section can help to prepare new server directories in order to meet all
+of these requirements.</p>
+<div class="section" id="initializing-the-server-directory-with-a-companion-image">
+<h4><span class="section-number">22.2.2.1. </span>Initializing the Server Directory with a Companion Image<a class="headerlink" href="#initializing-the-server-directory-with-a-companion-image" title="Permalink to this headline">¶</a></h4>
+<p>To simplify the initialization of new server directories, each image in the
+<a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a>
+repository has a companion image with a matching tag in the
+<a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox-init">oxfordsemantic/rdfox-init</a> repository. The purpose
+of these images is to prepare a mounted volume as a server directory for a
+long-lived container that will use the corresponding <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> image.</p>
+<p>Since initialization requires root privileges to ensure the correct file system
+access rights, as well as a plaintext password to initialize RDFox’s access
+control system, using a companion image to prepare the server directory for a
+long-lived RDFox container allows the latter to be run in a more secure
+environment. Specifically, the long-lived container can be launched as an
+unprivileged system account (such as the image’s default user, <code class="docutils literal notranslate"><span class="pre">rdfox</span></code>), all
+superuser capabilities can be dropped, and no plaintext password is needed for
+the first RDFox server role.</p>
+<p>When run against a completely uninitialized server directory, companion images
+perform the following steps:</p>
+<ol class="arabic simple">
+<li><p>ensure that the storage is owned by the <code class="docutils literal notranslate"><span class="pre">rdfox</span></code> user and is readable and
+writable by that user</p></li>
+<li><p>invoke RDFox to initialize access control and, optionally, execute a
+user-supplied RDFox shell script</p></li>
+</ol>
+<p>Step 1 requires that the container is launched as <code class="docutils literal notranslate"><span class="pre">root</span></code> with at least the
+capabilities <code class="docutils literal notranslate"><span class="pre">CAP_CHOWN</span></code>, <code class="docutils literal notranslate"><span class="pre">CAP_SETUID</span></code> and <code class="docutils literal notranslate"><span class="pre">CAP_SETGID</span></code>. Step 2 requires
+an RDFox license key as well as the name and password of the first role for
+RDFox. These can be supplied using the same command line arguments and
+environment variables as the main <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> images.</p>
+<p>Companion images accept any valid RDFox <code class="docutils literal notranslate"><span class="pre">init</span></code>-mode command (see
+<a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a>). Alternatively, the <code class="docutils literal notranslate"><span class="pre">init</span></code> mode specifier can be
+ommitted. In the latter case, companion images check for a file named
+<code class="docutils literal notranslate"><span class="pre">initialize.rdfox</span></code> in the container’s working directory and, if it exists,
+add it to the RDFox command line to be executed as an <a class="reference internal" href="rdfox-shell.html#shell-script-execution"><span class="std std-ref">RDFox shell script</span></a>. This can help avoid the need to create and configure
+via the REST endpoint later on.</p>
+<p>See <a class="reference internal" href="#example-docker-run-commands"><span class="std std-numref">Section 22.3</span></a> for an example Docker run command for
+a companion image.</p>
+</div>
+</div>
+<div class="section" id="mounting-the-shell-root-directory">
+<h3><span class="section-number">22.2.3. </span>Mounting the Shell Root Directory<a class="headerlink" href="#mounting-the-shell-root-directory" title="Permalink to this headline">¶</a></h3>
+<p>Often, when developing applications for RDFox it is convenient to keep the
+rules, base facts and shell scripts for the application in a single directory.
+When using the RDFox shell in Docker, this directory must be mounted into the
+container’s file system with the appropriate permissions to allow the <code class="docutils literal notranslate"><span class="pre">rdfox</span></code>
+user to read and write as necessary.</p>
+<p>Users are free to use either a named volume or a bind mount for the shell root
+directory. Bind mounting a host directory will often be more convenient for this
+purpose however named volumes offer more flexibility to achieve the necessary
+container-side permissions, particularly where the Docker client is on Windows.
+The most convenient target path for the mount is the default working directory
+<code class="docutils literal notranslate"><span class="pre">/data</span></code> as this is the default value for the shell root variable.</p>
+</div>
+</div>
+<div class="section" id="example-docker-run-commands">
+<span id="id1"></span><h2><span class="section-number">22.3. </span>Example Docker Run Commands<a class="headerlink" href="#example-docker-run-commands" title="Permalink to this headline">¶</a></h2>
+<p>The example commands in this section demonstrate how to run RDFox Docker images
+in several different configurations, starting with the simplest possible and
+progressing to more realistic scenarios. With the appropriate substitutions, the
+commands should work on any operating system where the Docker CLI is supported.</p>
+<p>In all of the examples, <code class="docutils literal notranslate"><span class="pre">&lt;path-to-license-file&gt;</span></code> should be replaced with an
+absolute path to a valid, in-date RDFox license key file.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Running Interactively with no Persistence or Endpoint</em>.</p>
+<p>The simplest possible <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">run</span></code> command to launch RDFox in a container
+is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>-v<span class="w"> </span>&lt;path-to-license-file&gt;:/opt/RDFox/RDFox.lic<span class="w"> </span>oxfordsemantic/rdfox<span class="w"> </span>sandbox
+</pre></div>
+</div>
+<p>This will start the RDFox shell for interactive usage but is not very useful.
+First of all, nothing from the session will be persisted since no server
+directory has been configured. Second, since no storage has been mounted to
+the <code class="docutils literal notranslate"><span class="pre">/data</span></code> path, there is no possibility of importing from or exporting to
+the host file system from the RDFox shell and we have no access to any shell
+scripts. Finally, since we did not publish the 12110 port it will be
+impossible to reach the RDFox endpoint from outside the container even if it
+is started using <code class="docutils literal notranslate"><span class="pre">endpoint</span> <span class="pre">start</span></code>. Nevertheless, this command may be useful
+for quickly testing out RDFox functionality on data and rules simple enough
+to be typed (or pasted) in.</p>
+</div>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Initializing a New Server Directory with a Companion Image</em>.</p>
+<p>The following command creates a Docker volume with name
+<code class="docutils literal notranslate"><span class="pre">rdfox-server-directory</span></code> (assuming no such volume exists already) and uses
+the latest <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox-init">oxfordsemantic/rdfox-init</a> image to prepare it
+for use with the latest <a class="reference external" href="https://hub.docker.com/r/oxfordsemantic/rdfox">oxfordsemantic/rdfox</a> image. Access control
+will be initialized with the role name in the command and password held in
+the environment variable <code class="docutils literal notranslate"><span class="pre">RDFOX_PASSWORD</span></code> (this must be set in the
+environment where the command is run).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-v<span class="w"> </span>&lt;path-to-license-file&gt;:/opt/RDFox/RDFox.lic<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>rdfox-server-directory:/home/rdfox/.RDFox<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-e<span class="w"> </span>RDFOX_PASSWORD<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>oxfordsemantic/rdfox-init<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>-persistence<span class="w"> </span>file<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>-request-logger<span class="w"> </span>elf<span class="w"> </span><span class="se">\</span>
+<span class="w">             </span>-role<span class="w"> </span>admin
+</pre></div>
+</div>
+<p>If the resulting container exits cleanly, the <code class="docutils literal notranslate"><span class="pre">rdfox-server-directory</span></code>
+volume will be ready for use, as demonstrated in the next example.</p>
+</div>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Running in Daemon Mode With Persistence</em></p>
+<p>Using volume <code class="docutils literal notranslate"><span class="pre">rdfox-server-directory</span></code>, prepared as described in the
+preceding example, a containerized RDFox daemon, reachable at host port
+<code class="docutils literal notranslate"><span class="pre">&lt;host-port&gt;</span></code>, can be launched using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--cap-drop<span class="w"> </span>ALL<span class="w"> </span>-p<span class="w"> </span>&lt;host-port&gt;:12110<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;path-to-license-file&gt;:/opt/RDFox/RDFox.lic<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>rdfox-server-directory:/home/rdfox/.RDFox<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>oxfordsemantic/rdfox
+</pre></div>
+</div>
+</div>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Running Interactively With Persistence</em></p>
+<p>To run interactively users must include the <code class="docutils literal notranslate"><span class="pre">-i</span></code> and <code class="docutils literal notranslate"><span class="pre">-t</span></code> arguments to
+docker run and override the default <code class="docutils literal notranslate"><span class="pre">daemon</span></code> command with <code class="docutils literal notranslate"><span class="pre">shell</span></code> as in
+the following command.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--cap-drop<span class="w"> </span>ALL<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;path-to-license-file&gt;:/opt/RDFox/RDFox.lic<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;rdfox-server-directory&gt;:/home/rdfox/.RDFox<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;shell-root-directory&gt;:/data<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>oxfordsemantic/rdfox<span class="w"> </span>shell
+</pre></div>
+</div>
+<p>When launched this way, RDFox will always prompt for a role name and password
+which it will use to initialize access control if
+<code class="docutils literal notranslate"><span class="pre">&lt;rdfox-server-directory&gt;</span></code> has not previously been initialized, and in all
+cases to log into the shell.</p>
+</div>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Running in Daemon Mode With No Persistence</em></p>
+<p>To run as a purely in-memory data store, where all interaction will be via
+the RDFox endpoint, it is possible to supply the name and password of the
+first role via environment variables in order to initialize access control
+without any interaction via standard input and output. Assuming variables
+<code class="docutils literal notranslate"><span class="pre">RDFOX_ROLE</span></code> and <code class="docutils literal notranslate"><span class="pre">RDFOX_PASSWORD</span></code> have been defined in the environment
+where the command will run, a containerized RDFox daemon with no persistence,
+reachable at host port <code class="docutils literal notranslate"><span class="pre">&lt;host-port&gt;</span></code>, can be launched using the following
+command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--cap-drop<span class="w"> </span>ALL<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-p<span class="w"> </span>&lt;host-port&gt;:12110<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;path-to-license-file&gt;:/opt/RDFox/RDFox.lic<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-e<span class="w"> </span>RDFOX_ROLE<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-e<span class="w"> </span>RDFOX_PASSWORD<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>oxfordsemantic/rdfox<span class="w"> </span><span class="se">\</span>
+<span class="w">               </span>-persistence<span class="w"> </span>off<span class="w"> </span>daemon
+</pre></div>
+</div>
+<p>The RDFox server started by the above command will contain no data stores
+initially. These can be created and populated via the REST API however, in
+some situations, it may be desirable to do this at startup time using an
+RDFox shell script. Given a startup script <code class="docutils literal notranslate"><span class="pre">start.rdfox</span></code> in host directory
+<code class="docutils literal notranslate"><span class="pre">&lt;shell-root-directory&gt;</span></code>, a containerized RDFox daemon with no persistence,
+initialized by the script and reachable at host port <code class="docutils literal notranslate"><span class="pre">&lt;host-port&gt;</span></code>, can be
+launched using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--cap-drop<span class="w"> </span>ALL<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-p<span class="w"> </span>&lt;host-port&gt;:12110<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;path-to-license-file&gt;:/opt/RDFox/RDFox.lic<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-v<span class="w"> </span>&lt;shell-root-directory&gt;:/data<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-e<span class="w"> </span>RDFOX_ROLE<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>-e<span class="w"> </span>RDFOX_PASSWORD<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>oxfordsemantic/rdfox<span class="w"> </span><span class="se">\</span>
+<span class="w">               </span>-persistence<span class="w"> </span>off<span class="w"> </span>daemon<span class="w"> </span>.<span class="w"> </span>start
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="checking-the-health-of-rdfox-containers">
+<h2><span class="section-number">22.4. </span>Checking the Health of RDFox Containers<a class="headerlink" href="#checking-the-health-of-rdfox-containers" title="Permalink to this headline">¶</a></h2>
+<p>Many container orchestration systems require a health check endpoint to
+determine whether a container is healthy. The RDFox endpoint has a dedicated API
+for this purpose at path <code class="docutils literal notranslate"><span class="pre">/health</span></code>. <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests to this path will always
+return <code class="docutils literal notranslate"><span class="pre">204</span> <span class="pre">-</span> <span class="pre">No</span> <span class="pre">Content</span></code>. See also <a class="reference internal" href="apis.html#rest-endpoint-health"><span class="std std-numref">Section 16.19</span></a>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="high-availability.html" class="btn btn-neutral float-left" title="21. High Availability" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="release-notes.html" class="btn btn-neutral float-right" title="23. Release Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

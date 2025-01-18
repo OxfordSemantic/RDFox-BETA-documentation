@@ -1,0 +1,11 @@
+tech.oxfordsemantic.jrdfox
+tech.oxfordsemantic.jrdfox.client
+tech.oxfordsemantic.jrdfox.exceptions
+tech.oxfordsemantic.jrdfox.formats
+tech.oxfordsemantic.jrdfox.io
+tech.oxfordsemantic.jrdfox.logic
+tech.oxfordsemantic.jrdfox.logic.datalog
+tech.oxfordsemantic.jrdfox.logic.expression
+tech.oxfordsemantic.jrdfox.logic.sparql.path
+tech.oxfordsemantic.jrdfox.logic.sparql.pattern
+tech.oxfordsemantic.jrdfox.logic.sparql.statement

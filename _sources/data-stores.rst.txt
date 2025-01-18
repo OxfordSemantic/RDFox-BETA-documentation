@@ -1,0 +1,733 @@
+.. _data-stores:
+
+Data Stores
+===========
+
+As explained in :numref:`servers`, a *data store* encapsulates a unit of
+logically related information. Many applications will store all of their
+related data in one data store (although some applications may use more than
+one data store). It is important to keep in mind that a query and rule can
+operate only on one data store; thus, all information that should be queried or
+reasoned within one unit should be loaded into one data store.
+
+As explained in :numref:`servers`, a data store serves as a container for
+other kinds of objects:
+
+- *tuple tables* are data store components that store facts (see
+  :numref:`tuple-tables`);
+
+- *data sources* can be registered with a data store to access external,
+  non-RDF data (see :numref:`data-sources`);
+
+- *OWL axioms* and *Datalog rules* are used to specify rules of inference that
+  are to be applied to the data loaded into the data store (see
+  :numref:`reasoning`);
+
+- *statistics modules* summarize the data loaded into a data store in a way
+  that helps query planning.
+
+The behavior of a data store can be customized using various parameters and
+properties, as explained in :numref:`data-store-configuration`.
+
+.. _operations-on-data-stores:
+
+Operations on Data Stores
+-------------------------
+
+The following list summarizes the operations on data stores available in the
+shell or via one of the available APIs.
+
+- A data store can be *created* on a server. To create a data store, one must
+  specify the data store name and zero or more :ref:`parameters
+  <data-store-parameters>` expressed as key-value pairs.
+
+- A data store can be *deleted* on the server. RDFox® allows a data store to be
+  deleted only if there are no active :ref:`connections <connections>` to the
+  data store.
+
+- A data store can be *saved* to and subsequently *loaded* from a binary file.
+  The file obtained in this way contains all data store content; thus, when a
+  data store is loaded from a file, it is restored to exactly the same state as
+  before saving. RDFox supports the following binary formats.
+
+   - The ``standard`` format stores the data in a way that is more resilient to
+     changes in RDFox implementation. This format should be used in most cases.
+   - The ``raw`` format stores the data in exactly the same way as the data is
+     stored in RAM. This format allows one to reconstruct the state of a data
+     store exactly and is therefore useful when reporting bugs, but it is more
+     likely to change between RDFox releases.
+
+.. _organization-of-rdf-data:
+
+Organization of Data
+--------------------
+
+The following sections explain how data is organized within a data store with
+details on how the data are stored, managed, imported, and queried.
+
+Storage
+~~~~~~~
+
+By default, two in-memory tuple tables are created automatically when a data
+store is created. The first, ``DefaultTriples``, has arity three and is
+designed to hold triples from an `RDF dataset's
+<https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/Overview.html#dfn-rdf-dataset>`__
+default graph. The second, ``Quads``, has arity four and is designed to hold
+triples from all of the RDF dataset's named graphs. If the ``default-graph-name``
+(see :numref:`default-graph-name-parameter`) parameter is specified at data
+store creation time, the ``DefaultTriples`` table is not created.
+
+Importation and DELETE/INSERT Clauses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, when performing import operations or evaluating SPARQL ``DELETE``
+or ``INSERT`` clauses, RDFox maps default graph triples to entries in the
+``DefaultTriples`` table and named graph triples (also known as quads) to
+entries in the ``Quads`` table. While named graph triples are always mapped to
+the ``Quads`` table, it is possible to override the default mapping for default
+graph triples so that they too are mapped to entries in the ``Quads`` table.
+The exact mechanisms for doing this are described next.
+
+For import operations, the default mapping for default graph triples can be
+overridden by setting the *target default graph* parameter (see
+:numref:`import-parameters`) of the operation. In this case, default graph
+triples are written to the ``Quads`` table with the specified graph name. When
+the target default graph parameter is not provided for the specific operation,
+but the data store's ``default-graph-name`` parameter is set (see
+:numref:`default-graph-name-parameter`), the data store parameter is used as
+the graph name instead.
+
+For SPARQL ``DELETE`` and ``INSERT`` clauses, overriding the default graph can
+be achieved by wrapping the triple patterns in the standard syntax for named
+graphs. When this syntax is not used, any setting for the
+``default-graph-name`` parameter is used as the name of the graph that should
+receive all default triples.
+
+When importing rules, default graph atoms are interpreted as references to the
+the ``DefaultTriples`` table unless the target default graph parameter is set
+for the import or the ``default-graph-name`` parameter is set for the data
+store. In the latter two cases, default graph atoms are interpreted as
+references to the named graph with the specified name.
+
+When importing OWL, all axioms are applied to the ``DefaultTriples`` table
+unless the target default graph parameter is set for the import or the
+``default-graph-name`` parameter is set for the data store. In the latter two
+cases, axioms are instead applied to the named graph with the specified name.
+
+Mapping Triples and Quads to RDF Datasets for SPARQL WHERE/ASK
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before evaluating SPARQL ``WHERE`` clauses or ``ASK`` queries, it is necessary
+to determine the RDF dataset for the query. An RDF dataset comprises exactly
+one default graph plus zero or more named graphs. The default RDF dataset for
+an RDFox data store contains the triples stored in the data store's
+``DefaultTriples`` table in the default graph and all named graphs stored in
+the data store's ``Quads`` table as its named graphs.
+
+If the ``DefaultTriples`` table is not present when a query begins, the default
+RDF dataset instead contains the multiset of all triples from the data store's
+``Quads`` table in the default graph and, as above, all named graphs stored in
+the data store's ``Quads`` table as its named graphs.
+
+Regardless of whether the ``DefaultTriples`` table exists or not, the default
+behaviors described above can always be overridden using either ``FROM`` and
+``FROM NAMED`` clauses in the query itself or, in the case of the SPARQL
+protocol, the ``default-graph-uri`` and ``named-graph-uri`` request parameters.
+
+.. _compaction-dead-fact-removal:
+
+Compaction and Dead Fact Removal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Facts added to any in-memory tuple table can be deleted using any of the APIs
+provided by RDFox, and all facts can be removed from a data store using a
+dedicated *clear* operation. Facts deleted in any of these two ways will not be
+taken into account during reasoning or query evaluation. However, it is
+important to bear in mind that fact deletion typically only marks the fact as
+deleted and does not reclaim any resources used to store the fact. Facts that
+have been marked for deletion are sometimes called *dead*, and all other facts
+are called *live*. If a fact is added to a data store that already contains the
+same fact marked for deletion, the fact is *resurrected* -- that is, the
+deletion flag is removed and the fact becomes live. As a consequence of these
+implementation choices, an application that keeps adding and deleting batches
+of distinct facts will eventually run out of memory, even if the number of
+facts that are live at any point in time is bounded.
+
+Memory occupied by dead facts can be reclaimed by *compacting* a data store.
+Roughly speaking, this operation removes all dead facts from memory, rebuilds
+all indexes used for query evaluation, and updates all statistics used during
+query planing. This operation increments the version of the data store even
+though the data store content does not change conceptually. The memory used by
+a data store after compaction should be roughly the same as if the data was
+imported into a fresh data store. It is thus generally good practice to compact
+a data store after periods of substantial data deletion.
+
+If a data store is persistent (see :numref:`persistence`), compacting it also
+saves a fresh snapshot of its entire content to disk and removes older
+snapshots and deltas to free up disk space. On startup, RDFox loads data stores
+by first loading their most recent snapshot and then replaying the changes in
+all subsequent deltas in order. Compacting regularly helps to speed up server
+restart by minimizing the number of deltas that need to be replayed after the
+most recent snapshot is loaded.
+
+Since compaction completely reorganizes the data in a data store, it can be
+performed only in exclusive mode -- that is, if no readers and no writers are
+active on the data store. Moreover, compaction requires reindexing the data
+store, which can take considerable time if the data store contains a lot of
+data. Thus, in applications where the data changes frequently, it is prudent to
+schedule compaction at times of low use.
+
+For persistent data stores, compaction will also temporarily increase the disk
+usage of the volume containing the server directory by the size of the data
+store's new snapshot, which must be safely written to disk before older
+snapshots and deltas can be removed. Because of this, operators should ensure
+that sufficient disk space is available before initiating compaction.
+
+Because compaction can be a heavy-weight operation, particularly when a new
+snapshot of the data store is saved to disk, RDFox also supports *dead fact
+removal*, which can be seen as a lighter form of compaction. Unlike compaction,
+it is applied only to tuple tables that contain more than 50% dead facts, and
+it does not save a new snapshot of the data store. Thus, while dead fact
+removal also requires exclusive access to the data store, the exclusive lock
+will typically be held for shorter periods of time and so this operation is
+less likely to disturb client operation, and there is no associated increase in
+disk usage.
+
+An operator can explicitly initiate data store compaction using any of the
+available APIs. Moreover, RDFox can be configured to perform compaction and
+dead fact removal automatically as follows.
+
+- The ``auto-compact-after`` data store property (see
+  :numref:`data-store-properties`) can be used to configure a data store to be
+  automatically compacted after a fixed number of committed transactions. For
+  example, if the ``auto-compact-after`` data store property is set to ``5``,
+  then the data store will be compacted automatically if (a) the last
+  compaction occurred at least five transactions ago and (b) no readers and no
+  writers are active on the data store when the transaction is committed. If a
+  reader or writer is active, compaction will be attempted when the next
+  transaction is committed. This option should be used only when compaction
+  overhead is unlikely to adversely affect the query and update rate of an
+  RDFox instance. The default value for the ``auto-compact-after`` data store
+  property is ``never`` -- that is, automatic compaction is switched off by
+  default.
+
+- If the value of the ``remove-dead-facts`` data store property (see
+  :numref:`data-store-properties`) is set to ``auto``, then dead fact removal
+  will be performed every time when a transaction is committed or rolled back.
+  Specifically, provided that no readers and no writers are active on a data
+  store at the point of commit or rollback, dead facts will be removed from
+  every tuple table that contains more than 50% of dead facts. If an exclusive
+  lock cannot be obtained, dead fact removal will be attempted again on the
+  next commit or rollback. Dead fact removal is switched on by default as this
+  should pose no problems for many applications. However, the need to acquire
+  an exclusive lock can introduce an occasional slowdown in query response
+  times, in which case the ``remove-dead-facts`` data store property should be
+  set to ``off``.
+
+.. _literal-data-types:
+
+Supported Data Types for Literals
+---------------------------------
+
+As well as IRIs and blank nodes, RDFox data stores can store literal values in
+the following formats:
+
++----------------------------------------------------------+
+| Datatype                                                 |
++==========================================================+
+| \http://www.w3.org/2000/01/rdf-schema#Literal            |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#anyURI                 |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#string                 |
++----------------------------------------------------------+
+| \http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#boolean                |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#dateTime               |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#dateTimeStamp          |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#time                   |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#date                   |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#gYearMonth             |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#gYear                  |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#gMonthDay              |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#gDay                   |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#gMonth                 |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#duration               |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#yearMonthDuration      |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#dayTimeDuration        |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#double                 |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#float                  |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#decimal                |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#integer                |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#nonNegativeInteger     |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#nonPositiveInteger     |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#negativeInteger        |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#positiveInteger        |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#long                   |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#int                    |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#short                  |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#byte                   |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#unsignedLong           |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#unsignedInt            |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#unsignedShort          |
++----------------------------------------------------------+
+| \http://www.w3.org/2001/XMLSchema#unsignedByte           |
++----------------------------------------------------------+
+
+.. _data-store-configuration:
+
+Data Store Configuration
+------------------------
+
+The behavior of a data store can be customized using options expressed as
+key-value pairs. These options are arranged into the following two groups.
+
+- *Data store parameters* are options that are set when a data store is created
+  and cannot be changed subsequently. They are supplied to various APIs that
+  allow data store creation, and they generally govern issues such as data
+  store capacity or the persistence scheme used. Data store parameters are
+  described in more detail in :numref:`data-store-parameters`.
+
+- *Data store properties* are options that can change throughout the lifetime
+  of a data store. RDFox provides various APIs for retrieving and changing data
+  store properties; moreover, if a data store is persisted, any changes to data
+  store properties are persisted too. Data store properties are described in
+  more detail in :numref:`data-store-properties`.
+
+.. _data-store-parameters:
+
+Data Store Parameters
+~~~~~~~~~~~~~~~~~~~~~
+
+Data store parameters are key-value pairs that are determined when a data store
+is created and that cannot be changed subsequently.
+
+.. _default-graph-name-parameter:
+
+``default-graph-name``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``default-graph-name`` option can be set to any IRI to activate RDFox's
+alternative handling of default graph data. See
+:numref:`organization-of-rdf-data` for a full description. By default, this
+parameter is unset.
+
+.. _equality-parameter:
+
+``equality``
+^^^^^^^^^^^^
+
+The ``equality`` option determines how RDFox deals with the semantics of
+equality, which is encoded using the ``owl:sameAs`` property. This option has
+the following values.
+
+- ``off``: There is no special handling of equality and the ``owl:sameAs``
+  property is treated as just another property. This is the default if the
+  ``equality`` option is not specified.
+
+- ``noUNA``: The ``owl:sameAs`` property is treated as equality, and the
+  *Unique Name Assumption* is not used --- that is, deriving an equality
+  between two IRIs does not result in a contradiction. This is the treatment of
+  equality in OWL 2 DL.
+
+- ``UNA``: : The ``owl:sameAs`` property is treated as equality, but
+  interpreted under UNA --- that is, deriving an equality between two IRIs
+  results in a contradiction, and only equalities between an IRI and a blank
+  node, or between two blank nodes are allowed. Thus, if a triple of the form
+  ``<IRI₁, owl:sameAs, IRI₂>`` is derived, RDFox detects a clash and derives
+  ``<IRI₁, rdf:type, owl:Nothing>`` and ``<IRI₂, rdf:type, owl:Nothing>``.
+
+In all equality modes (i.e., all modes other than ``off``), distinct RDF
+literals (e.g., strings, numbers, dates) are assumed to refer to distinct
+objects, and so deriving an equality between the distinct literals results in a
+contradiction.
+
+**Note** RDFox will reject rules that use negation-as-failure or aggregation in
+all ``equality`` modes other than ``off``.
+
+``init-resource-capacity``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The value of the ``init-resource-capacity`` option is an integer that is used
+as a hint to the data store specifying the number of resources that the store
+will contain. This hint is used to initialize certain data structures to the
+sizes that ensure faster importation of data. The actual number of resources
+that a data store can contain is not limited by this option: RDFox will resize
+the data structures as needed if this hint is exceeded.
+
+``init-tuple-capacity``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The value of the ``init-tuple-capacity`` option is an integer that is used as a
+hint to the data store specifying the number of tuples that the store will
+contain. This hint is used to initialize certain data structures to the sizes
+that ensure faster importation of data. The actual number of tuples that a data
+store can contain is not limited by this option: RDFox will resize the data
+structures as needed if this hint is exceeded.
+
+``max-data-pool-size``
+^^^^^^^^^^^^^^^^^^^^^^
+
+The value of the ``max-data-pool-size`` option is an integer that determines the
+maximum number of bytes that RDFox can use to store resource values (e.g., IRIs
+and strings). Specifying this option can reduce significantly the amount of
+virtual memory that RDFox uses per data store.
+
+``max-resource-capacity``
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The value of the ``max-resource-capacity`` option is an integer that determines
+the maximum number of resources that can be stored in the data store. Specifying
+this option can reduce significantly the amount of virtual memory that RDFox
+uses per data store.
+
+``max-tuple-capacity``
+^^^^^^^^^^^^^^^^^^^^^^
+
+The value of the ``max-tuple-capacity`` option is an integer that determines
+the maximum number of tuples that can be stored by the in-memory tuple tables
+of a data store. Specifying this option can reduce significantly the amount of
+virtual memory that RDFox uses per data store.
+
+``persistence``
+^^^^^^^^^^^^^^^
+
+The ``persistence`` option controls how RDFox persists data contained in a data
+store. The option can be set to ``off`` to disable persistence for individual
+data stores contained within a persistent server. The option can also be set to
+the same value as the ``persistence`` option of the server that contains the
+data store but, as this is the default value, this is not necessary.
+
+.. _quad-table-type-option:
+
+``quad-table-type``
+^^^^^^^^^^^^^^^^^^^
+
+The ``quad-table-type`` parameter determines the type of the ``Quads``
+table, which is used to store named graph triples. Each option offers different
+indexing strategies to optimize performance based on specific use cases.
+
+The available options are:
+- `quad-table-lg-fi` (default)
+- `quad-table-lg-pi`
+- `quad-table-sg-fi`
+- `quad-table-sg-pi`
+
+The ``-lg`` suffix indicates that the table is optimized for typical use cases
+where named graphs contain a substantial amount of facts. In contrast, the `-sg`
+suffix is suitable for rare cases where each graph consists of very few triples.
+
+The ``-fi`` suffix denotes ``full`` indexing, providing comprehensive indexing
+for efficient read and write access. Alternatively, the ``-pi`` suffix denotes
+``partial`` indexing, which offers a reduced set of indexes, making it more
+memory efficient.
+
+.. _swrl-naf-option:
+
+``swrl-negation-as-failure``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``swrl-negation-as-failure`` option determines how RDFox treats
+``ObjectComplementOf`` class expressions in SWRL rules.
+
+- ``off``. SWRL rules are interpreted under the open-world assumption and SWRL
+  rules featuring ``ObjectComplementOf`` are rejected. This is the default
+  value.
+
+- ``on``. SWRL rules are interpreted under the closed-world assumption, as
+  described in :numref:`swrl-naf-description`.
+
+.. _triple-table-type-option:
+
+``triple-table-type``
+^^^^^^^^^^^^^^^^^^^^^
+
+The ``triple-table-type`` parameter determines the type of the ``Triple`` table.
+Each option offers different indexing strategies to optimize performance based
+on specific use cases.
+
+The available options are:
+- `triple-table-fi` (default)
+- `triple-table-pi`
+
+The ``-fi`` suffix denotes ``full`` indexing, providing comprehensive indexing
+for efficient read and write access. Alternatively, the ``-pi`` suffix denotes
+``partial`` indexing, which offers a reduced set of indexes, making it more
+memory efficient.
+
+.. _data-store-type:
+
+``type``
+^^^^^^^^
+
+The ``type`` option determines the storage scheme used by the data store. The
+value determines the maximum capacity of a data store (i.e., the maximum number
+of resources and/or facts), its memory footprint, and the speed with which it
+can answer certain types of queries. The following data store types are
+currently supported:
+
+-  ``parallel-nn`` (default)
+-  ``parallel-nw``
+-  ``parallel-ww``
+
+In suffixes ``nn``, ``nw``, and ``ww``, the first character determines whether
+the system uses 32-bit (``n`` for *narrow*) or 64-bit (``w`` for *wide*)
+unsigned integers for representing resource IDs, and the second character
+determines whether the system uses 32-bit (``n``) or 64-bit (``w``) unsigned
+integers for representing triple or quad IDs. Thus, an ``nw`` store can contain
+at most 4 × 10\ :sup:`9` resources and at most 1.8 × 10\ :sup:`19` triples.
+
+.. _data-store-properties:
+
+Data Store Properties
+~~~~~~~~~~~~~~~~~~~~~
+
+Data store properties are key-value pairs that can be modified at any point
+during a data store's lifetime using any of the provided RDFox APIs (see
+:numref:`apis`) or the ``dsprop`` shell command (see :numref:`dsprop-command`).
+
+.. _auto-compact-after:
+
+``auto-compact-after``
+^^^^^^^^^^^^^^^^^^^^^^
+
+The ``auto-compact-after`` data store property determines whether and how
+frequently a data store is compacted automatically. The allowed values are as
+follows.
+
+- ``never``: The data store is never compacted automatically. (However,
+  compaction can be requested explicitly using any of the provided APIs.). This
+  is the default.
+
+- an integer ``n``: The data store is compacted after ``n`` transactions are
+  successfully committed, provided that the data store has no active readers or
+  writers at the point of commit.
+
+``auto-update-statistics-mode``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``auto-update-statistics-mode`` data store property governs how RDFox
+manages statistics about the data loaded into the system. RDFox uses these
+statistics during query planning in order to identify an efficient plan, so
+query performance may be suboptimal if the statistics are not up to date. The
+allowed values are as follows.
+
+- ``off``: Statistics are never updated automatically, but they can be updated
+  manually using the ``stats update`` command or via one of the available APIs.
+
+- ``balanced``: The cost of updating the statistics is balanced against the
+  possibility of using outdated statistics. This is the default.
+
+- ``eager``: Statistics are updated after each operation that has the potential
+  to invalidate the statistics (e.g., importing data).
+
+``base-iri``
+^^^^^^^^^^^^
+
+The ``base-iri`` data store property contains an IRI that is used as the base
+when importing data or evaluating queries with no explicitly set base IRI. All
+relative IRIs in such cases are resolved against the value of this property in
+order to obtain an absolute IRI. The defalt value is
+``https://rdfox.com/default-base-iri/``.
+
+``errors-in-bind``
+^^^^^^^^^^^^^^^^^^
+
+The ``errors-in-bind`` data store property governs how errors encountered
+during the evaluation of ``BIND`` expressions are handled in queries. As an
+example, consider SPARQL query ``SELECT ?X ?Y WHERE { BIND(2 + "a" AS ?X) . ?Y
+:R ?X }``; here, the expression ``2 + "a"`` raises an error because strings
+cannot be added to integers.
+
+- If the value of ``errors-in-bind`` is equal to ``standard-compliant``, then
+  variable ``?X`` is unbound after evaluating the ``BIND`` expression, and the
+  query becomes equivalent to ``SELECT ?X ?Y WHERE { ?Y :R ?X }``. This is the
+  default behavior.
+
+- If the value of ``errors-in-bind`` is equal to ``skip``, then the attempt to
+  bind ``?X`` to an error is skipped and the query does not return any answers.
+
+The default behavior is compliant with the SPARQL 1.1 standard, but it can be
+counterintuitive by silently accepting errors, and it can also lead to
+inefficient query plans. The value of this data store property can be
+overridden during query evaluation by passing the query parameter with the same
+name.
+
+.. _invalid-literal-policy-property:
+
+``invalid-literal-policy``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``invalid-literal-policy`` data store property governs how RDFox handles
+invalid literals in imported data, queries, and updates.
+
+- ``error``: Invalid literals in the input are treated as errors, and so input
+  containing such literals cannot be processed. This is the default.
+
+- ``as-string``: During import, invalid literals are converted to string
+  literals and a warning is emitted alerting the user to the fact that the
+  value was converted. In queries and updates, invalid literals are converted
+  to strings, but no warning is emitted.
+
+- ``as-string-silent``: Invalid literals are converted to string literals in
+  the import data, queries, and updates, but without emitting a warning.
+
+``max-backward-chaining-depth``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``max-backward-chaining-depth`` data store property determines the
+recursion depth of the backward chaining phase in the incremental reasoning
+that RDFox uses to update the materialization. The value can be a nonnegative
+integer, or ``unbounded`` (the default). The value of this property should be
+changed only if so directed by Oxford Semantic Technologies support personnel.
+
+``max-threads-used``
+^^^^^^^^^^^^^^^^^^^^
+
+The ``max-threads-used`` data store property determines how many threads of the
+server's thread pool this data store is allowed to use for tasks such as
+importation or reasoning. The value can be a nonnegative integer, or
+``all-available``; the latter is the default and it states that a data store
+can use as many threads of the server's thread pool as are currently available.
+Note that this doesn't affect the number of REST requests served concurrently
+(see ``num-http-workers`` in :numref:`endpoint-parameters`).
+
+``property-paths-cardinality``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``property-paths-cardinality`` data store property governs the evaluation
+of property paths in queries. As an example, consider SPARQL query ``SELECT ?X
+?Y WHERE { ?X :R/:S ?Y }``.
+
+- If the value of ``property-paths-cardinality`` is equal to
+  ``standard-compliant``, then the query is equivalent to ``SELECT ?X ?Y WHERE
+  { ?X :R ?Z . ?Z :S ?Y }`` --- that is, the query can return the same pair of
+  values for ``?X`` and ``?Y`` more than once. This is the default.
+
+- If the value of ``property-paths-cardinality`` is equal to ``distinct``, then
+  the query is equivalent to ``SELECT DISTINCT ?X ?Y WHERE { ?X :R ?Z . ?Z :S
+  ?Y }`` --- that is, the query can return a pair of values for ``?X`` and
+  ``?Y`` at most once.
+
+Elimination of duplicate values is required by the standard whenever a property
+path contains ``*``, ``+``, or ``?``. Thus, the ``distinct`` value for the
+``property-paths-cardinality`` data store property presents a more uniform and
+consistent semantics for SPARQL 1.1 property paths; moreover, complex property
+paths can often be evaluated more efficiently with the ``distinct`` option. The
+value of this data store property can be overridden during query evaluation by
+passing the query parameter with the same name.
+
+
+``query-planning-algorithms``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``query-planning-algorithms`` data store property governs which algorithms
+are used to plan a query. The value of this property should be changed only if
+so directed by Oxford Semantic Technologies support personnel. The value of
+this data store property can be overridden during query evaluation by passing
+the query parameter with the same name.
+
+``remove-dead-facts``
+^^^^^^^^^^^^^^^^^^^^^
+
+The ``remove-dead-facts`` data store property specifies whether :ref:`dead fact
+removal <compaction-dead-fact-removal>` is applied automatically after a
+transaction is committed or rolled back. The allowed values are ``auto`` (the
+default), and ``off``.
+
+``query-validation``
+^^^^^^^^^^^^^^^^^^^^
+
+The ``query-validation`` data store property specifies whether RDFox should
+reject queries that conform to the SPARQL 1.1 standard in a strict sense, but
+exhibit a pattern that was often found to represent a user error. The value
+``standard-compliant`` instructs RDFox to closely follow the SPARQL 1.1
+specification, whereas the value ``strict`` instructs RDFox to perform further
+checks, some of which are listed below. The default value is ``strict``. The
+value of this data store property can be overridden during query evaluation by
+passing the query parameter with the same name.
+
+The following list presents some of the types of queries that RDFox will reject
+in ``strict`` mode, all of which represent common mistakes.
+
+- Query ``SELECT * WHERE { BIND(?X + 2 AS ?Y) . ?Z :R ?X }`` will be rejected
+  because, as per the SPARQL 1.1 standard, ``BIND(?X + 2 AS ?Y)`` must be
+  evaluated before triple pattern ``?Z :R ?X``, and so variable ``?X`` is
+  necessarily unbound when ``BIND`` is evaluated. Such a query should usually
+  be written as ``SELECT * WHERE { ?Z :R ?X . BIND(?X + 2 AS ?Y) }``.
+
+- Query ``SELECT * WHERE { ?X :R ?Y . FILTER(?Z > 2) }`` will be rejected
+  because variable ``?Z`` occurs in ``FILTER(?Z > 2)``, but not in ``?X :R
+  ?Y``. Variable ``?Z`` is thus necessarily unbound. Such queries usually
+  contain a typo: this query was likely meant to be ``SELECT * WHERE { ?X :R ?Y
+  . FILTER(?X > 2) }``.
+
+- Query ``SELECT * WHERE { ?X :R ?Y . OPTIONAL { ?X :S ?Y . FILTER(?Z > 2) }``
+  will be rejected because variable ``?Z`` in ``FILTER(?Z > 2)`` occurs in
+  neither ``?X :R ?Y`` nor ``?X :S ?Y``, and so the variable is necessarily
+  unbound. Such queries usually contain a typo just as in the previous item.
+
+- Query ``SELECT * WHERE { GRAPH :G { ?S ?P ?O } }`` will be rejected if either
+  the dataset does not include the named graph ``:G``, or the user does not
+  have permissions to read the named graph ``:G``. SPARQL 1.1 requires such
+  queries to be evaluated as if named graph ``:G`` were empty; however, this
+  does not support detecting errors (e.g., if ``:G`` was mistyped in the query).
+
+- Query ``SELECT * WHERE { ?S ?P ?O } ORDER BY ?Z`` will be rejected because
+  variable ``?Z`` is used in ``ORDER BY``, but is not bound in the main part of
+  the query.
+
+- Query ``SELECT ?X ?Y WHERE { ?X :R ?Y } GROUP BY ?X`` will be rejected
+  because the query uses ``GROUP BY``, but variable ``?Y`` occurs neither in
+  ``GROUP BY`` nor in an aggregation function. SPARQL 1.1 standard stipulates
+  that the value of ``?Y`` should be sampled in such cases --- that is the
+  query should be evaluated as if it was written as ``SELECT ?X (SAMPLE(?Y1) AS
+  ?Y) WHERE { ?X :R ?Y1 } GROUP BY ?X``. However, such implicit, significant
+  rewriting of the query often tends to hide a typo or an omission of ``?Y``
+  from ``GROUP BY``.
+
+- Query ``SELECT ?X ?Z WHERE { ?X :R ?Y }`` will be rejected because variable
+  ``?Z`` is selected, but not bound in the query. Variable ``?Z`` is thus
+  necessarily unbound, which usually indicates a typo.
+
+``user-blank-node-import-policy``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the ``user-blank-node-import-policy`` data store property is set to
+``rename-apart``, then user-defined blank nodes imported from distinct files
+are renamed apart during the importation process; hence, importing data
+*merges* blank nodes according to the RDF specification. There is no way to
+control the process of renaming blank nodes, which can be problematic in some
+applications. Because of that, the default value of this option is
+``keep-unchanged``, which ensures that the data is imported 'as is'. Regardless
+of the state of this option, autogenerated blank nodes (i.e., blank nodes
+obtained by expanding ``[]`` or ``(...)`` in Turtle files) are always renamed
+apart.

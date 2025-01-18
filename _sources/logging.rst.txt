@@ -1,0 +1,129 @@
+.. _logging:
+
+Logging
+=======
+
+RDFox® supports two types of logging: API logging, which can be used with any
+RDFox interface, and HTTP request logging, which is specific to the RDFox
+endpoint. This section describes the purpose of each type of logging and
+provides guidance on usage.
+
+.. _api-logging:
+
+API Logging
+-----------
+
+API logging has been designed in order to simplify the reproduction of issues
+with importation, querying or reasoning, regardless of which RDFox API is being
+used when an issue is encountered. To support reproducing a problem, API
+logging can be switched on, after which all calls to the core RDFox API are
+logged into a shell script. This script can later be run in the RDFox shell,
+and this will produce exactly the same sequence of internal calls to RDFox.
+Hence, replaying the script will hopefully reproduce the original problem,
+which is the first important step towards analyzing the problem and providing
+support.
+
+Each shell command written to the script is surrounded by comments containing
+the time and date of the API call, the duration of the call, and the details of
+any exception arising as a result of the call. This information is intended to
+help with analyzing the problem.
+
+When API logging is enabled, each RDFox server session creates a subdirectory
+of the configured logging directory whose name is derived from the date and
+time that the server was started. The directory will contain a single script
+file named ``script.txt``. Additionally, each distinct input imported during
+the session is recorded as a separate file in the directory so that the shell
+script can repeat the relevant import operations. An exception to this is
+inputs imported as files: since these are already available from the local
+file system and may be large, API logging does not create copies.
+
+API logging is configured via the server parameters whose names begin with
+``api-log`` (see :numref:`server-parameters`).
+
+Recommended Usage
+~~~~~~~~~~~~~~~~~
+
+Although API logging has no impact on the function of the API, it may introduce
+a non-negligible performance penalty depending on the exact pattern of API
+calls. Accordingly, API logging is disabled by default and should only be
+enabled while trying to reproduce an issue.
+
+The recommended workflow to reproduce any problem for offline analysis is to
+restart the RDFox server with API logging enabled, repeat the interactions
+which provoked the issue, restart the server again with logging disabled and
+then to archive the directory created by the session where logging was enabled.
+
+When archiving a log directory for offline reproduction, the following items
+should be gathered:
+
+- the log directory created for the session (including all its files),
+
+- the server directory if role persistence or role and data store persistence
+  are enabled, and
+
+- any files that were imported during the logging session.
+
+Note that, when moving the above items to another system, manual editing of the
+log script may be necessary to ensure that the paths to any imported files are
+correct for the receiving system.
+
+.. container:: example
+
+   **Example:** The following shell command imports one local Turtle file and
+   one TriG file hosted at the imaginary example.org:::
+
+      import /home/user1/data.ttl <https://example.org/hosted-data.trig>
+
+   When API logging is enabled, this would lead to a log entry similar to the
+   following:
+
+   .. code-block::
+      :linenos:
+
+      ########### 2021-07-12 11:19:05 +0100 ###########
+      # START importData on ldsc1
+      import + \
+          "/home/user1/data.ttl" \
+          "input_recording_000001+.txt"
+
+   The local file path has been used directly in the import command in the log
+   entry (on line 4) whereas the data retrieved from example.org has been
+   recorded into ``input_recording_000001+.txt`` and is then referenced using
+   just that file name as a relative path (on line 5). When archiving the
+   directory containing the above API log for reproduction later on, a copy of
+   the file at ``/home/user1/data.ttl`` should be included and line 4 of the
+   above snippet adjusted as needed to ensure that it refers to the same file
+   as ``/home/user1/data.ttl`` did when the logged import operation occurred.
+
+
+.. _request-logging:
+
+HTTP Request Logging
+--------------------
+
+HTTP request logging provides standardized logging of HTTP requests serviced by
+the RDFox endpoint. Both the common and extended log formats are supported. In
+contrast to API logging, request logging has been implemented to minimize the
+impact on performance as much as possible, and so the use of HTTP request
+logging in production is recommended.
+
+HTTP request logging is configured via the endpoint parameters
+``request-logger`` and, when the extended log format logger is active,
+``elf-logger-fields`` (see :numref:`endpoint-parameters`).
+
+Errors and Exceptions
+~~~~~~~~~~~~~~~~~~~~~
+
+The endpoint attempts to ensure that, when a logger is configured, a single log
+entry is created for each attempted request, regardless of any errors that have
+occurred. For example, if a client connects and then sends arbitrary data not
+conforming to the HTTP protocol, a log entry is still made with dashes (``-``)
+in place of, for example, the request method or URI.
+
+In the case of an error which prevents RDFox accepting a new connection, the
+extended log format logger supports the proprietary field identifier
+``x-socket-exception`` which can be used to specify that the textual
+representation of such errors should be included in the log. This can be useful
+for diagnosing problems with the configuration of the endpoint such as when the
+number of concurrent connections to the endpoint exhausts the allowed limit for
+open file descriptors.

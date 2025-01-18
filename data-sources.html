@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7. Data Sources &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="8. Import and Export" href="import-and-export.html" />
+    <link rel="prev" title="6. Tuple Tables" href="tuple-tables.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">7. Data Sources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#registering-data-sources">7.1. Registering Data Sources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#registering-delimited-file-data-sources">7.1.1. Registering Delimited File Data Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registering-postgresql-data-sources">7.1.2. Registering PostgreSQL Data Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registering-odbc-data-sources">7.1.3. Registering ODBC Data Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registering-solr-data-sources">7.1.4. Registering Solr Data Sources</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-data-source-tuple-tables">7.2. Creating Data Source Tuple Tables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-data-source-tuple-table-creation-parameters">7.2.1. General Data Source Tuple Table Creation Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-delimited-file-data-source-tuple-tables">7.2.2. Creating Delimited File Data Source Tuple Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-postgresql-data-source-tuple-tables">7.2.3. Creating PostgreSQL Data Source Tuple Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-odbc-data-source-tuple-tables">7.2.4. Creating ODBC Data Source Tuple Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-solr-data-source-tuple-tables">7.2.5. Creating Solr Data Source Tuple Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-sources-and-incremental-reasoning">7.3. Data Sources and Incremental Reasoning</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">7. </span>Data Sources</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="data-sources">
+<span id="id1"></span><h1><span class="section-number">7. </span>Data Sources<a class="headerlink" href="#data-sources" title="Permalink to this headline">¶</a></h1>
+<p>As explained in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>, a <em>data source</em> can be registered with a
+data store to provide access to an external, non-RDF source of data, such as a
+relational database, a CSV file, or an Apache Solr index. This data can then be
+used in queries and rules, this allowing for an integration of heterogenous data
+within RDFox®. Data sources also allow users to use specialist query engines such
+as Solr for indexed text searches within RDFox queries.</p>
+<p>Accessing external data is typically a two-step process.</p>
+<ul class="simple">
+<li><p>First, a data source is registered with a data store. This involves
+specifying the data source name, data source type, and configuration
+parameters. The supported data source types and the configuration parameters
+available for each type are documented in <a class="reference internal" href="#registering-data-sources"><span class="std std-numref">Section 7.1</span></a>.</p></li>
+<li><p>Second, one or more <em>data source tuple tables</em> are created, which provide
+suitable ‘views’ into the data of the data source (see
+<a class="reference internal" href="tuple-tables.html#types-of-tuple-tables"><span class="std std-numref">Section 6.1</span></a>). Such tuple tables can be used in used in
+queries and rules in exactly the same way as all other tuple tables (see
+<a class="reference internal" href="tuple-tables.html#using-tuple-tables"><span class="std std-numref">Section 6.3</span></a>). To create a data source tuple table, one must
+specify parameters that govern how external data is transformed to be
+compatible with RDF. The available parameters depend on the type of data
+source, and are described in detail in
+<a class="reference internal" href="#creating-data-source-tuple-tables"><span class="std std-numref">Section 7.2</span></a>.</p></li>
+</ul>
+<p>Data sources and their tuple tables can be managed using any of the available
+APIs (see <a class="reference internal" href="apis.html#apis-data-sources"><span class="std std-numref">Section 16.10</span></a>.). In the RDFox shell, management is
+achieved using the <code class="docutils literal notranslate"><span class="pre">dsource</span></code> (see <a class="reference internal" href="rdfox-shell.html#dsource-command"><span class="std std-numref">Section 15.2.15</span></a>) and
+<code class="docutils literal notranslate"><span class="pre">tupletable</span></code> (see <a class="reference internal" href="rdfox-shell.html#tupletable-command"><span class="std std-numref">Section 15.2.52</span></a>) commands.</p>
+<div class="section" id="registering-data-sources">
+<span id="id2"></span><h2><span class="section-number">7.1. </span>Registering Data Sources<a class="headerlink" href="#registering-data-sources" title="Permalink to this headline">¶</a></h2>
+<p>This section documents the types of data source that can be registered with
+RDFox along with their configuration options.</p>
+<p>When registering a data source, the parameter <code class="docutils literal notranslate"><span class="pre">type</span></code> is always required. The
+following sections describe the possible values for the <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter as
+well as the parameters specific to each type.</p>
+<div class="section" id="registering-delimited-file-data-sources">
+<span id="id3"></span><h3><span class="section-number">7.1.1. </span>Registering Delimited File Data Sources<a class="headerlink" href="#registering-delimited-file-data-sources" title="Permalink to this headline">¶</a></h3>
+<p>CSV and other delimited file types are registered as type <code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code>.
+The parameters for registering this type of data source are described below.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 14%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">delimiter</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">,</span></code></p></td>
+<td><p>Specifies the character used to
+delimit the cells in the file.</p>
+<p>Space can be specified with <code class="docutils literal notranslate"><span class="pre">&lt;space&gt;</span></code>
+and tab can be specified with <code class="docutils literal notranslate"><span class="pre">&lt;tab&gt;</span></code>
+.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The path to the delimited file to add.</p>
+<p>This parameter must be specified.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">header</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Boolean parameter specifying whether
+the file has a header or not</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quote</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;</span></code></p></td>
+<td><p>Specifies the character used to
+quote strings in the file.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="example docutils container">
+<p><strong>Example: Registering a CSV file as a Data Source using the Shell</strong></p>
+<p>Assume the following short CSV file exists as <code class="docutils literal notranslate"><span class="pre">people.csv</span></code> in our shell
+root directory.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>First Name,Last Name,Sex,Age
+Beverly,Strickland,F,33
+Thomas,Peterson,M,
+Urs,Andresson,M,63
+Abigail,Edwards,F,52
+Abigail,Edwards,,36
+</pre></div>
+</div>
+<p>The following command registers the file as a <code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code> data source
+with name <code class="docutils literal notranslate"><span class="pre">peopleDS</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dsource register &quot;peopleDS&quot;     \
+   type delimitedFile           \
+   file &quot;$(dir.root)people.csv&quot; \
+   header true
+</pre></div>
+</div>
+<p>Once added the data source can be inspected with the following command.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dsource show personDS
+</pre></div>
+</div>
+<p>It is also possible to sample the native data source table. The following
+command samples the first three rows.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dsource sample peopleDS &quot;$(dir.root)people.csv&quot; 3
+</pre></div>
+</div>
+<p>The second parameter to the <code class="docutils literal notranslate"><span class="pre">dsource</span> <span class="pre">sample</span></code> command is the name of the
+table to sample. In the case of <code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code> data sources, there is
+only one choice of table but the parameter is nonetheless required. The path
+of the file is used in this case.</p>
+</div>
+</div>
+<div class="section" id="registering-postgresql-data-sources">
+<span id="id4"></span><h3><span class="section-number">7.1.2. </span>Registering PostgreSQL Data Sources<a class="headerlink" href="#registering-postgresql-data-sources" title="Permalink to this headline">¶</a></h3>
+<p>PostgreSQL data sources are registered as type <code class="docutils literal notranslate"><span class="pre">PostgreSQL</span></code>. The parameters
+for registering this type of data source are described below.</p>
+<p>Registering this type of data source requires <a class="reference external" href="https://www.postgresql.org/docs/current/libpq.html">libpq</a>. See
+<a class="reference internal" href="features-and-requirements.html#third-party-software"><span class="std std-numref">Section 2.4.1.2</span></a> for more detail.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 23%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
+<td><p>A duration specified as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which determines
+how long unused database connections are kept
+alive before they are closed. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
+disables caching of database connections.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-string</span></code></p></td>
+<td><p>The empty string</p></td>
+<td><p>The connection string RDFox should use to connect
+to the ODBC instance.</p>
+<p>This parameter must be specified.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="registering-odbc-data-sources">
+<span id="id5"></span><h3><span class="section-number">7.1.3. </span>Registering ODBC Data Sources<a class="headerlink" href="#registering-odbc-data-sources" title="Permalink to this headline">¶</a></h3>
+<p>ODBC data sources are registered as type <code class="docutils literal notranslate"><span class="pre">ODBC</span></code>. The parameters for
+registering this type of data source are described below.</p>
+<p>Registering this type of data source requires either <a class="reference external" href="https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors">iODBC</a>
+or <a class="reference external" href="http://www.unixodbc.org/">unixODBC</a>. See <a class="reference internal" href="features-and-requirements.html#third-party-software"><span class="std std-numref">Section 2.4.1.2</span></a>
+for more detail.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 36%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
+<td><p>A duration specified as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which determines
+how long unused database connections are kept
+alive before they are closed. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
+disables caching of database connections.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-string</span></code></p></td>
+<td><p>The empty string</p></td>
+<td><p>The connection string RDFox should use to connect
+to the ODBC instance.</p>
+<p>This parameter must be specified.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default-schema</span></code></p></td>
+<td><p>The empty string</p></td>
+<td><p>The name of the schema that the SQL database uses
+to interpret unqualified references to tables.
+The value of this parameter should be determined
+by inspecting the configuration of the database
+being connected to. For example, in PostgreSQL,
+the required value of this paramerter can be
+determined by running the
+<code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">current_schema()</span></code> SQL query.
+Unfortunately, there is no standard way to
+retrieve the required value for this parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;</span></code></p></td>
+<td><p>The character used as the quote mark for
+<cite>quoted identifiers</cite> in SQL statements used to
+interrogate the data source.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote-open</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
+<td><p>The character used as the opening quote mark for
+<cite>quoted identifiers</cite> in SQL statements used to
+interrogate the data source.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote-close</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
+<td><p>The character used as the closing quote mark for
+<cite>quoted identifiers</cite> in SQL statements used to
+interrogate the data source.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="registering-solr-data-sources">
+<h3><span class="section-number">7.1.4. </span>Registering Solr Data Sources<a class="headerlink" href="#registering-solr-data-sources" title="Permalink to this headline">¶</a></h3>
+<p>Solr Data Sources are registered as type <code class="docutils literal notranslate"><span class="pre">solr</span></code>. The parameters for
+registering this type of data source are described below.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 14%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">channel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">unsecure</span></code></p></td>
+<td><p>Specifies the channel type used to  connect to the Solr instance.</p>
+<p>Valid values for this parameter are:</p>
+<p><code class="docutils literal notranslate"><span class="pre">unsecure</span></code>: no TLS.</p>
+<p><code class="docutils literal notranslate"><span class="pre">open-ssl</span></code>: use OpenSSL for TLS.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">channel-timeout</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
+<td><p>A duration specified as described in <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which
+determines the length of time that RDFox will wait for I/O while communicating
+with the Solr server. This parameter can be set to <code class="docutils literal notranslate"><span class="pre">unlimited</span></code>, in which
+case, the HTTP client will wait forever for each I/O.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">credentials</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>Specifies the private key, client certificate and intermediate certificates
+used when connecting to a Solr server configured for mutual TLS. The content
+is provided as a verbatim string in PEM format. See the example in the
+documentation of the endpoint parameter of the same name (see
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">credentials-file</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>Specifies the name of the file whose content contains the credentials.
+The file content must have the same format as the <code class="docutils literal notranslate"><span class="pre">credentials</span></code> parameter.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">credentials-name</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>Specifies the comma-separated list of names of items in the system’s keystore.
+The first name must identify a certificate and a private key, which are used
+as a main identity of the client. The remaining names identify intermediate
+certificates. This option is available only on macOS, where the keystore is
+the system’s keychain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">credentials-passphrase</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>Provides the passphrase that can be used to unlock the credentials in
+case they are encrypted. This parameter is optional.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">min-secure-protocol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tls12</span></code></p></td>
+<td><p>Determines the minimum protocol version that RDFox should use when
+communicating with the  Solr server via HTTPS. The allowed values are <code class="docutils literal notranslate"><span class="pre">ssl2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ssl3</span></code>, <code class="docutils literal notranslate"><span class="pre">tls1</span></code>, <code class="docutils literal notranslate"><span class="pre">tls11</span></code>, <code class="docutils literal notranslate"><span class="pre">tls12</span></code>, and <code class="docutils literal notranslate"><span class="pre">tls13</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
+<td><p>A duration specified as described in <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which
+determines how long HTTP connections are kept alive in the connection pool for
+the Solr instance. Value <code class="docutils literal notranslate"><span class="pre">0</span></code> disables the caching of HTTP connections.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">host</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">localhost</span></code></p></td>
+<td><p>The name or IP address of the host
+running the Solr instance.</p>
+<p>This parameter must be specified.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">indexes</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>A comma-separated list of index names
+in the Solr instance that will be
+accessible from the defined data
+source.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">port</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">8983</span></code></p></td>
+<td><p>Port number on <code class="docutils literal notranslate"><span class="pre">host</span></code> to connect to
+the Solr instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">protocol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IPv4</span></code></p></td>
+<td><p>Specifies the network layer protocol to be used for connecting to the Solr
+instance.</p>
+<p>Valid values for this parameter are:</p>
+<p><code class="docutils literal notranslate"><span class="pre">IPv4</span></code>: use IP version 4</p>
+<p><code class="docutils literal notranslate"><span class="pre">IPv6</span></code>: use IP version 6</p>
+<p><code class="docutils literal notranslate"><span class="pre">IPv6-v4</span></code>: try to use IP version 6 falling back to IP version 4 if
+unsuccessful.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verify-server-certificates</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p>Controls whether the server’s TLS certificate should be verified.
+The setting will be ignored if <code class="docutils literal notranslate"><span class="pre">channel</span></code> is <code class="docutils literal notranslate"><span class="pre">unsecure</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="creating-data-source-tuple-tables">
+<span id="id6"></span><h2><span class="section-number">7.2. </span>Creating Data Source Tuple Tables<a class="headerlink" href="#creating-data-source-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<p>Creating a data source tuple table requires a table name and a set of
+parameters specifying how to construct the table’s values from one of the data
+store’s registered data sources.</p>
+<p>The parameters specifying a data source tuple table can be broken into two
+groups. The first group determines the exact <em>source table</em> the tuple table
+will be bound to. The source table could be one of the data source’s tables or,
+depending on the type of data source, the result of a query against the data
+source as a whole. With the exception of <code class="docutils literal notranslate"><span class="pre">data-source-name</span></code>, parameters in
+this group are specific to each type of data source. The second group of
+parameters determines how the columns of the tuple table are formed from the
+columns of the source table. These parameters are the same for all data source
+types. The following diagram illustrates the relationships between data source
+tables, data source tuple tables, queries and source tables.</p>
+<div class="figure align-center">
+<img alt="SourceTable" src="_images/SourceTable.svg" /></div>
+<p>This section will first document the tuple table creation parameters common to
+all types of data source, and proceed to documenting the specifics of creating
+tuple tables for each of the supported data source types.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In this section, angle brackets are used to denote a variable portion of a
+parameter or placeholder name. Furthermore, <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code> is used to denote a
+1-based column index into the source table, <code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code> is used to denote the
+total number of columns the source table and <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> is used to denote a
+1-based column index into the data source tuple table to be created.</p>
+</div>
+<div class="section" id="general-data-source-tuple-table-creation-parameters">
+<h3><span class="section-number">7.2.1. </span>General Data Source Tuple Table Creation Parameters<a class="headerlink" href="#general-data-source-tuple-table-creation-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Creating a data source tuple table for any type of data source requires a
+description of how to map the columns of the source table (specified by the
+parameter <code class="docutils literal notranslate"><span class="pre">data-source-name</span></code> in combination with other type-specific
+parameters) to the columns of the tuple table to be created. The parameters for
+specifying this mapping, which are common to all types of data source, are as
+follows.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 13%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code></p></td>
+<td><p>The number of columns the data source tuple table
+will have.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The name of the data source.</p>
+<p>This parameter must be specified.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
+&lt;= <code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{&lt;k&gt;}</span></code></p></td>
+<td><p>Template for the lexical form of values in the
+<code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. See below for details.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;n&gt;.datatype</span></code> if <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> is
+<code class="docutils literal notranslate"><span class="pre">{&lt;n&gt;}</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p></td>
+<td><p>The datatype of values in the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. The
+valid values for this parameter are those listed
+in <a class="reference internal" href="data-stores.html#literal-data-types"><span class="std std-numref">Section 5.3</span></a> plus <code class="docutils literal notranslate"><span class="pre">bnode</span></code> for
+blank nodes <code class="docutils literal notranslate"><span class="pre">iri</span></code> for IRIs.
+Type names may be abbreviated using the standard
+standard prefixes <code class="docutils literal notranslate"><span class="pre">xsd:</span></code>, <code class="docutils literal notranslate"><span class="pre">rdf:</span></code> and <code class="docutils literal notranslate"><span class="pre">rdfs:</span></code>.
+Moreover, <code class="docutils literal notranslate"><span class="pre">xsd:string</span></code>, <code class="docutils literal notranslate"><span class="pre">xsd:integer</span></code> and
+<code class="docutils literal notranslate"><span class="pre">xsd:double</span></code> may be further abbreviated to
+<code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code> and <code class="docutils literal notranslate"><span class="pre">integer</span></code> respectively.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.default</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code> specifies
+a numeric type, otherwise the
+empty string</p></td>
+<td><p>The default value for the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column of the
+data source tuple table. See also <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.if-empty</span></code>.</p>
+<p>Note that the default value for this parameter is
+not guaranteed to be valid for the associated
+datatype. For example the empty string is not a
+valid <code class="docutils literal notranslate"><span class="pre">xsd:dateTime</span></code>. In such cases, a value must
+be specified if the corresponding <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.if-empty</span></code>
+policy is <code class="docutils literal notranslate"><span class="pre">default</span></code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.if-empty</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">default</span></code></p></td>
+<td><p>Specifies the policy for dealing with empty values
+in input columns. This policy is only consulted if
+<cite>all</cite> of the source table or query values
+referred to within the lexical form template <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
+are empty.</p>
+<p>Valid values for this parameter are:</p>
+<p><code class="docutils literal notranslate"><span class="pre">absent</span></code>: treat the field as absent. This will
+result in a hole appearing in the corresponding row
+in the data source tuple table.</p>
+<p><code class="docutils literal notranslate"><span class="pre">leave</span></code>: leave as is. This will result in the
+empty string being substituted for each placeholder
+in the lexical form template. For example, if
+<code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;{1}</span> <span class="pre">abc</span> <span class="pre">{2}&quot;</span></code>, the resulting value
+will be <code class="docutils literal notranslate"><span class="pre">&quot;</span> <span class="pre">abc</span> <span class="pre">&quot;</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">default</span></code>: use <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.default</span></code> as the value. This
+is the default value.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.invalid-literal-policy</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">error</span></code></p></td>
+<td><p>Specifies the action to take when the lexical form
+of a value calculated for the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column is
+not a valid literal of the type specified by
+<code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code>.</p>
+<p>Valid values for this parameter are:</p>
+<p><code class="docutils literal notranslate"><span class="pre">error</span></code>: treat such cases as errors, causing the
+current operation to fail.</p>
+<p><code class="docutils literal notranslate"><span class="pre">as-string-silent</span></code>: silently convert offending
+values to strings, allowing the current operation
+to proceed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>To determine the lexical form of each value of the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column of a data
+source tuple table, RDFox applies basic string interpolation to the lexical
+form template specified via parameter <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>. The following table lists the
+available placeholder names which RDFox will replace with the appropriate value
+for each row. Placeholder names should be be enclosed in braces <code class="docutils literal notranslate"><span class="pre">{}</span></code> within
+the lexical form template.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Placeholder</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>
+&lt;= <code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p>The lexical form of the value in the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th
+column <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code> of the source table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></p></td>
+<td><p>The lexical form of the value in the column with
+name <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> of the source table. This
+placeholder cannot be used with delimited file
+data sources that do not have a header.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">row#</span></code></p></td>
+<td><p>The index of the current row (<code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code>
+and <code class="docutils literal notranslate"><span class="pre">solr</span></code> data sources only).</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case of IRIs, no validation is performed on strings created from the
+lexical form template and there is no resolution against a base
+IRI. It is the user’s responsibility to ensure that the resulting values are
+valid IRIs, if that is required.</p>
+</div>
+</div>
+<div class="section" id="creating-delimited-file-data-source-tuple-tables">
+<h3><span class="section-number">7.2.2. </span>Creating Delimited File Data Source Tuple Tables<a class="headerlink" href="#creating-delimited-file-data-source-tuple-tables" title="Permalink to this headline">¶</a></h3>
+<p>Since data sources of type <code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code> only have one possible source
+table and do not support queries, creating associated tuple tables does not
+require any special parameters.</p>
+<div class="example docutils container">
+<p><strong>Example: Creating a CSV Data Source Tuple Table using the Shell</strong></p>
+<p>Continuing from the example in
+<a class="reference internal" href="#registering-delimited-file-data-sources"><span class="std std-numref">Section 7.1.1</span></a>, a data source tuple table
+with name <code class="docutils literal notranslate"><span class="pre">people</span></code>, can be created as follows.</p>
+<div class="highlight-none notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span>   tupletable create people               \
+      data-source-name &quot;peopleDS&quot;         \
+      &quot;columns&quot; 5                         \
+      &quot;1&quot; &quot;http://fg.com/{1}_{2}_{row#}&quot;  \
+      &quot;1.datatype&quot; &quot;iri&quot;                  \
+      &quot;2&quot; &quot;{First Name}&quot;                  \
+      &quot;2.datatype&quot; &quot;string&quot;               \
+      &quot;3&quot; &quot;{Last Name}&quot;                   \
+      &quot;3.datatype&quot; &quot;string&quot;               \
+      &quot;4&quot; &quot;{Sex}&quot;                         \
+      &quot;4.datatype&quot; &quot;string&quot;               \
+      &quot;4.if-empty&quot; &quot;default&quot;              \
+      &quot;4.default&quot; &quot;F&quot;                     \
+      &quot;5&quot; &quot;{ 4 }&quot;                         \
+      &quot;5.datatype&quot; &quot;integer&quot;              \
+      &quot;5.if-empty&quot; &quot;absent&quot;
+</pre></div></td></tr></table></div>
+</div>
+<p>Although the source table contains only four columns, the tuple table
+created by the above command will have five. The extra column will be in
+position <code class="docutils literal notranslate"><span class="pre">1</span></code> and will contain a unique ID for each row of the CSV file.
+These IDs (IRIs) are constructed from the person’s first and last names as
+well as the row number within the file. Including the row number avoids
+using the same IRI for two people that have the same first and last names
+(such as the two “Abigail Edwards” entries in the file).</p>
+<p>Note that the lexical form templates in the example use a mixture of
+position- and name-based placeholders to refer to source columns:
+position-based for column <code class="docutils literal notranslate"><span class="pre">1</span></code> (line 4) and name-based for columns <code class="docutils literal notranslate"><span class="pre">2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">3</span></code> and <code class="docutils literal notranslate"><span class="pre">4</span></code> (lines 6, 8 and 10 respectively). Also, note that column
+<code class="docutils literal notranslate"><span class="pre">4</span></code> has default <code class="docutils literal notranslate"><span class="pre">F</span></code> (i.e., if no sex is specified, then <code class="docutils literal notranslate"><span class="pre">F</span></code> is used as
+a default), and that column <code class="docutils literal notranslate"><span class="pre">5</span></code> is treated as absent if the corresponding
+input field is empty.</p>
+<p>Querying this tuple table returns the following tuples.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;http://fg.com/Beverly_Strickland_1&gt; &quot;Beverly&quot; &quot;Strickland&quot; &quot;F&quot; 33 .
+&lt;http://fg.com/Thomas_Peterson_2&gt; &quot;Thomas&quot; &quot;Peterson&quot; &quot;M&quot; UNDEF .
+&lt;http://fg.com/Urs_Andresson_3&gt; &quot;Urs&quot; &quot;Andresson&quot; &quot;M&quot; 63 .
+&lt;http://fg.com/Abigail_Edwards_4&gt; &quot;Abigail&quot; &quot;Edwards&quot; &quot;F&quot; 52 .
+&lt;http://fg.com/Abigail_Edwards_5&gt; &quot;Abigail&quot; &quot;Edwards&quot; &quot;F&quot; 36 .
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="creating-postgresql-data-source-tuple-tables">
+<h3><span class="section-number">7.2.3. </span>Creating PostgreSQL Data Source Tuple Tables<a class="headerlink" href="#creating-postgresql-data-source-tuple-tables" title="Permalink to this headline">¶</a></h3>
+<p>The parameters for creating a data source tuple table for a data source of type
+<code class="docutils literal notranslate"><span class="pre">PostgreSQL</span></code> are as follows.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 14%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The name of a data source table to
+use as the source table for the tuple
+table being created.</p>
+<p>Either this <cite>or</cite> <code class="docutils literal notranslate"><span class="pre">query</span></code> must be
+specified.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
+<td><p>Value reported by the
+PostgreSQL instance.</p></td>
+<td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
+of the table identified by <code class="docutils literal notranslate"><span class="pre">table.name</span></code>
+and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code> should be treated
+as nullable or not.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">public</span></code></p></td>
+<td><p>Specifies the schema to which
+<code class="docutils literal notranslate"><span class="pre">table.name</span></code> belongs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>An SQL query used to generated the source
+table for the tuple table being created.</p>
+<p>Either this <cite>or</cite> <code class="docutils literal notranslate"><span class="pre">table.name</span></code> must be
+specified.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
+<td><p>Value reported by the
+PostgreSQL instance.</p></td>
+<td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
+of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code> should
+be treated as nullable or not.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="creating-odbc-data-source-tuple-tables">
+<h3><span class="section-number">7.2.4. </span>Creating ODBC Data Source Tuple Tables<a class="headerlink" href="#creating-odbc-data-source-tuple-tables" title="Permalink to this headline">¶</a></h3>
+<p>The parameters for creating a data source tuple table for a data source of type
+<code class="docutils literal notranslate"><span class="pre">ODBC</span></code> are as follows.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 14%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The name of a data source table to
+use as the source table for the tuple
+table being created.</p>
+<p>Either this <cite>or</cite> <code class="docutils literal notranslate"><span class="pre">query</span></code> must be
+specified.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
+<td><p>Value reported by the
+ODBC instance.</p></td>
+<td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
+of the table identified by <code class="docutils literal notranslate"><span class="pre">table.name</span></code>
+and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code> should be treated
+as nullable or not.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.time-zone</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The time zone RDFox should apply to
+values that include times in the
+<code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of the table identified
+by <code class="docutils literal notranslate"><span class="pre">table.name</span></code> and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>Specifies the schema to which
+<code class="docutils literal notranslate"><span class="pre">table.name</span></code> belongs.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>An SQL query used to generated the source
+table for the tuple table being created.</p>
+<p>Either this <cite>or</cite> <code class="docutils literal notranslate"><span class="pre">table.name</span></code> must be
+specified.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.buffer-length</span></code></p></td>
+<td><p>Column width reported by
+the ODBC instance plus one,
+all multiplied by the
+width of the instance’s
+character type in bytes.</p></td>
+<td><p>The size in bytes of the buffer reserved
+for string values in the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th
+column of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
+<td><p>Value reported by the
+ODBC instance.</p></td>
+<td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
+of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code> should
+be treated as nullable or not.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.time-zone</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The time zone RDFox should apply to
+values that include times in the
+<code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of an answer to query
+<code class="docutils literal notranslate"><span class="pre">query</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="creating-solr-data-source-tuple-tables">
+<h3><span class="section-number">7.2.5. </span>Creating Solr Data Source Tuple Tables<a class="headerlink" href="#creating-solr-data-source-tuple-tables" title="Permalink to this headline">¶</a></h3>
+<p>The parameters for creating a data source tuple table for a data source of type
+<code class="docutils literal notranslate"><span class="pre">solr</span></code> are as follows.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 19%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
+<td><p>(none)</p></td>
+<td><p>The name of the Solr index to query.</p>
+<p>This parameter must be specified.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">variable</span></code></p></td>
+<td><p>Specifies the type of the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column.</p>
+<p>Valid values for this parameter are:</p>
+<p><code class="docutils literal notranslate"><span class="pre">variable</span></code>: the column can accept both variables and values when the table is accessed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">parameter</span></code>: the column can accept only values when the table is accessed.</p>
+<p>See the following discussion of the significance of this parameter.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">solr.&lt;param&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">&lt;param&gt;</span></code>
+is one of the query parameters
+supported by Solr other than <code class="docutils literal notranslate"><span class="pre">wt</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fl</span></code> or <code class="docutils literal notranslate"><span class="pre">omitHeader</span></code> which are
+reserved by RDFox.</p></td>
+<td><p>(none)</p></td>
+<td><p>This parameter template provides a mechanism for specifying Solr query options which will be
+passed through directly with the noted exceptions. See
+<a class="reference external" href="https://lucene.apache.org/solr/guide/8_6/common-query-parameters.html">Solr parameters</a>.</p>
+<p>All Solr paramters are optional but failing to specify <code class="docutils literal notranslate"><span class="pre">q</span></code> will result in an empty result
+set. See the following discussion for details of how to determine the value of this parameter.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The Solr data source introduces the notion of <em>parameter</em> columns, which can be
+used in the definition of Solr query parameters. A column with index <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
+may be specified as a parameter column by setting the value of <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code> to
+<code class="docutils literal notranslate"><span class="pre">parameter</span></code>. The values of parameter columns are determined dynamically
+during the evaluation of queries or rules. Once determined, RDFox will
+interpolate the values of the parameter columns into the Solr query parameters
+so that it can make the appropriate Solr request. Parameterized Solr tuple
+tables can only be used in queries and rules in which the values of parameter
+columns are determined either directly, using an RDF resource, or indirectly,
+using a variable whose value can be bound by the rest of the query or rule.</p>
+<p>Note that use of parameter columns is not mandatory - users may specify a
+static value for the <code class="docutils literal notranslate"><span class="pre">solr.q</span></code> parameter in which case all columns may be of
+type variable.</p>
+<div class="example docutils container">
+<p><strong>Example: Creating a Solr Data Source Tuple Table With a Dynamic Query using the Shell</strong></p>
+<p>Consider the following command, which assumes the prior registration of a
+Solr data source named <code class="docutils literal notranslate"><span class="pre">companiesDS</span></code> and creates a tuple table
+<code class="docutils literal notranslate"><span class="pre">companyNameByAddress</span></code>, with two columns.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tupletable create companyNameByAddress    \
+   data-source-name &quot;companiesDS&quot;         \
+   &quot;index&quot; &quot;companies&quot;                    \
+   &quot;solr.q&quot; &quot;address:\&quot;*{2}*\&quot;&quot;           \
+   &quot;solr.rows&quot; 1000                       \
+   &quot;columns&quot; 2                            \
+   &quot;1&quot; &quot;{company_name}&quot;                   \
+   &quot;2.type&quot; &quot;parameter&quot;
+</pre></div>
+</div>
+<p>At the beginning of each iteration of this table, RDFox will substitute the
+value from parameter column in position <code class="docutils literal notranslate"><span class="pre">2</span></code> into the template
+<code class="docutils literal notranslate"><span class="pre">&quot;address:\&quot;*{2}*\&quot;&quot;</span></code> to form the query to send to the Solr instance
+registered as <code class="docutils literal notranslate"><span class="pre">companiesDS</span></code>.</p>
+<p>The following SPARQL query, which references the tuple table, will return
+the names of the first 1000 companies whose addresses contain either “CA” or
+“NY”.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?name WHERE {
+   VALUES ?address { &quot;CA&quot; &quot;NY&quot;}
+   TT companyNameByAddress{ ?name ?address }
+   }
+</pre></div>
+</div>
+<p>Note that the values passed to parameter columns need not be constants in
+the query, but can also be dynamically bound from the data, as shown in the
+following query.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?name WHERE {
+   ?address a fg:addressPattern .
+   TT companyNameByAddress{ ?name ?address }
+   }
+</pre></div>
+</div>
+</div>
+<p>By default, RDFox escapes <a class="reference external" href="https://lucene.apache.org/solr/guide/8_6/the-standard-query-parser.html#escaping-special-characters">Solr special characters</a>
+in lexical forms during parameter expansion. In some cases, however, the
+escaping of Solr special characters may not be the desired behavior, like, for
+example, when the entire Solr query is parameterized. To indicate that a
+reference to a parameter column with index <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> should not be escaped during
+expansion, one needs to prefix it using the <code class="docutils literal notranslate"><span class="pre">+</span></code> sign, as shown in the
+following example.</p>
+<div class="example docutils container">
+<p><strong>Example: Creating a Solr Data Source Tuple Table With Unescaped Queries using the Shell</strong></p>
+<p>The following command demonstrates the syntax for suppressing escaping
+during parameter expansion.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>tupletable create companyNameGeneralQuery \
+   data-source-name &quot;companiesDS          \
+   &quot;index&quot; &quot;companies&quot;                    \
+   &quot;solr.q&quot; &quot;{+2}&quot;                        \
+   &quot;solr.rows&quot; 1000                       \
+   &quot;columns&quot; 2                            \
+   &quot;1&quot; &quot;{company_name}&quot;                   \
+   &quot;2.type&quot; &quot;parameter&quot;
+</pre></div>
+</div>
+<p>We can now ask for all companies that have “CA” in their addresses as
+follows.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?name WHERE {
+   VALUES ?solrQuery { &quot;address:*CA*&quot; }
+   TT companyNameGeneralQuery{ ?name ?solrQuery }
+   }
+</pre></div>
+</div>
+<p>Note that, if we instead use the reference <code class="docutils literal notranslate"><span class="pre">{2}</span></code>, the query would fail,
+because RDFox will escape the special characters <code class="docutils literal notranslate"><span class="pre">:</span></code> and <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
+</div>
+<p>A number of restrictions apply to the use of parameter columns, which we
+outline next.</p>
+<ul class="simple">
+<li><p>A tuple table can have any number of parameter columns.</p></li>
+<li><p>Parameter columns can be used in any Solr parameter (e.g. <code class="docutils literal notranslate"><span class="pre">rows</span></code>, <code class="docutils literal notranslate"><span class="pre">sort</span></code>,
+etc.).</p></li>
+<li><p>Parameter columns can be referenced in multiple fields and multiple times.</p></li>
+<li><p>All parameter columns have to be specified/bound when accessing the tuple
+table. For example, the following query would be invalid, since <code class="docutils literal notranslate"><span class="pre">?address</span></code>
+cannot be bound.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT * WHERE { TT companyNameByAddress{ ?name ?address } }
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Solr parameters can only refer to parameter columns (the use of
+<code class="docutils literal notranslate"><span class="pre">&quot;solr.q&quot;</span> <span class="pre">&quot;address:*{2}*&quot;</span></code> in the above examples will result in an error).</p></li>
+<li><p>Properties of parameter columns are ignored.</p></li>
+<li><p>Note that different values of the parameter columns of a Solr tuple table
+will typically result in a different ordered set of records. The virtual
+column <code class="docutils literal notranslate"><span class="pre">row#</span></code> added to each of the result sets will contain the index of
+each record in the given result set. So, for example, a California-based
+company may be assigned a different <code class="docutils literal notranslate"><span class="pre">row#</span></code> depending on whether we query
+for “address:<em>CA</em>” or “address:<em>US</em>”. The <code class="docutils literal notranslate"><span class="pre">row#</span></code> placeholder should
+therefore be used with caution when the source table contains parameter
+columns.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="data-sources-and-incremental-reasoning">
+<h2><span class="section-number">7.3. </span>Data Sources and Incremental Reasoning<a class="headerlink" href="#data-sources-and-incremental-reasoning" title="Permalink to this headline">¶</a></h2>
+<p>RDFox never caches data retrieved from a data source: facts are fetched on
+demand in order to answer queries or evaluate rules. Due to RDFox’s
+materialized reasoning, however, facts derived on the basis of data source
+facts are added to the <code class="docutils literal notranslate"><span class="pre">all</span></code> domain and form part of the data set for
+subsequent query or rule evaluations without further retrievals from the data
+source. Owing to RDFox’s incremental approach to reasoning, such facts will
+remain present in the data store until the next full materialization. A full
+materialization can be triggered in the following ways:</p>
+<ul class="simple">
+<li><p>using the <code class="docutils literal notranslate"><span class="pre">remat</span></code> command in the shell (see <a class="reference internal" href="rdfox-shell.html#remat-command"><span class="std std-numref">Section 15.2.37</span></a>)</p></li>
+<li><p>by making a <code class="docutils literal notranslate"><span class="pre">PATCH</span></code> request to the RDFox endpoint with the right path for
+the data store (e.g. <code class="docutils literal notranslate"><span class="pre">/datastores/my-datastore</span></code>) and including the
+parameter <code class="docutils literal notranslate"><span class="pre">operation=recompute-materialization</span></code> (see
+<a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.9</span></a>)</p></li>
+<li><p>by calling the
+<code class="docutils literal notranslate"><span class="pre">tech.oxfordsemantic.jrdfox.client.DataStoreConnection.recomputeMaterialization()</span></code>
+method in Java</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tuple-tables.html" class="btn btn-neutral float-left" title="6. Tuple Tables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="import-and-export.html" class="btn btn-neutral float-right" title="8. Import and Export" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

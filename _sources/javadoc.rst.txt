@@ -1,0 +1,10 @@
+.. _javadoc:
+
+Javadoc
+=======
+
+Full Javadoc documentation for the JRDFox API can be found `here
+<./_javadoc/index.html>`_.
+
+For additional information and examples on how RDFox®'s Java API 
+can be used in different circumstances you can see :numref:`apis`.

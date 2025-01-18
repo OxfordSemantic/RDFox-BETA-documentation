@@ -1,0 +1,729 @@
+.. _transactions:
+
+Transactions
+============
+
+All operations that read or change the state of an RDFox® server are grouped
+into *transactions* --- units of work that must be executed atomically and in
+apparent isolation from other transactions. Each transaction in RDFox operates
+on a single data store --- that is, transactions cannot span several data
+stores within a single server or data stores in different servers. A
+transaction can be rolled back (i.e., aborted without changing the data store)
+or committed. Transactions in RDFox satisfy the well-known *ACID* properties:
+
+Atomicity
+   If an operation inside a transaction starts changing the store but then
+   fails in the middle, the transaction will be rolled back and hence an
+   operation in a transaction cannot be partially executed.
+
+Consistency
+   A transaction can only bring the store from a consistent state to another
+   consistent state. In RDFox, consistency means that 1) every implicit fact
+   that logically follows from the given rules and explicit facts has been
+   materialized and 2) each constraint defined on the data store content is
+   satisfied (see :numref:`constraining-data-store-content`).
+
+Isolation
+   Transactions appear to be executed as if no other transaction was being
+   executing at the same time.
+
+Durability
+   The effect of a committed transaction is never lost; in particular, once a
+   transaction has been committed RDFox ensures that the state of the relevant
+   data store will be persisted on disk. Durability is configurable in RDFox:
+   see :numref:`persistence` for details.
+
+Types of Transactions
+---------------------
+
+Transactions in RDFox can be *read/write* or *read-only*. A data store can be
+updated only by a read/write transaction. Changes made by a read/write
+transaction are immediately visible to the transaction that made the change;
+this includes any new facts derived from reasoning.
+
+.. container:: example
+
+   **Example** *Read/write transaction*
+
+   Consider again the Family Guy example. We first initialize a store in the
+   shell and load the data as we did in the :ref:`Getting Started
+   <getting-started>` guide:
+
+   ::
+
+      dstore create family
+      active family
+      import data.ttl
+      set output out
+
+   We can group in a read/write transaction a write operation that imports
+   rules and a read operation that performs a query as follows:
+
+   ::
+
+      begin
+      import ! [?p, :hasChild, ?c] :- [?c, :hasParent, ?p] .
+      select ?p ?c where { ?p :hasChild ?c }
+      commit
+
+   Consequences derived by the imported rule will be derived automatically
+   before the query is evaluated. Hence, this sequence of commands produces the
+   following query results.
+
+   ::
+
+      :lois :meg .
+      :peter :meg .
+      :peter :chris .
+      :lois :stewie .
+
+   If an operation of a transaction fails after it has already changed parts of
+   the data store, the transaction will be rolled back. For example, assume
+   that reasoning in our running example derives several facts and then fails
+   (e.g., because of memory exhaustion). In order to not leave the data store
+   in an inconsistent state (i.e., containing just some of the required
+   consequences), the transaction is rolled back --- that is, the imported rule
+   and all all facts derived thus far are removed.
+
+   In contrast, if an error is encountered at the point when the data store has
+   not been updated yet, then the transaction can in most cases continue. This
+   is illustrated by the following sequence of commands.
+
+   ::
+
+      begin
+      import ! [?p, :hasDescendant, ?c] :- [?c, :hasParent, ?p] .
+      import ! [?x, :marriedTo ?y] - [?y, :marriedTo, ?x] .
+      commit
+
+   In this transaction, the first rule is syntactically correct and is imported
+   without any problems. In other words, the first operation is completed fully
+   and without any errors. In contrast, RDFox reports an error when evaluating
+   the second import operation since the rule is syntactically invalid. Now
+   this error is detected before any changes to the state of the data store are
+   made, and so the second import operation fails as a unit without leaving the
+   data store in an inconsistent state. Consequently, the ``commit`` command
+   will succeed, and the transaction will result in adding the first rule to
+   the data store. At this point, query
+
+   .. code:: sparql
+
+      select ?x ?y where {?x :hasDescendant ?y}
+
+   returns four answers, showing that the first rule has taken effect.
+
+Read-only transactions are only allowed to query a data store and cannot update
+its contents in any way. Their use is demonstrated in the following example.
+
+.. container:: example
+
+   **Example** *Read-only transactions*
+
+   Building on the previous example, the following shell commands produce a
+   read-only transaction consisting of two queries.
+
+   ::
+
+      begin read
+      select ?p ?n where { ?p rdf:type :Person . ?p :forename ?n }
+      select ?x ?y where { ?x :marriedTo ?y }
+      commit
+
+   The motivation for doing so is to ensure that both queries operate on the
+   same data. That is, a read-only transaction isolates the operations in the
+   transaction from any updates being performed on the same data store: both
+   queries are evaluated with respect to the information present at the moment
+   in time when the transaction was started.
+
+   Attempting to update (as shown below) the data store in a read-only
+   transaction leads to an error indicating that read-only transactions do not
+   support updates.
+
+   ::
+
+      begin read
+      import ! [?p, :hasChild, ?c] :- [?p, :hasDescendant, ?c] .
+      commit
+
+.. _concurrent-execution-of-transactions:
+
+Concurrent Execution of Transactions
+------------------------------------
+
+At any point in time, an arbitrary number of read-only transactions and at most
+one read/write transaction can be active on any data store. In addition, some
+operations (e.g., creation of tuple tables or replaying snapshots in an HA
+cluster) might require exclusive access to a data store.
+
+Each read-only transaction sees the snapshot of the data store at the point
+when the transaction was started; thus, all read/only transactions read only
+committed data and all reads are repeatable. Combined with the fact that only
+one writer is allowed to update the data store at any point in time, RDFox
+achieves the serializability isolation level between transactions --- that is,
+each set of concurrently running transactions has the same effect on a data
+store as some serial execution of the same transactions.
+
+.. _explicit-and-implicit-transactions:
+
+Explicit and Implicit Transactions
+----------------------------------
+
+Each data store operation takes place in a transaction. In the examples above,
+transactions are explicitly started using the ``begin`` shell command and
+finished using the ``commit`` shell command. If an operation is started when no
+transaction is active the active :ref:`connection <connections>`, RDFox will
+execute the operation in the context of an implicit transaction. If the
+operation in question only needs to read data, the implicit transaction will be
+a read-only transaction, and otherwise it will be a read/write transaction.
+Once the operation has completed, the implicit transaction is rolled back if
+the operation is unsuccessful, and it is committed if no errors were
+encountered.
+
+.. _recoverable-and-non-recoverable-errors:
+
+Recoverable and Non-recoverable Errors Within Read/Write Transactions
+---------------------------------------------------------------------
+
+Errors occurring within a read/write transaction are classified as either
+*recoverable* or *unrecoverable*. As the name suggests, unrecoverable errors
+put the transaction into an error state which mean that it cannot be committed
+and must instead be rolled back.
+
+.. _constraining-data-store-content:
+
+Constraining Data Store Content
+-------------------------------
+
+Transactions in which the default RDF graph contains at least one instance of
+the class ``<https://rdfox.com/vocabulary#ConstraintViolation>`` cannot be
+committed. Since RDFox runs incremental materialization prior to committing
+each *Read/Write* transaction, rules which derive an instance of the above
+class act as constraints on a data store's content.
+
+When an attempt to commit a transaction fails due to constraint violations, the
+resulting error message will include up to ten properties of up to ten of the
+violations to aid diagnosis of the problem.
+
+The following examples use the prefix ``rdfox:`` to represent
+``<https://rdfox.com/vocabulary#>`` and ``:`` to represent
+``<http://example.com/>``.
+
+.. container :: example
+
+   **Example** *Mandatory property constraint*
+
+   The following rule prevents instances of class ``foaf:Person`` from being
+   added to the default graph unless they have at least one ``foaf:mbox``
+   property.
+
+   ::
+
+      [?person, a, rdfox:ConstraintViolation] :-
+          [?person, a, foaf:Person],
+          NOT EXIST ?mbox IN [?person, foaf:mbox, ?mbox] .
+
+   With this rule loaded, attempting to import the following triples will fail
+   with the message shown underneath.
+
+   .. code:: turtle
+
+      :alice a foaf:Person; foaf:name "Alice" .
+
+   ::
+
+      The transaction could not be committed because it would have introduced
+      the following constraint violation:
+
+      <http://example.com/alice> <http://xmlns.com/foaf/0.1/name> "Alice";
+          rdf:type <http://xmlns.com/foaf/0.1/Person> .
+
+
+Although it is possible to make existing resources members of the constraint
+violation class, as in the example above, more informative failure messages can
+be obtained by ensuring that each separate violation has a unique resource to
+represent it. The built-in tuple-table ``SKOLEM`` can be used to generate blank
+nodes for this purpose.
+
+Once each violation has its own resource, it is safe to add further atoms to
+the rule head to associate with the violation any additional information that
+will help the reader of the error message understand what is wrong.
+
+.. container :: example
+
+   **Example** *Improved mandatory property constraint*
+
+   As in the previous example, the following rule prevents insertion of
+   ``foaf:Person`` instances with no ``foaf:mbox`` property but this time using
+   ``SKOLEM``.
+
+   ::
+
+      PREFIX rdfox: <https://rdfox.com/vocabulary#>
+      [?v, a, rdfox:ConstraintViolation],
+      [?v, :mboxMissingFrom, ?person],
+      [?v, :constraintDescription, "Every foaf:Person must have at least one foaf:mbox property."] :-
+          [?person, a, foaf:Person],
+          NOT EXIST ?mbox IN [?person, foaf:mbox, ?mbox],
+          SKOLEM("MissingMbox", ?person, ?v) .
+
+   The rule head classifies the blank node bound to ``?v`` via the ``SKOLEM``
+   tuple table as a constraint violation and gives it additional properties
+   identifying the deficient ``foaf:Person`` node and describing the constraint
+   it violates in natural language. With this rule loaded, the failure message
+   for importing the same data as in the previous example is:
+
+   ::
+
+      The transaction could not be committed because it would have introduced
+      the following constraint violation:
+
+      _:__05TWlzc2luZ01ib3gA_02aHR0cDovL2V4YW1wbGUuY29tL2FsaWNlAA-- <http://example.com/constraintDescription> "Every foaf:Person must have at least one foaf:mbox property.";
+        <http://example.com/mboxMissingFrom> <http://example.com/alice> .
+
+The presence of constraint violations at the moment a transaction commit is
+attempted results in a _recoverable_ error. That is, if the transaction has
+been explicitly opened, it is possible to attempt to fix the data so that it no
+longer violates the constraint, and to then retry the commit.
+
+.. _commit-procedure:
+
+Commit Procedure (EXPERIMENTAL)
+-------------------------------
+
+It is often useful for the data added explicitly to a data store to be
+automatically expanded in some way. In the vast majority of cases, the best way
+to achieve this in RDFox is through :ref:`reasoning <reasoning>`. There are,
+however, a few situations where reasoning is not suitable and, for these
+cases, RDFox provides a second mechanism for automatically deriving additional
+information from each transaction's data: the `commit procedure`.
+
+A commit procedure is a user-specified sequence of zero or more SPARQL
+``DELETE-INSERT`` statements that are evaluated as part of committing each and
+every read/write transaction on a data store. As with rules, a commit procedure
+can match data in the store and introduce additional facts derived from the
+matched data. Unlike rules, facts added by a commit procedure are added to the
+``explicit`` rather than the ``derived`` :ref:`fact domain <fact-domains>` and
+won't be retracted if the supporting facts are later deleted. This is useful in
+the audit logging example given below.
+
+Some other differences between rules and commit procedures are:
+
+- commit procedures may use built-in functions (such as ``NOW()``, ``ROLE()``
+  and ``RAND()``) and tuple tables (such as ``SHACL``) that are not supported
+  in Datalog rules,
+- commit procedures can delete as well as add facts facts whereas rules can
+  only add facts,
+- commit procedures are only evaluated at commit time whereas rules may be
+  evaluated during a read/write transaction if a query is received,
+- after the initial materialization, rules are evaluated using incremental
+  reasoning whereas commit procedures are always evaluated over the whole
+  stored data set.
+
+A commit procedure can be set on a data store using the ``commitproc`` shell
+command (see :numref:`commitproc-command`) or using an API call (see
+:numref:`APIs-data-store-commit-procedure`). Most API calls allow the commit
+procedure to be specified using a string consisting of zero or more
+``DELETE-INSERT`` statements separated by a semicolon.
+
+Outline of Transaction Commit Process
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For each read/write transaction that is committed, whether explicit or
+implicit, RDFox performs the following steps:
+
+1. For each step in the (possibly empty) commit procedure,
+
+   1. ensure materialization is up-to-date, and
+   2. evaluate the step, deleting and inserting facts as necessary.
+
+2. Ensure materialization is up to date.
+3. For each step in the commit procedure,
+
+   1. re-evaluate the step, counting how many fresh deletions or insertions take place, and
+   2. report an error if there were any fresh deletions or insertions,
+
+4. Query the default graph for triples matching ``?v a
+   rdfox:ConstraintViolation``, and raise an error if the query returns one or
+   more matches.
+
+5. Persist the transaction according to the persistence setting for the data store.
+
+Step 3 guards against instabilities that can arise from the combination of a
+set of Datalog rules and a commit procedure. In this context, instability
+refers to the possibility for reasoning to derive new facts that match the
+commit procedure's ``WHERE`` clause leading to insertion of additional new
+facts which create yet more rule applications and resulting facts, and so on.
+Without the convergence check implemented in step 3, this could lead to a
+situation where the evaluation of a commit procedure from one transaction would
+create latent materialization work for the next transaction. In that case,
+simply opening and immediately committing a transaction would lead to new facts
+appearing in the data store even though no new facts were added by the user.
+Note that the error thrown in this situation (step 3.1.1) is unrecoverable.
+
+.. warning::
+
+   RDFox's mechanism for detecting instability between rules and commit
+   procedures relies on the presence of data that triggers the divergent
+   behaviour. This means that is possible to add an intrinsically unstable
+   combination of rules and commit procedure while there is no data present.
+   The problem would then go undetected until such a time as the right data
+   pattern is inserted to trigger the convergence check. To avoid encountering
+   these problems in production settings, it is vital that the developers of
+   the rules and commit procedure carefully analyze them to ensure that they do
+   not interact in the way described above.
+
+Performance Considerations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As already mentioned, with the exception of the initial materialization step, a
+data store's rules are re-evaluated in each commit using RDFox's efficient
+incremental reasoning algorithms. This stops the cost of maintaining the
+correct set of derived facts from growing as the total number of rule body
+matches grows. Instead the cost remains proportional to the number of *new*
+matches due to the changes in the current transaction.
+
+By contrast, SPARQL updates and, by extension, data store commit procedures,
+are always evaluated over the entire data set. Used naively, a commit procedure
+could therefore take longer and longer to evaluate as the data set grows. This
+bad scaling behaviour can, however, be avoided by using Datalog rules to find
+the parts of the data where the commit procedure should apply. This is
+demonstrated in the following example.
+
+.. container:: example
+
+   **Example:** *Audit logging with commit procedures*.
+
+   In this example we will use a commit procedure to establish audit logging
+   for some class of entities within a data store. To begin with, we will use a
+   naive commit procedure and then adapt it to show how to avoid performance
+   problems.
+
+   We begin by defining a class, ``:Action``, on which we want to perform audit
+   logging --- that is to track who inserted each instance into the data store
+   and when. We assume that access control is configured such that the users we
+   are tracking have read and write access to the default graph in the data
+   store but no access to any named graphs or the data store's rules or commit
+   procedure. Given this we can achieve what we want by setting the following
+   SPARQL update as our commit procedure:
+
+   .. code::
+
+      INSERT {
+         GRAPH :actionLog {
+            ?action :actionTakenBy ?role ;
+               :actionTakenAt ?now .
+         }
+      }
+      WHERE {
+         ?action a :Action .
+         FILTER(NOT EXISTS {
+            GRAPH :actionLog {
+               ?action :actionTakenBy ?anyRole .
+            }
+         })
+         BIND(ROLE() AS ?role)
+         BIND(NOW() AS ?now)
+      }
+
+   This finds each instance of the ``:Action`` class that doesn't have an
+   ``:actionTakenBy`` property in the ``:actionLog`` graph, and inserts both
+   ``:actionTakenBy`` and ``:actionTakenAt`` properties using the values
+   returned by the ``ROLE()`` and ``NOW()`` built-in functions respectively.
+   Assuming that this is saved to file ``commit-procedure.rq``, we can set it
+   as the active data store's commit procedure with:
+
+   .. code::
+
+      commitproc set commit-procedure.rq
+
+   We can test that this has worked by inserting a triple matching ``?a a
+   :Action`` into the data store and then querying the ``:actionLog`` named
+   graph. This is demonstrated in the following excerpt from and RDFox shell
+   session:
+
+   .. code::
+
+      > import ! :anAction a :Action .
+      Adding data.
+      Import operation took 0.016 s.
+      Processed 1 fact, of which 1 was updated.
+      > set output out
+      output = "out"
+      > SELECT * WHERE { GRAPH :actionLog { ?S ?P ?O } }
+      @prefix : <http://rdfox.com/examples/commitprocedure#> .
+      @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+      :anAction :actionTakenAt "2023-06-05T17:58:27.991+01:00"^^xsd:dateTime .
+      :anAction :actionTakenBy "guest" .
+      Number of query answers:        2
+      Total number of query answers:  2
+      Total statement evaluation time: 0 s
+
+   This achieves our functional aims but we must also consider performance.
+   Evaluation of the ``WHERE`` clause of the commit procedure above will
+   iterate over every historical instance of the ``:Action`` class on each
+   commit, even if no new instances have been inserted. Initially, when there
+   are few instances, the cost of this will be negligible but over time this
+   may become problematic.
+
+   We can solve this scaling challenge using rules and incremental reasoning.
+   Instead of using ``FILTER(NOT EXISTS { ... })`` in SPARQL to find
+   newly-added actions, we install the following Datalog rule to add each of
+   them to the class, ``:NewAction``:
+
+   .. code::
+
+      [?a, a, :NewAction] :-
+         [?a, a, :Action],
+         NOT EXISTS ?anyRole IN (
+            [?a, :actionTakenBy, ?anyRole] :actionLog
+         ) .
+
+   Because rules are evaluated incrementally, the cost of identifying the new
+   actions in each transaction will now be proportional to the number of new
+   instances rather than the total number of instances in the data store. The
+   commit procedure can then be simplified to iterate over just the instances
+   of the incrementally evaluated ``:NewAction`` class:
+
+   .. code::
+
+      INSERT {
+         GRAPH :actionLog {
+            ?action :actionTakenBy ?role ;
+               :actionTakenAt ?now .
+         }
+      }
+      WHERE {
+         ?action a :NewAction .
+         BIND(ROLE() AS ?role)
+         BIND(NOW() AS ?now)
+      }
+
+   Note that this example is only for demonstration purposes and does not
+   constitute a production-ready audit logging feature. For advice on achieving
+   a more robust setup, please contact Oxford Semantic Technologies for
+   support.
+
+RDFox will try to detect read/write transactions that do not change the state
+of a data store (i.e., adding facts that are already contained in the data
+store) in order to avoid incrementing the data store version. However, in
+certain cases, even a vacuous (successful) transaction may increment the data
+store version.
+
+.. _delta-queries:
+
+Delta Queries
+-------------
+
+In complex data management scenarios, the efficient tracking of changes within
+a knowledge graph can be crucial for applications that depend on up-to-date and
+accurate information. This includes event-driven applications and applications
+that require efficient synchronization with relevant parts of the knowledge
+graph. Change identification is a complex task, particularly in the presence of
+reasoning. Delta queries is a feature in RDFox that allows tracking of changes
+to query answers over the user-provided data and the data derived through
+reasoning with rules and axioms. They enable developers to build robust
+applications that require real-time or historical insight into knowledge graph
+modifications.
+
+Overview
+~~~~~~~~
+
+A *delta query* in RDFox is a SPARQL query that is registered with the data
+store for continuous evaluation against incoming transactions. A data store can
+have any number of registered delta queries. Upon registration of a delta
+query, RDFox captures a full snapshot of the query answers at that point. As
+subsequent write transactions are committed to the data store, RDFox
+efficiently computes and records changes to the query answers as additions and
+deletions. These changes are computed incrementally, thus avoiding full query
+evaluation. The answer changes are stored alongside the original query answers.
+Users also have the option to trigger a full snapshot of the query answers at
+any time. All delta query answers (snapshots, additions, and deletions) are
+stored and retrievable until they are explicitly removed. This ensures
+historical tracking and traceability of changes over time.
+
+For each delta query, answers for a given transaction are computed at the end
+of commiting the transaction. In particular, the evaluation follows the update
+of the materialization (incremental reasoning), as well as the evaluation of
+the commit procedure. This ensures that the changes are computed with respect
+to the data store content that will be availbe after commit.
+
+The size of the produced snapshots, deletions and additions can be limited at
+delta query registration. Answers of a given type can also be completely
+disabled by providing a limit of 0 for that type. This is useful in cases where
+we are interested only in additions and/or deletions.
+
+Restrictions
+~~~~~~~~~~~~
+
+Delta queries only support a limitted fragment of SPARQL. In particular, delta
+queries can only use triple patterns, quad patterns, ``FILTER`` patterns, 
+``BIND`` patterns and ``VALUES`` patterns. As with rules, the use of 
+non-deterministic functions ``NOW``, ``RAND``, ``UUID`` and ``STRUUID`` and the 
+functions ``EXISTS`` and ``NOT EXISTS`` is not allowed. Finally, the use of tuple 
+tables is limitted to memory tuple tables and the built-in tuple table ``SKOLEM``.
+
+Usage
+~~~~~
+
+To enable the use of delta queries, one of the server parameters
+``delta-queries.answers-directory`` or ``server-directory`` has to point to a
+valid directory. The management of delta queries is done using the
+``deltaquery`` shell command (see :numref:`deltaquery-command`) or the relevant
+API calls (see :numref:`APIs-data-store-delta-queries`). Management of delta
+query answers is done using the ``deltaqueryanswer`` shell command (see
+:numref:`deltaqueryanswer-command`) or the relevant API calls (see
+:numref:`APIs-data-store-delta-queries`).
+
+The following example demonstrates the use of delta queries in the context of
+friend recommendations.
+
+.. container:: example
+
+   **Example:** *Friend recommendations*.
+
+   Initilaize a data store and load the following RDF data that represents
+   people with their hobbies.
+
+    .. code:: turtle
+
+        :Lucy a :Person ;
+            :likes :indoorSwimming, :outdoorSwimming, :tv .
+
+        :John a :Person ;
+            :likes :boardGames, :movies .
+
+        :George a :Person ;
+            :likes :boardGames, :movies, :indoorSwimming .
+
+        :David a :Person ;
+            :likes :cooking, :movies.
+
+        :Alex a :Person ;
+            :likes :cooking, :podcasts, :movies.
+
+
+    Next, import the following datalog rule that identifies people who
+    share multiple hobbies.
+
+    .. code::
+
+        [?person1, :hasMultipleCommonInterestsWith, ?person2] :-
+            [?person1, a, :Person],
+            [?person2, a, :Person],
+            [?person1, :likes, ?hobby1],
+            [?person2, :likes, ?hobby1],
+            [?person1, :likes, ?hobby2],
+            [?person2, :likes, ?hobby2],
+            FILTER(!sameTerm(?hobby1, ?hobby2)),
+            FILTER(!sameTerm(?person1, ?person2)).
+
+
+    Register a delta query that tracks the people who share multiple
+    hobbies using the shell command ``deltaquery`` as shown next.
+
+    .. code::
+
+        deltaquery register FriendSuggestions text/x.csv-abbrev !  \
+            SELECT * WHERE {                                       \
+                ?person1 :hasMultipleCommonInterestsWith ?person2  \
+                FILTER(?person1 < ?person2)                        \
+            }
+
+    The delta query is registered under the name ``FriendSuggestions`` with
+    query answer format ``text/x.csv-abbrev``. No limits are set for the size
+    of the query's snapshots, additions, and deletions. The query itself
+    selects pairs of people who share multiple hobbies and ensures that each
+    pair is reported only once.
+
+    We can now list the registered delta queries using the ``deltaquery list``
+    command to obtain the following output.
+
+    .. code::
+
+        ===========================================================================================
+          Name               Format             Latest snapshot  Latest deletion  Latest addition
+        -------------------------------------------------------------------------------------------
+          FriendSuggestions  text/x.csv-abbrev                5              N/A              N/A
+        ===========================================================================================
+
+    The output indicates that the delta query ``FriendSuggestions`` has been
+    registered, a snapshot has been taken, and no deletions or additions have
+    been recorded yet.
+
+    We can show the snapshot of the delta query using the command
+    ``deltaqueryanswer show FriendSuggestions 5 snapshot`` to obtain the
+    following output.
+
+    .. code::
+
+        person1,person2
+        :George,:John
+        :Alex,:David
+
+
+    Next, we update the hobbies of ``:George`` as follows.
+
+    .. code::
+
+        import - ! :George :likes :boardGames .
+        import + ! :George :likes :tv .
+
+
+    We can now list the answers for the delta query ``FriendSuggestions``
+    using the command ``deltaqueryanswer list name FriendSuggestions`` to
+    obtain the following output.
+
+    .. code::
+
+        ================================================================================================================================================================================================================
+          Delta query name   Data store version  Answer type  Path                                                                                                                                   Format
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          FriendSuggestions                   5  snapshot     17919880869262749985/delta-query-answers/00000000000000000001_06427138968738186804/00000000000000000005.snapshot.06427138968738186804  text/x.csv-abbrev
+          FriendSuggestions                   6  deletion     17919880869262749985/delta-query-answers/00000000000000000001_06427138968738186804/00000000000000000006.deletion.06427138968738186804  text/x.csv-abbrev
+          FriendSuggestions                   7  addition     17919880869262749985/delta-query-answers/00000000000000000001_06427138968738186804/00000000000000000007.addition.06427138968738186804  text/x.csv-abbrev
+        ================================================================================================================================================================================================================
+
+    In addition to the snapshot at version 5, we now have a deletion at version
+    6 and an addition at version 7.
+
+    We can show the deletion by using the command ``deltaqueryanswer show
+    FriendSuggestions 6 deletion`` to obtain the following output.
+
+    .. code::
+
+        person1,person2
+        :George,:John
+
+
+    Likewise, we can show the addition by using the command
+    ``deltaqueryanswer show FriendSuggestions 7 addition`` to obtain the
+    following output.
+
+    .. code::
+
+        person1,person2
+        :George,:Lucy
+
+
+    Assume that we have processed the delta query answers for versions 5 and 6
+    and that we want to remove them. We can do this using the command
+    ``deltaqueryanswer delete name FriendSuggestions from 5 to 6``. After a
+    confirmation, we get the following output: ``2 delta query answers were
+    deleted.``
+
+    Running the command ``deltaquery list`` now shows that we are only left
+    with the addition at version 7.
+
+    .. code::
+
+        ===========================================================================================
+          Name               Format             Latest snapshot  Latest deletion  Latest addition
+        -------------------------------------------------------------------------------------------
+          FriendSuggestions  text/x.csv-abbrev              N/A              N/A                7
+        ===========================================================================================
+
+
+    Finally, we can remove the delta query using the command ``deltaquery
+    deregister FriendSuggestions``.
+

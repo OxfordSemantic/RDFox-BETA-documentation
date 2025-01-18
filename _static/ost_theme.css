@@ -1,0 +1,27 @@
+
+
+
+.wy-nav-content {
+    max-width: 1200px !important;
+    }
+
+div.example {
+    border-left: 2px solid lightblue;
+    padding: 5px 8px 5px 20px;
+    margin-bottom: 24px;
+}
+
+div.example *:last-child {
+    margin-bottom: 0px;
+}
+
+/* override table width restrictions and allow columns to wrap. */
+@media screen and (min-width: 767px) {
+    .wy-table-responsive table td {
+        white-space: normal !important;
+     }
+  
+     .wy-table-responsive {
+        overflow: visible !important;
+     }
+ }

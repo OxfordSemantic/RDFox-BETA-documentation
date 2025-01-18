@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2. RDFox Features and Requirements &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Getting Started" href="getting-started.html" />
+    <link rel="prev" title="1. Welcome to RDFox" href="welcome-to-rdfox.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. RDFox Features and Requirements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rdfox-features">2.1. RDFox Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software-archive">2.2. Software Archive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interfaces">2.3. Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-requirements">2.4. System Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#software">2.4.1. Software</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#operating-systems">2.4.1.1. Operating Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#third-party-software">2.4.1.2. Third-party Software</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#license-key">2.4.1.3. License Key</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware">2.4.2. Hardware</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">2. </span>RDFox Features and Requirements</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="rdfox-features-and-requirements">
+<span id="features-and-requirements"></span><h1><span class="section-number">2. </span>RDFox Features and Requirements<a class="headerlink" href="#rdfox-features-and-requirements" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="rdfox-features">
+<h2><span class="section-number">2.1. </span>RDFox Features<a class="headerlink" href="#rdfox-features" title="Permalink to this headline">¶</a></h2>
+<p>RDFox® provides the following main functionality:</p>
+<ul class="simple">
+<li><p>RDFox can import RDF triples, rules, and OWL 2 and SWRL axioms either
+programmatically or from files of certain formats (see <a class="reference internal" href="import-and-export.html#import"><span class="std std-numref">Section 8.2</span></a> for
+details). RDF data can be validated using the SHACL constraint language.
+Additionally, RDFox can access information from external data sources, such as
+CSV files, relational databases, or Apache Solr (see <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>).</p></li>
+<li><p>Triples, rules and axioms can be exported into a number of different formats
+(see <a class="reference internal" href="import-and-export.html#export"><span class="std std-numref">Section 8.3</span></a> for details). Furthermore, the contents of the system
+can be incrementally saved into a binary file, which can later be loaded to
+restore the system’s state.</p></li>
+<li><p>RDFox can answer SPARQL 1.1 queries (see <a class="reference internal" href="querying.html#querying"><span class="std std-numref">Section 9</span></a>) and provides
+functionality for monitoring query answering and accessing query plans.</p></li>
+<li><p>RDFox supports materialization-based reasoning, where all triples that
+logically follow from the facts and rules in the system are materialized as
+new triples (see <a class="reference internal" href="reasoning.html#reasoning"><span class="std std-numref">Section 10</span></a>) . Materializations can be incrementally
+updated, which means that reasoning does not need to be performed from
+scratch once the information in the system is updated. Furthermore, the
+results of reasoning can be <em>explained</em>, which means that RDFox is able to
+return proofs for any new fact added to the store through materialization.</p></li>
+<li><p>RDFox supports ACID transactional updates (see <a class="reference internal" href="transactions.html#transactions"><span class="std std-numref">Section 11</span></a> for
+further details on transactions).</p></li>
+<li><p>Individual information elements in the system can be assigned different
+access permissions for different users (see <a class="reference internal" href="access-control.html#access-control"><span class="std std-numref">Section 12</span></a> for
+further details on access control).</p></li>
+</ul>
+</div>
+<div class="section" id="software-archive">
+<span id="id1"></span><h2><span class="section-number">2.2. </span>Software Archive<a class="headerlink" href="#software-archive" title="Permalink to this headline">¶</a></h2>
+<p>RDFox is distributed as an archive containing the following files and
+directories:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">RDFox</span></code> (macOS/Linux) or <code class="docutils literal notranslate"><span class="pre">RDFox.exe</span></code> (Windows): a stand-alone executable
+that can be used to run RDFox on the command line.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lib</span></code>: a directory containing the following libraries:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">JRDFox.jar</span></code>: the Java API to the RDFox engine.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libRDFox.dylib</span></code> (macOS), <code class="docutils literal notranslate"><span class="pre">libRDFox.so</span></code> (Linux), or <code class="docutils literal notranslate"><span class="pre">libRDFox.dll</span></code>
+(Windows): a dynamic/shared library that implements the C and the Java
+Native APIs of RDFox.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libRDFox.lib</span></code> (Windows only): the import library needed for linking
+<code class="docutils literal notranslate"><span class="pre">libRDFox.dll</span></code> on Windows.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libRDFox-static.a</span></code> (macOS and Linux) or <code class="docutils literal notranslate"><span class="pre">libRDFox-static.lib</span></code>
+(Windows): a static library that implements the C API of RDFox.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include</span></code>: a directory containing definitions for an EXPERIMENTAL C API.
+The definitions include C++ classes that can be used to make it easier to
+correctly manage the resources exposed by the C API within C++ applications.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code>: a directory containing demonstration programs that show how to
+call RDFox as a library.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code>: a directory containing a C source file demonstrating how to call
+RDFox via the experimental C API. The directory also contains scripts
+<code class="docutils literal notranslate"><span class="pre">compile-shared-and-run.sh</span></code> and <code class="docutils literal notranslate"><span class="pre">compile-static-and-run.sh</span></code> on macOS
+and Linux, and scripts <code class="docutils literal notranslate"><span class="pre">compile-shared-and-run.bat</span></code> and
+<code class="docutils literal notranslate"><span class="pre">compile-static-and-run.bat</span></code> on Windows, which can be used to build and
+run the demo. On macOS and Linux, the scripts assumes a C-99 compliant
+version of gcc is available on the path. On Windows, the scripts assume
+that <code class="docutils literal notranslate"><span class="pre">vcvars64.bat</span></code> has been executed in the shell prior to execution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">C++</span></code>: a directory containing a C++ source file demonstrating how to call
+RDFox via the C++ wrapper for the experimental C API. The directory also
+contains scripts <code class="docutils literal notranslate"><span class="pre">compile-shared-and-run.sh</span></code> and
+<code class="docutils literal notranslate"><span class="pre">compile-static-and-run.sh</span></code> on macOS and Linux, and scripts
+<code class="docutils literal notranslate"><span class="pre">compile-shared-and-run.bat</span></code> and <code class="docutils literal notranslate"><span class="pre">compile-static-and-run.bat</span></code> on
+Windows, which can be used to build and run the demo. On macOS and Linux,
+the script assumes a version of g++ supporting C++11 is available on the
+path. On Windows, the script assumes that <code class="docutils literal notranslate"><span class="pre">vcvars64.bat</span></code> has been
+executed in the shell prior to execution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Java</span></code>: a directory containing source code for a program demonstrating
+how to call RDFox via the JRDFox API. The <code class="docutils literal notranslate"><span class="pre">examples/Java/build.xml</span></code>
+Apache Ant script can be used to compile and run the program.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="interfaces">
+<h2><span class="section-number">2.3. </span>Interfaces<a class="headerlink" href="#interfaces" title="Permalink to this headline">¶</a></h2>
+<p>Users and developers can interact with RDFox through the following interfaces:</p>
+<dl>
+<dt>CLI</dt><dd><p>RDFox comes with a built-in shell that can be used to interact with and
+control the RDFox Server. The shell can be launched together with an RDFox
+Server instance using the <code class="docutils literal notranslate"><span class="pre">shell</span></code> or <code class="docutils literal notranslate"><span class="pre">sandbox</span></code> modes of the executable.
+Alternatively the <code class="docutils literal notranslate"><span class="pre">remote</span></code> executable mode can be used to connect to and use
+the shell interface of a remote RDFox Server. See <a class="reference internal" href="rdfox-shell.html#rdfox-shell"><span class="std std-numref">Section 15</span></a> for
+details.</p>
+</dd>
+<dt>RESTful API</dt><dd><p>When RDFox’s endpoint is running, clients can interact with the associated
+RDFox server via a RESTful API. For details of the RESTful API, see
+<a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a>. For details of how to configure and start the
+endpoint, see <a class="reference internal" href="rdfox-endpoint.html#rdfox-endpoint"><span class="std std-numref">Section 19</span></a>.</p>
+</dd>
+<dt>Java API</dt><dd><p>RDFox can be embedded into Java applications and called via the Java API
+described in <a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a> and <a class="reference internal" href="javadoc.html#javadoc"><span class="std std-numref">Section 17</span></a>. To use JRDFox in
+your project, simply add <code class="docutils literal notranslate"><span class="pre">JRDFox.jar</span></code> to your classpath, and make sure that
+the path to the dynamic library is correctly specified when starting your
+program using the following JVM option:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>-Djava.library.path=&lt;path to the dynamic library&gt;
+</pre></div>
+</div>
+</dd>
+<dt>C API (EXPERIMENTAL)</dt><dd><p>RDFox can be dynamically loaded and called through a C API.</p>
+</dd>
+<dt>GUI</dt><dd><p>As well as serving the REST API, the RDFox endpoint serves the RDFox Console,
+a browser-based user interface supporting basic querying and visualization of
+data store content. When the endpoint is running, the Console can be loaded by
+visiting <code class="docutils literal notranslate"><span class="pre">http[s]:&lt;hostname&gt;:&lt;port&gt;/console/</span></code> where <code class="docutils literal notranslate"><span class="pre">&lt;hostname&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&lt;port&gt;</span></code> are the host name and port number at which the endpoint can be
+reached.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="system-requirements">
+<h2><span class="section-number">2.4. </span>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="software">
+<h3><span class="section-number">2.4.1. </span>Software<a class="headerlink" href="#software" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="operating-systems">
+<h4><span class="section-number">2.4.1.1. </span>Operating Systems<a class="headerlink" href="#operating-systems" title="Permalink to this headline">¶</a></h4>
+<p>RDFox supports the following operating system versions:</p>
+<dl class="simple">
+<dt>Windows</dt><dd><p>Windows 10 or higher</p>
+</dd>
+<dt>Mac</dt><dd><p>macOS 10.14 or higher</p>
+</dd>
+<dt>Linux</dt><dd><ul class="simple">
+<li><p>Ubuntu 18.04 or higher</p></li>
+<li><p>Amazon Linux 2 or higher</p></li>
+</ul>
+</dd>
+</dl>
+<p>Additionally, RDFox can be run using Docker. See <a class="reference internal" href="docker.html#docker"><span class="std std-numref">Section 22</span></a> for
+details.</p>
+</div>
+<div class="section" id="third-party-software">
+<span id="id2"></span><h4><span class="section-number">2.4.1.2. </span>Third-party Software<a class="headerlink" href="#third-party-software" title="Permalink to this headline">¶</a></h4>
+<p>Some RDFox features depend on dynamic-link libraries (DLL) from the list of the
+third-party software packages below. In each case, the DLL or DLLs are loaded
+on-demand the first time the dependent functionality is accessed within a
+session. This means that RDFox can be deployed in the absence of these packages
+if the dependent functionality is not needed.</p>
+<dl>
+<dt><a class="reference external" href="https://www.openssl.org/">OpenSSL</a></dt><dd><p>Used to implement TLS for RDFox’s HTTP client and server code, as well as for
+persistence and session encryption. The search paths used to locate the DLLs
+from this package when the endpoint is starting can be specified via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_LIBCRYPTO_PATH</span></code> and <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBSSL_PATH</span></code> environment variables. If
+the environment variables are not set, the default values shown in the
+following table are used.</p>
+<blockquote>
+<div><table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>libcrypto search path</p></th>
+<th class="head"><p>libssl search path</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Windows</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libcrypto-3-x64.dll</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libssl-3-x64.dll</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>macOS</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libcrypto.3.dylib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libssl.3.dylib</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Linux</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libcrypto.so</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libssl.so</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The resolved libraries must have version v3.0.0 or higher.</p>
+</dd>
+<dt><a class="reference external" href="https://www.postgresql.org/docs/14/libpq.html">libpq</a></dt><dd><p>Used to access PostgreSQL data sources. The search path used to locate
+<code class="docutils literal notranslate"><span class="pre">libpq</span></code> when registering one of these data sources can be specified via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_LIBPQ_PATH</span></code> environment variable. If the environment variable is not
+set, the default value shown in the following table is used.</p>
+<blockquote>
+<div><table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>libpq search path</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Windows</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libpq.dll</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>macOS</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libpq.dylib</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Linux</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libpq.so</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The resolved library should be of a version that matches that of the
+PostgreSQL server being connected to. The current release was built and
+tested with both library and server from PostgreSQL 14, however it will also
+work with a wider range of versions, both higher and lower. Please test you
+configuration and contact OST support as needed.</p>
+</dd>
+<dt><a class="reference external" href="https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors">iODBC</a> or <a class="reference external" href="http://www.unixodbc.org/">unixODBC</a></dt><dd><p>Used to access external data sources via ODBC. The search path used to locate
+the DLL that will manage drivers for accessing the ODBC source can be
+specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_ODBC_DRIVER_MANAGER_PATH</span></code> environment variable. If
+the environment variable is not set, RDFox will attempt to use the default
+search paths shown in the following table to load unixODBC and, if that fails
+and the platform is not Windows, iODBC.</p>
+<blockquote>
+<div><table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>unixODBC search path</p></th>
+<th class="head"><p>iODBC search path</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Windows</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">odbc32.dll</span></code></p></td>
+<td><p>(not supported)</p></td>
+</tr>
+<tr class="row-odd"><td><p>macOS</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libodbc.dylib</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libiodbc.dylib</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Linux</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libodbc.so</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">libiodbc.so</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Although iODBC can be used, unixODBC is recommended. The current release was
+built and tested with unixODBC v2.3, however it will work with a wider range
+of versions, both higher and lower. Please test you configuration and contact
+OST support as needed.</p>
+</dd>
+</dl>
+<p>For a list of other third-party components used within RDFox, see
+<a class="reference internal" href="acknowledgments.html#acknowledgments"><span class="std std-numref">Section 24</span></a>.</p>
+</div>
+<div class="section" id="license-key">
+<span id="rdfox-license-key"></span><h4><span class="section-number">2.4.1.3. </span>License Key<a class="headerlink" href="#license-key" title="Permalink to this headline">¶</a></h4>
+<p>Creating an <a class="reference internal" href="servers.html#servers"><span class="std std-ref">RDFox Server</span></a> requires a time-limited license key
+issued by Oxford Semantic Technologies. At server creation time, RDFox will
+search the following locations, in the order shown, for the license key:</p>
+<ul class="simple">
+<li><p>the value of the <code class="docutils literal notranslate"><span class="pre">license.content</span></code> server parameter, if set</p></li>
+<li><p>[<strong>RDFox executable only</strong>] the value of the <code class="docutils literal notranslate"><span class="pre">RDFOX_LICENSE_CONTENT</span></code>
+environment variable, if set</p></li>
+<li><p>the content of the file specified via the <code class="docutils literal notranslate"><span class="pre">license.file</span></code> server parameter,
+if set</p></li>
+<li><p>[<strong>RDFox executable only</strong>] the content of the file specified via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_LICENSE_FILE</span></code> environment variable, if set</p></li>
+<li><p>[<strong>RDFox executable only</strong>] the content of the file <code class="docutils literal notranslate"><span class="pre">RDFox.lic</span></code> in the
+directory containing the running executable, if the file exists</p></li>
+<li><p>the content of the file at the default value for the <code class="docutils literal notranslate"><span class="pre">license.file</span></code> server
+parameter, if the file exists</p></li>
+</ul>
+<p>If a candidate key is found in one location, the remaining locations will not be
+checked even if the candidate turns out to be invalid or expired. See
+<a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a> for details of how to specify server parameters such
+as <code class="docutils literal notranslate"><span class="pre">license.content</span></code> and <code class="docutils literal notranslate"><span class="pre">license.file</span></code>.</p>
+</div>
+</div>
+<div class="section" id="hardware">
+<h3><span class="section-number">2.4.2. </span>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline">¶</a></h3>
+<p>RDFox is a main-memory data store and as such its performance is heavily
+dependent on access to a suitable amount of RAM. Oxford Semantic Technologies
+recommends that users ensure that RDFox has unpaged access to 60-120 bytes of
+RAM per triple that their store will contain. This includes both explicitly
+imported triples and those materialized via reasoning.</p>
+<p>When RDFox is configured for <a class="reference internal" href="persistence.html#persistence"><span class="std std-ref">Persistence</span></a>, data will also be saved to
+disk, ready to be loaded in subsequent sessions. The underlying file system
+must satisfy the system requirements documented in
+<a class="reference internal" href="persistence.html#persistence-options"><span class="std std-numref">Section 13.2.1</span></a> for the chosen persistence option, and have 40-60
+bytes of disk space per triple. This includes enough space to store the data
+itself and some working free space that is needed for operations such as
+compaction and upgrade.</p>
+<p>Recovering from low-memory or low-disk-space conditions can be complex, so it
+is vital to monitor these metrics and take action before they become exhausted.
+Regular <a class="reference internal" href="data-stores.html#compaction-dead-fact-removal"><span class="std std-ref">compaction</span></a> of data stores can
+help minimize a server’s memory and disk space usage.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="welcome-to-rdfox.html" class="btn btn-neutral float-left" title="1. Welcome to RDFox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getting-started.html" class="btn btn-neutral float-right" title="3. Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

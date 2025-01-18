@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1. Welcome to RDFox &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. RDFox Features and Requirements" href="features-and-requirements.html" />
+    <link rel="prev" title="Table of Contents" href="index.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Welcome to RDFox</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-read-this-documentation">1.1. How to Read this Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">1. </span>Welcome to RDFox</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="welcome-to-rdfox">
+<span id="id1"></span><h1><span class="section-number">1. </span>Welcome to RDFox<a class="headerlink" href="#welcome-to-rdfox" title="Permalink to this headline">¶</a></h1>
+<p>RDFox® is a main-memory, scalable, centralized data store that allows users to
+efficiently manage graph-structured data represented according to the <a class="reference external" href="https://www.w3.org/RDF/">RDF data
+model</a> and query that data using the <a class="reference external" href="https://www.w3.org/TR/sparql11-query/">SPARQL 1.1
+query language</a>.</p>
+<p>RDFox also enables intelligent information processing by providing means for
+representing and reasoning with domain knowledge in the form of rules and
+ontological axioms. Rules in RDFox can be represented using a powerful
+extension of the well-understood Datalog language, whereas ontology axioms can
+be represented in the standard ontology language <a class="reference external" href="https://www.w3.org/TR/owl2-overview/">OWL 2</a> and in the <a class="reference external" href="https://www.w3.org/Submission/SWRL/">Semantic Web Rule
+Language SWRL</a>.</p>
+<p>RDFox runs on Linux, macOS, and Windows. It can be integrated as a library into
+Java applications using an efficient native API. It can also be used as a
+standalone server accessible via a RESTful API. These versatile modes of use,
+combined with the very efficient storage and reasoning capabilities, make RDFox
+suitable for a wide range of application scenarios.</p>
+<div class="section" id="how-to-read-this-documentation">
+<h2><span class="section-number">1.1. </span>How to Read this Documentation<a class="headerlink" href="#how-to-read-this-documentation" title="Permalink to this headline">¶</a></h2>
+<p>We next provide a brief guide on how to use this documentation.</p>
+<dl>
+<dt>Introduction</dt><dd><p>Sections <a class="reference internal" href="#welcome-to-rdfox"><span class="std std-numref">1</span></a> to <a class="reference internal" href="getting-started.html#getting-started"><span class="std std-numref">3</span></a> contain introductory information to help users who are new
+to RDFox.</p>
+<p><a class="reference internal" href="features-and-requirements.html#features-and-requirements"><span class="std std-numref">Section 2</span></a> begins with a high level description of
+RDFox’s functionality then gives details of the RDFox software archive, the
+available interfaces to the system (GUI, CLI and APIs), and the software and
+hardware requirements for running RDFox. <a class="reference internal" href="getting-started.html#getting-started"><span class="std std-numref">Section 3</span></a> contains
+our <em>Getting Started</em> guide, which will walk you through your first
+experience with RDFox.</p>
+</dd>
+<dt>Organization of Data</dt><dd><p>Sections <a class="reference internal" href="servers.html#servers"><span class="std std-numref">4</span></a> to <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">7</span></a>
+explain how RDFox organizes data. The information in these sections is not
+specific to any particular RDFox interface and is relevant to all users of
+the system.</p>
+<p><a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a> introduces the concept of the <em>RDFox server</em>, the top-level
+container for all information stored in RDFox, and the hierarchy of concepts
+used to organize that information. The parameters available for configuring
+servers are also described. The three subsequent sections provide more detail
+on the most important concepts: <em>data stores</em> in <a class="reference internal" href="data-stores.html#data-stores"><span class="std std-numref">Section 5</span></a>,
+<em>tuple tables</em> in <a class="reference internal" href="tuple-tables.html#tuple-tables"><span class="std std-numref">Section 6</span></a>, and <em>data sources</em> in
+<a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>. Finally, <a class="reference internal" href="connections.html#connections"><span class="std std-numref">Section 14</span></a> explains the concept
+of <em>connections</em> which are used to mediate access to the system.</p>
+</dd>
+<dt>Functionality</dt><dd><p>Sections <a class="reference internal" href="import-and-export.html#import-and-export"><span class="std std-numref">8</span></a> to <a class="reference internal" href="persistence.html#persistence"><span class="std std-numref">13</span></a> document the core functionality of RDFox. As with the sections
+on concepts, the information in these sections is not specific to any
+particular RDFox interface and is potentially relevant to all users of the
+system, depending on the needs of their application.</p>
+<p><a class="reference internal" href="import-and-export.html#import-and-export"><span class="std std-numref">Section 8</span></a> describes RDFox’s operations for importing and
+exporting bulk data, rules and axioms.</p>
+<p><a class="reference internal" href="querying.html#querying"><span class="std std-numref">Section 9</span></a> describes querying in RDFox. It assumes that readers are
+familiar with the RDF 1.1 and SPARQL 1.1 standards however RDFox’s
+proprietary extensions to the latter are explained in depth with examples.
+This section also contains information on how to access and visualize query
+plans in RDFox as well as how to monitor query execution.</p>
+<p><a class="reference internal" href="reasoning.html#reasoning"><span class="std std-numref">Section 10</span></a> contains a comprehensive guide to RDFox’s reasoning
+functionality. Unlike the section on querying, no prior knowledge of
+reasoning is assumed and the section includes many examples that you can
+readily execute using RDFox. This section also contains information on how to
+obtain explanations of facts materialized by reasoning and on how to monitor
+the reasoning process to analyze the performance of rules.</p>
+<p><a class="reference internal" href="transactions.html#transactions"><span class="std std-numref">Section 11</span></a> describes how RDFox uses transactions to allow many
+users to safely share a single RDFox instance. Finally,
+<a class="reference internal" href="access-control.html#access-control"><span class="std std-numref">Section 12</span></a> introduces RDFox’s access control model.</p>
+<p><a class="reference internal" href="persistence.html#persistence"><span class="std std-numref">Section 13</span></a> describes the available options for persisting the
+settings and data loaded into RDFox.</p>
+</dd>
+<dt>Interfaces</dt><dd><p>Sections <a class="reference internal" href="connections.html#connections"><span class="std std-numref">14</span></a> to <a class="reference internal" href="javadoc.html#javadoc"><span class="std std-numref">17</span></a>
+contain reference documentation and guides for various RDFox interfaces.</p>
+<p><a class="reference internal" href="connections.html#connections"><span class="std std-numref">Section 14</span></a> introduces the concept of <em>connections</em> which provide
+access to core RDFox functionality. Connections are used in the RDFox shell
+and all APIs so this section is useful for anyone using those interfaces.</p>
+<p><a class="reference internal" href="rdfox-shell.html#rdfox-shell"><span class="std std-numref">Section 15</span></a> describes the RDFox shell, a command line interface
+with support for both interactive and batch operation that can be used
+remotely or directly via standard input and output. <a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a> contains
+the main API reference documentation for the REST and Java (JRDFox) APIs.
+<a class="reference internal" href="javadoc.html#javadoc"><span class="std std-numref">Section 17</span></a> contains a link to the full Javadoc documentation for
+JRDFox.</p>
+</dd>
+<dt>Operations Manual</dt><dd><p>Sections <a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">18</span></a> to <a class="reference internal" href="docker.html#docker"><span class="std std-numref">22</span></a>
+constitute the operations manual for RDFox. This information is intended to
+help users responsible for establishing long-running, secure and maintainable
+RDFox deployments.</p>
+<p><a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a> explains how to use the RDFox executable.
+<a class="reference internal" href="rdfox-endpoint.html#rdfox-endpoint"><span class="std std-numref">Section 19</span></a> describes the RDFox Endpoint including details of
+how to start and stop it, its configuration parameters and how RDFox treats
+anonymous HTTP(S) requests. <a class="reference internal" href="logging.html#logging"><span class="std std-numref">Section 20</span></a> describes the types of logging
+supported by RDFox. <a class="reference internal" href="high-availability.html#high-availability"><span class="std std-numref">Section 21</span></a> gives details on how to
+deploy a group of RDFox instances to provide a single high-availability
+service. Finally, <a class="reference internal" href="docker.html#docker"><span class="std std-numref">Section 22</span></a> describes the official Docker images for
+RDFox.</p>
+</dd>
+<dt>Information</dt><dd><p>Sections <a class="reference internal" href="release-notes.html#release-notes"><span class="std std-numref">23</span></a> and <a class="reference internal" href="acknowledgments.html#acknowledgments"><span class="std std-numref">24</span></a> contain release notes and software license acknowledgments
+for RDFox respectively.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Table of Contents" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="features-and-requirements.html" class="btn btn-neutral float-right" title="2. RDFox Features and Requirements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

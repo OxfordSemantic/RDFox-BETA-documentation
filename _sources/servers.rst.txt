@@ -1,0 +1,564 @@
+.. _servers:
+
+Servers
+=======
+
+Each RDFox® instance is associated with a distinct *server* object, which acts
+as a top-level container for all information stored in the RDFox instance. A
+server's job is to keep track of global configuration options of the RDFox
+instance, manage *data stores* that contain various data, and manage *roles*
+that identify users capable of interacting with the server. A server instance
+is created whenever RDFox is started via the command line or via the Java API;
+in either case, there is a way to specify server options such as the number of
+threads and the maximum amount of memory that the server should use. The list
+of all options is given in :numref:`server-parameters`.
+
+The following diagram illustrates the subcomponents of servers, which are used
+to structure the information loaded in the system. The basic idea behind each
+concept is described in the following sections.
+
+.. figure:: _static/RDFoxConcepts.svg
+   :align: center
+   :alt: RDFoxConcepts
+
+Each server is associated with a *server version number*, which is incremented
+for every change to the server's list of data stores. This version number is
+visible in the output of the ``serverinfo`` shell command and equivalent API
+calls (to see the role manager version number, the extended info must be
+requested).
+
+Data Stores
+-----------
+
+A server is divided into *data stores*. Each data store is identified by a
+user-defined name that is unique within the server. A data store acts as a
+container for data that logically belongs together. Many applications will use
+one data store to store their data; thus, several applications can share one
+server, while keeping their data separate. Some applications can use more than
+one data store, but it is key to remember that all queries and rules are
+evaluated within the context of a single data store. Thus, all information that
+an application wishes to access in a single query should be loaded into one
+data store.
+
+RDFox provides many types of data stores, and each type is identified by a
+unique type name (e.g., ``parallel-nn``). Data store types differ in their
+maximum capacity, and some support concurrent operations where others do not.
+Moreover, each data store can be customized via a number of parameters; for
+example, a data store can be configured to use the implicit semantics of
+``owl:sameAs`` or not. All parameters are specified as a list of key-value
+pairs when the data store is created, and they cannot be changed subsequently.
+Data store types and parameters are described in detail in
+:numref:`data-stores`.
+
+Data stores organize application data using *tuple tables*. *In-memory tuple
+tables* are used to store application data, like RDF data, in memory. A data
+store can also reference a number of *data sources*, which provide access to
+data in formats other than RDF, such as relational databases or CSV files.
+Moreover, a data store can contain OWL axioms and rules, which jointly provide
+inference rules that are to be used for reasoning within a data store. Finally,
+a data store can contain *statistics modules*, which keep summaries of the data
+loaded in the data store that are useful for query planning.
+
+Each data store is assigned a `data store ID` that is with high probability
+unique across servers. Clients can use this identifier to ensure that they are
+referring to the same data store in different API calls.
+
+Each data store is associated with a *data store version number*, which is
+incremented every time a data store is compacted or a transaction is
+successfully committed on the data store. The data store version number can be
+read using any of the provided APIs.
+
+A data store can be `online` or `offline`. When online, a data store is loaded
+into RAM and can process requests. In contrast, when offline, a data store
+occupies almost no RAM but also cannot process any requests. When a data store
+is brought online, it is restored from persistence. Thus, only persistent data
+stores can be brought offline: bringing a data store that is not persisted
+offline would result in data loss. A data store can be brought offline only if
+there are no open connections to it.
+
+Tuple Tables
+~~~~~~~~~~~~
+
+A data store can contain several tuple tables, which are containers for actual
+data. The data of a tuple table is a collection of items called *facts*, and
+each fact can be understood as a list of *RDF resources* (i.e., IRIs, blank
+nodes, or literals). Facts with just three components are commonly called
+*triples*, and facts with four components are called *quads*. Each tuple table
+is identified with a name that must be unique within a data store. Moreover,
+each tuple table has a *minimal* and *maximal arity*, which are numbers
+determining the smallest and the largest numbers of RDF resources in a fact
+stored in the tuple table. In most cases, the minimal and maximal arity are the
+same, in which case they are called just *arity*.
+
+RDFox uses the very general concept of a tuple table to represent many
+different kinds of data containers.
+
+- *In-memory tuple tables* are used to store application data in memory. The
+  `RDF dataset
+  <https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/Overview.html#dfn-rdf-dataset>`__
+  of a data store is represented using the in-memory tuple tables
+  ``DefaultTriples`` and ``Quads``. Further detail on in-memory tuple tables is
+  given in :numref:`in-memory-tuple-tables`.
+
+- *Built-in tuple tables* contain facts that can be useful in various
+  applications of RDFox, and they are described in more detail in
+  :numref:`built-in-tuple-tables`.
+
+- *Data source tuple tables* provide a 'virtual view' over data in non-RDF data
+  sources, such as CSV files, relational databases, or an Apache Solr index.
+  Importing external data is explained in detail in :numref:`data-sources`.
+
+Each fact in a tuple table is associated with one or more *fact domains*.
+Intuitively, the domain of a fact reflects how a fact was added to a tuple
+table --- that is, whether a fact was explicitly introduced by the user or
+derived through reasoning, and so on. Fact domains are described in more detail
+in :numref:`fact-domains`.
+
+Data Sources
+~~~~~~~~~~~~
+
+To support accessing data in formats other than RDFox, one or more data sources
+can be registered with a data store. Registering a data source requires
+specifying a number of parameters that govern how the data is accessed. Each
+data source is identified by a name that is unique for the data store. The
+access to the actual data is provided by data source tuple tables, which are
+created by referencing previously registered data sources. The process of
+accessing external data sources is described in more detail in
+:numref:`data-sources`.
+
+.. _axioms:
+
+OWL Axioms
+~~~~~~~~~~
+
+To support reasoning with OWL ontologies, one can import OWL axioms into a data
+store. For example, an OWL axiom can be used to state that the ``:Professor``
+class is a subclass of the ``:Person`` class; if such an axiom is imported into
+a data store, RDFox will automatically infer that each instance of
+``:Professor`` is also an instance of ``:Person``. RDFox associates a separate
+set of axioms with each named graph, and it provides APIs for adding or
+removing axioms in either the Functional-Style Syntax (FSS) or the RDF-based
+syntax.
+
+.. _rules:
+
+Rules
+~~~~~
+
+To support general reasoning, one can import *Datalog* rules into a data
+store. Rules can intuitively be understood as "if-then" statements expressing
+general truths about a domain of interest. For example, ``:Person[?X] :-
+:Professor[?X] .`` is a rule stating that every professor is a person. If such
+a rule is added to a data store, then if the data store also contains triples
+``:Peter rdf:type :Professor .`` and ``:Paul rdf:type :Professor .``, RDFox
+will automatically derive triples ``:Peter rdf:type :Person .`` and ``:Paul
+rdf:type :Person .``. RDFox also supports *incremental reasoning*: if triple
+``:Paul rdf:type :Professor .`` is removed from the data store, RDFox will
+automatically remove ``:Paul rdf:type :Person .``. RDFox provides ways to add
+and remove rules, as well as to retrieve the rules in a data store. The rule
+language of RDFox, the provided reasoning support, and examples of use of
+reasoning in practical applications are discussed in detail in
+:numref:`reasoning`.
+
+.. _rule-domains:
+
+Rule Domains
+^^^^^^^^^^^^
+
+Each rule in a data store is associated with one or more of the following three
+*rule domains*.
+
+- The ``user`` rule domain contains the rules that a user added explicitly,
+  either by using the RDFox API or by importing a Datalog document.
+
+- The ``axioms`` rule domain contains rules obtained by translating all OWL
+  axioms in the data store (in both axiom domains), thus allowing RDFox to
+  perform OWL reasoning. Only axioms that conform to the OWL 2 RL profile are
+  translated. Rules in this rule domain cannot be manipulated directly by the
+  user; rather, a user can add/remove triples and/or axioms in the ``user``
+  axiom domain, and RDFox will automatically adjust the rules in the ``axioms``
+  rule domain.
+
+- The ``internal`` rule domain contains rules that RDFox uses internally. The
+  exact internal rules used depend on the data store configuration, and they
+  are discussed in more detail in :numref:`appendix-internal-rule-domain`.
+
+A rule can belong to multiple rule domains. For example, a rule could be added
+by the user to the ``user`` rule domain, and it could also be obtained from OWL
+axioms and thus be added to the ``axioms`` rule domain.
+
+.. _base-iri-and-prefixes:
+
+Base IRI and Prefixes
+~~~~~~~~~~~~~~~~~~~~~
+
+Each data store keeps track of a string called *base IRI*, as well as a mapping
+of strings to strings called *prefixes*. Both of these two objects can be
+manipulated using RDFox's APIs. These objects are used when importing data into
+or running queries over a data store. For example, when importing a `Turtle 1.1
+<https://www.w3.org/TR/turtle/>`__ file into a data store, the import process
+will proceed *as if* the base IRI and prefixes associated with the target data
+store are present before the beginning of the file. Analogously, when
+evaluating a `SPARQL 1.1 <https://www.w3.org/TR/sparql11-query/>`__ query over
+a data store, the query will be processed *as if* the base IRI and prefixes
+associated with the target data store are specified before the query text. This
+allows applications to set up a default base IRI and prefixes that are
+implicitly used in all RDFox operations. The following prefix definitions are
+added to new data stores:
+
+.. table ::
+   :align: center
+   :widths: 5,15
+
+   +------------+-------------------------------------------------+
+   |  Prefix    |         Expansion                               |
+   +============+=================================================+
+   | ``owl:``   | ``http://www.w3.org/2002/07/owl#``              |
+   +------------+-------------------------------------------------+
+   | ``rdf:``   | ``http://www.w3.org/1999/02/22-rdf-syntax-ns#`` |
+   +------------+-------------------------------------------------+
+   | ``rdfox:`` | ``https://rdfox.com/vocabulary#``               |
+   +------------+-------------------------------------------------+
+   | ``rdfs:``  | ``http://www.w3.org/2000/01/rdf-schema#``       |
+   +------------+-------------------------------------------------+
+   | ``sh:``    | ``http://www.w3.org/ns/shacl#``                 |
+   +------------+-------------------------------------------------+
+   | ``swrl:``  | ``http://www.w3.org/2003/11/swrl#``             |
+   +------------+-------------------------------------------------+
+   | ``swrlb:`` | ``http://www.w3.org/2003/11/swrlb#``            |
+   +------------+-------------------------------------------------+
+   | ``xsd:``   | ``http://www.w3.org/2001/XMLSchema#``           |
+   +------------+-------------------------------------------------+
+
+All interfaces provide a method for clearing a data store's prefixes. For
+example, in the shell issuing ``prefixes clear`` will clear the prefixes of the
+data store associated with the active data store connection.
+
+Commit Procedure (EXPERIMENTAL)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each data store may have an associated SPARQL update, known as a ``commit
+procedure``, that is evaluated as part of committing each read/write
+transaction on the store. This can be useful for capturing additional explicit
+facts as part of each transaction. See :numref:`commit-procedure` for more
+details.
+
+Delta Queries
+~~~~~~~~~~~~~
+
+For tracking changes to the relevant parts of the knowledge graph, one or more
+SPARQL queries can be registered with a data store. These queries are called
+**delta queries** and are continuously evaluated by RDFox against write
+transactions to identify changes to their results. See :numref:`delta-queries`
+for more details.
+
+Roles
+-----
+
+A server can contain several *roles*, each representing an actor (or a type of
+actor) allowed to access a server. Performing actions on a server or its parts
+requires first authenticating as one of that server's roles. The access control
+model of RDFox is described in detail in :numref:`access-control`.
+
+.. _server-parameters:
+
+Server Parameters
+-----------------
+
+When a server is instantiated, it can be given a number of parameters that
+govern various aspects of the server's operation. All parameters are specified
+as key-value pairs. When an RDFox instance is created from the command line,
+the server parameters are passed as arguments to the RDFox executable as
+described in :numref:`rdfox-executable`. If an RDFox instance is started from
+Java, the server parameters can be specified as arguments to the
+`RDFoxServer.start(...)
+<./_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#start(java.util.Map)>`_
+or `RDFoxServer.initialize(...)
+<_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#initialize(java.lang.String,java.lang.String,java.util.Map)>`_
+methods. In all cases, when the ``server-directory`` parameter is set, RDFox
+will load additional parameters from a file named ``server.params`` within the
+server directory, if said file exists. See :numref:`server-parameters-file` for
+details on the format of this file.
+
+The following table describes all available server parameters, except those
+that control the behavior of authentication managers, which are documented in
+:numref:`authentication-managers`.
+
+.. table ::
+   :widths: 35,20,50
+
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   |        Option                                    |              Value              |             Description                         |
+   +==================================================+=================================+=================================================+
+   | ``all-data-stores-online-on-startup``            | ``true`` or ``false``           | If the value is ``true``, the server            |
+   |                                                  |                                 | will bring all of its data stores online        |
+   |                                                  |                                 | at startup, otherwise all data stores           |
+   |                                                  |                                 | begin in the offline state. The default         |
+   |                                                  |                                 | value is ``true``.                              |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``allowed-schemes-on-load``                      | a string containing a space-    | Specifies a space-separated list of             |
+   |                                                  | separated list of URI schemes   | schemes that are allowed to be used             |
+   |                                                  |                                 | in the SPARQL 1.1 ``LOAD`` update               |
+   |                                                  |                                 | and to import from IRIs.                        |
+   |                                                  |                                 | The default value is ``https rdfox``            |
+   |                                                  |                                 | (``rdfox`` is used to import                    |
+   |                                                  |                                 | TBoxReasoning as described in                   |
+   |                                                  |                                 | :numref:`appendix-internal-rule-domain`)        |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``api-log``                                      | ``on`` or ``off``               | If the value is ``on``, all API calls           |
+   |                                                  |                                 | are recorded in a script that the shell         |
+   |                                                  |                                 | can replay later. The default value is          |
+   |                                                  |                                 | ``off``. See :numref:`api-logging` for          |
+   |                                                  |                                 | more information.                               |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``api-log.directory``                            | a string                        | Specifies the directory into which              |
+   |                                                  |                                 | API logs will be written. Default is            |
+   |                                                  |                                 | directory ``api-log`` within the                |
+   |                                                  |                                 | configured server directory.                    |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``api-log.input-recording-limit``                | ``0``, a positive integer or    | Limits the amount of each input that            |
+   |                                                  | ``unlimited``                   | is recorded during import operations as         |
+   |                                                  |                                 | a part of an API log to the specified           |
+   |                                                  |                                 | number of bytes. The value ``unlimited``,       |
+   |                                                  |                                 | which is the default, signifies that            |
+   |                                                  |                                 | each input should be recorded in its            |
+   |                                                  |                                 | entirety.                                       |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | .. _authentication-managers-server-param:        | a comma-separated list of zero  | Specifies the list of authentication            |
+   |                                                  | or more of                      | managers that should be used by the             |
+   | ``authentication-managers``                      | ``role-name+password`` and      | server. Parameters for the                      |
+   |                                                  | ``oidc``                        | authentication managers are documented          |
+   |                                                  |                                 | in :numref:`authentication-managers` and        |
+   |                                                  |                                 | must be specified as server parameters          |
+   |                                                  |                                 | with the name of the authentication             |
+   |                                                  |                                 | manager and a single dot '.' prefixed,          |
+   |                                                  |                                 | e.g. ``oidc.<parameter-name>``.                 |
+   |                                                  |                                 |                                                 |
+   |                                                  |                                 | The default value is ``role-name+password``.    |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``delta-queries.answers-directory``              | a string                        | The directory in which the delta query          |
+   |                                                  |                                 | answers will be stored.                         |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``delta-queries.encryption.algorithm``           | a string                        | The name of an encryption algorithm             |
+   |                                                  |                                 | supported by the available OpenSSL              |
+   |                                                  |                                 | crypto library. If an OpenSSL executable        |
+   |                                                  |                                 | is available, a list of the supported           |
+   |                                                  |                                 | algorithms can be obtained with command         |
+   |                                                  |                                 | ``openssl list -cipher-algorithms``.            |
+   |                                                  |                                 | The default value is ``AES-256-CBC``            |
+   |                                                  |                                 | but this is only used if the                    |
+   |                                                  |                                 | ``delta-queries.encryption.key`` parameter      |
+   |                                                  |                                 | is set.                                         |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``delta-queries.encryption.key``                 | a string                        | A base64-encoded encryption key. If this        |
+   |                                                  |                                 | parameter is set, the server will use it        |
+   |                                                  |                                 | to encrypt and decrypt all persisted            |
+   |                                                  |                                 | data using the algorithm specified by           |
+   |                                                  |                                 | the ``delta-queries.encryption.algorithm``      |
+   |                                                  |                                 | parameter. The key must meet the                |
+   |                                                  |                                 | requirements of the selected algorithm.         |
+   |                                                  |                                 | This parameter may alternatively be             |
+   |                                                  |                                 | supplied via the                                |
+   |                                                  |                                 | ``RDFOX_DELTA_QUERIES_ENCRYPTION_KEY``          |
+   |                                                  |                                 | environment variable.                           |
+   |                                                  |                                 | By default, this parameter is unset.            |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``license.content``                              | a string                        | Specifies the license content verbatim.         |
+   |                                                  |                                 | This parameter is not set by default.           |
+   |                                                  |                                 | See :numref:`rdfox-license-key` for             |
+   |                                                  |                                 | the precedence of license-related               |
+   |                                                  |                                 | options.                                        |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``license.file``                                 | a string                        | Specifies the path to the license key           |
+   |                                                  |                                 | file to use. The default value is               |
+   |                                                  |                                 | ``$HOME/.RDFox/RDFox.lic`` on Linux/Mac,        |
+   |                                                  |                                 | and ``%LOCALAPPDATA%\RDFox\RDFox.lic``          |
+   |                                                  |                                 | on Windows.                                     |
+   |                                                  |                                 | See :numref:`rdfox-license-key` for             |
+   |                                                  |                                 | the precedence of license-related               |
+   |                                                  |                                 | options.                                        |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``max-memory``                                   | an integer                      | Specifies the initial value for the             |
+   |                                                  |                                 | maximum of memory (in MB) that the RDFox        |
+   |                                                  |                                 | instance should use. The default is 0.9         |
+   |                                                  |                                 | times the installed memory.                     |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   |  .. _num-threads-server-param:                   | an integer                      | Specifies the initial number of threads         |
+   |                                                  |                                 | that the system will use for tasks such         |
+   | ``num-threads``                                  |                                 | as reasoning and importation. The default       |
+   |                                                  |                                 | is the number of logical processors             |
+   |                                                  |                                 | available on the machine.                       |
+   |                                                  |                                 |                                                 |
+   |                                                  |                                 |                                                 |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence``                                  | ``file``, ``file-sequence``, or | If the value is ``file`` or                     |
+   |                                                  | ``off``                         | ``file-sequence``, the content of the           |
+   |                                                  |                                 | server will be incrementally saved              |
+   |                                                  |                                 | (persisted) within the server                   |
+   |                                                  |                                 | directory using the matching persistence        |
+   |                                                  |                                 | option. See :numref:`persistence-options`       |
+   |                                                  |                                 | for an explanation of the available options.    |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence.disk-sector-size``                 | an integer                      | The physical sector size of the disk            |
+   |                                                  |                                 | containing the server directory in bytes.       |
+   |                                                  |                                 | This parameter is used when the                 |
+   |                                                  |                                 | ``persistence`` parameter is set to             |
+   |                                                  |                                 | ``file`` in order to achieve atomicity          |
+   |                                                  |                                 | for read/write transactions in data             |
+   |                                                  |                                 | stores. The default value is ``4096``.          |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence.encryption.algorithm``             | a string                        | The name of the encryption algorithm to use     |
+   |                                                  |                                 | to encrypt and decrypt all persisted data.      |
+   |                                                  |                                 | The algorithm must be supported by the          |
+   |                                                  |                                 | available OpenSSL crypto library. If an         |
+   |                                                  |                                 | OpenSSL executable is available, a list of the  |
+   |                                                  |                                 | supported algorithms can be obtained with       |
+   |                                                  |                                 | command ``openssl list -cipher-algorithms``.    |
+   |                                                  |                                 | The default value is ``AES-256-CBC``            |
+   |                                                  |                                 | but this is only used if the                    |
+   |                                                  |                                 | ``persistence.encryption.key`` parameter        |
+   |                                                  |                                 | is set.                                         |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence.encryption.key``                   | a string                        | A base64-encoded encryption key. If this        |
+   |                                                  |                                 | parameter is set, the server will use it        |
+   |                                                  |                                 | to encrypt and decrypt all persisted            |
+   |                                                  |                                 | data using the algorithm specified by           |
+   |                                                  |                                 | the ``persistence.encryption.algorithm``        |
+   |                                                  |                                 | parameter. The key must meet the                |
+   |                                                  |                                 | requirements of the selected algorithm.         |
+   |                                                  |                                 | This parameter may alternatively be             |
+   |                                                  |                                 | supplied via the                                |
+   |                                                  |                                 | ``RDFOX_PERSISTENCE_ENCRYPTION_KEY``            |
+   |                                                  |                                 | environment variable.                           |
+   |                                                  |                                 | By default, this parameter is unset.            |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence.file-system-poll-interval``        | a duration of ``10 ms`` or more | Specifies the interval between successive       |
+   |                                                  | specified as described in       | polls of the file system for each               |
+   |                                                  | :numref:`specifying-durations`. | component configured to use                     |
+   |                                                  |                                 | ``file-sequence`` persistence.                  |
+   |                                                  |                                 | This setting defaults to 60 s and is            |
+   |                                                  |                                 | ignored unless ``file-sequence``                |
+   |                                                  |                                 | persistence is in use. See also                 |
+   |                                                  |                                 | :numref:`replication-performance`.              |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence.notifications-address``            | a hostname and UDP              | Specifies a hostname and UDP port number        |
+   |                                                  | port number separated           | to which other instances should send            |
+   |                                                  | separated by a plus             | notifications. This setting is ignored          |
+   |                                                  | symbol.                         | unless ``file-sequence`` persistence is         |
+   |                                                  |                                 | in use. If this parameter is not set,           |
+   |                                                  |                                 | the instance will neither listen for nor        |
+   |                                                  |                                 | send notifications. See also                    |
+   |                                                  |                                 | :numref:`replication-performance`.              |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``role-manager.argon2i.memory-cost``             | a non-negative integer          | See                                             |
+   |                                                  |                                 | :numref:`role-manager-configuration-parameters` |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``role-manager.argon2i.time-cost``               | a non-negative integer          | See                                             |
+   |                                                  |                                 | :numref:`role-manager-configuration-parameters` |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``role-manager.argon2i.parallelism``             | a non-negative integer          | See                                             |
+   |                                                  |                                 | :numref:`role-manager-configuration-parameters` |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``role-manager.externally-authenticatable-role`` | a string                        | See                                             |
+   |                                                  |                                 | :numref:`role-manager-configuration-parameters` |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``role-manager.externally-grantable-role``       | a string                        | See                                             |
+   |                                                  |                                 | :numref:`role-manager-configuration-parameters` |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``sandbox-directory``                            | a string                        | Specifies the directory to which RDFox          |
+   |                                                  |                                 | should restrict any file system access          |
+   |                                                  |                                 | where the path is specified as part of          |
+   |                                                  |                                 | an API call or shell command. The               |
+   |                                                  |                                 | purpose of this feature is to prevent an        |
+   |                                                  |                                 | attacker from probing the host's                |
+   |                                                  |                                 | file system using RDFox. The default            |
+   |                                                  |                                 | value is the working directory of the           |
+   |                                                  |                                 | RDFox process. Sandboxing of file access        |
+   |                                                  |                                 | can be disabled by setting this option          |
+   |                                                  |                                 | to the empty string.                            |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | .. _server-directory-server-param:               | a string                        | Specifies the directory to be used for          |
+   |                                                  |                                 | persistence of data and as the default          |
+   | ``server-directory``                             |                                 | location for various other files logs. When     |
+   |                                                  |                                 | this parameter is not specified or is set to    |
+   |                                                  |                                 | the empty string, RDFox will be unable to use   |
+   |                                                  |                                 | persistence. See also                           |
+   |                                                  |                                 | :numref:`server-directory`.                     |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``session.encryption.algorithm``                 | a string                        | The name of the encryption algorithm to use     |
+   |                                                  |                                 | to encrypt and decrypt all session data. The    |
+   |                                                  |                                 | algorithm must be supported by the available    |
+   |                                                  |                                 | OpenSSL crypto library. If an OpenSSL           |
+   |                                                  |                                 | executable is available, a list of the          |
+   |                                                  |                                 | supported algorithms can be obtained with       |
+   |                                                  |                                 | command ``openssl list -cipher-algorithms``.    |
+   |                                                  |                                 | The default value is ``AES-256-CBC``            |
+   |                                                  |                                 | but this is only used if the                    |
+   |                                                  |                                 | ``session.encryption.key`` parameter            |
+   |                                                  |                                 | is set.                                         |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``session.encryption.key``                       | a string                        | A base64-encoded encryption key. If this        |
+   |                                                  |                                 | parameter is set, the server will use it        |
+   |                                                  |                                 | to encrypt and decrypt session tokens issued    |
+   |                                                  |                                 | from or received by the session-based APIs      |
+   |                                                  |                                 | described in :numref:`REST-sessions`. The       |
+   |                                                  |                                 | encryption algorithm is specified by the        |
+   |                                                  |                                 | ``session.encryption.algorithm`` parameter.     |
+   |                                                  |                                 | This parameter may alternatively be             |
+   |                                                  |                                 | supplied via the                                |
+   |                                                  |                                 | ``RDFOX_SESSION_ENCRYPTION_KEY``                |
+   |                                                  |                                 | environment variable.                           |
+   |                                                  |                                 | It has no default value but if it is            |
+   |                                                  |                                 | left unset, session encryption will fall back   |
+   |                                                  |                                 | first to using the key and algorithm specified  |
+   |                                                  |                                 | by the ``persistence.encryption.*`` options,    |
+   |                                                  |                                 | if they are available, and then to using a      |
+   |                                                  |                                 | randomly-generated key for the duration of the  |
+   |                                                  |                                 | server session.                                 |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+
+.. _server-parameters-file:
+
+The Server Parameters File
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When an RDFox server is configured to use a server directory, it will inspect
+the directory for a file named ``server.params`` and, if the file is found,
+attempt to load server parameters from it. Parameter values specified
+explicitly by the user (for example via the command line arguments when using
+the RDFox executable) take precedence over values from the parameters file.
+
+The parameters file must be encoded in UTF-8. Lines with ``#`` as the first
+non-whitespace character are ignored, as are empty lines. Each (parameter name,
+parameter value) pair must appear on a single line with optional leading
+whitespace followed by the parameter name, more whitespace, the value and
+optional trailing whitespace. Values that contain whitespace must be enclosed in
+double quotes (``"``). Double quotes within values must be escaped as ``\"``,
+newlines as ``\n``, and backslashes as ``\\``.
+
+The following text block shows an example parameters file:
+
+.. code:: text
+
+  # Use 'file' persistence
+  persistence              file
+
+  # Enable loading of file: and https: URLs only
+  allowed-schemes-on-load  "file https"
+
+  # Restrict importing, exporting and reading of shell scripts to the ``/data`` directory
+  sandbox-directory        /data
+
+.. _specifying-durations:
+
+Specifying Durations
+~~~~~~~~~~~~~~~~~~~~
+
+Several parameters of the server and other RDFox components control waiting
+times between actions; in other words, durations. All such duration parameters
+are specified as follows. To specify a finite waiting time, a parameter value
+must contain a non-negative integer followed by an optional space and an
+optional unit specifier. The accepted unit specifiers are ``ms``, ``s`` (the
+default), ``h``, and ``d``. To specify an infinite waiting time the value can be
+set to the string ``unlimited`` although this is not accepted for all duration
+parameter names.

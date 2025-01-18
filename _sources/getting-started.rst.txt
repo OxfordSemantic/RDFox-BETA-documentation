@@ -1,0 +1,763 @@
+.. _getting-started:
+
+Getting Started
+===============
+
+This page will guide you through running the RDFox® executable for the first
+time. It is organised into one section of common setup steps, followed by three
+equivalent sections demonstrating how to access RDFox's querying and reasoning
+functionality through different interfaces (GUI, CLI and REST API), and finally
+a section of suggestions for how to learn more. 
+
+If you are looking to get started with the Java, or the experimental C or C++
+APIs to RDFox, see instead the appropriate demo program included with each RDFox
+release.
+
+.. _setup:
+
+Setup
+-----
+
+Before you begin, make sure that you have downloaded the latest RDFox release
+for your system from `www.rdfox.com/downloads
+<https://www.rdfox.com/downloads>`__ and unzipped it. This will produce a new
+directory containing the RDFox executable (named ``RDFox`` on Linux and macOS,
+and ``RDFox.exe`` on Windows) and some other files. The following instructions
+refer to this directory as ``<working_directory>``.
+
+You will also need to ensure that RDFox can find a
+valid license key. The quickest way to do this is to add a copy of your license
+key file directly to ``<working_directory>`` (see :numref:`rdfox-license-key`
+for other ways). If you do not have a license key file, you can request one at
+`https://www.rdfox.com/tryrdfoxforfree
+<https://www.rdfox.com/tryrdfoxforfree>`__.
+
+The following small RDF graph in `Turtle <https://www.w3.org/TR/turtle/>`__
+format will be used in the instructions below.
+
+.. _data_ttl:
+
+.. literalinclude:: data.ttl
+   :language: turtle
+   :linenos:
+
+
+.. _has_child_dlog:
+
+Additionally, the following Datalog file will be used to demonstrate RDFox's
+reasoning capabilities.
+
+.. literalinclude:: hasChild.dlog
+   :language: text
+   :linenos:
+
+Download :download:`data.ttl <./data.ttl>` and :download:`hasChild.dlog
+<./hasChild.dlog>` into ``<working_directory>``.
+
+Next, open a terminal, change directory to ``<working_directory>``, and then
+start RDFox as follows:
+
+.. tabs::
+    .. tab:: macOS/Linux
+
+        .. code-block:: bash
+
+            ./RDFox sandbox
+
+    .. tab:: Windows
+
+        .. code-block:: bash
+
+            RDFox.exe sandbox
+
+You should be presented with a command prompt indicating that you have an
+instance of the RDFox shell awaiting input. If not, you may find `this video
+<https://www.youtube.com/watch?v=mmoNFRz3-6Y>`__ demonstrating how to start the
+executable on Windows and macOS, helpful. Otherwise, run the following command
+to prepare for the main tutorial:
+
+::
+
+       endpoint start
+
+This starts RDFox's endpoint which serves the REST API, including a SPARQL over
+HTTP endpoint, and RDFox's graphical web console.
+
+You are now ready to proceed to the tutorial. There are three versions of the
+tutorial. Each follows the same workflow using a different RDFox interface. To
+complete the tutorial using the web console (GUI) jump to
+:numref:`tutorial-web-console-version`. To complete the tutorial using the RDFox
+shell (CLI), jump to :numref:`tutorial-shell-version`. To complete the tutorial
+using REST (API) jump to :numref:`tutorial-rest-ap-versioni`.
+
+.. _tutorial-web-console-version:
+
+Tutorial (Web Console version)
+------------------------------
+
+Ensure all steps from the :ref:`Setup <setup>` chapter have been completed
+and then load the web console by pointing your browser to |console_link|.
+
+.. |console_link| raw:: html
+
+   <a href="http://localhost:12110/console/" target="_blank">http://localhost:12110/console/</a>
+   
+Creating a Data Store
+~~~~~~~~~~~~~~~~~~~~~
+
+.. |CreateDataStoreLanding| image:: _static/create-datastore-landing-image.png
+   :height: 25
+   
+.. |CreateDataStore| image:: _static/create-datastore-image.png
+   :height: 25
+
+All facts and rules in RDFox live inside a *data store*. Initially no data
+stores exist so we must create one before we can load any triples. To create a
+data store, click |CreateDataStoreLanding| in the welcome dialog to display the data
+store creation dialog. Enter ``family`` as the name and click |CreateDataStore|.
+
+Importing Data
+~~~~~~~~~~~~~~
+   
+.. |ImportContent| image:: _static/import-content-image.png
+   :height: 25
+   
+.. |ChooseFile| image:: _static/choose-file-image.png
+   :height: 25
+
+.. |AddContent| image:: _static/add-content-image.png
+   :height: 25
+   
+.. |OK| image:: _static/upload-completed-image.png
+   :height: 25
+
+On successfully creating the data store, the console displays an option to
+import data into the data store. Click |ImportContent| to display the "Add
+content" dialog. Drag the :ref:`data.ttl <data_ttl>` file you downloaded
+earlier onto the dialog. The dialog should update to show the pending import.
+Toggle the "Update prefixes" switch to "on" to also load the prefixes stored
+within :ref:`data.ttl <data_ttl>`. Prefixes are used to abbreviate IRIs
+(internationalized URIs) so that they are easier to type in queries and other
+commands. To assist in setup, RDFox adds eight default prefixes to every new
+datastore (see :numref:`base-iri-and-prefixes`). Click |AddContent| to confirm
+no further data files are to be added for now, in order to proceed with the
+import.
+   
+A status report of the number of facts read (21) and added (21) to the data
+store is displayed. Dismiss the report by clicking |OK|.
+
+Running Queries
+~~~~~~~~~~~~~~~
+
+.. |Run| image:: _static/run-image.png
+   :height: 25
+
+You are now ready to run your first query!
+
+The newly created data store is automatically selected and so the SPARQL query
+editor is enabled. `SPARQL <http://www.w3.org/TR/sparql11-query/>`__ is the
+primary query language recognized by RDFox.
+
+Run the default query, which returns all of the triples in the store, by
+clicking |Run|. You should see that 21 answers were retrieved from the server
+and presented in a table below the editor.
+
+To demonstrate a simple conjunction, print each person's forename by replacing
+the default query with the query below and clicking |Run| again.
+
+::
+
+       SELECT ?p ?n
+       WHERE { 
+           ?p a :Person ;
+               :forename ?n
+       }
+
+Note that ``:brian`` is not returned as there is no triple to say that it is of
+type ``:Person`` as required by the first part of the ``WHERE`` clause.
+
+Inserting Data Using SPARQL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is also possible to modify the contents of the data store using SPARQL
+updates. For example, make the ``:marriedTo`` relationship symmetric by running:
+
+::
+
+       INSERT { ?x :marriedTo ?y }
+       WHERE  { ?y :marriedTo ?x }
+
+This adds one new triple to the data store reflecting the fact that Lois is
+married to Peter, which was derived from the fact that Peter is married to Lois.
+Rerunning the first ``SELECT`` query should now return 22 triples. You can use
+the back button in the browser to return to the original query.
+
+Adding Rules
+~~~~~~~~~~~~
+
+Reasoning is the ability to calculate the logical consequences of applying a set
+of rules to a set of facts. To illustrate how this can be useful, consider a
+query to find a particular person's children. The above data has the inverse
+information --- *i.e.* only ``:hasParent`` relationships --- so querying for
+``:hasChild``, though more natural for this use case, will return no results.
+We could remodel the data but this could make the phrasing of any queries about
+parents less natural. We could add all the ``:hasChild`` relationships as new
+facts in the Turtle file but the dataset would then have a bunch of redundancy
+and we would need to make sure that we always add both relationships together
+when we add new people to the dataset.
+
+With reasoning we can have the best of both worlds. Keeping the original
+dataset, we add a rule to state that if ``?c`` has a parent ``?p`` then ``?p``
+has a child ``?c``. RDFox can then determine all of the ``:hasChild``
+relationships itself --- including for any new families that we add later on.
+
+.. |AddContentHeader| image:: _static/add-content-header-image.png
+   :height: 25
+
+RDFox uses the Datalog language for expressing rules. The rule described above
+is captured in the Datalog file :ref:`hasChild.dlog <has_child_dlog>` that you
+downloaded to ``<working_directory>`` earlier. Import it by clicking on the
+|AddContentHeader| button in the header. In the "Add content" dialog that opens,
+click |ChooseFile|, navigate to ``<working_directory>``, select ``hasChild.dlog``,
+click to confirm and then click |AddContent|.
+
+Importing this file will cause RDFox to run its reasoning algorithms, adding the
+triples that result from applying the loaded rules to the loaded facts to the
+data store as additional facts. Facts loaded explicitly from data are referred
+to as *explicit* whereas those derived through reasoning are referred to as
+*derived*. 
+
+To check that we now have some derived triples, run the following query which
+looks for any triple that uses the ``:hasChild`` predicate we introduced in the
+Datalog rule:
+
+::
+
+       SELECT ?p ?c WHERE { ?p :hasChild ?c }
+
+Four results are returned, all of which were added by reasoning.
+    
+Deleting Facts
+~~~~~~~~~~~~~~
+
+If a fact or rule that was used in the derivation of a derived triple is removed
+from a data store, RDFox will also remove the derived triple. To check that this
+is the case, delete the triple that says ``:stewie`` has ``:lois`` as a
+parent by running:
+
+::
+
+       DELETE DATA { :stewie :hasParent :lois }
+
+and then re-query the triples using the ``:hasChild`` property with:
+
+::
+
+       SELECT ?p ?c WHERE { ?p :hasChild ?c }
+
+Observe that the answer ``:lois :stewie .``, which was derived from the
+combination of the rule we added `and` the fact we just deleted, no longer
+appears.
+
+
+Exploring a Data Store
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. |Explore| image:: _static/explore-image.png
+   :height: 25
+
+.. |Update| image:: _static/ctx-update-image.png
+   :height: 25
+
+In addition to the SPARQL runner, the web console provides a way to explore the
+facts in a data store visually. Click the |Explore| icon to the right of
+``:peter`` where it appears in the results table to switch to begin an
+exploration.
+
+Initially, a single purple rectangle is displayed representing the node
+``:peter``. The dot icon in the upper right of the purple ``peter`` node
+indicates that there are links present in the data store that are not being
+visualized. Right-click the node to display a context menu of the connections
+between ``:peter`` and other entities in this data store. 
+
+Select ``:gender "male"`` from “Outbound edges” and ``:lois :marriedTo`` from
+“Inbound edges” as seen on the menu and click |Update|. The link to the literal
+``"male"`` is displayed, as is the link from ``:lois`` to ``:peter``.
+
+You have now completed the tutorial for the web console. Enter ``quit`` into the
+RDFox shell to shut the process down then, if you would like to repeat the
+tutorial using a different interface (CLI or REST API), repeat the :ref:`setup
+<setup>` steps and then navigate to the appropriate section. Alternatively, see
+:numref:`next-steps` for some suggested next steps.
+
+.. _tutorial-shell-version:
+
+Tutorial (Shell version)
+------------------------
+
+Ensure all steps from the :ref:`Setup <setup>` chapter have been completed
+before proceeding.
+
+Creating a Data Store
+~~~~~~~~~~~~~~~~~~~~~
+
+All facts and rules in RDFox live inside a *data store*. Initially no data
+stores exist so we must create one before we can load any triples. To create a
+data store, use the ``dstore`` command as follows:
+
+::
+
+       dstore create family
+
+The above command initializes our ``family`` data store. To ensure that
+subsequent shell commands address our new data store, we use the ``active``
+command to tell the shell to connect to the ``family`` data store when running
+commands that address a data store:
+
+::
+
+       active family
+
+Importing Data
+~~~~~~~~~~~~~~
+
+Import the :ref:`data.ttl <data_ttl>` file you downloaded to
+``<working_directory>`` earlier with:
+
+::
+
+       import +p data.ttl
+
+Using the +p option ensures the prefixes stored within the :ref:`data.ttl
+<data_ttl>` file are also imported. Prefixes are used to abbreviate IRIs
+(internationalized URIs) so that they are easier to type in queries and other
+commands. To assist in setup, RDFox adds eight default prefixes to every new
+datastore (see :numref:`base-iri-and-prefixes`).
+
+This command should report the time taken by the import and that 21 data items
+were processed and updated.
+
+Running Queries
+~~~~~~~~~~~~~~~
+
+By default, RDFox does not specify where query answers must be sent. To
+instruct RDFox to print answers to the terminal, run the following command:
+
+::
+
+       set output out
+
+You are now ready to run your first query!
+
+The primary query language recognized by RDFox is `SPARQL
+<http://www.w3.org/TR/sparql11-query/>`__. SPARQL queries can be typed or
+pasted directly into the shell.
+
+Copy and paste the following SPARQL into the shell and hit enter to print all
+of the triples in the store:
+
+::
+
+       SELECT ?S ?P ?O WHERE { ?S ?P ?O }
+
+You should see a few lines beginning ``@prefix`` followed by a blank line and
+then the original 21 triples (facts) from ``data.ttl``. After the triples, a
+summary of the number of answers returned and the time taken for the query is
+printed.
+
+To demonstrate a simple conjunction, print each person’s forename by running the
+following query:
+
+::
+
+       SELECT ?p ?n WHERE { ?p a :Person . ?p :forename ?n }
+
+Note that ``:brian`` is not returned as there is no triple to say that it is of
+type ``:Person`` as required by the first part of the ``where`` clause.
+
+Inserting Data Using SPARQL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is also possible to modify the contents of the data store using SPARQL
+updates. For example, make the ``:marriedTo`` relationship symmetric by running:
+
+::
+
+       INSERT { ?x :marriedTo ?y } \
+       WHERE  { ?y :marriedTo ?x }
+
+This adds one new triple to the data store reflecting the fact that Lois is
+married to Peter, which was derived from the fact that Peter is married to Lois.
+Rerunning the first ``SELECT`` query should now return 22 triples. You can use
+the up arrow key to step back through your command history to find the original
+query.
+
+Adding Rules
+~~~~~~~~~~~~
+
+Reasoning is the ability to calculate the logical consequences of applying a set
+of rules to a set of facts. To illustrate how this can be useful, consider a
+query to find a particular person's children. The above data has the opposite
+information --- *i.e.* only ``:hasParent`` relationships --- so querying for
+``:hasChild``, though more natural for this use case, will turn up no results.
+We could remodel the data but this could make the phrasing of any queries about
+parents less natural. We could add all the ``:hasChild`` relationships as new
+facts in the Turtle file but the dataset would then have a bunch of redundancy
+and we would need to make sure that we always add both relationships together
+when we add new people to the dataset.
+
+With reasoning we can have the best of both worlds. Keeping the original
+dataset, we add a rule to state that if ``?c`` has a parent ``?p`` then ``?p``
+has a child ``?c``. RDFox can then determine all of the ``:hasChild``
+relationships itself --- including for any new families that we add later on.
+
+RDFox uses the Datalog language for expressing rules. The rule described above
+is captured in the Datalog file :ref:`hasChild.dlog <has_child_dlog>` that you
+downloaded to ``<working_directory>`` earlier. Import it with:
+
+::
+
+       import hasChild.dlog
+
+Importing this file will cause RDFox to run its reasoning algorithms, adding the
+triples that result from applying the loaded rules to the loaded facts to the
+data store as additional facts. Facts loaded explicitly from data are referred
+to as *explicit* whereas those derived through reasoning are referred to as
+*derived*. 
+
+To check that we now have some derived triples, run the following query which
+looks for any triple that uses the ``:hasChild`` predicate we introduced in the
+Datalog rule:
+
+::
+
+       SELECT ?p ?c WHERE { ?p :hasChild ?c }
+
+Four results are returned, all of which were added by reasoning.
+
+Deleting Facts
+~~~~~~~~~~~~~~
+
+If a fact or rule that was used in the derivation of a derived triple is removed
+from a data store, RDFox will also remove the derived triple. To check that this
+is the case, delete the triple that says ``:stewie`` has ``:lois`` as a
+parent by running:
+
+::
+
+       DELETE DATA { :stewie :hasParent :lois }
+
+and then requery the triples using the ``:hasChild`` property with:
+
+::
+
+       SELECT ?p ?c WHERE { ?p :hasChild ?c }
+
+Observe that the answer ``:lois :stewie .``, which was derived from the
+combination of the rule we added `and` the fact we just deleted, no longer
+appears.
+
+Stopping and Restarting RDFox
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Shut down RDFox by typing the ``quit`` command. Since RDFox is an in-memory
+database, and because we started the process using the ``sandbox`` command
+which disables any form of persistence, the contents of the data store will be
+dropped when the process exits. While experimenting with RDFox, it may
+therefore be useful to write the commands to initialize the data store and load
+data into a script which can be passed to RDFox at startup. The following
+script repeats the whole of this tutorial. Save it to a new file
+``<working_directory>/start.rdfox`` and then run it with ``./RDFox sandbox .
+start`` (on Linux or Mac) or ``RDFox.exe sandbox . start`` (on
+Windows).
+
+::
+
+       endpoint start
+       dstore create family
+       active family
+       import +p data.ttl
+       set output out
+       SELECT ?S ?P ?O WHERE { ?S ?P ?O }
+       SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :forename ?n }
+       INSERT { ?x :marriedTo ?y } WHERE { ?y :marriedTo ?x }
+       import hasChild.dlog
+       SELECT ?p ?c WHERE { ?p :hasChild ?c }
+       DELETE DATA { :stewie :hasParent :lois }
+       SELECT ?p ?c WHERE { ?p :hasChild ?c }
+
+For alternative ways of starting RDFox which do not disable persistence, see
+:numref:`rdfox-executable`.
+
+You have now completed the tutorial with the RDFox shell. Enter ``quit`` to shut
+the process down again then, if you would like to repeat the tutorial using a
+different interface (GUI or REST API), repeat the :ref:`setup <setup>` steps and
+then navigate to the appropriate section.
+
+
+.. _tutorial-rest-ap-versioni:
+
+Tutorial (REST version)
+-----------------------
+
+Ensure all steps from the :ref:`Setup <setup>` chapter have been completed
+before proceeding.
+
+The steps in this section use the cURL tool which is normally installed on
+MacOS, Linux and modern versions of Windows. You will need to open a new shell
+to run the cURL commands in addition to the shell where RDFox is running.
+Inside the new shell, change directory to ``<working_directory>`` so that the
+relative paths in the examples correctly locate the files you downloaded in the
+setup steps.
+
+At the end of this section, we give an example of achieving the same results
+:ref:`using Python <python_rest>`.
+
+Creating a Data Store
+~~~~~~~~~~~~~~~~~~~~~
+
+All facts and rules in RDFox live inside a *data store*. Initially no data
+stores exist so we must create one before we can load any triples. To create a
+data store, issue a POST request to path ``datastores/<data-store-name>`` such
+as:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family
+
+Note we run cURL with the ``-i`` option to *include* the response headers in
+the output which means the output will be similar to:
+
+.. code:: http
+
+   HTTP/1.1 201 Created
+   Date: Wed, 13 Jul 2022 15:39:06 GMT
+   Server: RDFox Endpoint
+   ETag: "09649913528177635553-1"
+   Location: /datastores/family
+   Content-Length: 0
+
+Importing Data
+~~~~~~~~~~~~~~
+
+Import the :ref:`data.ttl <data_ttl>` file you downloaded to
+``<working_directory>`` earlier, into the data store created above by issuing a
+PATCH request to path ``datastores/family/content`` path:
+
+.. code:: bash
+
+   curl -i -X PATCH "localhost:12110/datastores/family/content?operation=add-content-update-prefixes" -H "Content-Type:" -T data.ttl
+
+This sends the content of the file to RDFox and reports success with:
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+   Date: Wed, 13 Jul 2022 15:40:02 GMT
+   Server: RDFox Endpoint
+   ETag: "09649913528177635553-2"
+   Content-Type: text/plain; charset=UTF-8
+   Vary: Accept
+   Transfer-Encoding: chunked
+
+   prefix: : = https://rdfox.com/getting-started/
+   prefix: owl: = http://www.w3.org/2002/07/owl#
+   prefix: rdf: = http://www.w3.org/1999/02/22-rdf-syntax-ns#
+   prefix: rdfox: = https://rdfox.com/vocabulary#
+   prefix: rdfs: = http://www.w3.org/2000/01/rdf-schema#
+   prefix: sh: = http://www.w3.org/ns/shacl#
+   prefix: swrl: = http://www.w3.org/2003/11/swrl#
+   prefix: swrlb: = http://www.w3.org/2003/11/swrlb#
+   prefix: xsd: = http://www.w3.org/2001/XMLSchema#
+   information: #aborted = false
+   information: #errors = 0
+   information: #warnings = 0
+   information: #processed-facts = 21
+   information: #changed-facts = 21
+   information: #processed-rules = 0
+   information: #changed-rules = 0
+   information: #processed-axioms = 0
+   information: #changed-axioms = 0
+
+Note the use of ``-H "Content-Type:"`` in the cURL command. By default, cURL
+will set the content type to ``application/x-www-form-urlencoded`` which is a
+not a supported RDFox ``Content-Type``. Using ``-H "Content-Type:"`` instructs
+cURL not to set the ``Content-Type`` and allows RDFox to automatically detect
+that we have data in Turtle format. Alternatively, we could explicitly set the
+type using ``-H "Content-Type: text/turtle"``. For the different formats
+supported by RDFox for encoding data store content, see
+:numref:`data-store-content-formats`.
+
+Including ``operation=add-content-update-prefixes`` ensures the prefixes stored
+within the :ref:`data.ttl <data_ttl>` file are also imported. Prefixes are used
+to abbreviate IRIs (internationalized URIs) so that they are easier to type in
+queries and other commands. To assist in setup, RDFox adds eight default
+prefixes to every new datastore (see :numref:`base-iri-and-prefixes`).
+
+Running Queries
+~~~~~~~~~~~~~~~
+
+You are now ready to run your first query!
+
+The primary query language recognized by RDFox is `SPARQL
+<http://www.w3.org/TR/sparql11-query/>`__. RDFox exposes a fully compliant
+SPARQL-over-HTTP endpoint at path ``/datastores/<data-store-name>/sparql``. To
+run a query we send a ``POST`` request to this path and set the ``query``
+parameter to a SPARQL query. 
+
+Run the following cURL command to retrieve all of the triples in the store:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/sparql \
+        -H "Accept: application/x.sparql-results+turtle-abbrev" \
+        -d "query=SELECT ?S ?P ?O WHERE { ?S ?P ?O }"
+
+After the HTTP response headers you should see a few lines beginning ``@prefix``
+followed by a blank line and then the original 21 triples (facts) from
+``data.ttl`` in the proprietary format
+``application/x.sparql-results+turtle-abbrev``. 
+
+To demonstrate a simple conjunction, print each person's forename by running the
+following cURL command:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/sparql \
+      -H "Accept: application/x.sparql-results+turtle-abbrev" \
+      -d "query=SELECT ?p ?n WHERE { ?p a :Person . ?p :forename ?n }"
+
+Note that ``:brian`` is not returned as there is no triple to say that it is of
+type ``:Person`` as required by the first part of the ``where`` clause.
+
+.. _inserting-data-using-sparql-1:
+
+Inserting Data Using SPARQL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is also possible to modify the contents of the data store using SPARQL
+updates. To run a SPARQL update via REST, we must use the ``update`` parameter
+rather than the ``query`` parameter. For example, make the ``:marriedTo``
+relationship symmetric by running:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/sparql \
+      -d "update=INSERT { ?x :marriedTo ?y } WHERE { ?y :marriedTo ?x }"
+
+this returns the no content (204) status code to indicate success:
+
+.. code:: http
+
+   HTTP/1.1 204 No Content
+   Date: Wed, 13 Jul 2022 16:53:28 GMT
+   Server: RDFox Endpoint
+   ETag: "09649913528177635553-3"
+
+Adding Rules
+~~~~~~~~~~~~
+
+
+Reasoning is the ability to calculate the logical consequences of applying a set
+of rules to a set of facts. To illustrate how this can be useful, consider a
+query to find a particular person's children. The above data has the opposite
+information --- *i.e.* only ``:hasParent`` relationships --- so querying for
+``:hasChild``, though more natural for this use case, will turn up no results.
+We could remodel the data but this could make the phrasing of any queries about
+parents less natural. We could add all the ``:hasChild`` relationships as new
+facts in the Turtle file but the dataset would then have a bunch of redundancy
+and we would need to make sure that we always add both relationships together
+when we add new people to the dataset.
+
+With reasoning we can have the best of both worlds. Keeping the original
+dataset, we add a rule to state that if ``?c`` has a parent ``?p`` then ``?p``
+has a child ``?c``. RDFox can then determine all of the ``:hasChild``
+relationships itself --- including for any new families that we add later on.
+
+RDFox uses the Datalog language for expressing rules. The rule described above
+is captured in the Datalog file :ref:`hasChild.dlog <has_child_dlog>` that you
+downloaded to ``<working_directory>`` earlier. Import it with:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/content \
+        -H "Content-Type: application/x.datalog" \
+        -T hasChild.dlog
+
+If successful, the ``200 OK`` response code should be returned.
+
+Importing this file will cause RDFox to run its reasoning algorithms, adding the
+triples that result from applying the loaded rules to the loaded facts to the
+data store as additional facts. Facts loaded explicitly from data are referred
+to as *explicit* whereas those derived through reasoning are referred to as
+*derived*. 
+
+To check that we now have some derived triples, run the following query which
+looks for any triple that uses the ``:hasChild`` predicate we introduced in the
+Datalog rule:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/sparql \
+      -H "Accept: application/x.sparql-results+turtle-abbrev" \
+      -d "query=SELECT ?p ?c WHERE { ?p :hasChild ?c }"
+
+Four results are returned, all of which were added by reasoning.
+
+Deleting Facts
+~~~~~~~~~~~~~~
+
+If a fact or rule that was used in the derivation of a derived triple is removed
+from a data store, RDFox will also remove the derived triple. To check that this
+is the case, delete the triple that says ``:stewie`` has ``:lois`` as a
+parent by running:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/sparql \
+      -d "update=DELETE DATA { :stewie :hasParent :lois }"
+
+and then requery the triples using the ``:hasChild`` property with:
+
+.. code:: bash
+
+   curl -i -X POST localhost:12110/datastores/family/sparql \
+      -H "Accept: application/x.sparql-results+turtle-abbrev" \
+      -d "query=SELECT ?p ?c WHERE { ?p :hasChild ?c }"
+
+Observe that the answer ``:lois :stewie .``, which was derived from the
+combination of the rule we added `and` the fact we just deleted, no longer
+appears.
+
+.. _python_rest:
+
+Python example
+~~~~~~~~~~~~~~
+
+The following Python script uses the requests module to reproduce the same
+steps as used in the cURL examples presented previous.
+
+.. literalinclude:: pythonRest.py
+   :language: python
+   :linenos:
+
+Download: :download:`pythonRest.py <./pythonRest.py>`.
+
+You have now completed the tutorial for the REST API. Enter ``quit`` into the
+RDFox shell to shut the process down then, if you would like to repeat the
+tutorial using a different interface (CLI or GUI), repeat the :ref:`setup
+<setup>` steps and then navigate to the appropriate section.
+
+.. _next-steps:
+
+Next Steps
+----------
+
+To learn more about RDFox's shell environment see
+:numref:`rdfox-shell`.
+
+To learn more about how to use RDFox programatically, including via REST or
+Java, see :numref:`apis`.
+
+To learn how RDFox structures the information loaded into the system, see
+:numref:`servers`.

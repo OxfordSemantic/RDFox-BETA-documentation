@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Table of Contents &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="1. Welcome to RDFox" href="welcome-to-rdfox.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Table of Contents</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="table-of-contents">
+<h1>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="welcome-to-rdfox.html#how-to-read-this-documentation">1.1. How to Read this Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features-and-requirements.html#rdfox-features">2.1. RDFox Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features-and-requirements.html#software-archive">2.2. Software Archive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features-and-requirements.html#interfaces">2.3. Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features-and-requirements.html#system-requirements">2.4. System Requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#setup">3.1. Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#tutorial-web-console-version">3.2. Tutorial (Web Console version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#tutorial-shell-version">3.3. Tutorial (Shell version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#tutorial-rest-version">3.4. Tutorial (REST version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#next-steps">3.5. Next Steps</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers.html#data-stores">4.1. Data Stores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servers.html#roles">4.2. Roles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servers.html#server-parameters">4.3. Server Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data-stores.html#operations-on-data-stores">5.1. Operations on Data Stores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-stores.html#organization-of-data">5.2. Organization of Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-stores.html#supported-data-types-for-literals">5.3. Supported Data Types for Literals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-stores.html#data-store-configuration">5.4. Data Store Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tuple-tables.html#types-of-tuple-tables">6.1. Types of Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tuple-tables.html#fact-domains">6.2. Fact Domains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tuple-tables.html#managing-and-using-tuple-tables">6.3. Managing and Using Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tuple-tables.html#in-memory-tuple-tables">6.4. In-Memory Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tuple-tables.html#built-in-tuple-tables">6.5. Built-In Tuple Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data-sources.html#registering-data-sources">7.1. Registering Data Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-sources.html#creating-data-source-tuple-tables">7.2. Creating Data Source Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-sources.html#data-sources-and-incremental-reasoning">7.3. Data Sources and Incremental Reasoning</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="import-and-export.html#data-store-content-formats">8.1. Data Store Content Formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import-and-export.html#import">8.2. Import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import-and-export.html#export">8.3. Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import-and-export.html#access-control">8.4. Access Control</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#sparql-1-1-support">9.1. SPARQL 1.1 Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#built-in-functions">9.2. Built-In Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#aggregate-functions">9.3. Aggregate Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#querying-tuple-tables">9.4. Querying Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#distinguishing-explicit-and-derived-facts-in-queries">9.5. Distinguishing Explicit and Derived Facts in Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#monitoring-query-evaluation">9.6. Monitoring Query Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="querying.html#access-control">9.7. Access Control</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#rule-languages">10.1. Rule Languages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#materialization-based-reasoning">10.2. Materialization-Based Reasoning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#restrictions-on-rule-sets">10.3. Restrictions on Rule Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#the-rule-language-of-rdfox">10.4. The Rule Language of RDFox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#common-uses-of-rules-in-practice">10.5. Common Uses of Rules in Practice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#owl-2-support-in-rdfox">10.6. OWL 2 Support in RDFox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#swrl-support-in-rdfox">10.7. SWRL Support in RDFox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#explaining-reasoning-results">10.8. Explaining Reasoning Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#monitoring-reasoning-in-rdfox">10.9. Monitoring Reasoning in RDFox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reasoning.html#querying-the-explicitly-given-data">10.10. Querying the Explicitly given Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#types-of-transactions">11.1. Types of Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#concurrent-execution-of-transactions">11.2. Concurrent Execution of Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#explicit-and-implicit-transactions">11.3. Explicit and Implicit Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#recoverable-and-non-recoverable-errors-within-read-write-transactions">11.4. Recoverable and Non-recoverable Errors Within Read/Write Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#constraining-data-store-content">11.5. Constraining Data Store Content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#commit-procedure-experimental">11.6. Commit Procedure (EXPERIMENTAL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html#delta-queries">11.7. Delta Queries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="access-control.html#key-concepts">12.1. Key Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="access-control.html#role-manager">12.2. Role Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="access-control.html#authentication-managers">12.3. Authentication Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="access-control.html#other-authentication-pathways">12.4. Other Authentication Pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="access-control.html#securing-an-rdfox-server">12.5. Securing an RDFox Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="access-control.html#example-access-control-policies">12.6. Example Access Control Policies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="persistence.html#the-server-directory">13.1. The Server Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="persistence.html#configuration">13.2. Configuration</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-shell.html#connection-management">15.1. Connection Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-shell.html#shell-commands">15.2. Shell Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-shell.html#shell-variables">15.3. Shell Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-shell.html#script-execution">15.4. Script Execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-shell.html#error-handling">15.5. Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#basics-of-the-java-api">16.1. Basics of the Java API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#basics-of-the-restful-api">16.2. Basics of the RESTful API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-servers">16.3. Managing Servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-data-stores">16.4. Managing Data Stores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-data-store-properties">16.5. Managing Data Store Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-data-store-prefixes">16.6. Managing Data Store Prefixes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-delta-queries">16.7. Managing Delta Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-the-commit-procedure">16.8. Managing the Commit Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-data-store-content">16.9. Managing Data Store Content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-data-sources">16.10. Managing Data Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-tuple-tables">16.11. Managing Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-statistics">16.12. Managing Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#evaluating-queries">16.13. Evaluating Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#working-with-transactions">16.14. Working with Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#cursors">16.15. Cursors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#explaining-fact-derivation">16.16. Explaining Fact Derivation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#handling-concurrent-updates">16.17. Handling Concurrent Updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#managing-roles">16.18. Managing Roles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#checking-endpoint-health">16.19. Checking Endpoint Health</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apis.html#remote-shell-execution">16.20. Remote Shell Execution</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#sandbox">18.1. <code class="docutils literal notranslate"><span class="pre">sandbox</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#analyze">18.2. <code class="docutils literal notranslate"><span class="pre">analyze</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#init">18.3. <code class="docutils literal notranslate"><span class="pre">init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#upgrade">18.4. <code class="docutils literal notranslate"><span class="pre">upgrade</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#daemon">18.5. <code class="docutils literal notranslate"><span class="pre">daemon</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#shell">18.6. <code class="docutils literal notranslate"><span class="pre">shell</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#remote">18.7. <code class="docutils literal notranslate"><span class="pre">remote</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-executable.html#service">18.8. <code class="docutils literal notranslate"><span class="pre">service</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-endpoint.html#starting-and-stopping-the-endpoint">19.1. Starting and Stopping the Endpoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters">19.2. Endpoint Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#api-logging">20.1. API Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#http-request-logging">20.2. HTTP Request Logging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="high-availability.html#characteristics">21.1. Characteristics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high-availability.html#recommended-deployment-steps">21.2. Recommended Deployment Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="high-availability.html#suggested-approaches-to-load-balancing">21.3. Suggested Approaches to Load Balancing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docker.html#image-defaults">22.1. Image Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html#suggested-mounts">22.2. Suggested Mounts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html#example-docker-run-commands">22.3. Example Docker Run Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html#checking-the-health-of-rdfox-containers">22.4. Checking the Health of RDFox Containers</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="welcome-to-rdfox.html" class="btn btn-neutral float-right" title="1. Welcome to RDFox" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

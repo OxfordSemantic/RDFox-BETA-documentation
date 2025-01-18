@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>6. Tuple Tables &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="7. Data Sources" href="data-sources.html" />
+    <link rel="prev" title="5. Data Stores" href="data-stores.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">6. Tuple Tables</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types-of-tuple-tables">6.1. Types of Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fact-domains">6.2. Fact Domains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#managing-and-using-tuple-tables">6.3. Managing and Using Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#in-memory-tuple-tables">6.4. In-Memory Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-tuple-tables">6.5. Built-In Tuple Tables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#skolem">6.5.1. <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shacl">6.5.2. <code class="docutils literal notranslate"><span class="pre">SHACL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencygraph">6.5.3. <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">6. </span>Tuple Tables</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="tuple-tables">
+<span id="id1"></span><h1><span class="section-number">6. </span>Tuple Tables<a class="headerlink" href="#tuple-tables" title="Permalink to this headline">¶</a></h1>
+<p>As explained in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>, a data store uses <em>tuple tables</em> as
+containers for facts – that is, triples and other kind of data that RDFox®
+should process. Each tuple table is identified by a name that is unique for a
+data store. Moreover, each tuple table has a <em>minimal</em> and <em>maximal arity</em>,
+which are numbers determining the smallest and the largest numbers of RDF
+resources in a fact stored in the tuple table. In most cases, the minimal and
+maximal arity are the same, in which case they are called just <em>arity</em>.</p>
+<div class="section" id="types-of-tuple-tables">
+<span id="id2"></span><h2><span class="section-number">6.1. </span>Types of Tuple Tables<a class="headerlink" href="#types-of-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<p>RDFox supports three kinds of tuple tables.</p>
+<ul class="simple">
+<li><p>In-memory tuple tables are the most commonly used kind of tuple table, which,
+as the name suggests, store facts in RAM. The <a class="reference external" href="https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/Overview.html#dfn-rdf-dataset">RDF dataset</a>
+of a data store is represented using the in-memory tuple tables
+<code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code>. Tuple table <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> has arity
+three and contains the triples of the default graph, and tuple table
+<code class="docutils literal notranslate"><span class="pre">Quads</span></code> has arity four and contains the triples of every named graph. RDFox
+provides ways to add and delete facts in in-memory tuple tables. See
+<a class="reference internal" href="data-stores.html#organization-of-rdf-data"><span class="std std-numref">Section 5.2</span></a> for more detail on how RDFox stores RDF
+datasets.</p></li>
+<li><p><em>Built-in tuple tables</em> contain facts that can be useful in various
+applications of RDFox. Their content is determined by RDFox and cannot be
+modified by users. They are described in more detail in
+<a class="reference internal" href="#built-in-tuple-tables"><span class="std std-numref">Section 6.5</span></a>.</p></li>
+<li><p><em>Data source tuple tables</em> provide a ‘virtual view’ over data in non-RDF data
+sources, such as CSV files, relational databases, or a full-text Apache Solr
+index. Such tuple tables must be created explicitly by the user, and doing so
+requires specifying how the external data is to be transformed into a format
+compatible with RDF. The facts in data source tuple tables are ‘virtual’ in
+the sense that they are constructed automatically by RDFox based on the data
+in the data source — that is, there is no way to add/delete such facts
+directly. Finally, data source tuple tables can be of arbitrary arity —
+that is, such tuple tables are not limited to containing just triples. Data
+source tuple tables and the process of importing external data are described
+in detail in <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>.</p></li>
+</ul>
+</div>
+<div class="section" id="fact-domains">
+<span id="id3"></span><h2><span class="section-number">6.2. </span>Fact Domains<a class="headerlink" href="#fact-domains" title="Permalink to this headline">¶</a></h2>
+<p>Each fact in a tuple is associated with one or more fact domains.</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">explicit</span></code> fact domain contains facts that were imported explicitly by
+the user.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">derived</span></code> fact domain contains facts that were not imported explicitly
+by the user, but were derived by a rule.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">all</span></code> fact domain contains all facts — that is, <code class="docutils literal notranslate"><span class="pre">all</span></code> is the
+union of <code class="docutils literal notranslate"><span class="pre">explicit</span></code> and <code class="docutils literal notranslate"><span class="pre">derived</span></code>.</p></li>
+</ul>
+<p>A fact can belong to more than one domain. For example, facts added to the
+store are stored into the <code class="docutils literal notranslate"><span class="pre">explicit</span></code> domain, and during reasoning they are
+transferred into the <code class="docutils literal notranslate"><span class="pre">all</span></code> domain.</p>
+<p>Only the <code class="docutils literal notranslate"><span class="pre">explicit</span></code> fact domain can be directly affected by users. That is,
+all explicitly added facts are added to the <code class="docutils literal notranslate"><span class="pre">explicit</span></code> domain, and only those
+facts can be deleted. It is not possible to manually delete derived facts since
+the meaning of such deletions is unclear.</p>
+<p>Many RDFox operations accept a fact domain as an argument. For example, SPARQL
+query evaluation takes a fact domain as an argument, which determines what
+subset of the facts the query should be evaluated over. Thus, if a query is
+evaluated with respect to the <code class="docutils literal notranslate"><span class="pre">explicit</span></code> domain, it will ‘see’ only the facts
+that were explicitly added to a data store, and it will ignore the facts that
+were derived by reasoning.</p>
+</div>
+<div class="section" id="managing-and-using-tuple-tables">
+<span id="using-tuple-tables"></span><h2><span class="section-number">6.3. </span>Managing and Using Tuple Tables<a class="headerlink" href="#managing-and-using-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<p>RDFox provide ways for creating and deleting tuple tables: this can be
+accomplished in the shell using the <code class="docutils literal notranslate"><span class="pre">tupletable</span></code> command (see
+<a class="reference internal" href="rdfox-shell.html#tupletable-command"><span class="std std-numref">Section 15.2.52</span></a>) and the corresponding APIs described in
+<a class="reference internal" href="apis.html#apis-tuple-tables"><span class="std std-numref">Section 16.11</span></a>. When creating a tuple table, one must specify a
+list of key-value parameters that determine what kind of tuple table is to be
+created. The parameters for data source tuple tables depend on the type of data
+source and are described in detail in <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>. Moreover, the
+parameters for in-memory and built-in tuple tables are described in
+<a class="reference internal" href="#in-memory-tuple-tables"><span class="std std-numref">Section 6.4</span></a> and <a class="reference internal" href="#built-in-tuple-tables"><span class="std std-numref">Section 6.5</span></a>,
+respectively.</p>
+<p>Facts in tuple tables can be accessed during querying and reasoning. In
+queries, tuple tables <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code> can be accessed using
+standard SPARQL syntax for querying <a class="reference external" href="https://www.w3.org/TR/sparql11-query/#queryDataset">RDF datasets</a>. Access to arbitrary
+tuple tables in the data store is established using the proprietary SPARQL
+operator <code class="docutils literal notranslate"><span class="pre">TT</span></code> and the reserved IRI <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code>, both of which are described
+in <a class="reference internal" href="querying.html#querying-tuple-tables"><span class="std std-numref">Section 9.4</span></a>. In rules, tuple tables <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Quads</span></code> can be accessed using the dedicated syntax for <em>default graph
+atoms</em> (see <a class="reference internal" href="reasoning.html#default-graph-atom"><span class="std std-numref">Section 10.4.1.1</span></a>) and <em>named graph atoms</em> (see
+<a class="reference internal" href="reasoning.html#named-graph-atom"><span class="std std-numref">Section 10.4.1.2</span></a>), respectively. Access to arbitrary tuple tables is
+established using the <em>general atom syntax</em> described in
+<a class="reference internal" href="reasoning.html#general-atom"><span class="std std-numref">Section 10.4.1.3</span></a>.</p>
+<p>RDFox provides different ways of updating the content of <em>in-memory</em> tuple
+tables. The content of tuple tables <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code> can be
+updated by adding or removing RDF data using the shell command <code class="docutils literal notranslate"><span class="pre">import</span></code> (see
+<a class="reference internal" href="rdfox-shell.html#import-command"><span class="std std-numref">Section 15.2.26</span></a>) and the corresponding APIs described in
+<a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.9</span></a>. Similarly, one can update the content of
+arbitrary in-memory tuple tables by importing facts using the Datalog <em>general
+atom</em> syntax (see <a class="reference internal" href="reasoning.html#general-atom"><span class="std std-numref">Section 10.4.1.3</span></a>). Another way of updating the content
+of in-memory tuple tables is to use the <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">SPARQL Update Language</a>. One can use
+standard syntax to update the tuple tables <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code>,
+and they can use the operator <code class="docutils literal notranslate"><span class="pre">TT</span></code> and the reserved IRI <code class="docutils literal notranslate"><span class="pre">rdfox::TT</span></code> (see
+<a class="reference internal" href="querying.html#querying-tuple-tables"><span class="std std-numref">Section 9.4</span></a>) to update the content of arbitrary in-memory
+tuple tables. The final way of updating the content of in-memory tuple tables
+is via reasoning. For example, adding an OWL ontology to the default graph or
+to a named graph will derive facts in <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code>,
+respectively. Similarly, adding a set of Datalog rules to the data store, will
+update the tuple tables referenced in their head atoms.</p>
+</div>
+<div class="section" id="in-memory-tuple-tables">
+<span id="id4"></span><h2><span class="section-number">6.4. </span>In-Memory Tuple Tables<a class="headerlink" href="#in-memory-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<p>RDFox uses in-memory tuple tables to store facts imported by the users.
+In-memory tuple tables <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> and <code class="docutils literal notranslate"><span class="pre">Quads</span></code> are created
+automatically when a fresh data store is created to represent the default RDF
+dataset of the data store. Moreover, in-memory tuple tables can be created and
+deleted using the tuple table management APIs. During table creation, the user
+can specify the following parameters.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 17%" />
+<col style="width: 70%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Default value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></td>
+<td><p>—</p></td>
+<td><p>Specifies the type of the in-memory tuple table. The available options are <code class="docutils literal notranslate"><span class="pre">unary-table</span></code>,
+<code class="docutils literal notranslate"><span class="pre">binary-table</span></code>, <code class="docutils literal notranslate"><span class="pre">triple-table-fi</span></code>, <code class="docutils literal notranslate"><span class="pre">triple-table-pi</span></code>, <code class="docutils literal notranslate"><span class="pre">quad-table-lg-fi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">quad-table-sg-fi</span></code>, <code class="docutils literal notranslate"><span class="pre">quad-table-lg-pi</span></code>, and <code class="docutils literal notranslate"><span class="pre">quad-table-sg-pi</span></code>. See
+<code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code> <a class="reference internal" href="data-stores.html#triple-table-type-option"><span class="std std-numref">Section 5.4.1.11</span></a> and <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code>
+<a class="reference internal" href="data-stores.html#quad-table-type-option"><span class="std std-numref">Section 5.4.1.9</span></a> for more information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code></p></td>
+<td><p>(as in the data store)</p></td>
+<td><p>Specifies the maximum number of tuples that the new tuple table will
+be able to hold. The main purpose of this parameter is to reduce the
+amount of address space that the tuple table will use. The default value
+is the value of the data store parameter with the same name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code></p></td>
+<td><p>(as in the data store)</p></td>
+<td><p>Provides a hint as to how many facts the system should expect to store
+initially in the tuple table. When importing large data sets, setting
+this parameter to be roughly equal to the number of facts to be imported
+could improve the speed of importation.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="built-in-tuple-tables">
+<span id="id5"></span><h2><span class="section-number">6.5. </span>Built-In Tuple Tables<a class="headerlink" href="#built-in-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<p>Every data store contains a fix set of <em>built-in</em> tuple tables whose content is
+determined by RDFox. Built-in tables are different to other tuple tables in
+that they don’t necessarily store facts explicitly, they may have a variable
+arity, they may not be allowed in rules, and they may impose restrictions on
+what positions need to be fixed when accessed. As with other tuple tables,
+built-in tuple tables are referenced in queries using the proprietary <code class="docutils literal notranslate"><span class="pre">TT</span></code>
+operator or the reserved IRI <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code> (see
+<a class="reference internal" href="querying.html#querying-tuple-tables"><span class="std std-numref">Section 9.4</span></a>). Similarly, when allowed in rules, built-in
+tuple tables are referenced using general atoms (see <a class="reference internal" href="reasoning.html#general-atom"><span class="std std-numref">Section 10.4.1.3</span></a>).</p>
+<p>Each built-in tuple table is identified by a fixed name, which cannot be
+changed. When a data store is created, all built-in tuple tables supported by
+RDFox will be created automatically. Like with other tuple tables, RDFox allows
+built-in tuple tables to be deleted. Once deleted, a built-in table can be
+recreated as outlined in <a class="reference internal" href="#using-tuple-tables"><span class="std std-numref">Section 6.3</span></a> by specifying the tuple
+table name without any parameters. Note that names of built-in tuple tables
+cannot be used for the creation of other types of tuple tables.</p>
+<div class="section" id="skolem">
+<h3><span class="section-number">6.5.1. </span><code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code><a class="headerlink" href="#skolem" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> tuple table can have arity from one onwards. Moreover, in each
+fact in this tuple table, the last resource of the fact is a blank node that is
+uniquely determined by all remaining arguments. This can be useful in queries
+and/or rules that need to create new objects. This is explained using the
+following example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Let us assume we are dealing with a dataset where each person
+is associated with zero or more companies using the <code class="docutils literal notranslate"><span class="pre">:worksFor</span></code>
+relationship. For example, our dataset could contain the following triples.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:Peter :worksFor :Company1 .
+:Peter :worksFor :Company2 .
+:Paul  :worksFor :Company1 .
+</pre></div>
+</div>
+<p>Now assume that we wish to attach additional information to each individual
+employment. For example, we might want to say that the employment of
+<code class="docutils literal notranslate"><span class="pre">:Peter</span></code> in <code class="docutils literal notranslate"><span class="pre">:Company1</span></code> started on a specific date. To be able to
+capture such data, we will ‘convert’ each <code class="docutils literal notranslate"><span class="pre">:worksFor</span></code> link to a separate
+instance of the <code class="docutils literal notranslate"><span class="pre">:Employment</span></code> class; then, we can attach arbitrary
+information to such instances. This presents us with a key challenge: for
+each combination of a person and company, we need to ‘invent’ a fresh
+object that is uniquely determined by the person and company.</p>
+<p>This problem is solved using the <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> built-in tuple table. In
+particular, we can restructure the data using the following rule.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:Employment[?E],
+:employee[?E,?P],
+:inCompany[?E,?C] :-
+    :worksFor[?P,?C],
+    SKOLEM(&quot;Employment&quot;,?P,?C,?E) .
+</pre></div>
+</div>
+<p>The above rule can be understood as follows. Body atom <code class="docutils literal notranslate"><span class="pre">:worksFor[?P,?C]</span></code>
+selects all combinations of a person and a company that the person works
+for. Moreover, atom <code class="docutils literal notranslate"><span class="pre">SKOLEM(&quot;Employment&quot;,?P,?C,?E)</span></code> contains all
+facts where the value of <code class="docutils literal notranslate"><span class="pre">?E</span></code> is uniquely determined by the fixed string
+<code class="docutils literal notranslate"><span class="pre">&quot;Employment&quot;</span></code>, the value of <code class="docutils literal notranslate"><span class="pre">?P</span></code>, and the value of <code class="docutils literal notranslate"><span class="pre">?C</span></code>. Thus, for
+each combination of <code class="docutils literal notranslate"><span class="pre">?P</span></code> and <code class="docutils literal notranslate"><span class="pre">?C</span></code>, the built-in tuple table will
+produce a unique value of <code class="docutils literal notranslate"><span class="pre">?E</span></code>, which is then used in the rule head to
+derive new triples.</p>
+<p>How a value of <code class="docutils literal notranslate"><span class="pre">?E</span></code> is computed from the other arguments is not under
+application control: each value is a blank node whose name is guaranteed to
+be unique. However, what matters is that the value of <code class="docutils literal notranslate"><span class="pre">?E</span></code> is always the
+same whenever the values of all other arguments are the same. Thus, we can
+use the following rule to specify the start time of Peter’s employment in
+Company 1.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:startDate[?E,&quot;2020-02-03&quot;^^xsd:date] :- SKOLEM(&quot;Employment&quot;,:Peter,:Company1,?E) .
+</pre></div>
+</div>
+<p>After evaluating these rules, the following triples will be added to the
+data store. We use blank node names such as <code class="docutils literal notranslate"><span class="pre">_:new_1</span></code> for clarity: the
+actual names of new blank nodes will be much longer in practice.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_:new_1 rdf:type   :Employment            .
+_:new_1 :employee  :Peter                 .
+_:new_1 :inCompany :Company1              .
+_:new_1 :startDate &quot;2020-02-03&quot;^^xsd:date .
+_:new_2 rdf:type   :Employment            .
+_:new_2 :employee  :Peter                 .
+_:new_2 :inCompany :Company2              .
+_:new_3 rdf:type   :Employment            .
+_:new_3 :employee  :Paul                  .
+_:new_3 :inCompany :Company1              .
+</pre></div>
+</div>
+</div>
+<p>When creating fresh objects using the <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> built-in tuple table, it
+is good practice to incorporate object type into the argument. The above
+example achieved this by passing a fixed string <code class="docutils literal notranslate"><span class="pre">&quot;Employment&quot;</span></code> as the first
+argument of <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>. This allows us to create another, distinct blank
+node for each combination of a person and a company by simply varying the first
+argument of <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>.</p>
+<p>Atoms involving the <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> built-in tuple table must satisfy certain
+<em>binding restrictions</em> in rules and queries. Essentially, it must be possible
+to evaluate a query/rule so that, once an <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> atom is reached,
+either the value of the last argument, or the values of all all but the last
+argument must be known. This is explained using the following example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> The following query cannot be evaluated by RDFox — that is,
+the system will respond with a query planning error.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?P ?C ?E WHERE {
+    TT SKOLEM { &quot;Employment&quot; ?P ?C ?E }
+}
+</pre></div>
+</div>
+<p>This query essentially says “return all <code class="docutils literal notranslate"><span class="pre">?P</span></code>, <code class="docutils literal notranslate"><span class="pre">?C</span></code>, and <code class="docutils literal notranslate"><span class="pre">?E</span></code> where
+the value of <code class="docutils literal notranslate"><span class="pre">?E</span></code> is uniquely defined by <code class="docutils literal notranslate"><span class="pre">&quot;Employment&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">?P</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">?C</span></code>”. The problem with this is that the values of <code class="docutils literal notranslate"><span class="pre">?P</span></code> and <code class="docutils literal notranslate"><span class="pre">?C</span></code> have
+not been restricted in any way, so the query should, in principle, return
+infinitely many answers.</p>
+<p>To evaluate the query, one must provide the values of <code class="docutils literal notranslate"><span class="pre">?P</span></code> and <code class="docutils literal notranslate"><span class="pre">?C</span></code>, or
+for <code class="docutils literal notranslate"><span class="pre">?E</span></code>, either explicitly as arguments or implicitly by binding the
+arguments in other parts of the query. Thus, both of the following queries
+can be successfully evaluated.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?E WHERE {
+    TT SKOLEM { &quot;Employment&quot; :Paul :Company2 ?E }
+}
+
+SELECT ?T ?C ?P WHERE {
+    BIND (_:new_1 as ?E)
+    TT SKOLEM { ?T ?P ?C ?E }
+}
+</pre></div>
+</div>
+<p>The latter query aims to unpack <code class="docutils literal notranslate"><span class="pre">_:new_1</span></code> into the values of <code class="docutils literal notranslate"><span class="pre">?T</span></code>,
+<code class="docutils literal notranslate"><span class="pre">?C</span></code>, and <code class="docutils literal notranslate"><span class="pre">?P</span></code> for which <code class="docutils literal notranslate"><span class="pre">_:new_1</span></code> is the uniquely generated fresh
+blank node. Note that such <code class="docutils literal notranslate"><span class="pre">?T</span></code>, <code class="docutils literal notranslate"><span class="pre">?C</span></code>, and <code class="docutils literal notranslate"><span class="pre">?P</span></code> may or may not exist,
+depending on the algorithm RDFox uses to generate blank nodes. The
+following is a more realistic example of blank node ‘unpacking’.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?T ?C ?P WHERE {
+    ?E rdf:type :Employment .
+    TT SKOLEM { ?T ?P ?C ?E }
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="shacl">
+<span id="shacl-tuple-table"></span><h3><span class="section-number">6.5.2. </span><code class="docutils literal notranslate"><span class="pre">SHACL</span></code><a class="headerlink" href="#shacl" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://www.w3.org/TR/shacl/">SHACL</a> constraint validation in RDFox can be
+performed using the following RDFox tuple tables.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SHACL { DataGraph [FactDomain = rdfox:all] ShapesGraph S P O }
+SHACL_NN { DataGraph [FactDomain = rdfox:all] ShapesGraph S P O }
+SHACL_ND { DataGraph [FactDomain = rdfox:all] S P O }
+SHACL_DN { [FactDomain = rdfox:all] ShapesGraph S P O }
+SHACL_DD { [FactDomain = rdfox:all] S P O }
+</pre></div>
+</div>
+<p>The tables differ in whether the validated graph (i.e. the <a class="reference external" href="https://www.w3.org/TR/shacl/#dfn-data-graph">SHACL data graph</a>) and the graph storing the
+constraints (i.e. the <a class="reference external" href="https://www.w3.org/TR/shacl/#shapes-graph">SHACL shapes graph</a>) are named graphs or the default
+graph. In particular, tuple tables <code class="docutils literal notranslate"><span class="pre">SHACL</span></code>, <code class="docutils literal notranslate"><span class="pre">SHACL_NN</span></code> and <code class="docutils literal notranslate"><span class="pre">SHACL_ND</span></code>
+validate the content of the named graph <code class="docutils literal notranslate"><span class="pre">DataGraph</span></code>, while tuple tables
+<code class="docutils literal notranslate"><span class="pre">SHACL_DN</span></code> and <code class="docutils literal notranslate"><span class="pre">SHACL_DD</span></code> validate the content of the default graph.
+Similarly, tuple tables <code class="docutils literal notranslate"><span class="pre">SHACL</span></code>, <code class="docutils literal notranslate"><span class="pre">SHACL_NN</span></code> and <code class="docutils literal notranslate"><span class="pre">SHACL_DN</span></code> perform
+validation using the SHACL shapes stored in the named graph <code class="docutils literal notranslate"><span class="pre">ShapesGraph</span></code>,
+while tuple tables <code class="docutils literal notranslate"><span class="pre">SHACL_ND</span></code> and <code class="docutils literal notranslate"><span class="pre">SHACL_DD</span></code> perform validation using the
+shapes stored in the default graph.</p>
+<p>In all variants, the <code class="docutils literal notranslate"><span class="pre">FactDomain</span></code> argument specifies the domain of the facts
+in the data graph that will be validated. This argument is optional with
+default value <code class="docutils literal notranslate"><span class="pre">rdfox:all</span></code> and possible values <code class="docutils literal notranslate"><span class="pre">rdfox:explicit</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rdfox:derived</span></code>, and <code class="docutils literal notranslate"><span class="pre">rdfox:all</span></code>, corresponding to the respective fact
+domain values described in <a class="reference internal" href="#fact-domains"><span class="std std-numref">Section 6.2</span></a>. The last three arguments
+receive the <em>subject</em>, the <em>predicate</em> and the <em>object</em> of each triple in the
+<a class="reference external" href="https://www.w3.org/TR/shacl/#validation-report">validation report</a> that
+results from validating the data graph with respect to the constraints in the
+shapes graph.</p>
+<p><strong>Basic SHACL Validation</strong></p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Assume that the following <strong>data graph</strong> about employees and
+their employers is imported into the named graph <code class="docutils literal notranslate"><span class="pre">:data</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>@prefix sh: &lt;http://www.w3.org/ns/shacl#&gt;.
+@prefix : &lt;https://rdfox.com/examples/shacl#&gt;.
+
+:John a :Employee;
+    :worksFor :Company1.
+
+:Jane a :Employee;
+    :worksFor [ a :Employer ].
+</pre></div>
+</div>
+<p>Furthermore, assume that the following <strong>shapes graph</strong>, which asserts that
+each value of the property <code class="docutils literal notranslate"><span class="pre">:worksFor</span></code> is of type <code class="docutils literal notranslate"><span class="pre">:Employer</span></code>, is
+imported into the named graph <code class="docutils literal notranslate"><span class="pre">:shacl</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>@prefix sh: &lt;http://www.w3.org/ns/shacl#&gt;.
+@prefix : &lt;https://rdfox.com/examples/shacl#&gt;.
+
+:ClassShape
+    sh:targetClass :Employee ;
+    sh:path :worksFor ;
+    sh:class :Employer.
+</pre></div>
+</div>
+<p>One can now query the <strong>SHACL tuple table</strong> to generate the validation
+report resulting from the validation of the data graph <code class="docutils literal notranslate"><span class="pre">:data</span></code> using the
+shapes graph <code class="docutils literal notranslate"><span class="pre">:shacl</span></code> as follows.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>PREFIX : &lt;https://rdfox.com/examples/shacl#&gt;
+
+SELECT ?s ?p ?o {
+    TT SHACL { :data :shacl ?s ?p ?o }
+}
+</pre></div>
+</div>
+<p>The <strong>validation report</strong> should look as follows, modulo blank
+node names and prefix abbreviations:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_:anonymous1001 rdf:type sh:ValidationReport .
+_:anonymous1001 sh:conforms false .
+_:anonymous1001 sh:result _:anonymous1002 .
+_:anonymous1002 rdf:type sh:ValidationResult .
+_:anonymous1002 sh:focusNode :John .
+_:anonymous1002 sh:sourceConstraintComponent sh:ClassConstraintComponent .
+_:anonymous1002 sh:sourceShape :ClassShape .
+_:anonymous1002 sh:resultPath :worksFor .
+_:anonymous1002 sh:value :Company1 .
+_:anonymous1002 sh:resultSeverity sh:Violation .
+_:anonymous1002 sh:resultMessage &quot;The current value node is not a member of the specified class &lt;https://rdfox.com/examples/shacl#Employer&gt;.&quot; .
+</pre></div>
+</div>
+</div>
+<p><strong>Saving a Validation Report</strong></p>
+<p>A validation report can be saved into a named graph using the <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> update
+of SPARQL. This is illustrated in the following example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> The following update saves the validation report into the
+named graph <code class="docutils literal notranslate"><span class="pre">:report</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>PREFIX sh: &lt;http://www.w3.org/ns/shacl#&gt;
+PREFIX : &lt;https://rdfox.com/examples/shacl#&gt;
+
+INSERT {
+    GRAPH :report { ?s ?p ?o }
+}
+WHERE {
+    TT SHACL { :data :shacl ?s ?p ?o }
+}
+</pre></div>
+</div>
+</div>
+<p><strong>Rejection of Non-Conforming Updates</strong></p>
+<p>Certain use cases may require the content of a data store to be kept consistent
+with SHACL constraints at all times — that is, any updates that result in a
+violation of a SHACL constraint should be rejected. To achieve this behavior
+in RDFox, one can query the <code class="docutils literal notranslate"><span class="pre">SHACL</span></code> tuple table before committing a
+transaction as follows and, in case any violations are detected, adding an
+instance of the <code class="docutils literal notranslate"><span class="pre">rdfox:ConstraintViolation</span></code> class in the default graph; As
+discussed in <a class="reference internal" href="transactions.html#constraining-data-store-content"><span class="std std-numref">Section 11.5</span></a>, the latter will prevent
+a transaction from committing. This technique is demonstrated in the following
+example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Consider the data and shape graphs from the previous examples
+and assume the insertion of the data graph is performed using the following
+RDFox commands.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin
+
+import &gt; :data data.ttl
+
+INSERT { ?report a rdfox:ConstraintViolation } \
+    WHERE { TT SHACL { :data :shacl ?report sh:conforms false } }
+
+# the transaction fails
+commit
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> update checks whether the SHACL constraints are satisfied,
+and if not, adds the value of <code class="docutils literal notranslate"><span class="pre">?report</span></code> as an instance of
+<code class="docutils literal notranslate"><span class="pre">rdfox:ConstraintViolation</span></code>. As discussed earlier, the constraints are
+not satisfied for the data in this example, so the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> part of the
+update will bind variable <code class="docutils literal notranslate"><span class="pre">?report</span></code> to <code class="docutils literal notranslate"><span class="pre">_:anonymous1001</span></code>; thus, triple
+<code class="docutils literal notranslate"><span class="pre">_:anonymous1001</span> <span class="pre">a</span> <span class="pre">rdfox:ConstraintViolation</span></code> will be added to the default graph,
+which will prevent the transaction from completing successfully.</p>
+<p>In contrast, if we fix the data prior to committing the transaction as in
+the following example, the transaction will be successfully committed.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin
+
+import &gt; :data data.ttl
+
+# the following tuple makes the data in data.ttl consistent with the SHACL graph
+import &gt; :data ! :Company1 a :Employer.
+
+INSERT { ?report a rdfox:ConstraintViolation } \
+    WHERE { TT SHACL { :data :shacl ?report sh:conforms false } }
+
+# the transaction succeeds
+commit
+</pre></div>
+</div>
+<p>If we now attempt to remove the triple <code class="docutils literal notranslate"><span class="pre">:Company1</span> <span class="pre">a</span> <span class="pre">:Employer</span></code> using the
+same approach, the transaction in question will be rejected, since the
+remaining data would no longer conform with the constraints in the SHACL
+graph.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin
+
+# attempting to remove a tuple that would invalidate the remaining of the data
+import &gt; :data - ! :Company1 a :Employer.
+
+INSERT { ?report a rdfox:ConstraintViolation } \
+    WHERE { TT SHACL { :data :shacl ?report sh:conforms false } }
+
+# the transaction fails
+commit
+</pre></div>
+</div>
+<p>If we want the error message to contain additional information about the constraint violation,
+we can insert other triples with the rdfox:ConstraintViolation instance in the subject postion
+into the default graph, for example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin
+
+import &gt; :data - ! :Company1 a :Employer.
+
+INSERT { \
+    ?s a rdfox:ConstraintViolation . \
+    ?s ?p ?o \
+} WHERE { \
+    TT SHACL { :data :shacl ?s ?p ?o} . \
+    FILTER(?p IN (sh:sourceShape, sh:resultMessage, sh:value)) \
+}
+
+commit
+</pre></div>
+</div>
+<p>This should produce an error message like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>An error occurred while executing the command:
+    The transaction could not be committed because it would have introduced the following constraint violation:
+
+    _:anonymous1 sh:resultMessage &quot;The current value node is not a member of the specified class &lt;https://rdfox.com/examples/shacl#Employer&gt;.&quot;;
+        sh:value &lt;https://rdfox.com/examples/shacl#Company1&gt;;
+        sh:sourceShape &lt;https://rdfox.com/examples/shacl#ClassShape&gt; .
+</pre></div>
+</div>
+</div>
+<p><strong>Scope of SHACL support:</strong></p>
+<ul class="simple">
+<li><p>RDFox supports <a class="reference external" href="https://www.w3.org/TR/shacl/#dfn-shacl-core">SHACL Core</a>.</p></li>
+<li><p>SHACL validation is available during query answering, but not in rules.</p></li>
+<li><p>The  <a class="reference external" href="https://www.w3.org/TR/shacl/#terminology">definitions</a> of <strong>SHACL
+Subclass</strong>, <strong>SHACL Superclass</strong>, and <strong>SHACL Type</strong> rely on a limited form
+of taxonomical reasoning. This is not automatically performed during SHACL
+validation, since the desired consequences can be derived using the standard
+reasoning facilities of RDFox.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">owl:imports</span></code> in shapes graph is not supported.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sh:shapesGraph</span></code> in data graphs is not supported.</p></li>
+</ul>
+</div>
+<div class="section" id="dependencygraph">
+<span id="dependency-graph-tuple-table"></span><h3><span class="section-number">6.5.3. </span><code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code><a class="headerlink" href="#dependencygraph" title="Permalink to this headline">¶</a></h3>
+<p>The dependency graph of a Datalog program can be inspected using the following
+tuple tables.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>DependencyGraph { NamedGraph [FactDomain = rdfox:all] S P O }
+DependencyGraph_N { NamedGraph [FactDomain = rdfox:all] S P O }
+DependencyGraph_D { [FactDomain = rdfox:all] S P O }
+</pre></div>
+</div>
+<p>The tuple tables work with RDF encoded Datalog programs stored as RDF graphs.
+Tuple tables <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code> and <code class="docutils literal notranslate"><span class="pre">DependencyGraph_N</span></code> read the encoded
+program from the named graph <code class="docutils literal notranslate"><span class="pre">NamedGraph</span></code>, while the tuple table
+<code class="docutils literal notranslate"><span class="pre">DependencyGraph_D</span></code> reads the encoded program from the default graph. The RDF
+encoding of Datalog programs is defined below. The <code class="docutils literal notranslate"><span class="pre">FactDomain</span></code> argument
+specifies the domain of the facts in the named graph that will be analyzed.
+This argument is optional with default value <code class="docutils literal notranslate"><span class="pre">rdfox:all</span></code>, and possible values
+<code class="docutils literal notranslate"><span class="pre">rdfox:explicit</span></code>, <code class="docutils literal notranslate"><span class="pre">rdfox:derived</span></code>, and <code class="docutils literal notranslate"><span class="pre">rdfox:all</span></code>, corresponding to the
+respective fact domain values described in <a class="reference internal" href="#fact-domains"><span class="std std-numref">Section 6.2</span></a>. The last
+three arguments receive the <em>subject</em>, the <em>predicate</em> and the <em>object</em> of each
+triple in the RDF encoding of the dependency graph. The arguments NamedGraph
+and FactDomain, if specified, should be bound at the time of evaluation, while
+the arguments <code class="docutils literal notranslate"><span class="pre">S</span></code>, <code class="docutils literal notranslate"><span class="pre">P</span></code>, and <code class="docutils literal notranslate"><span class="pre">O</span></code> can be either bound or unbound. The tuple
+table is available during query answering, but not in rules.</p>
+<p><strong>Dependency Graph</strong></p>
+<p>Datalog rules have to be evaluated in a specific order due to the presence of
+negation and aggregation. In particular, a rule can only be evaluated after all
+of its negated and aggregated atoms have been fully computed, i.e. the rules
+deriving such atoms and all the rules that they depend on have been fully
+evaluated. RDFox uses the dependency graph of a Datalog program to determine
+the evaluation order of its rules.</p>
+<p>The <em>dependency graph</em> of an RDFox Datalog program encodes the dependencies
+between the atoms in the program. The nodes of the dependency graph are the
+atoms in the program, while the edges of the dependency graph determine the
+different types of dependencies between the atoms. (Note that RDFox uses an
+extension of the standard definition of a dependency graph in which the nodes
+of the graph are atoms rather than predicates. This is because in RDF there is
+typically only one predicate, i.e. the predicate for all triples in the default
+graph. Therefore, using the standard definition of a dependency graph, most
+programs with negation and aggregation would not have a valid rule evaluation
+order.)</p>
+<p>There are three types of dependencies between atoms. <em>Positive dependencies</em>
+encode the dependencies of head atoms on the body atoms of the rule that are
+not under aggregation or negation. <em>Negative dependencies</em> encode the
+dependencies of head atoms of a rule on the body atoms that are under
+aggregation or negation. Finally, <em>unification dependencies</em> encode that two
+atoms match a common fact, e.g. <code class="docutils literal notranslate"><span class="pre">[?X,</span> <span class="pre">:r,</span> <span class="pre">:b]</span></code> and <code class="docutils literal notranslate"><span class="pre">[:a,</span> <span class="pre">:r,</span> <span class="pre">?Y]</span></code> unify
+since they both match the triple <code class="docutils literal notranslate"><span class="pre">:a</span> <span class="pre">:r</span> <span class="pre">:b</span></code>.</p>
+<p>Once the dependency graph of a Datalog program has been constructed, RDFox
+determines its <em>strongly connected components</em>. A component can be evaluated
+only if it is <em>stratifiable</em>, i.e. if it contains no atom that negatively
+depends on another atom from the same component. If all strongly connected
+components are stratifiable, then the whole program is stratifiable.  RDFox
+groups the strongly connected components by strata. The first stratum contains
+all components that don’t depend on other components; the second stratum
+contains all components that depend only on components from the first stratum; and
+so on. The rules are then evaluated by RDFox according to the stratification
+of components. Rules that derive facts in the first stratum are evaluated
+first, rules that derive facts in the second stratum are evaluated next, and so
+on.</p>
+<p><strong>RDF Encoding of Datalog Programs</strong></p>
+<p>To extract the dependency graph of a Datalog program, one first has to add
+its RDF encoding into a named graph. The RDF encoding of a Datalog program is
+done using the predicate <code class="docutils literal notranslate"><span class="pre">rdfox:rule</span></code> to specify the rules of the program and
+the predicate <code class="docutils literal notranslate"><span class="pre">rdfox:prefix</span></code> to specify the prefixes used in the rule
+definitions.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Consider for example the following program.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>prefix : &lt;https://rdfox.com/examples/&gt;
+prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+
+:C[?x] :- not :A[?x], :r[?x, ?y].
+</pre></div>
+</div>
+<p>This program can be encoded using the following RDF triples.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_:p1 rdfox:prefix &quot;prefix : &lt;https://rdfox.com/examples/&gt;&quot;.
+_:p2 rdfox:prefix &quot;prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&quot;.
+_:r1 rdfox:rule &quot;:C[?x] :- not :A[?x], :r[?x, ?y].&quot;.
+</pre></div>
+</div>
+</div>
+<p><strong>Querying for the Dependency Graph of a Program</strong></p>
+<p>Once the RDF encoding of a Datalog program is in a named graph, one can simply
+query the tuple table <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code>.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Let’s assume that the RDFox encoding of the above Datalog
+program has been added to the graph <code class="docutils literal notranslate"><span class="pre">:G</span></code>. To extract the dependency we
+can simply run the following SPARQL query.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?s ?p ?o WHERE { (:G ?s ?p ?o) rdfox:TT &quot;DependencyGraph&quot; }
+</pre></div>
+</div>
+<p>The result of this query will contain the following triples.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span> 1) _:p2 rdfox:prefix &quot;prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&quot;.
+ 2) _:p1 rdfox:prefix &quot;prefix : &lt;https://rdfox.com/examples/&gt;&quot;.
+ 3) _:r1 rdfox:rule &quot;:C[?x] :- not :A[?x], :r[?x, ?y].&quot; .
+ 4) _:r1 rdfox:headAtom _:atom2 .
+ 5) _:r1 rdfox:negativeBodyAtom _:atom0 .
+ 6) _:r1 rdfox:positiveBodyAtom _:atom1 .
+ 7) _:component0 rdfox:stratumIndex 1 .
+ 8) _:component0 rdfox:stratifiable true .
+ 9) _:atom2 rdfox:component _:component0 .
+10) _:atom2 rdfox:atom &quot;[*, rdf:type, :C]&quot; .
+11) _:atom2 rdfox:dependsPositivelyOn _:atom1 .
+12) _:atom2 rdfox:dependsNegativelyOn _:atom0 .
+13) _:component1 rdfox:stratumIndex 0 .
+14) _:component1 rdfox:stratifiable true .
+15) _:atom0 rdfox:component _:component1 .
+16) _:atom0 rdfox:atom &quot;[*, rdf:type, :A]&quot; .
+17) _:component2 rdfox:stratumIndex 0 .
+18) _:component2 rdfox:stratifiable true .
+19) _:atom1 rdfox:component _:component2 .
+20) _:atom1 rdfox:atom &quot;[*, :r, *]&quot; .
+</pre></div>
+</div>
+<p>The triples 1-3 encode the input program. The triples 4-6 establish the
+link between the rule and its atoms. The remaining triples describe the
+strongly connected components of the dependency graph of the program. There
+are three components for each of the three atoms in the program. The
+components of the body atoms <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">:r,</span> <span class="pre">*]</span></code> and <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:A]</span></code> are
+in the first statum (index 0), since they don’t depend on other components.
+The component for the head atom <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:C]</span></code> is in the second
+stratum (stratum 1), since it depends on the components in stratum 0. The
+result set also encodes that atom <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:C]</span></code> depends negatively
+on atom <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:A]</span></code> and that it depends positively on the atom
+<code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">:r,</span> <span class="pre">*]</span></code>. All three components are stratifiable.</p>
+<p><strong>Example:</strong> We now give an example of a program that is not stratifiable
+and therefore cannot be evaluated by RDFox.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>prefix : &lt;https://rdfox.com/examples/&gt;
+prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+
+:B[?x] :- :A[?x].
+:C[?x] :- :B[?x], not :A[?x].
+:A[?x] :- :C[?x].
+</pre></div>
+</div>
+<p>Now assume that the following encoding has been added to the named graph
+<code class="docutils literal notranslate"><span class="pre">:G</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_:p1 rdfox:prefix &quot;prefix : &lt;https://rdfox.com/examples/&gt;&quot;.
+_:p2 rdfox:prefix &quot;prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&quot;.
+_:r1 rdfox:rule &quot;:B[?x] :- :A[?x].&quot;.
+_:r2 rdfox:rule &quot;:C[?x] :- :B[?x], not :A[?x].&quot;.
+_:r3 rdfox:rule &quot;:A[?x] :- :C[?x].&quot;.
+</pre></div>
+</div>
+<p>Querying the tuple table <code class="docutils literal notranslate"><span class="pre">DependencyGraph</span></code> as before will result in
+the following triples.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span> 1) _:p2 rdfox:prefix &quot;prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;&quot; .
+ 2) _:p1 rdfox:prefix &quot;prefix : &lt;https://rdfox.com/examples/&gt;&quot; .
+ 3) _:r3 rdfox:rule &quot;:A[?x] :- :C[?x].&quot; .
+ 4) _:r3 rdfox:headAtom _:atom1 .
+ 5) _:r3 rdfox:positiveBodyAtom _:atom0 .
+ 6) _:r2 rdfox:rule &quot;:C[?x] :- :B[?x], not :A[?x].&quot; .
+ 7) _:r2 rdfox:headAtom _:atom0 .
+ 8) _:r2 rdfox:positiveBodyAtom _:atom2 .
+ 9) _:r2 rdfox:negativeBodyAtom _:atom1 .
+10) _:r1 rdfox:rule &quot;:B[?x] :- :A[?x].&quot; .
+11) _:r1 rdfox:headAtom _:atom2 .
+12) _:r1 rdfox:positiveBodyAtom _:atom1 .
+13) _:component0 rdfox:stratumIndex 0 .
+14) _:component0 rdfox:stratifiable false .
+15) _:atom1 rdfox:component _:component0 .
+16) _:atom1 rdfox:atom &quot;[*, rdf:type, :A]&quot; .
+17) _:atom1 rdfox:dependsPositivelyOn _:atom0 .
+18) _:atom0 rdfox:component _:component0 .
+19) _:atom0 rdfox:atom &quot;[*, rdf:type, :C]&quot; .
+20) _:atom0 rdfox:dependsNegativelyOn _:atom1 .
+21) _:atom0 rdfox:dependsPositivelyOn _:atom2 .
+22) _:atom2 rdfox:component _:component0 .
+23) _:atom2 rdfox:atom &quot;[*, rdf:type, :B]&quot; .
+24) _:atom2 rdfox:dependsPositivelyOn _:atom1 .
+</pre></div>
+</div>
+<p>As before, the first two blocks of triples encode the input program and the
+relationships between rules and their head and body atoms (1-12). The
+remaining triples describe the dependency graph of the program. In this
+example, all atoms in the program depend on each other in a recursive
+fashion. As a result, the dependency graph has exactly one strongly
+connected component, which contains all the atoms in the program. Since the
+atom <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:C]</span></code> negatively depends on another atom from the same
+component (i.e. <code class="docutils literal notranslate"><span class="pre">[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:A]</span></code>), the component is not stratifiable.
+Therefore, the program as a whole has no valid rule evaluation order and
+will thus be rejected by RDFox.</p>
+</div>
+<p><strong>RDF Vocabulary for Dependency Graph Encoding</strong></p>
+<p>The following table describes the vocabulary used in the RDF encoding of
+Datalog programs and their dependency graphs.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 30%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Predicate</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>rdfox:prefix</p></td>
+<td><p>Specifies a prefix mapping.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:p1</span> <span class="pre">rdfox:prefix</span> <span class="pre">&quot;&#64;prefix</span> <span class="pre">:</span> <span class="pre">&lt;https://rdfox.com/examples/&gt;</span> <span class="pre">.&quot;</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>rdfox:rule</p></td>
+<td><p>Specifies a rule.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:r1</span> <span class="pre">rdfox:rule</span> <span class="pre">&quot;:C[?x]</span> <span class="pre">:-</span> <span class="pre">:A[?x],</span> <span class="pre">:r[?x,</span> <span class="pre">?y].&quot;</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>rdfox:atom</p></td>
+<td><p>Specifies an atom.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:atom2</span> <span class="pre">rdfox:atom</span> <span class="pre">&quot;[*,</span> <span class="pre">rdf:type,</span> <span class="pre">:C]&quot;</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>rdfox:headAtom</p></td>
+<td><p>Links a rule with a head atom.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:r1</span> <span class="pre">rdfox:headAtom</span> <span class="pre">_:atom2</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>rdfox:positiveBodyAtom</p></td>
+<td><p>Links a rule with a positive body atom.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:r1</span> <span class="pre">rdfox:positiveBodyAtom</span> <span class="pre">_:atom2</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>rdfox:negativeBodyAtom</p></td>
+<td><p>Links a rule with a negative body atom.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:r1</span> <span class="pre">rdfox:negativeBodyAtom</span> <span class="pre">_:atom2</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>rdfox:component</p></td>
+<td><p>Links an atom with its strongly connected
+component in the dependency graph.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:atom2</span> <span class="pre">rdfox:component</span> <span class="pre">_:component0</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>rdfox:stratumIndex</p></td>
+<td><p>Links a strongly connected component with
+its stratum index.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:component1</span> <span class="pre">rdfox:stratumIndex</span> <span class="pre">0</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>rdfox:stratifiable</p></td>
+<td><p>Specifies whether a strongly connected
+component is stratifiable.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:component1</span> <span class="pre">rdfox:stratifiable</span> <span class="pre">true</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>rdfox:dependsPositivelyOn</p></td>
+<td><p>Specifies a positive dependency between
+two atoms.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:atom2</span> <span class="pre">rdfox:dependsPositivelyOn</span> <span class="pre">_:atom1</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>rdfox:dependsNegativelyOn</p></td>
+<td><p>Specifies a negative dependency between
+two atoms.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:atom2</span> <span class="pre">rdfox:dependsNegativelyOn</span> <span class="pre">_:atom1</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>rdfox:unifiesWith</p></td>
+<td><p>Specifies that two atoms unify.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_:atom1</span> <span class="pre">rdfox:unifiesWith</span> <span class="pre">_:atom3</span> <span class="pre">.</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data-stores.html" class="btn btn-neutral float-left" title="5. Data Stores" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data-sources.html" class="btn btn-neutral float-right" title="7. Data Sources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>12. Access Control &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="13. Persistence" href="persistence.html" />
+    <link rel="prev" title="11. Transactions" href="transactions.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">12. Access Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#key-concepts">12.1. Key Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#resources">12.1.1. Resources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resource-specifiers">12.1.2. Resource Specifiers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#access-types">12.1.3. Access Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#privileges">12.1.4. Privileges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agents">12.1.5. Agents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#roles">12.1.5.1. Roles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#external-agents">12.1.5.2. External Agents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#authorization">12.1.6. Authorization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#identifying-prerequisites">12.1.6.1. Identifying Prerequisites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#authorization-special-cases">12.1.6.2. Authorization Special Cases</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#role-manager">12.2. Role Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#role-manager-services">12.2.1. Role Manager Services</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#password-based-authentication">12.2.1.1. Password-Based Authentication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#direct-role-retrieval">12.2.1.2. Direct Role Retrieval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#determining-the-effective-privileges-of-external-agents">12.2.1.3. Determining the Effective Privileges of External Agents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#role-manager-configuration-parameters">12.2.2. Role Manager Configuration Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-managers">12.3. Authentication Managers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#role-name-password-authentication-manager">12.3.1. <code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> Authentication Manager</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-parameters">12.3.1.1. Configuration Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#session-based-authentication">12.3.1.2. Session-Based Authentication</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#oidc-authentication-manager">12.3.2. <code class="docutils literal notranslate"><span class="pre">oidc</span></code> Authentication Manager</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id16">12.3.2.1. Configuration Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#oidc-session-authentication">12.3.2.2. Session-Based Authentication</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#other-authentication-pathways">12.4. Other Authentication Pathways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#securing-an-rdfox-server">12.5. Securing an RDFox Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#initialization">12.5.1. Initialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#managing-roles">12.5.2. Managing Roles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assigning-privileges-directly">12.5.3. Assigning Privileges Directly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#discovering-privilege-requirements">12.5.4. Discovering Privilege Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assigning-privileges-via-membership">12.5.5. Assigning Privileges via Membership</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#securing-the-rest-endpoint">12.5.6. Securing the REST Endpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-the-setup">12.5.7. Testing the Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#persistence">12.5.8. Persistence</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example-access-control-policies">12.6. Example Access Control Policies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anonymous-read-only-rest-access">12.6.1. Anonymous, Read-Only REST Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delegating-administration-of-a-data-store">12.6.2. Delegating Administration of a Data Store</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">12. </span>Access Control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="access-control">
+<span id="id1"></span><h1><span class="section-number">12. </span>Access Control<a class="headerlink" href="#access-control" title="Permalink to this headline">¶</a></h1>
+<p>This section introduces RDFox®’s access control system. The key concepts of the
+system are described first, followed by sections on roles, external agents, the
+role manager, and authentication. The final two sub-sections present a
+walkthrough of how to secure and RDFox server followed by some examples of
+access control policies.</p>
+<p>Access control settings may be persisted between sessions or for replication
+purposes. See <a class="reference internal" href="persistence.html#persistence"><span class="std std-numref">Section 13</span></a> for more information.</p>
+<div class="section" id="key-concepts">
+<h2><span class="section-number">12.1. </span>Key Concepts<a class="headerlink" href="#key-concepts" title="Permalink to this headline">¶</a></h2>
+<p>This section describes the key concepts of RDFox’s access control system,
+beginning with primitives such as <em>resources</em> and <em>access types</em>, and moving on
+to more complex concepts such as <em>privileges</em> and <em>agents</em> and finally,
+<em>authorization</em>.</p>
+<div class="section" id="resources">
+<span id="access-control-resources"></span><h3><span class="section-number">12.1.1. </span>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h3>
+<p>A <em>resource</em> represents a component of an RDFox server to which access can be
+controlled. As described in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>, the set of resources within each
+server form a containment hierarchy with the server itself at the root.</p>
+<p>Every resource has a unique name relative to the server. To make it clear which
+resources are contained within other resources, the names of contained
+resources begin with the name of the resource that contains them.</p>
+<p>The following table shows the different types of resource within an RDFox
+server with the corresponding resource name format. Braces (<code class="docutils literal notranslate"><span class="pre">{}</span></code>) indicate
+list-element segments.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Description</p></th>
+<th class="head"><p>Resource name format</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>The server itself.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>The list of requests running on
+the RDFox endpoint.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|requests</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>The list of data stores within a
+server.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>A specific data store within the
+server.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>The Datalog program loaded inside
+a data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|rules</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>The OWL axioms loaded inside a
+data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|axioms</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>The commit procedure of a data
+store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|commitprocedure</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>The list of delta queries
+registered with a data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|deltaqueries</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>A specific delta query registered
+with a data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|deltaqueries|{delta-query-name}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>The list of data sources
+registered with a data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|datasources</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>A specific data source registered
+with a data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|datasources|{data-source-name}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>The list of tuple tables within a
+data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|tupletables</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>A specific tuple table within a
+data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|tupletables|{tuple-table-name}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>A specific named graph within a
+data store.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|datastores|{data-store-name}|namedgraphs|{graph-name}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>The list of roles in the server’s
+role database.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|roles</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>A specific role in the server’s
+role database.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">|roles|{role-name}</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Graph names appearing in access control resource names must be valid Turtle
+literals. For convenience, IRIs may be specified using prefixes defined
+within the referenced data store, or as relative IRIs against the data
+store’s base IRI. Named graph resource names will usually be output using
+fully-expanded IRIs in the graph name segment, regardless of how they were
+input.</p>
+</div>
+</div>
+<div class="section" id="resource-specifiers">
+<span id="id2"></span><h3><span class="section-number">12.1.2. </span>Resource Specifiers<a class="headerlink" href="#resource-specifiers" title="Permalink to this headline">¶</a></h3>
+<p>Resource specifiers enable administrators to describe sets of resources
+succinctly. All valid resource names are also valid resource specifiers.
+Additionally, resource specifiers may have the following elements:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code>, the list element wildcard. This may appear as the final segment of a
+resource specifier if and only if that segment is a list-element segment, and
+signifies that a privilege applies to all possible values in that segment as
+determined at the time authorization is checked. For example, in a server
+containing roles <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">c</span></code> and no other roles, the resource
+specifier <code class="docutils literal notranslate"><span class="pre">|roles|*</span></code> specifies exactly the resources <code class="docutils literal notranslate"><span class="pre">|roles|a</span></code>,
+<code class="docutils literal notranslate"><span class="pre">|roles|b</span></code> and <code class="docutils literal notranslate"><span class="pre">|roles|c</span></code>. If role <code class="docutils literal notranslate"><span class="pre">d</span></code> is added, it too will be
+included in the set specified by <code class="docutils literal notranslate"><span class="pre">|roles|*</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, the recursivity indicator. A specifier beginning with <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>
+instead of the initial <code class="docutils literal notranslate"><span class="pre">|</span></code> character specifies the same resources that
+would be specified by the non-recursive version <em>plus</em> all of their
+subordinate resources. For example, in a server with a data store called
+<code class="docutils literal notranslate"><span class="pre">ds</span></code> containing data sources <code class="docutils literal notranslate"><span class="pre">one</span></code> and <code class="docutils literal notranslate"><span class="pre">two</span></code>, the resource specifier
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores|ds|datasources</span></code> specifies exactly the resources
+<code class="docutils literal notranslate"><span class="pre">|datastores|ds|datasources</span></code>, <code class="docutils literal notranslate"><span class="pre">|datastores|ds|datasources|one</span></code> and
+<code class="docutils literal notranslate"><span class="pre">|datastores|ds|datasources|two</span></code>. It is an error to use the recursivity
+indicator to begin the name of a resource with no subordinate resources.</p></li>
+</ul>
+<p>The list element wildcard and recursivity indicator may be combined freely
+(subject to their individual rules). For example, if we want to grant a
+privilege over every part of every data store within a server but not over the
+list of data stores itself, we can use the resource specifier
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores|*</span></code>. To also include the list of data stores, we can use
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code>.</p>
+<p>Resource specifiers have their own set of escaping rules which ensure that they
+do not impose any restrictions on list element names. The rules are as follow:</p>
+<ul class="simple">
+<li><p>Names beginning with <code class="docutils literal notranslate"><span class="pre">*</span></code> must have the initial <code class="docutils literal notranslate"><span class="pre">*</span></code> escaped as <code class="docutils literal notranslate"><span class="pre">**</span></code>. For
+example the correct specifier for a role with name <code class="docutils literal notranslate"><span class="pre">*abc</span></code> would be
+<code class="docutils literal notranslate"><span class="pre">|roles|**abc</span></code>. No escaping of <code class="docutils literal notranslate"><span class="pre">*</span></code> characters is required at any other
+position within a name.</p></li>
+<li><p>Names containing <code class="docutils literal notranslate"><span class="pre">|</span></code> must have each <code class="docutils literal notranslate"><span class="pre">|</span></code> escaped as <code class="docutils literal notranslate"><span class="pre">||</span></code>. For example,
+the correct specifier for a data store with name <code class="docutils literal notranslate"><span class="pre">my|store</span></code> would be
+<code class="docutils literal notranslate"><span class="pre">|datastores|my||store</span></code>.</p></li>
+</ul>
+</div>
+<div class="section" id="access-types">
+<span id="id3"></span><h3><span class="section-number">12.1.3. </span>Access Types<a class="headerlink" href="#access-types" title="Permalink to this headline">¶</a></h3>
+<p>An <em>access type</em> describes a particular mode of access to a resource.</p>
+<p>RDFox defines three access types; <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">write</span></code> and <code class="docutils literal notranslate"><span class="pre">grant</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">read</span></code> access type covers all retrieval of information from the system. The
+<code class="docutils literal notranslate"><span class="pre">write</span></code> access type covers addition, mutation and deletion of information.
+The <code class="docutils literal notranslate"><span class="pre">grant</span></code> access type is used to restrict which roles can grant and revoke
+privileges over a resource to or from other roles.</p>
+<p>Multiple access types can be specified at once in a comma-separated list, e.g.,
+<code class="docutils literal notranslate"><span class="pre">read,write</span></code>. To save typing in situations where a role should have full
+control of one or more resources, RDFox accepts the access type name <code class="docutils literal notranslate"><span class="pre">full</span></code>,
+which allows all of the above access types. Note that the <code class="docutils literal notranslate"><span class="pre">full</span></code> privilege
+for a resource specifier is stored separately from the <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">write</span></code> and
+<code class="docutils literal notranslate"><span class="pre">grant</span></code> privileges. This means that revoking <code class="docutils literal notranslate"><span class="pre">full</span></code> access type must be
+done explicitly, <em>i.e.</em> revoking <code class="docutils literal notranslate"><span class="pre">read</span></code> access from a role that has <code class="docutils literal notranslate"><span class="pre">full</span></code>
+access has no impact on what the role can actually do.</p>
+</div>
+<div class="section" id="privileges">
+<span id="id4"></span><h3><span class="section-number">12.1.4. </span>Privileges<a class="headerlink" href="#privileges" title="Permalink to this headline">¶</a></h3>
+<p>In RDFox, privileges to access the system are expressed as pairs of <em>resource
+specifiers</em> and <em>access type</em> lists. The resource specifier identifies a subset
+of the server’s <em>resources</em>, and the access type list specifies the ways which
+those resources may be accessed by holders of the privilege.</p>
+</div>
+<div class="section" id="agents">
+<span id="id5"></span><h3><span class="section-number">12.1.5. </span>Agents<a class="headerlink" href="#agents" title="Permalink to this headline">¶</a></h3>
+<p>In the context of RDFox access control, an <em>agent</em> is a person or system that
+uses an RDFox server. RDFox’s access control system enables the administrator
+of a server to control which agents can authenticate to the server and what
+level of access they have once authenticated.</p>
+<p>There are two classes of agent: <em>roles</em>, which are managed by an RDFox server
+instance, and <em>external agents</em>, which are managed by an external system (e.g.,
+Microsoft Entra™). The process of authenticating agents is described in
+sections <a class="reference internal" href="#authentication-managers"><span class="std std-numref">Section 12.3</span></a> and
+<a class="reference internal" href="#other-authentication-pathways"><span class="std std-numref">Section 12.4</span></a>.</p>
+<div class="section" id="roles">
+<span id="id6"></span><h4><span class="section-number">12.1.5.1. </span>Roles<a class="headerlink" href="#roles" title="Permalink to this headline">¶</a></h4>
+<p><em>Roles</em> are agents that are stored within an RDFox server. Roles can be created
+for individual users, or for groups of users. Although the concept of a role is
+common to many access control systems, this document uses the term to refer
+exclusively to RDFox roles. Roles are stored in and managed by the server’s
+<em>role manager</em>, which is described in more detail in <a class="reference internal" href="#role-manager"><span class="std std-numref">Section 12.2</span></a>.</p>
+<p>Each role maintains a name that uniquely identifies a role. This name can be
+included in logs to provide a record of system usage.</p>
+<p>Each role maintains a set <a class="reference internal" href="#privileges"><span class="std std-ref">privileges</span></a> directly assigned to
+it, which can be modified by <em>granting</em> or <em>revoking</em> a privilege: the former
+adds a privilege to the set, and the latter removes a privilege from the set.
+To understand how grant and revoke operations work and how they affect what a
+role can do, assume that role <code class="docutils literal notranslate"><span class="pre">A</span></code> is granted a read privilege over
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code> and consider the following.</p>
+<ul class="simple">
+<li><p>Only explicitly granted privileges can be revoked. Thus, although role <code class="docutils literal notranslate"><span class="pre">A</span></code>
+can read a data store called <code class="docutils literal notranslate"><span class="pre">myStore</span></code> (because <code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code> is a
+recursive resource specifier that extends the read privilege too all data
+stores), an attempt to revoke a read privilege over <code class="docutils literal notranslate"><span class="pre">|datastores|myStore</span></code>
+for <code class="docutils literal notranslate"><span class="pre">A</span></code> will report that the latter privilege does not exist. This is
+because the set of privileges for <code class="docutils literal notranslate"><span class="pre">A</span></code> explicitly contains only a read
+privilege for <code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code>, and not a read privilege over
+<code class="docutils literal notranslate"><span class="pre">|datastores|myStore</span></code>.</p></li>
+<li><p>All privileges are <em>positive</em> in the sense that they specify what is allowed.
+Hence, since role <code class="docutils literal notranslate"><span class="pre">A</span></code> has been granted a read privilege over
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code>, it is not possible to prevent <code class="docutils literal notranslate"><span class="pre">A</span></code> from reading a specific
+data store.</p></li>
+<li><p>The set of privileges associated with a role is a true set in the sense that
+all duplicates are eliminated. Hence, if a read privilege over
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code> is granted once more to role <code class="docutils literal notranslate"><span class="pre">A</span></code>, the set of privileges of
+<code class="docutils literal notranslate"><span class="pre">A</span></code> contains just one copy of the said privilege. Consequently, a
+subsequent attempt to revoke the read privilege for <code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code> removes
+the privilege from the set.</p></li>
+</ul>
+<p>Each role additionally maintains a set of roles that it is a member of, which
+can be modified by <em>granting</em> or <em>revoking</em> a role. For example, after granting
+a role <code class="docutils literal notranslate"><span class="pre">B</span></code> to a role <code class="docutils literal notranslate"><span class="pre">A</span></code>, role <code class="docutils literal notranslate"><span class="pre">A</span></code> is added as a member of role <code class="docutils literal notranslate"><span class="pre">B</span></code>.
+The term “granting a role” reflects how this feature is often used in practice;
+for example, one can grant a role <code class="docutils literal notranslate"><span class="pre">Administrator</span></code> to a role <code class="docutils literal notranslate"><span class="pre">Peter</span></code> to make
+<code class="docutils literal notranslate"><span class="pre">Peter</span></code> an administrator. The membership relation is transitive: if role
+<code class="docutils literal notranslate"><span class="pre">B</span></code> is granted to role <code class="docutils literal notranslate"><span class="pre">A</span></code>, and role <code class="docutils literal notranslate"><span class="pre">C</span></code> is granted to role <code class="docutils literal notranslate"><span class="pre">B</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">A</span></code> is a member of both <code class="docutils literal notranslate"><span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">C</span></code>; moreover <code class="docutils literal notranslate"><span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">C</span></code> are said to
+be <em>super roles</em> of <code class="docutils literal notranslate"><span class="pre">A</span></code>.</p>
+<p>RDFox uses the set of role’s <em>effective privileges</em> to authorize an access of a
+role to a protected resource (see <a class="reference internal" href="#authorization"><span class="std std-numref">Section 12.1.6</span></a>). In particular, the
+set of effective privileges of a role is the union of the privileges granted to
+the role or any of its super roles. For example, if role <code class="docutils literal notranslate"><span class="pre">B</span></code> is granted a
+read privilege for <code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code>, role <code class="docutils literal notranslate"><span class="pre">A</span></code> is granted a read and a write
+privilege for <code class="docutils literal notranslate"><span class="pre">|datastores|myStore</span></code>, and role <code class="docutils literal notranslate"><span class="pre">B</span></code> is granted to role <code class="docutils literal notranslate"><span class="pre">A</span></code>,
+then the set of effective privileges of <code class="docutils literal notranslate"><span class="pre">A</span></code> contains a read privilege for
+<code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code>, a read privilege for <code class="docutils literal notranslate"><span class="pre">|datastores|myStore</span></code>, and a write
+privilege for for <code class="docutils literal notranslate"><span class="pre">|datastores|myStore</span></code>. One should not be confused by the
+fact that the read privilege for <code class="docutils literal notranslate"><span class="pre">|datastores|myStore</span></code> is redundant because
+it is subsumed by the read privilege for <code class="docutils literal notranslate"><span class="pre">&gt;datastores</span></code>: the set of effective
+privileges for <code class="docutils literal notranslate"><span class="pre">A</span></code> still consists (conceptually) of these three privileges.
+The set of effective privileges cannot be modified directly: it is always
+derived automatically from the sets of the explicitly granted privileges and
+roles in the system.</p>
+<p>When a role is created, it can optionally be associated with a password. Roles
+created with a password can authenticate in local shell sessions (i.e., using
+the RDFox executable’s <code class="docutils literal notranslate"><span class="pre">shell</span></code> mode) and may change their passwords later on.
+In contrast, roles created without a password cannot authenticate in local
+shell sessions and cannot have a password set at any later time. If a password
+is needed for a role that doesn’t have one, the role can be deleted and
+recreated with a password. The main use for password-less roles is providing a
+way to centrally store privileges for a class of user.</p>
+</div>
+<div class="section" id="external-agents">
+<span id="id7"></span><h4><span class="section-number">12.1.5.2. </span>External Agents<a class="headerlink" href="#external-agents" title="Permalink to this headline">¶</a></h4>
+<p>An external agent is any agent that does not have a corresponding role, but is
+provided by a trusted third-party system (for example Microsoft Entra™).
+External agents are typically used to provide single sign-on (SSO) facilities
+in large organizations, where creating a role in RDFox for each user would be
+inconvenient.</p>
+<p>Unlike roles, privileges cannot be granted to external agents directly;
+instead, they can acquire privileges only by inheritance from super roles. To
+facilitate this, the third-party system must associate with each external agent
+a list of roles that the agent is a member of, which determines the set of
+effective privileges of an agent in the same way as described in
+<a class="reference internal" href="#roles"><span class="std std-numref">Section 12.1.5.1</span></a>. During authentication, the third-party system must confirm the
+identity of the external agent, as well as provide the list of roles that the
+agent is a member of. This process is described in
+<a class="reference internal" href="#effective-privileges-external-agent"><span class="std std-numref">Section 12.2.1.3</span></a>.</p>
+</div>
+</div>
+<div class="section" id="authorization">
+<span id="id8"></span><h3><span class="section-number">12.1.6. </span>Authorization<a class="headerlink" href="#authorization" title="Permalink to this headline">¶</a></h3>
+<p>Before an agent attempts to execute an operation (e.g., importing data or
+running a query), RDFox will perform an <em>authorization</em> check for all resources
+that are required for the operation to succeed. In most cases cases this check
+is performed as follows.</p>
+<ul class="simple">
+<li><p>RDFox first identifies the set of all prerequisites for the operation, where
+each prerequisite consists of a resource and an access type. This step is
+described in more detail in <a class="reference internal" href="#identifying-prerequisites"><span class="std std-numref">Section 12.1.6.1</span></a>.</p></li>
+<li><p>For each prerequisite, RDFox inspects the set of agent’s effective privileges
+trying to locate at least one privilege whose resource specifier and access
+type covers the resource and the access type of the prerequisite.</p></li>
+<li><p>As soon as a prerequisite is identified type cannot be covered by any of the
+privileges in the effective set, the operation is aborted, and an error
+message is provided describing the prerequisite resource and access type in
+question. Hence, the error message describes one, but not necessarily all
+reasons why an operation cannot proceed.</p></li>
+<li><p>If all resources and access types can be matched, the operation is allowed to
+proceed.</p></li>
+</ul>
+<p>In certain cases, however, applying this general authorization protocol might
+be hard; for example, it is hard (or in many cases even impossible) to identify
+the named graphs touched by a SPARQL query without evaluating the query itself.
+RDFox thus sometimes deviates from this general pattern, as further described
+in <a class="reference internal" href="#authorization-special-cases"><span class="std std-numref">Section 12.1.6.2</span></a>.</p>
+<div class="section" id="identifying-prerequisites">
+<span id="id9"></span><h4><span class="section-number">12.1.6.1. </span>Identifying Prerequisites<a class="headerlink" href="#identifying-prerequisites" title="Permalink to this headline">¶</a></h4>
+<p>Prerequisites for an operation are identified in the obvious way in most cases.
+For example, importing a Turtle file requires a read privilege over the data
+store (to access the data store’s prefixes), as well as a write privilege over
+the <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> tuple table (to write imported triples into the data
+store). The rest of this section discusses several less obvious cases.</p>
+<p>Creating new resources (data stores, data sources, tuple tables or roles)
+requires a write privilege over the containing list resource. For example,
+creating a data store requires a write privilege over the <code class="docutils literal notranslate"><span class="pre">/datastores</span></code>
+resources. Deleting resources requires a write privilege over both the
+containing list resource <em>and</em> the element to be deleted.</p>
+<p>Granting and revoking privileges involves two prerequisites: a <code class="docutils literal notranslate"><span class="pre">grant</span></code> access
+type over the resource to which access is being granted, and <code class="docutils literal notranslate"><span class="pre">write</span></code> access
+type over the role which will receive or, in the case of revocation, lose the
+privilege.</p>
+<div class="example docutils container">
+<p><strong>Example: Privileges needed to grant privileges over a data store</strong></p>
+<p>Granting the power to create data stores to a role named
+<code class="docutils literal notranslate"><span class="pre">datastore-creators</span></code> requires privileges sufficient for the following
+accesses:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Type of access</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">|datastores</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">grant</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">|roles|datastore-creators</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">write</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Granting and revoking membership of one role to another role works in a similar
+way. To grant membership of a role requires two privileges: <code class="docutils literal notranslate"><span class="pre">grant</span></code> over the
+role being granted and <code class="docutils literal notranslate"><span class="pre">write</span></code> over the role which will receive or, in the
+case of revocation, lose the membership.</p>
+<div class="example docutils container">
+<p><strong>Example: Privileges needed to grant membership of a role</strong></p>
+<p>Granting role <code class="docutils literal notranslate"><span class="pre">group</span></code> to role <code class="docutils literal notranslate"><span class="pre">user1</span></code>, requires privileges sufficient to
+allow these accesses:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Type of access</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">|roles|group</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">grant</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">|roles|user1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">write</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="authorization-special-cases">
+<span id="id10"></span><h4><span class="section-number">12.1.6.2. </span>Authorization Special Cases<a class="headerlink" href="#authorization-special-cases" title="Permalink to this headline">¶</a></h4>
+<p>This section documents four special cases where authorization does not follow
+the general pattern described in <a class="reference internal" href="#authorization"><span class="std std-numref">Section 12.1.6</span></a>.</p>
+<div class="section" id="distinct-privileges-for-list-and-list-elements">
+<h5><span class="section-number">12.1.6.2.1. </span>Distinct Privileges for List and List Elements<a class="headerlink" href="#distinct-privileges-for-list-and-list-elements" title="Permalink to this headline">¶</a></h5>
+<p>RDFox provides several operations that retrieve lists of elements together with
+some basic elements’ properties. For example, it is possible to list all data
+stores and, for each, retrieve certain basic information such as the data store
+unique ID and whether a data store is online or offline. Strictly speaking,
+such operations have the following prerequisites:</p>
+<ul class="simple">
+<li><p>a read access over the list resource (i.e., <code class="docutils literal notranslate"><span class="pre">|datastores</span></code> in this example)
+is needed to allow enumerating the elements in question, and</p></li>
+<li><p>a read access over each element in the list (i.e., each data store in this
+example) is needed to read the element’s properties.</p></li>
+</ul>
+<p>The “all or nothing” authorization check outlined in <a class="reference internal" href="#authorization"><span class="std std-numref">Section 12.1.6</span></a>
+requires all prerequisites to be satisfied before the operation can proceed,
+which can be problematic; for example, listing data stores would fail as soon
+as an agent cannot read at least one data store. To support such requests while
+still obeying access control restrictions, the prerequisites over the list
+elements are treated as <em>optional</em> – that is, the call succeeds if the agent
+as the read permission over the element list, and the element’s properties are
+optionally included for each element that the agent can read.</p>
+<div class="example docutils container">
+<p>Consider an RDFox server with two data stores: <code class="docutils literal notranslate"><span class="pre">ds1</span></code> and <code class="docutils literal notranslate"><span class="pre">ds2</span></code>. Agent
+<code class="docutils literal notranslate"><span class="pre">admin</span></code> has read access over all resources, while agent <code class="docutils literal notranslate"><span class="pre">client</span></code> has
+read access to the list of data stores and to <code class="docutils literal notranslate"><span class="pre">ds1</span></code> but not to <code class="docutils literal notranslate"><span class="pre">ds2</span></code>.
+When <code class="docutils literal notranslate"><span class="pre">admin</span></code> queries the list of data stores, the response will name
+<code class="docutils literal notranslate"><span class="pre">ds1</span></code> and <code class="docutils literal notranslate"><span class="pre">ds2</span></code> and include properties of both. When <code class="docutils literal notranslate"><span class="pre">client</span></code> makes
+the same query, their response will name both data stores but will only
+include properties of <code class="docutils literal notranslate"><span class="pre">ds1</span></code>.</p>
+</div>
+</div>
+<div class="section" id="authorizing-named-graph-access">
+<span id="named-graph-access-control"></span><h5><span class="section-number">12.1.6.2.2. </span>Authorizing Named Graph Access<a class="headerlink" href="#authorizing-named-graph-access" title="Permalink to this headline">¶</a></h5>
+<p>Applying the authorization check from <a class="reference internal" href="#authorization"><span class="std std-numref">Section 12.1.6</span></a> to the evaluation
+of SPARQL queries would require identifying the set of relevant named graphs in
+advance, but this is often very hard or even impossible without evaluating the
+query itself. Analogously, when importing a TriG file, the set of relevant
+named graphs is known only once the file has been fully processed. Thus, named
+graphs are never included into the set of prerequisites, and, instead, the
+following policies are applied.</p>
+<ul class="simple">
+<li><p>For read access to named graphs, RDFox simply “pretends” that all named
+graphs not readable by the agent do not exist.</p></li>
+<li><p>For write accesses to named graphs, RDFox aborts the operation on the first
+attempt to write to an unwritable named graph.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All operations that read or write to named graphs require privileges to
+access the containing data store and its <code class="docutils literal notranslate"><span class="pre">Quads</span></code> tuple table, all of which
+are checked as prerequisites.</p>
+</div>
+<div class="example docutils container">
+<p>The following SPARQL query selects all named graphs in a data store that
+are visible to the agent evaluating the query. This example shows how
+different agents may receive different results to the same query.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT DISTINCT ?G WHERE { GRAPH ?G { ?S ?P ?O } }
+</pre></div>
+</div>
+</div>
+<p>SPARQL updates involving <code class="docutils literal notranslate"><span class="pre">DELETE/INSERT</span> <span class="pre">WHERE</span></code>, <code class="docutils literal notranslate"><span class="pre">COPY</span></code>, <code class="docutils literal notranslate"><span class="pre">ADD</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">MOVE</span></code> statements, are separately sensitive to which graphs are readable and
+writable as illustrated in the following example.</p>
+<div class="example docutils container">
+<p>The following SPARQL update copies all of the triples from graph <code class="docutils literal notranslate"><span class="pre">:G1</span></code> to
+graph <code class="docutils literal notranslate"><span class="pre">:G2</span></code>. Let’s assume that graph <code class="docutils literal notranslate"><span class="pre">:G1</span></code> is not empty and that the
+prefix <code class="docutils literal notranslate"><span class="pre">:</span></code> is defined in the data store.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INSERT { GRAPH :G2 { ?S ?P ?O } }
+WHERE  { GRAPH :G1 { ?S ?P ?O } }
+</pre></div>
+</div>
+<p>Imagine we have a role with read and write privileges over the <code class="docutils literal notranslate"><span class="pre">Quads</span></code>
+table within the data store but no privileges over any named graphs. When
+the role invokes the above query, no authorization error is raised even
+though the <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> clause specifies an unwritable graph. This is because
+access control prevented the body of the query (the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> clause) from
+matching the triple in the unreadable graph <code class="docutils literal notranslate"><span class="pre">:G1</span></code> so there was no attempt
+to write a triple into the unwritable graph <code class="docutils literal notranslate"><span class="pre">:G2</span></code>.</p>
+<p>If we grant the role a read privilege over graph <code class="docutils literal notranslate"><span class="pre">:G1</span></code> and reevaluate the
+update (on a fresh connection), an error will be produced. This time, the
+query body was allowed to match the triple in <code class="docutils literal notranslate"><span class="pre">:G1</span></code> and an attempt to
+write it to <code class="docutils literal notranslate"><span class="pre">:G2</span></code> was made. This resulted in the operation being
+immediately aborted.</p>
+<p>Finally, if we grant a write privilege over graph <code class="docutils literal notranslate"><span class="pre">:G2</span></code> and reevaluate
+once more (again, on a fresh connection), no error is produced. If we were
+to inspect graph <code class="docutils literal notranslate"><span class="pre">:G2</span></code> as a role with read permission over it, we would
+find the triples from <code class="docutils literal notranslate"><span class="pre">:G1</span></code> there.</p>
+</div>
+</div>
+<div class="section" id="authorizing-request-access">
+<span id="request-access-control"></span><h5><span class="section-number">12.1.6.2.3. </span>Authorizing Request Access<a class="headerlink" href="#authorizing-request-access" title="Permalink to this headline">¶</a></h5>
+<p>Requests running on the RDFox endpoint are transient (i.e., they come and go as
+they are submitted) so it is not possible to control access to each request
+individually. Instead, RDFox observes the following rules for governing access
+to requests.</p>
+<ul class="simple">
+<li><p>Each role has full control over all requests it creates.</p></li>
+<li><p>For requests created by other roles, each role inherits the privileges of the
+<code class="docutils literal notranslate"><span class="pre">|requests</span></code> resource. Thus, a role with write access to the <code class="docutils literal notranslate"><span class="pre">|requests</span></code>
+resource is allowed to cancel any request running on the system.</p></li>
+</ul>
+</div>
+<div class="section" id="authorizing-a-role-s-access-to-itself">
+<h5><span class="section-number">12.1.6.2.4. </span>Authorizing a Role’s Access to Itself<a class="headerlink" href="#authorizing-a-role-s-access-to-itself" title="Permalink to this headline">¶</a></h5>
+<p>No role is allowed to grant or revoke its own privileges or memberships.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="role-manager">
+<span id="id11"></span><h2><span class="section-number">12.2. </span>Role Manager<a class="headerlink" href="#role-manager" title="Permalink to this headline">¶</a></h2>
+<p>Every RDFox server has a built-in role manager that is responsible for storing
+the server’s roles. The roles contained by the role manager can be modified
+using the appropriate APIs (see <a class="reference internal" href="apis.html#apis-managing-roles"><span class="std std-numref">Section 16.18</span></a>) or shell
+commands (see the <a class="reference internal" href="rdfox-shell.html#role-command"><span class="std std-ref">role</span></a>, <a class="reference internal" href="rdfox-shell.html#grant-command"><span class="std std-ref">grant</span></a>, and
+<a class="reference internal" href="rdfox-shell.html#revoke-command"><span class="std std-ref">revoke</span></a> commands).</p>
+<div class="section" id="role-manager-services">
+<h3><span class="section-number">12.2.1. </span>Role Manager Services<a class="headerlink" href="#role-manager-services" title="Permalink to this headline">¶</a></h3>
+<p>Every authentication workflow in RDFox uses one of the role manager
+services described in this section.</p>
+<div class="section" id="password-based-authentication">
+<span id="id12"></span><h4><span class="section-number">12.2.1.1. </span>Password-Based Authentication<a class="headerlink" href="#password-based-authentication" title="Permalink to this headline">¶</a></h4>
+<p>A role can be authenticated by supplying the role’s name and password. When
+authentication fails, no information is leaked about whether the role exists or
+not.</p>
+</div>
+<div class="section" id="direct-role-retrieval">
+<span id="id13"></span><h4><span class="section-number">12.2.1.2. </span>Direct Role Retrieval<a class="headerlink" href="#direct-role-retrieval" title="Permalink to this headline">¶</a></h4>
+<p>Direct role retrieval is the process of retrieving a role using the role’s name
+alone (i.e., without checking the role’s password). This is used for cases where
+the role’s identity is authenticated by a trusted third-party system. Role
+retrieval will be successful only if the following conditions are met, and will
+otherwise result in an error.</p>
+<ol class="arabic simple">
+<li><p>The role being authenticated exists (that is, there is a role with the same
+name).</p></li>
+<li><p>The role manager’s <code class="docutils literal notranslate"><span class="pre">externally-authenticatable-role</span></code> parameter is set to a
+role that also exists.</p></li>
+<li><p>The role being authenticated is a member of the role mentioned in condition
+2.</p></li>
+<li><p>The role being authenticated does not have any members.</p></li>
+</ol>
+</div>
+<div class="section" id="determining-the-effective-privileges-of-external-agents">
+<span id="effective-privileges-external-agent"></span><h4><span class="section-number">12.2.1.3. </span>Determining the Effective Privileges of External Agents<a class="headerlink" href="#determining-the-effective-privileges-of-external-agents" title="Permalink to this headline">¶</a></h4>
+<p>As explained in <a class="reference internal" href="#external-agents"><span class="std std-numref">Section 12.1.5.2</span></a>, external agents are not granted
+privileges directly. Rather, when authenticating an external agent, the
+third-party system conducting the authentication will provide a list of roles
+that the agent is a member of. If the following conditions are met, the role
+manager then produces the set of agent’s effective privileges provided;
+otherwise, authenticating the external agent fails.</p>
+<ol class="arabic simple">
+<li><p>The agent name does not match that of any of the server’s roles.</p></li>
+<li><p>The role manager’s <code class="docutils literal notranslate"><span class="pre">externally-grantable-role</span></code> parameter is set to a role
+that exists.</p></li>
+<li><p>Every role in the list of roles specified by the third-party system
+exists and is a member of the role mentioned in condition 2.</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="role-manager-configuration-parameters">
+<span id="id14"></span><h3><span class="section-number">12.2.2. </span>Role Manager Configuration Parameters<a class="headerlink" href="#role-manager-configuration-parameters" title="Permalink to this headline">¶</a></h3>
+<p>The following table lists the configuration parameters for the role manager. To
+specify these parameters, pass them as <a class="reference internal" href="servers.html#server-parameters"><span class="std std-ref">server parameters</span></a>, prefixed with <code class="docutils literal notranslate"><span class="pre">role-manager.</span></code>.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 21%" />
+<col style="width: 53%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">argon2i.memory-cost</span></code></p></td>
+<td><p>a non-negative integer</p></td>
+<td><p>The amount of memory the role manager will use to generate Argon2i password
+hashes in kibibytes. If not zero, this parameter must be at least 8 times the
+<code class="docutils literal notranslate"><span class="pre">argon2i.parallelism</span></code> parameter although much larger values are usually
+required for security. The authors of the Argon2i algorithm included guidance
+on setting the parameters in Section 4 of
+<a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9106.html#name-parameter-choice">rfc9106</a></p>
+<p>This parameter, and the others beginning <code class="docutils literal notranslate"><span class="pre">argon2i.</span></code>, only have an effect
+during initialization of a new persistent server. At that time, if any of the
+parameters is zero (the default value in all cases), RDFox will automatically
+determine values for all three parameters together to attempt to achieve a
+hashing time of approximately 1 second on the current hardware. Once the
+parameters are determined (whether from the user’s settings or by the
+automatic procedure) they are saved within the server directory and used when
+generating new hashes.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">argon2i.time-cost</span></code></p></td>
+<td><p>a non-negative integer</p></td>
+<td><p>The number of iterations of the core Argon2i hashing algorithm that the role
+manager will use to generate Argon2i password hashes. See the comments for the
+<code class="docutils literal notranslate"><span class="pre">argon2i.memory-cost</span></code> parameter.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">argon2i.parallelism</span></code></p></td>
+<td><p>a non-negative integer</p></td>
+<td><p>The number of independent computational chains that the role manager will use
+to generate Argon2i password hashes. See the comments for the
+<code class="docutils literal notranslate"><span class="pre">argon2i.memory-cost</span></code> parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">externally-authenticatable-role</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of a role whose members may be authenticated by a third-party system
+(see conditions 2 and 3 in <a class="reference internal" href="#direct-role-retrieval"><span class="std std-numref">Section 12.2.1.2</span></a>). Setting this
+parameter does not create the role automatically: this must be done separately
+using a role creation API call or shell command.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">externally-grantable-role</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of a role whose members may be granted to external agents (see
+<a class="reference internal" href="#effective-privileges-external-agent"><span class="std std-numref">Section 12.2.1.3</span></a>). Setting this parameter does
+not create the role automatically: this must be done using a role creation API
+call or shell command.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="authentication-managers">
+<span id="id15"></span><h2><span class="section-number">12.3. </span>Authentication Managers<a class="headerlink" href="#authentication-managers" title="Permalink to this headline">¶</a></h2>
+<p><em>Authentication</em> is the process of identifying the agent that is involved in
+processing a request. Authentication requests are often processed by one of the
+preconfigured authentication <em>authentication managers</em>, but
+<a class="reference internal" href="#other-authentication-pathways"><span class="std std-numref">Section 12.4</span></a> specifies several cases in which an
+authentication manager is bypassed. The <a class="reference internal" href="servers.html#authentication-managers-server-param"><span class="std std-ref">authentication-managers</span></a> server parameter contains a
+comma-separated list of authentication managers configured for the server.</p>
+<p>Each authentication manager provides two ways to authenticate an agent.</p>
+<ul class="simple">
+<li><p>Each authentication manager implements an <em>authentication scheme</em> that can
+authenticate an agent from an opaque <em>credentials</em> string.</p></li>
+<li><p>An authentication manager can be asked to create a <em>session</em>. Doing so
+produces a <em>session token</em> that uniquely identifies an agent. When making
+subsequent requests, a session token must be presented to the authentication
+manager to identify the agent involved in the request. At that point, the
+authentication manager may decide to <em>refresh</em> a session token – that is,
+issue a new a session token that is to be used in subsequent requests. The
+latter ensures that the same session token is not used for long periods of
+time, which could be a potential security vulnerability. In addition, an
+authentication manager can impose a validity time on session tokens – that
+is, reject authentication requests with tokens that are older than a
+predefined time period.</p></li>
+</ul>
+<p>At present, both options are available only through the RESTful API. Thus, the
+HTTP authentication schemes define authentication scheme names and the format
+of the credentials string. Moreover, session tokens in the RESTful API are
+managed as described in <a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.2.1.1.2</span></a>. The available authentication
+managers are described in the following sections.</p>
+<div class="section" id="role-name-password-authentication-manager">
+<span id="role-name-password"></span><h3><span class="section-number">12.3.1. </span><code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> Authentication Manager<a class="headerlink" href="#role-name-password-authentication-manager" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> authentication manager allows users to authenticate
+as a role by supplying the role’s name and password. It has no support for
+authenticating external agents. To enable this role manager, include
+<code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> in the comma-separated list specified for the
+<a class="reference internal" href="servers.html#authentication-managers-server-param"><span class="std std-ref">authentication-managers</span></a> server
+parameter. When enabled, the <code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> authentication manager will
+be responsible for verifying the authentication information received in
+requests that use the <code class="docutils literal notranslate"><span class="pre">Basic</span></code> HTTP authentication scheme.</p>
+<div class="section" id="configuration-parameters">
+<h4><span class="section-number">12.3.1.1. </span>Configuration Parameters<a class="headerlink" href="#configuration-parameters" title="Permalink to this headline">¶</a></h4>
+<p>The following table lists the configuration parameters for the
+<code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> authentication manager. To specify these parameters,
+pass them as <a class="reference internal" href="servers.html#server-parameters"><span class="std std-ref">server parameters</span></a>, prefixed with
+<code class="docutils literal notranslate"><span class="pre">role-name+password.</span></code>.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 21%" />
+<col style="width: 53%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">session-refresh-time</span></code></p></td>
+<td><p>a duration of <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">s</span></code> or more
+specified as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a></p></td>
+<td><p>Specifies the time after which a session token is refreshed –
+that is, when a request is made with a session token that is
+older than this time, the server will issue a fresh session
+token as part of authentication. The default value is 5
+minutes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">session-validity-time</span></code></p></td>
+<td><p>a duration of <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">s</span></code> or more
+specified as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a></p></td>
+<td><p>Specifies the validity time of a session token – that is, an
+authentication request with a session token older than this
+time will fail. The default value is 24 hours.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="session-based-authentication">
+<span id="role-name-password-session-authentication"></span><h4><span class="section-number">12.3.1.2. </span>Session-Based Authentication<a class="headerlink" href="#session-based-authentication" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">role-name+password</span></code> authentication manager does not require a login
+initiation call.</p>
+<p>Login completion calls that are routed to this authentication manager must
+include the following parameters in the request body:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">role-name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>The authentication manager will call the role manager to perform
+<a class="reference internal" href="#effective-privileges-external-agent"><span class="std std-ref">password-based authentication</span></a>.</p>
+<p>Logout calls that are routed this authentication manager perform no action
+besides unsetting the session token cookie.</p>
+</div>
+</div>
+<div class="section" id="oidc-authentication-manager">
+<span id="oidc"></span><h3><span class="section-number">12.3.2. </span><code class="docutils literal notranslate"><span class="pre">oidc</span></code> Authentication Manager<a class="headerlink" href="#oidc-authentication-manager" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">oidc</span></code> (short for OpenID Connect) authentication manager allows users to
+authenticate as either a role or an external agent using OIDC tokens. To enable
+this role manager, include <code class="docutils literal notranslate"><span class="pre">oidc</span></code> in the comma-separated list specified for
+the <a class="reference internal" href="servers.html#authentication-managers-server-param"><span class="std std-ref">authentication-managers</span></a>
+server parameter.</p>
+<p>When enabled, the OIDC authentication manager will be responsible for verifying
+the authentication information received in requests that use the <code class="docutils literal notranslate"><span class="pre">Bearer</span></code>
+HTTP authentication scheme.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>RDFox does not support any mechanism for checking whether the credentials it
+receives have been revoked. This means that the holder of the credentials
+which has a valid structure and cryptographic signature will be able to use
+the credentials to authenticate to RDFox until the token’s expiration time.
+The same applies to any session derived from these credentials (see
+<a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.2.1.1.2</span></a>).</p>
+</div>
+<div class="section" id="id16">
+<h4><span class="section-number">12.3.2.1. </span>Configuration Parameters<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<p>The following table lists the configuration parameters for the OIDC
+authentication manager. To specify these parameters, pass them as <a class="reference internal" href="servers.html#server-parameters"><span class="std std-ref">server
+parameters</span></a>, prefixed with <code class="docutils literal notranslate"><span class="pre">oidc.</span></code>.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 20%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">agent-name-claim</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of the JWT claim from which the agent name will
+be extracted. The default value of this parameter is
+<code class="docutils literal notranslate"><span class="pre">sub</span></code>.</p>
+<p>The values in the claim specified by this parameter may be
+printed in HTTP request logs and returned by the <code class="docutils literal notranslate"><span class="pre">AGENT</span></code>
+built-in in SPARQL requests. It is important that the
+value in this claim uniquely identifies the subject of the
+token.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">client-id</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The identifier for the current RDFox instance as an OpenID
+Connect client. The <code class="docutils literal notranslate"><span class="pre">aud</span></code> claim from the received token
+must match the value set for this parameter, which has no
+default value and must be set explicitly.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">client-secret</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The secret issued for the current RDFox instance as an
+OpenID Connect client, for use when authenticating itself
+to the OpenID provider. This parameter has no default
+value and must be specified if interactive OIDC login is
+desired.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">delete-refresh-token-after</span></code></p></td>
+<td><p>a duration, specified
+as described in
+<a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a></p></td>
+<td><p>The duration of time after which a refresh token is
+deleted from disk. This value should be longer than the
+validity of the refresh token, otherwise the refresh token
+may be deleted while it is still in use. The default value
+is 91 days.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">issuer</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The identifier for the OpenID provider’s issuer, which
+must be a case-sensitive URL using the <code class="docutils literal notranslate"><span class="pre">https</span></code> scheme
+that contains scheme, host, and optionally port number and
+path components, and no query or fragment components.
+The <code class="docutils literal notranslate"><span class="pre">iss</span></code> claim in received tokens must match this value.
+The value is also used to discover the OpenID provider’s
+configuration including its public keys, authorization
+endpoint and token endpoint. This parameter has no default
+and must be set explicitly.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">roles-claim</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>The name of the claim from the received JWT
+token which will be used as the agent name. This
+parameter has no default and may be left unset
+(see comments below this table).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">refresh-tokens-directory</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the directory to be used for persistence of
+refresh tokens. This value may be omitted, in which case
+RDFox will store the OIDC refresh tokens in the
+<code class="docutils literal notranslate"><span class="pre">oidc-refresh-tokens</span></code> subdirectory of the server
+directory (See also <a class="reference internal" href="persistence.html#server-directory"><span class="std std-numref">Section 13.1</span></a>).</p></td>
+</tr>
+</tbody>
+</table>
+<p>When authenticating a JWT, the OIDC authentication manager uses the
+availability of a roles claim to decide how to complete the authentication. If
+the <code class="docutils literal notranslate"><span class="pre">roles-claim</span></code> parameter is not set or if it is set but the JWT in
+question does not have a claim with the specified name, the OIDC authentication
+manager will ask the role manager to complete the authentication process using
+<a class="reference internal" href="#direct-role-retrieval"><span class="std std-ref">direct role retrieval</span></a>. If the <code class="docutils literal notranslate"><span class="pre">roles-claim</span></code>
+parameter is set and the JWT in question does have a claim with the specified
+name, the OIDC authentication manager will attempt to compile the privileges of
+the JWT subject as an external agent, using the process described in
+<a class="reference internal" href="#effective-privileges-external-agent"><span class="std std-ref">external agent privilege compilation</span></a>. Note that both of these options depend
+on the configuration of the role manager.</p>
+</div>
+<div class="section" id="oidc-session-authentication">
+<span id="id17"></span><h4><span class="section-number">12.3.2.2. </span>Session-Based Authentication<a class="headerlink" href="#oidc-session-authentication" title="Permalink to this headline">¶</a></h4>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">oidc</span></code> authentication manager in session-based authentication
+requires that the <code class="docutils literal notranslate"><span class="pre">client-secret</span></code> parameter be set.</p>
+<p>Login initiation calls that are routed to the OIDC authentication manager are
+required to specify the <code class="docutils literal notranslate"><span class="pre">completion-uri</span></code> initiation parameter specifying the
+URI where the OP will redirect the client after a successful login. Such a call
+initializes the state parameter for the authorization code flow, sets a cookie
+based on this, and redirects the client to the OpenID Connect provider (OP)’s
+authorization endpoint to request a token. The OP must then redirect the client
+back to the same URI as was specified via the <code class="docutils literal notranslate"><span class="pre">completion-uri</span></code>. The page at
+this URI must decode the code and state parameters from the URL fragment or
+query string, and use them to make a login completion call to the RDFox server,
+ensuring that the cookie set by the login initiation call is included in the
+request.</p>
+<p>Login completion calls that are routed to the OIDC authentication manager must
+include, in the request body, the <code class="docutils literal notranslate"><span class="pre">code</span></code> and <code class="docutils literal notranslate"><span class="pre">state</span></code> values received from
+the OP as well as the same <code class="docutils literal notranslate"><span class="pre">completion-uri</span></code> value as was used in the
+initiation call. Using this information, the OIDC authentication manager will
+then attempt to authenticate the resource owner by performing a token request
+with the OP and, if this is successful, processing the received ID token in the
+same way if it were received with the <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header. A refresh token
+is requested and must be present in the token response.</p>
+<p>The OIDC authentication manager securely encrypts and stores refresh tokens to
+disk as specified by the <code class="docutils literal notranslate"><span class="pre">refresh-tokens-directory</span></code> parameter. Logout calls
+that are routed to the OIDC authentication manager delete the refresh token from
+disk and unset the session token cookie. This model ensures that even in the
+case that an attacker gains access to a valid session token cookie, they are not
+able to refresh the session after logout. Expired refresh tokens are
+automatically deleted from disk after the time specified by the
+<code class="docutils literal notranslate"><span class="pre">delete-refresh-token-after</span></code> parameter has elapsed.</p>
+</div>
+</div>
+</div>
+<div class="section" id="other-authentication-pathways">
+<span id="id18"></span><h2><span class="section-number">12.4. </span>Other Authentication Pathways<a class="headerlink" href="#other-authentication-pathways" title="Permalink to this headline">¶</a></h2>
+<p>The following authentication workflows do not use an authentication manager,
+instead using the role manager directly:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Clients of the RDFox HTTP <a class="reference internal" href="rdfox-endpoint.html#rdfox-endpoint"><span class="std std-ref">endpoint</span></a> may authenticate
+using client TLS certificates. See <a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a>.</p></li>
+<li><p>Authenticating to a local RDFox shell session uses <a class="reference internal" href="#password-based-authentication"><span class="std std-ref">password-based
+authentication</span></a>.</p></li>
+<li><p>Authentication via the Java or C/C++ APIs also uses <a class="reference internal" href="#password-based-authentication"><span class="std std-ref">password-based
+authentication</span></a>.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="securing-an-rdfox-server">
+<h2><span class="section-number">12.5. </span>Securing an RDFox Server<a class="headerlink" href="#securing-an-rdfox-server" title="Permalink to this headline">¶</a></h2>
+<p>This section gives practical information on how to set up a secure, persistent
+RDFox server. Examples are given for the RDFox executable and shell but all
+steps can also be achieved programmatically using the APIs described in
+<a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a>.</p>
+<div class="section" id="initialization">
+<span id="access-control-initialization"></span><h3><span class="section-number">12.5.1. </span>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h3>
+<p>At least one role must exist within an RDFox server’s role database before that
+server can be used. When the role database is empty at startup, either because
+the server directory has not been initialized for role persistence, or because
+role persistence is disabled, RDFox will check the process’s command line
+arguments and environment variables for the name and password to use for the
+first role. If either value is missing after that, the behavior depends on the
+executable mode in use. In <code class="docutils literal notranslate"><span class="pre">init</span></code> mode, the user is prompted to provide the
+missing values as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Enter the name of the first role: admin
+Enter the first role password:
+Confirm the password:
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a> for more details on how to start the RDFox
+executable.</p>
+<p>When using role persistence, RDFox will next determine the parameters for
+hashing passwords on the local hardware. This may take a minute or more but
+will only happen the first time persistence is used with a given server
+directory. A successful initialization will continue as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Initializing access control (may take a minute or more)...
+Access control has been initialized by creating the first role with name &quot;admin&quot;.
+</pre></div>
+</div>
+<p>This concludes the initialization process and the process will now exit. At
+this point, the first role holds the privilege <code class="docutils literal notranslate"><span class="pre">full</span> <span class="pre">&gt;</span></code>, giving it full
+control over the server and all its resources, including the power to configure
+access control. Next, we launch a <code class="docutils literal notranslate"><span class="pre">shell</span></code> mode process which will ask for
+login credentials. Once authentication is successful, the shell prompt is
+returned.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>A new server connection was opened as role &#39;admin&#39; and stored with name &#39;sc1&#39;.
+&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>RDFox uses <a class="reference external" href="https://en.wikipedia.org/wiki/Argon2">argon2i</a> to compute
+hashes for storage when role persistence is enabled.</p>
+</div>
+</div>
+<div class="section" id="managing-roles">
+<h3><span class="section-number">12.5.2. </span>Managing Roles<a class="headerlink" href="#managing-roles" title="Permalink to this headline">¶</a></h3>
+<p>In the shell, the <a class="reference internal" href="rdfox-shell.html#role-command"><span class="std std-ref">role</span></a> command provides several subcommands for
+managing the roles in the system. It uses the shell’s active server connection
+to perform operations. To understand how the shell manages server and data store
+connections, see <a class="reference internal" href="rdfox-shell.html#connection-management-shell"><span class="std std-numref">Section 15.1</span></a>.</p>
+<p>The command <code class="docutils literal notranslate"><span class="pre">role</span> <span class="pre">create</span> <span class="pre">&lt;role-name&gt;</span></code> creates a new role, prompting for the
+role’s password to be provided and confirmed. For example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; role create user1
+Enter the password for the new role:
+Confirm the password:
+A new role was created with name &quot;user1&quot;.
+</pre></div>
+</div>
+<p>In some situations, it may be necessary to create a role without a password,
+for example when the role will used solely to group other roles. This can be
+achieved by adding the <code class="docutils literal notranslate"><span class="pre">no-password</span></code> flag to the command:</p>
+<blockquote>
+<div><p>&gt; role create group no-password
+A new role was created with name “group”.</p>
+</div></blockquote>
+<p>To list the roles in the server’s role database, use <code class="docutils literal notranslate"><span class="pre">role</span> <span class="pre">list</span></code>. To delete a
+role which is no longer needed, use <code class="docutils literal notranslate"><span class="pre">role</span> <span class="pre">delete</span> <span class="pre">&lt;role-name&gt;</span></code>.</p>
+<p>To change a role’s password, ensure that the active server connection is
+authenticated as the role whose password is to be changed and issue the
+<a class="reference internal" href="rdfox-shell.html#password-command"><span class="std std-ref">password</span></a> command. It is not possible to change the password of a
+role that was created without a password. If this is necessary, the role must be
+deleted and recreated with a password.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Commands that require interactive password entry cannot be used in the
+remote shell.</p>
+</div>
+</div>
+<div class="section" id="assigning-privileges-directly">
+<h3><span class="section-number">12.5.3. </span>Assigning Privileges Directly<a class="headerlink" href="#assigning-privileges-directly" title="Permalink to this headline">¶</a></h3>
+<p>In the shell, privileges are granted or revoked with the <code class="docutils literal notranslate"><span class="pre">privileges</span></code>
+subcommand of the <a class="reference internal" href="rdfox-shell.html#grant-command"><span class="std std-ref">grant</span></a> or <a class="reference internal" href="rdfox-shell.html#revoke-command"><span class="std std-ref">revoke</span></a> commands.
+Privileges must be given as a list of access types followed by a resource
+specifier. For example the following script grants <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">write</span></code> and
+<code class="docutils literal notranslate"><span class="pre">grant</span></code> privileges over all data stores to <code class="docutils literal notranslate"><span class="pre">user1</span></code> and then revokes the
+<code class="docutils literal notranslate"><span class="pre">write</span></code> and <code class="docutils literal notranslate"><span class="pre">grant</span></code> privileges:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; grant privileges read,write,grant &gt;datastores|* to user1
+The privileges &#39;read,write,grant&#39; over the resource specifier &quot;&gt;datastores|*&quot; were granted to the role &quot;user1&quot;.
+&gt; revoke privileges write,grant &gt;datastores|* from user1
+The privileges &#39;write,grant&#39; over resource specifier &quot;&gt;datastores|*&quot; were revoked from the role &quot;user1&quot;.
+</pre></div>
+</div>
+<p>To check that the role’s privileges are now as we expect, we can use the
+<code class="docutils literal notranslate"><span class="pre">show</span></code> subcommand of the <a class="reference internal" href="rdfox-shell.html#role-command"><span class="std std-ref">role</span></a> command which prints all of the
+specified role’s privileges, memberships and members:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; role show user1
+
+Password hash for &#39;user1&#39; is &lt;password-hash&gt;
+
+&#39;user1&#39; has the following directly assigned privileges:
+==============================================
+  Resource specifier   Allowed access types
+----------------------------------------------
+  &gt;datastores|*        read
+==============================================
+
+&#39;user1&#39; is a direct member of the following roles:
+================
+  Memberships
+----------------
+================
+
+The following roles are direct members of &#39;user1&#39;:
+============
+  Members
+------------
+============
+</pre></div>
+</div>
+</div>
+<div class="section" id="discovering-privilege-requirements">
+<h3><span class="section-number">12.5.4. </span>Discovering Privilege Requirements<a class="headerlink" href="#discovering-privilege-requirements" title="Permalink to this headline">¶</a></h3>
+<p>Individual operations may require several privileges depending on which
+resources they access. To determine which privileges are needed for a particular
+operation, attempt the operation as a completely unprivileged role and examine
+the resulting error message to identify the first required privilege. For
+example, the error messages in the following shell session tells us that in
+order to list the roles, a role must have a <code class="docutils literal notranslate"><span class="pre">read</span></code> privilege over the
+<code class="docutils literal notranslate"><span class="pre">|roles</span></code> resource.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; srvconn open user1-connection as user1
+Password for &#39;user1&#39;:
+A new server connection was opened and stored with name &#39;user1-connection&#39;.
+&gt; srvconn active user1-connection
+Server connection &#39;user1-connection&#39; is active.
+&gt; role list
+An error occurred while executing the command:
+    The role &#39;user1&#39; is not authorized to read the resource &#39;|roles&#39;.
+</pre></div>
+</div>
+<p>Next, grant the missing privilege:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; srvconn active sc1
+Server connection &#39;user1-connection&#39; is active.
+&gt; grant privileges read |roles to user1
+The privilege &#39;read&#39; over the resource specifier &quot;|roles&quot; was granted to the role &quot;user1&quot;.
+</pre></div>
+</div>
+<p>Although the privileges were successfully granted to the role, the server
+connection we opened earlier as <code class="docutils literal notranslate"><span class="pre">user1</span></code> will not have been modified. To
+exercise the new privileges available to <code class="docutils literal notranslate"><span class="pre">user1</span></code>, we first close the existing
+server connection and open and activate a new one:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; srvconn close
+The active server connection was closed.
+&gt; srvconn open user1-connection as user1
+Password for &#39;user1&#39;:
+A new server connection was opened and stored with name &#39;user1-connection&#39;.
+&gt; srvconn active user1-connection
+Server connection &#39;user1-connection&#39; is active.
+</pre></div>
+</div>
+<p>Finally, retry the operation:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; role list
+=========
+Name
+---------
+admin
+group
+user1
+=========
+</pre></div>
+</div>
+<p>The command is now successful. For other commands, multiple iterations of the
+above process may be needed before the command succeeds. For security reasons,
+RDFox only reveals the missing privileges for one resource at a time.</p>
+</div>
+<div class="section" id="assigning-privileges-via-membership">
+<span id="id19"></span><h3><span class="section-number">12.5.5. </span>Assigning Privileges via Membership<a class="headerlink" href="#assigning-privileges-via-membership" title="Permalink to this headline">¶</a></h3>
+<p>Roles can be arranged into hierarchies using the <code class="docutils literal notranslate"><span class="pre">role</span></code> subcommand of the
+<a class="reference internal" href="rdfox-shell.html#grant-command"><span class="std std-ref">grant</span></a> command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; srvconn active sc1
+Server connection &#39;sc1&#39; is active.
+&gt; grant role group to user1
+Membership of the role &#39;group&#39; was granted to the role &#39;user1&#39;.
+</pre></div>
+</div>
+<p>and removed from them using the <code class="docutils literal notranslate"><span class="pre">role</span></code> subcommand of the <a class="reference internal" href="rdfox-shell.html#revoke-command"><span class="std std-ref">revoke</span></a>
+command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; revoke role group from user1
+Membership of the role &quot;group&quot; was revoked from the role &quot;user1&quot; (if it was present).
+</pre></div>
+</div>
+<p>A role may be a member of as many other roles as is necessary however RDFox
+will prevent cycles: a role cannot be a member of itself either directly or
+indirectly. RDFox will also not allow roles with one or more members to be
+deleted.</p>
+</div>
+<div class="section" id="securing-the-rest-endpoint">
+<span id="id20"></span><h3><span class="section-number">12.5.6. </span>Securing the REST Endpoint<a class="headerlink" href="#securing-the-rest-endpoint" title="Permalink to this headline">¶</a></h3>
+<p>On receipt of an anonymous REST request (one with no <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header
+or TLS-authenticated role name), RDFox will attempt to create a new connection
+for the request by authenticating with role name <code class="docutils literal notranslate"><span class="pre">guest</span></code> and password
+<code class="docutils literal notranslate"><span class="pre">guest</span></code>. To enable anonymous REST access, administrators should therefore
+create the <code class="docutils literal notranslate"><span class="pre">guest</span></code> role and grant it the privileges to perform any operation
+which should be available to <em>any</em> client that can reach the REST endpoint. As
+a corollary, anonymous REST access can be completely disabled by ensuring the
+absence of a role named <code class="docutils literal notranslate"><span class="pre">guest</span></code> from the server’s role list. Note that RDFox
+will not allow the <code class="docutils literal notranslate"><span class="pre">guest</span></code> role to be created with any password other than
+<code class="docutils literal notranslate"><span class="pre">guest</span></code>, nor will it allow this role’s password to be changed.</p>
+</div>
+<div class="section" id="testing-the-setup">
+<h3><span class="section-number">12.5.7. </span>Testing the Setup<a class="headerlink" href="#testing-the-setup" title="Permalink to this headline">¶</a></h3>
+<p>Verifying that your access control policy is correct is an essential step in
+establishing a secure RDFox server. Oxford Semantic Technologies recommends
+comprehensive tests including both positive (checking that a given role can
+perform the operations it should be authorized to perform) and negative (check
+that a given role cannot perform the operations it should not be authorized to
+perform) tests.</p>
+</div>
+<div class="section" id="persistence">
+<h3><span class="section-number">12.5.8. </span>Persistence<a class="headerlink" href="#persistence" title="Permalink to this headline">¶</a></h3>
+<p>When persistence (see <a class="reference internal" href="persistence.html#persistence"><span class="std std-numref">Section 13</span></a>) is enabled, RDFox saves relevant
+parts of the server’s content to the server directory. An attacker with access
+to that directory will be able to tamper with any persisted access control
+policies. For this reason, it is vital to also tightly control access to the
+server directory when role persistence is enabled.</p>
+</div>
+</div>
+<div class="section" id="example-access-control-policies">
+<h2><span class="section-number">12.6. </span>Example Access Control Policies<a class="headerlink" href="#example-access-control-policies" title="Permalink to this headline">¶</a></h2>
+<p>This section contains several additional examples of access control policies.
+The scripts in this section are written assuming they are being run by a role
+with the all-powerful <code class="docutils literal notranslate"><span class="pre">full</span> <span class="pre">&gt;</span></code> privilege as is assigned to the first server
+role.</p>
+<div class="section" id="anonymous-read-only-rest-access">
+<h3><span class="section-number">12.6.1. </span>Anonymous, Read-Only REST Access<a class="headerlink" href="#anonymous-read-only-rest-access" title="Permalink to this headline">¶</a></h3>
+<p>The following shell example shows how to enable anonymous (unauthenticated),
+read-only access to the entire server:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; role create guest
+A new role was created with name &quot;guest&quot;.
+&gt; grant privileges read &gt; to guest
+The privilege &#39;read&#39; over the resource specifier &quot;&gt;&quot; was granted to the role &quot;guest&quot;.
+&gt; endpoint start
+The REST endpoint was successfully started at port number/service name 12110 with 11 threads.
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#securing-the-rest-endpoint"><span class="std std-ref">Securing the REST Endpoint</span></a> for more details.</p>
+</div>
+<div class="section" id="delegating-administration-of-a-data-store">
+<h3><span class="section-number">12.6.2. </span>Delegating Administration of a Data Store<a class="headerlink" href="#delegating-administration-of-a-data-store" title="Permalink to this headline">¶</a></h3>
+<p>To minimize the work that must be done as the most powerful role, it may be
+desirable to create separate roles to administrate each data store. To do this,
+first create the data store and its administrator role and ensure that the role
+has full control over the data store as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; dstore create ds
+A new data store &#39;ds&#39; was created and initialized.
+&gt; active ds
+Data store connection &#39;ds&#39; is active.
+&gt; role create ds-admin
+...
+A new role was created with name &quot;ds-admin&quot;.
+&gt; grant privileges full &gt;datastores|ds to ds-admin
+The privilege &#39;full&#39; over the resource specifier &quot;&gt;datastores|ds&quot; was granted to the role &quot;ds-admin&quot;.
+</pre></div>
+</div>
+<p>Finally, to ensure that <code class="docutils literal notranslate"><span class="pre">ds-admin</span></code> is able to grant and revoke privileges over
+the data store to and from other roles, we grant it write access over all roles
+as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; grant privileges read |roles to ds-admin
+The privilege &#39;read&#39; over the resource specifier &quot;|roles&quot; was granted to the role &quot;ds-admin&quot;.
+&gt; grant privileges read,write |roles|* to ds-admin
+The privileges &#39;read,write&#39; over the resource specifier &quot;|roles|*&quot; were granted to the role &quot;ds-admin&quot;.
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="transactions.html" class="btn btn-neutral float-left" title="11. Transactions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="persistence.html" class="btn btn-neutral float-right" title="13. Persistence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

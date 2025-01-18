@@ -1,0 +1,121 @@
+.. _welcome-to-rdfox:
+
+Welcome to RDFox
+================
+
+RDFox® is a main-memory, scalable, centralized data store that allows users to
+efficiently manage graph-structured data represented according to the `RDF data
+model <https://www.w3.org/RDF/>`_ and query that data using the `SPARQL 1.1
+query language <https://www.w3.org/TR/sparql11-query/>`__.
+
+RDFox also enables intelligent information processing by providing means for
+representing and reasoning with domain knowledge in the form of rules and
+ontological axioms. Rules in RDFox can be represented using a powerful
+extension of the well-understood Datalog language, whereas ontology axioms can
+be represented in the standard ontology language `OWL 2
+<https://www.w3.org/TR/owl2-overview/>`__ and in the `Semantic Web Rule
+Language SWRL <https://www.w3.org/Submission/SWRL/>`__.
+
+RDFox runs on Linux, macOS, and Windows. It can be integrated as a library into
+Java applications using an efficient native API. It can also be used as a
+standalone server accessible via a RESTful API. These versatile modes of use,
+combined with the very efficient storage and reasoning capabilities, make RDFox
+suitable for a wide range of application scenarios.
+
+
+How to Read this Documentation
+------------------------------
+
+We next provide a brief guide on how to use this documentation.
+
+Introduction
+  Sections :numref:`{number} <welcome-to-rdfox>` to :numref:`{number}
+  <getting-started>` contain introductory information to help users who are new
+  to RDFox.
+  
+  :numref:`features-and-requirements` begins with a high level description of
+  RDFox's functionality then gives details of the RDFox software archive, the
+  available interfaces to the system (GUI, CLI and APIs), and the software and
+  hardware requirements for running RDFox. :numref:`getting-started` contains
+  our *Getting Started* guide, which will walk you through your first
+  experience with RDFox.
+
+Organization of Data
+  Sections :numref:`{number} <servers>` to :numref:`{number} <data-sources>`
+  explain how RDFox organizes data. The information in these sections is not
+  specific to any particular RDFox interface and is relevant to all users of
+  the system.
+
+  :numref:`servers` introduces the concept of the *RDFox server*, the top-level
+  container for all information stored in RDFox, and the hierarchy of concepts
+  used to organize that information. The parameters available for configuring
+  servers are also described. The three subsequent sections provide more detail
+  on the most important concepts: *data stores* in :numref:`data-stores`,
+  *tuple tables* in :numref:`tuple-tables`, and *data sources* in
+  :numref:`data-sources`. Finally, :numref:`connections` explains the concept
+  of *connections* which are used to mediate access to the system.
+
+Functionality
+  Sections :numref:`{number} <import-and-export>` to :numref:`{number}
+  <persistence>` document the core functionality of RDFox. As with the sections
+  on concepts, the information in these sections is not specific to any
+  particular RDFox interface and is potentially relevant to all users of the
+  system, depending on the needs of their application.
+
+  :numref:`import-and-export` describes RDFox's operations for importing and
+  exporting bulk data, rules and axioms.
+
+  :numref:`querying` describes querying in RDFox. It assumes that readers are
+  familiar with the RDF 1.1 and SPARQL 1.1 standards however RDFox's
+  proprietary extensions to the latter are explained in depth with examples.
+  This section also contains information on how to access and visualize query
+  plans in RDFox as well as how to monitor query execution.
+
+  :numref:`reasoning` contains a comprehensive guide to RDFox's reasoning
+  functionality. Unlike the section on querying, no prior knowledge of
+  reasoning is assumed and the section includes many examples that you can
+  readily execute using RDFox. This section also contains information on how to
+  obtain explanations of facts materialized by reasoning and on how to monitor
+  the reasoning process to analyze the performance of rules.
+  
+  :numref:`transactions` describes how RDFox uses transactions to allow many
+  users to safely share a single RDFox instance. Finally,
+  :numref:`access-control` introduces RDFox's access control model.
+
+  :numref:`persistence` describes the available options for persisting the
+  settings and data loaded into RDFox.
+
+Interfaces
+  Sections :numref:`{number} <connections>` to :numref:`{number} <javadoc>`
+  contain reference documentation and guides for various RDFox interfaces.
+
+  :numref:`connections` introduces the concept of *connections* which provide
+  access to core RDFox functionality. Connections are used in the RDFox shell
+  and all APIs so this section is useful for anyone using those interfaces.
+
+  :numref:`rdfox-shell` describes the RDFox shell, a command line interface
+  with support for both interactive and batch operation that can be used
+  remotely or directly via standard input and output. :numref:`apis` contains
+  the main API reference documentation for the REST and Java (JRDFox) APIs.
+  :numref:`javadoc` contains a link to the full Javadoc documentation for
+  JRDFox.
+
+Operations Manual
+  Sections :numref:`{number} <rdfox-executable>` to :numref:`{number} <docker>`
+  constitute the operations manual for RDFox. This information is intended to
+  help users responsible for establishing long-running, secure and maintainable
+  RDFox deployments.
+
+  :numref:`rdfox-executable` explains how to use the RDFox executable.
+  :numref:`rdfox-endpoint` describes the RDFox Endpoint including details of
+  how to start and stop it, its configuration parameters and how RDFox treats
+  anonymous HTTP(S) requests. :numref:`logging` describes the types of logging
+  supported by RDFox. :numref:`high-availability` gives details on how to
+  deploy a group of RDFox instances to provide a single high-availability
+  service. Finally, :numref:`docker` describes the official Docker images for
+  RDFox.
+
+Information
+  Sections :numref:`{number} <release-notes>` and :numref:`{number}
+  <acknowledgments>` contain release notes and software license acknowledgments
+  for RDFox respectively.

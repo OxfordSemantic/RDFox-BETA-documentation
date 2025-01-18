@@ -1,0 +1,63 @@
+
+Table of Contents
+=================
+
+.. toctree::
+   :numbered:
+   :maxdepth: 2
+   :caption: Introduction
+   
+   welcome-to-rdfox
+   features-and-requirements
+   getting-started
+
+.. toctree::
+   :numbered:
+   :maxdepth: 2
+   :caption: Organization of Data
+
+   servers
+   data-stores
+   tuple-tables
+   data-sources
+
+.. toctree::
+   :numbered:
+   :maxdepth: 2
+   :caption: Functionality
+
+   import-and-export
+   querying
+   reasoning
+   transactions
+   access-control
+   persistence
+
+.. toctree::
+   :numbered:
+   :maxdepth: 2
+   :caption: Interfaces
+   
+   connections
+   rdfox-shell
+   apis
+   javadoc
+
+.. toctree::
+   :numbered:
+   :maxdepth: 2
+   :caption: Operations Manual
+   
+   rdfox-executable
+   rdfox-endpoint
+   logging
+   high-availability
+   docker
+
+.. toctree::
+   :numbered:
+   :maxdepth: 1
+   :caption: Information
+   
+   release-notes
+   acknowledgments

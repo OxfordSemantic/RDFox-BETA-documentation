@@ -1,0 +1,476 @@
+.. _persistence:
+
+Persistence
+===========
+
+RDFox® is a main-memory system, which means that a full copy of the data loaded
+into the system is always held in main memory to support query answering and
+other operations. It is, however, possible to configure RDFox to incrementally
+save various types of information to persistent storage so that it may be
+restored in a subsequent or concurrent session.
+
+There are three reasons to enable persistence. The first is when RDFox is being
+used as the `System of Record
+<https://en.wikipedia.org/wiki/System_of_record>`_ for the data it contains. In
+this case, persisting to disk is essential in order to achieve acceptable
+levels of data durability. The second reason is to improve restart performance.
+Using persistence achieves this because it is generally faster for RDFox to
+reload data stored in its native format than it is to import it from other
+formats, or to copy it from another data store. The third reason is so that
+changes to the data store can be continuously replicated amongst several RDFox
+instances. Only the ``file-sequence`` persistence type described in
+:numref:`file-sequence-persistence` supports this last goal.
+
+.. note::
+
+   Persistence does not increase the capacity of an RDFox data store beyond
+   what can be stored in memory.
+
+RDFox's persistence is compliant with the ACID properties described in
+:numref:`transactions`.
+
+The persisted state of an RDFox instance consists of the following types of
+information:
+
+- information about all data stores in the system (also known as the *server catalog*),
+- information about the roles used for access control, and
+- the data loaded into each data store.
+
+Each version of the server catalog is uniquely identified by a server version
+number, and each distinct state of a data store us uniquely identified by a
+data store version number (see :numref:`servers`). In addition, each distinct
+list of roles used for access control is uniquely identified by a unique *role
+manager version number*.
+
+.. _server-directory:
+
+The Server Directory
+--------------------
+
+In order to use persistence, an RDFox server must be configured with a server
+directory which will contain all of the server's persisted content and
+settings. See the documentation of the ``server-directory`` parameter in
+:numref:`server-parameters`.
+
+Care must be taken to ensure that the disk containing the server directory has
+sufficient space to accommodate the persisted data. The amount of space
+required will depend on the size of the data store(s) and the frequency of
+changes to the data. The disk should be continuously monitored to ensure that
+it has sufficient free space to accommodate any new data that will be added.
+Additional disk space is required temporarily when persistent data stores are
+:ref:`compacted <compaction-dead-fact-removal>` and when a server directory is
+:ref:`upgraded <persistence-upgrade>`.
+
+To ensure smooth operation, a persistent server should have uninterrupted read
+and write access to its server directory. Specifically, the server must have
+complete freedom to create, delete, or move files in the server directory. If
+other processes access files within a server directory concurrently with an
+RDFox server, the server's operations may fail or behave unexpectedly. It is
+therefore advised that the server directory should be added to the exclusion
+list of potential programs that would interfere with its file operations. These
+programs can include but are not limited to anti-virus, anti-malware programs,
+security applications, and file indexing services.
+
+The remaining sub-sections of the current section describe key points in the
+lifecycle of a server directory.
+
+.. _persistence-initialization:
+
+Initialization
+~~~~~~~~~~~~~~
+
+Before starting a persistent server, its server directory must be initialized
+for the desired :ref:`persistence option <persistence-options>`. The
+initialization step creates the server directory, if it does not already exist,
+and creates the necessary files to store the server catalog and roles database.
+Initializing a server directory also captures any server parameters specified
+at the time of initialization into the :ref:`server parameters file
+<server-parameters-file>` to serve as defaults for future server sessions. When
+initializing a server directory using the RDFox executable, parameters for the
+endpoint are also captured and written to the endpoint parameters file (see
+:numref:`specifying-endpoint-parameters`).
+
+.. _persistence-upgrade:
+
+Upgrade
+~~~~~~~
+
+RDFox can upgrade the contents of a server directory that has been populated by
+an earlier version so that it can be used with the current version. Upgrade is
+possible for at least the immediately preceding persistence version and
+possibly from versions before that.
+
+The upgrade procedure uses two auxiliary directories, the *new* and *saved*
+directories, both of which are within the same folder as the existing server
+directory. First, the upgraded server directory is created as the new
+directory. This step works by creating, within the new directory, modified
+copies of any files in the existing server directory that need to be changed to
+conform to the new persistence format, and then hard-linking or copying any
+files that do not need to be modified to give a complete, upgraded directory.
+Next, the existing server directory is moved to the saved directory path and
+then the new server directory is moved to the original server directory path.
+Finally, the saved directory is deleted. This process ensures that the server
+directory is always in a recoverable state, even if the upgrade process is
+interrupted.
+
+.. warning::
+
+   While the above procedure has been designed for safety, operators should
+   always take a back of the server directory immediately before upgrade as a
+   precaution. In the event that you are unable to start the RDFox server after
+   the upgrade using either the old or new version, restore the backup, return
+   to using the old version, and contact Oxford Semantic Technologies for
+   assistance.
+
+The procedure described above results in the following requirements which the
+operator must satisfy in order to successfully perform an upgrade:
+
+  - No RDFox server, or other process, can be using the directory to be
+    upgraded during any part of the upgrade process.
+  - The server directory must be on the same volume as its parent directory so
+    that the auxiliary directory paths will be on the same volume as the
+    existing directory. This is necessary to ensure that the two move
+    operations succeed.
+  - The process performing the upgrade must be able to write to the parent
+    directory of the server directory in order to create the new directory and
+    move the existing and new directories.
+  - There should be enough disk space on the volume to hold a complete copy of
+    the server directory. This is a worst-case requirement as hard-linking of
+    files that do not need to change may substantially reduce the additional
+    disk space that is required. Operators should consider compacting all data
+    stores using the older RDFox version to reduce the disk space used before
+    upgrade begins.
+
+Upgrade can be invoked using the ``upgrade`` mode of the RDFox executable (see
+:numref:`exe-mode-upgrade`) or by using the ``upgrade(...)`` method of the
+`RDFoxServer <./_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html>`_
+class in the Java API.
+
+Backup and Restore
+~~~~~~~~~~~~~~~~~~
+
+RDFox does not expose any specific functionality for backing up and restoring
+persistent servers but backups can be taken by recursively copying the complete
+server directory to a new location. The server directory can be restored by
+recursively copying a backed-up server version to a new location and specifying
+the new location as the server directory for a new RDFox server instance.
+
+With the ``file-sequence`` persistence option, backups can be taken at any
+time, even if replicas are running however with the ``file`` persistence
+option, backups should only be taken after ensuring that no writes to the
+server directory will take place (for example by shutting down the server).
+
+Decommissioning
+~~~~~~~~~~~~~~~
+
+To decommission a persistent server, simply stop all running replicas and
+delete the server directory.
+
+.. _persistence-configuration:
+
+Configuration
+-------------
+
+This section describes RDFox's configuration options related to persistence in
+RDFox.
+
+.. _persistence-options:
+
+Persistence Options
+~~~~~~~~~~~~~~~~~~~
+
+The persistence option to be used for a particular server is controlled by the
+``persistence`` :ref:`server parameter <server-parameters>`, which can be set
+to ``off`` (no persistence), ``file``, or ``file-sequence``. The ``file`` and
+``file-sequence`` options are described in the following sections. Even when
+persistence is enabled at the server level, it may be disabled at the data
+store level by setting the ``persistence`` :ref:`data store parameter
+<data-store-parameters>` to ``off``.
+
+``file`` persistence
+^^^^^^^^^^^^^^^^^^^^
+
+The ``file`` persistence option stores the persisted content (the data store
+catalog, the list of available roles, and the content of a data store) in a
+single file. The data store catalog and the list of available roles are always
+saved as a snapshot. The content of a data store is saved as a snapshot
+followed by zero or more deltas. When a data store is compacted, the saved data
+is replaced by a fresh snapshot, which is extended by deltas as further
+transactions are committed on the data store. The process of compacting a data
+store first saves the current snapshot into a new file, and then it atomically
+replaces the old file with the new file. Consequently, compacting a data store
+eventually frees the storage occupied by any deltas written after the snapshot,
+but it may temporarily use additional disk space in order to hold both the old
+and the new files.
+
+A server directory containing this persistence type can only be used by one
+RDFox server at a time. RDFox ensures that this is the case by seeking an
+exclusive lock on the directory when the server instance is created and exiting
+if the lock cannot be obtained.
+
+RDFox will update the persisted data in a way that is in most cases resilient
+to RDFox crashing or the system losing power during the saving process.
+Specifically, if saving of a delta is interrupted for any reason, RDFox will
+undo any changes made to the data the next time the RDFox process is restarted;
+in this way, RDFox provides ACID guarantees for transaction updates.
+
+While RDFox guarantees consistency of persisted data due to RDFox crashes and
+power failure, RDFox is not immune against external damage to persisted files.
+RDFox will attempt to detect such corruption as follows.
+
+- When data is encrypted, the encryption algorithm itself offers protection
+  against corruption: decrypting a damaged file will produce data that has a
+  very high chance to be detected by RDFox as invalid.
+
+- When data is not encrypted, RDFox will use the CRC64 checksum algorithm to
+  detect data corruption.
+
+RDFox will refuse to start if corruption is detected in any part of the
+persisted data. In such cases, the only possible course of action is to restore
+a recent state of the RDFox database from backup. Consequently, it is highly
+recommended to create periodic backups of the entire server directory. It is
+safe to create copies of the server directory even if an RDFox instance is
+running, provided that the RDFox instance does not write any data during the
+backup period. If RDFox tries to save a transaction or change the server
+catalog while a backup is in progress, the backed up data may be invalid (i.e.,
+it cannot be used in future to restore the state of an RDFox server).
+Consequently, backups of the server directory should only be taken during a
+maintenance window in which no read/write transactions are performed.
+
+System Requirements
++++++++++++++++++++
+
+In order to exclusively lock the server directory , ``file`` persistence uses
+the ``flock`` system call with the ``LOCK_EX`` flag on Linux, and the
+``CreateFileW`` system call with the ``dwShareMode`` set to 0 on Windows. In
+both cases, the underlying file system must faithfully and correctly support
+the locking semantics of those calls.
+
+Correctness of ``file`` persistence relies on the following important
+system-level considerations.
+
+- To guard against sudden power failure, RDFox writes data in multiples of disk
+  sector size. However, determining the sector size programmatically typically
+  requires administrative privileges in modern OSes. Consequently, RDFox relies
+  on users to configure the sector size correctly. RDFox will function
+  correctly as long as its sector size is a multiple of actual sector size;
+  however, using a sector size that size that is larger than what is strictly
+  necessary for the disk may waste a very small amount of storage per
+  transaction. Most disks available nowadays on the market use sectors of 512
+  or 4096 bytes, so RDFox uses a sector size of 4096 by default as this ensures
+  correctness on commonly used hardware. If RDFox is used on a disk with a
+  different sector size, the correct sector size must be set explicitly using
+  the ``persistence.disk-sector-size`` server parameter.
+
+- RDFox relies on system calls that ensure that the data is persisted on disk
+  (``FlushFileBuffers`` on Windows, ``fcntl`` with the ``F_BARRIERFSYNC``
+  option on macOS, and ``fsyncdata`` on Linux). It is well documented that
+  certain disks and disk drivers will "lie" to the operating system; for
+  example, some disks will report that the data has been fully persisted even
+  if the data has not yet been flushed from the disk controller's cache. Modern
+  operating systems do not provide a way of detecting such situations, and so
+  RDFox has no choice but to "believe" the operating system. If RDFox is used
+  with a disk that "lies" about persistence, data can be lost in case of
+  unexpected power failure or kernel crash. Please check with your disk's
+  manufacturer whether their product is safe to be used in a transactional
+  application.
+
+- On macOS, RDFox uses the ``fcntl`` with the ``F_BARRIERFSYNC`` option to
+  synchronize data with external storage. This system call is **well known** to
+  not offer hard persistence guarantees, and in fact it was observed in
+  practice that the data can be kept in disk buffers for a few seconds after
+  the system call is issued. The ``F_FULLFSYNC`` option offers stronger
+  persistence guarantees, but is known to cause considerable slowdown and can
+  introduce considerable wear and tear with Apple's SSDs; moreover, even that
+  system call does not completely guarantee no data loss in case of power
+  failure. Please refer to `Apple's documentation
+  <https://developer.apple.com/documentation/xcode/reducing-disk-writes#>`_
+  about these system calls and their recommendation to use ``F_BARRIERFSYNC``.
+  Consequently, persisted data is not 100% safe from power failure on macOS.
+  However, in our experience, Mac computers are rarely used to run
+  production-grade databases, and moreover Mac laptops (which are the most
+  common form of Mac computers) are equipped with a battery that considerably
+  reduces the chances of sudden power failure. Thus, relaxing consistency in
+  order to improve performance and reduce wear and tear is acceptable in
+  typical usage scenarios of RDFox on macOS. Please contact Oxford Semantic
+  Technologies if you plan to use RDFox in production on macOS.
+
+.. _file-sequence-persistence:
+
+``file-sequence`` persistence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``file-sequence`` persistence option stores the persisted content (whether
+it is the data store catalog, roles database, or the content of a data store)
+in a sequence of files with one file per version. The path of each file is
+determined by the relevant version number (server, role manager or data store).
+
+Unlike with ``file`` persistence, a server directory using ``file-sequence``
+persistence may be shared by several RDFox servers at once. So long as the
+underlying file system meets the criteria described in
+:numref:`file-sequence-file-system-requirements`, any modification successfully
+made via any of these instances will be replicated to the other instances
+eventually. This provides the basis for deploying RDFox in a leaderless, high
+availability (HA) configuration. Please refer to
+:numref:`replication-performance` for information about replication lag and
+:numref:`high-availability` for details of how to setup HA deployments.
+
+Also unlike the ``file`` persistence type, ``file-sequence`` server directories
+can be backed up during write operations, removing the need for maintenance
+windows in order to collect backups. This is because the files that form the
+file sequence never contain partial deltas.
+
+When data stores persisted with this file type are :ref:`compacted
+<compaction-dead-fact-removal>`, old snapshots and deltas are replaced with a
+small file indicating that original file content has been deleted from the
+disk, known as a tombstone.
+
+.. note::
+
+    In order to use the ``file-sequence`` persistence option, the license key
+    provided at startup must explicitly support the feature.
+
+.. note::
+
+    The ``file-sequence`` persistence option is ``EXPERIMENTAL`` on Windows and
+    macOS.
+
+.. _file-sequence-file-system-requirements:
+
+System Requirements
++++++++++++++++++++
+
+In order to make it safe for **any** of the RDFox instances sharing a server
+directory to persist new transactions, each instance must add files to file
+sequences in a way that will fail if the version they are trying to create has
+already been created by another instance. This requires that the file system
+containing the server directory supports an atomic move or link operation that
+returns a distinct error code when the target path is already occupied.
+
+The Network File System (NFS) protocol meets the above requirement through the
+``LINK`` operation (documented, in `Section 18.9 of RFC5661
+<https://datatracker.ietf.org/doc/html/rfc5661#section-18.9>`). Oxford Semantic
+Technologies has successfully tested the ``file-sequence`` persistence option
+under sustained write contention on the following managed NFS services:
+
+- `Amazon Elastic File System <https://aws.amazon.com/efs/>`_
+- `Azure Files
+  <https://learn.microsoft.com/en-us/azure/storage/files/storage-files-introduction>`_
+  and `Azure NetApp Files <https://azure.microsoft.com/en-gb/products/netapp>`_
+- `Google Cloud Filestore <https://cloud.google.com/filestore>`_
+
+In each case, testing was performed by provisioning an instance of the file
+system and mounting it to three Linux hosts in separate availability zones
+using the mounting procedure recommended by the service provider. An instance
+of RDFox was then started in ``shell`` mode on each host with the
+``server-directory`` parameter pointing to the same directory on the NFS file
+system. Using one of the instances, a data store was created with the following
+command:
+
+.. code::
+
+    dstore create default
+
+Next, the following commands were run on each host:
+
+.. code::
+
+    set output out
+    rwtest 500 5000
+
+The ``rwtest`` shell command has been designed specifically to detect
+replication errors and is described fully in :numref:`rwtest`. When invoked as
+shown, the test attempts to commit a transaction every 2.75 s on average.
+Running the command on three instances simultaneously results in frequent write
+contention events.
+
+After 72 hours, the ``rwtest`` command was interrupted by issuing ``Ctrl-C`` in
+the terminal on each host. This produces a final report that shows the total
+number of transactions successfully committed by each instance. The sum of
+these numbers was found to match the data store version minus 1 (the initial
+data store version) as expected. If more than one of the instances had
+concluded that it had successfully created any given version, the sum of these
+numbers would be higher. If in any iteration of the test loop on any of the
+three instances the content of the data store differed from the expected
+content, which is known for each data store version, the test would have
+stopped with an error.
+
+The above procedure constitutes a minimum test for qualifying file systems (and
+the associated configuration options) for production use in scenarios where
+write contention may occur. Users planning deployments of RDFox that use the
+``file-sequence`` persistence option are advised to conduct their own testing
+using this procedure. The degree of write contention can be varied in the test
+by changing the numeric parameters to the command which represent the minimum
+and maximum duration in milliseconds between iterations of the test loop.
+
+It is worth noting that the atomic operation described above is only required
+in situations where there is a risk of write contention and that a broader
+range of file systems may be safe to use under the constraint that write
+contention will not occur. This can be achieved by ensuring (externally) that
+all writes will be committed via the same nominated instance. Some approaches
+to this are reviewed in :numref:`suggested-load-balancing-approaches`. To
+qualify file systems for use in such setups, the ``rwtest`` command can be
+invoked with the ``read-only`` argument on all but one of the hosts.
+
+.. note::
+
+    On UNIX operating systems, RDFox uses the ``link`` system call as the
+    atomic commit operation, while on Windows ``MoveFileW`` is used. The
+    ``EEXISTS`` (UNIX) and ``ERROR_ALREADY_EXISTS`` (Windows) error codes are
+    interpreted to mean that the commit has failed because another instance
+    successfully committed a change first.
+
+.. _replication-performance:
+
+Replication Performance
++++++++++++++++++++++++
+
+In order for a change to be replicated between instances, the instance writing
+the change must successfully commit it to the path reserved for the new version
+number, and the other instances must then discover it and apply the changes to
+their own in-memory copies of the data. The time taken for this process is
+called replication *lag*.
+
+In all, there are three mechanisms by which a receiving instance can discover
+new version files. The first is through polling. The poll interval is
+controlled by the ``persistence.file-system-poll-interval`` server parameter
+which has a default of 60 s. A separate poll interval is established for each
+persisted component. This means that, in the case of a server with three
+persisted data stores, the file system will be polled five times in each
+interval: once for new server versions, once for new role manager versions, and
+once for each of the three data stores. It is generally desirable to keep
+polling intervals long to minimise load on the file system so, while this
+mechanism helps bound worst-case replication lag, it is unsuitable for
+achieving low average-case replication lag.
+
+The second mechanism by which new version files are discovered is when a commit
+fails because the local version has fallen behind the highest persisted
+version. In this case, the instance will apply the new version and any others
+that have been created since as soon as the failed transaction has been rolled
+back. This mechanism is provided to reduce the time taken for an instance to
+catch up with the latest changes after a commit fails due to write contention.
+It will not, in most cases, be useful for achieving low average-case
+replication lag.
+
+The third mechanism for new version files to be discovered is by notification
+over UDP. This mechanism gives the lowest possible average-case replication
+lag. To activate this mechanism, the ``persistence.notifications-address``
+server parameter must be set to a host name and UDP port number separated by a
+plus (``+``) symbol. An instance configured this way will register itself for
+notifications by writing the given notifications address to the server
+directory itself. For the mechanism to work, the host name must be resolvable
+by the other instances that share the server directory and UDP packets must be
+able to flow freely from the other instances to the specified port. With this
+mechanism in place, it should be possible to achieve sub-second replication lag
+for instances within the same data center assuming that changes are small.
+
+Encryption
+~~~~~~~~~~
+
+When using any form of persistence, a RDFox server can be configured to encrypt
+and decrypt the data stored in the server directory by supplying a
+base64-encoded key via the ``persistence.encryption.key`` server parameter. By
+default the ``AES-256-CBC`` cipher, which requires a 256-bit AES key, is used
+but this can be changed by setting the ``persistence.encryption.algorithm``
+parameter. See the full documentation of the above parameters in
+:numref:`server-parameters` for more details.

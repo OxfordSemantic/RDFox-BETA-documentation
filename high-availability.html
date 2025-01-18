@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>21. High Availability &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="22. RDFox Docker Images" href="docker.html" />
+    <link rel="prev" title="20. Logging" href="logging.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">21. High Availability</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#characteristics">21.1. Characteristics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recommended-deployment-steps">21.2. Recommended Deployment Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#suggested-approaches-to-load-balancing">21.3. Suggested Approaches to Load Balancing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#single-read-write-service-with-single-group-of-instances">21.3.1. Single read/write Service with Single Group of Instances</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#separate-read-only-and-read-write-services-with-dedicated-writer-instance">21.3.2. Separate read-only and read/write Services with Dedicated Writer Instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#separate-read-only-and-read-write-services-with-single-group-of-instances">21.3.3. Separate read-only and read/write Services with Single Group of Instances</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">21. </span>High Availability</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="high-availability">
+<span id="id1"></span><h1><span class="section-number">21. </span>High Availability<a class="headerlink" href="#high-availability" title="Permalink to this headline">¶</a></h1>
+<p>This section describes how to deploy several instances of RDFox® to work
+together to provide a service with high availability.</p>
+<p>Availability is the non-functional characterstic of a system that determines
+what proportion of the time the system is available for its intended use.
+Achieving high availability (HA) for a software service in the face of
+unpredictable problems such as power failures, network outages, and fires,
+requires running multiple copies of the service with identical or close to
+identical data so that if one fails, there are still other instances to service
+inbound requests.</p>
+<p>Making several service copies with identical data (also known as replicas) is
+trivial for read-only services but more challenging for services that allow
+data to be modified as well as queried. The latter case requires a mechanism to
+ensure that new changes committed via one replica, are propagated to the
+others. In RDFox, this is achieved by configuring the instances to use the same
+server directory, and then load-balancing the inbound requests over those
+instances. In order to share a server directory, RDFox instances must be
+configured to use the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence type described in
+<a class="reference internal" href="persistence.html#file-sequence-persistence"><span class="std std-numref">Section 13.2.1.2</span></a>.</p>
+<p>The characterstics of RDFox HA deployments are described in the following
+section. It is important that both developers and operators understand these
+aspects of RDFox HA deployments. <a class="reference internal" href="#ha-recommended-deployment-steps"><span class="std std-numref">Section 21.2</span></a>
+describes the general workflow for creating new RDFox HA deployments while
+<a class="reference internal" href="#suggested-load-balancing-approaches"><span class="std std-numref">Section 21.3</span></a> sketches some possible load
+balancing approaches.</p>
+<div class="section" id="characteristics">
+<h2><span class="section-number">21.1. </span>Characteristics<a class="headerlink" href="#characteristics" title="Permalink to this headline">¶</a></h2>
+<p>RDFox HA deployments have the following characteristics.</p>
+<dl>
+<dt>Leaderless</dt><dd><p>All the instances that share a server directory are equivalent: there is no
+<em>leader</em> or <em>master</em> role. This means that any instance will accept writes
+without needing to communicate with other instances. This supports a range of
+different load balancing strategies, some of which are reviewed in
+<a class="reference internal" href="#suggested-load-balancing-approaches"><span class="std std-numref">Section 21.3</span></a>.</p>
+</dd>
+<dt>Dynamic</dt><dd><p>Additional replicas can be added at any time just by launching them with the
+appropriate parameters. New instances become available as soon as they have
+loaded the existing data from the server directory.</p>
+</dd>
+<dt>Eventually Consistent</dt><dd><p>Each change becomes visible on the non-committing instances at some point
+after the change is successfully committed. In most cases it is useful for
+changes to be replicated as soon as possible after commit. For a discussion
+of how to achieve the lowest possible replication lag, please refer to
+<a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p>
+<p>Eventual consistency is a widely-used consistency model but correct usage
+requires developers to understand the implications. These issues are explored
+briefly in <a class="reference internal" href="#suggested-load-balancing-approaches"><span class="std std-numref">Section 21.3</span></a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="recommended-deployment-steps">
+<span id="ha-recommended-deployment-steps"></span><h2><span class="section-number">21.2. </span>Recommended Deployment Steps<a class="headerlink" href="#recommended-deployment-steps" title="Permalink to this headline">¶</a></h2>
+<p>This section describes, at a high level, the recommended steps for provisioning
+a new RDFox HA service.</p>
+<ol class="arabic">
+<li><p>Provision a file system to contain the server directory for the deployment.
+The file system must meet the requirements specified in
+<a class="reference internal" href="persistence.html#file-sequence-file-system-requirements"><span class="std std-numref">Section 13.2.1.2.1</span></a> and must have sufficient
+capacity for the data that will be loaded into RDFox.</p></li>
+<li><p>Provision a separate host for each of the desired number of RDFox instances.
+Each must have sufficient memory to store the data that will be imported and
+at least one CPU core for each desired RDFox thread.</p></li>
+<li><p>Download and unzip the RDFox software archive onto each host.</p></li>
+<li><p>Make sure that a valid, in-date license key is accessible from each host.
+See <a class="reference internal" href="features-and-requirements.html#rdfox-license-key"><span class="std std-numref">Section 2.4.1.3</span></a> for the full list of ways this can be
+provided.</p></li>
+<li><p>If desired, create a directory on the file system that will act as the
+shared server directory. Otherwise, the root of the file system can be used
+directly for this purpose.</p></li>
+<li><p>Mount the server directory to each of the hosts. In the following steps,
+<code class="docutils literal notranslate"><span class="pre">&lt;host-server-dir&gt;</span></code> will represent the path at which the server directory
+will be found on a given host.</p></li>
+<li><p>On one of the hosts, launch RDFox in <code class="docutils literal notranslate"><span class="pre">init</span></code> mode to initialize the server
+directory. The command line must explicitly set the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code>
+server parameter to <code class="docutils literal notranslate"><span class="pre">&lt;host-server-dir&gt;</span></code> and the <code class="docutils literal notranslate"><span class="pre">persistence</span></code> server
+parameter to <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>. It may also include any other server or
+endpoint parameters which should be used by all RDFox servers sharing the
+server directory. Please refer to <a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a> for details of
+the command line arguments supported by RDFox.</p></li>
+<li><p>Determine the network name for each host and choose a UDP port number at
+which the host will receive notifications about new versions from other
+instances. We will use <code class="docutils literal notranslate"><span class="pre">&lt;hostname&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;port&gt;</span></code> to represent these
+values in what follows. Ensure that UDP packets can be sent from the other
+hosts to the chosen hostname and port number.</p></li>
+<li><p>On each of the hosts, launch RDFox in <code class="docutils literal notranslate"><span class="pre">daemon</span></code> mode to start the
+<a class="reference internal" href="rdfox-endpoint.html#rdfox-endpoint"><span class="std std-ref">RDFox endpoint</span></a>. Again, the command line must
+explicitly set the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> server parameter to
+<code class="docutils literal notranslate"><span class="pre">&lt;host-server-dir&gt;</span></code> but this time the
+<code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code> server parameter should also be set
+using the hostname and port determined above. It is usually also desirable
+to enable request logging. The launch command may be built using the
+following template:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RDFox -server-directory &lt;host-server-dir&gt; -persistence.notifications-address &lt;hostname&gt;+&lt;port&gt; daemon request-logger elf
+</pre></div>
+</div>
+<p>Please refer to <a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a> for details of the command line
+arguments supported by RDFox.</p>
+</li>
+<li><p>Finally, establish load balancing over the instances using external
+software. The following section outlines some possible approaches.</p></li>
+</ol>
+</div>
+<div class="section" id="suggested-approaches-to-load-balancing">
+<span id="suggested-load-balancing-approaches"></span><h2><span class="section-number">21.3. </span>Suggested Approaches to Load Balancing<a class="headerlink" href="#suggested-approaches-to-load-balancing" title="Permalink to this headline">¶</a></h2>
+<p>The following section describes a selection of load balancing topologies that
+can be used with RDFox HA to help illustrate the relevant considerations.
+Whichever approach is chosen, it is crucial that developers working with the
+system understand what guarantees they can expect from the service or services.</p>
+<p>The following sections make some assumptions about the infrastructure used for
+the RDFox HA deployment. First, it is assumed that, where a group of instances
+is used, there is some system responsible for ensuring that the group contains
+the desired number of healthy instances at all times, with the capability to
+start new instances when this is not the case. This could be done manually but
+will most often be autonomous. Second, it is assumed that the load balancer can
+be configured to route traffic to the healthy instances within such groups.
+<a class="reference external" href="https://kubernetes.io/">Kubernetes</a> is an example of a system that meets
+these criteria.</p>
+<div class="section" id="single-read-write-service-with-single-group-of-instances">
+<h3><span class="section-number">21.3.1. </span>Single read/write Service with Single Group of Instances<a class="headerlink" href="#single-read-write-service-with-single-group-of-instances" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/load-balancing-single-service.png"><img alt="Single read/write service with single group of instances" src="_images/load-balancing-single-service.png" style="width: 450px;" /></a>
+</div>
+<p>For deployments with infrequent updates, the simple load balancing topology
+depicted above is a good choice. This uses a single load balancer to distribute
+all types of request over all of the instances that share the server directory.
+As well as being easy to configure, this gives developers a single service
+identity for use in code, regardless of whether they are performing a query or
+update, and gives the same availability for both of these types of traffic.</p>
+<p>One downside to this approach is inefficient handling of write contention. The
+problem can be explained as follows. Imagine that all of the replicas in the
+group are in sync at version <em>v</em> of the data store when two clients attempt to
+apply changes concurrently. These changes could be to add or remove data via
+import or to apply arbitrary SPARQL udpates. Imagine also that the two requests
+are routed to <em>different</em> replicas. In this situation, each replica starts a
+read/write transaction, applies the modification specified in the request to
+its in-memory state, and attempts to commit the change by writing it to the
+path for version <em>v</em>+1. Only one commit will succeed. The unsuccessful replica
+will then have to roll back the changes to its in-memory data and then report
+the error to the client which will then have to retry at the cost of at least
+one more server round-trip.</p>
+<p>Next, imagine that both requests are instead routed to the <em>same</em> replica. This
+time the RDFox instance will, as before, begin a read/write transaction for the
+first request that arrives. The thread servicing the second request will,
+however, see that the data store is locked and wait for up to two seconds to
+start its own transaction. If the first request completes within this time, the
+transaction for the second can begin immediately and the change specified by
+that request will also be applied. In this version of events, neither client
+experiences an error and the throughput is higher.</p>
+<p>With a single read/write service balanced over all of the replicas, there is no
+way to ensure that all write traffic goes to the same replica, so the
+inefficient write contention situation remains possible. If concurrent writes
+are expected to occur frequently, one of the topologies described in the
+following sections may give better results.</p>
+<p>As well as the write contention issue, this load balancing topology fails to
+automatically provide read-your-own-writes consistency. This can be important
+when a user makes a change via some user interface and expects the effects of
+that change to be visible immediately afterwards. If the request that makes the
+change is routed to one instance, but a subsequent follow-up query to refresh
+the UI is routed to another instance that has not yet replicated the change,
+the query will return stale results.</p>
+<p>There are two ways to address this problem without changing to a different load
+balancing topology. The first is for the client to save the ETag returned in
+the HTTP response for the update request and then to repeat the query request
+until a matching or higher data store version number is returned (see
+<a class="reference internal" href="apis.html#apis-detecting-updates"><span class="std std-numref">Section 16.17.1</span></a>). The other is to choose a load balancer that
+supports “sticky” sessions. Sticky sessions are a mechanism to improve the
+likelihood that successive requests from the same client are routed to the same
+instance.</p>
+</div>
+<div class="section" id="separate-read-only-and-read-write-services-with-dedicated-writer-instance">
+<h3><span class="section-number">21.3.2. </span>Separate read-only and read/write Services with Dedicated Writer Instance<a class="headerlink" href="#separate-read-only-and-read-write-services-with-dedicated-writer-instance" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/load-balancing-separate-services-with-dedicated-writer.png"><img alt="Separate read-only and read/write services with dedicated writer instance" src="_images/load-balancing-separate-services-with-dedicated-writer.png" style="width: 450px;" /></a>
+</div>
+<p>For deployments which need to support frequent updates, especially where these
+might be concurrent, it is useful to distinguish read/write requests (updates)
+from read-only requests (queries) and to use a dedicated instance to process
+the read/write requests as depicted above. This brings the advantage that
+updates do not have to contend with queries (see
+<a class="reference internal" href="transactions.html#concurrent-execution-of-transactions"><span class="std std-numref">Section 11.2</span></a>).</p>
+<p>For this scheme to work, application code must be aware of the two service
+identities and call the right one in each case otherwise the advantage of the
+dedicated writer is lost. If read-your-own-writes consistency is needed to
+support particular user interactions, developers may use the ETag solution
+described in the previous section, or may choose to send the follow-up query to
+the read/write service. This does reintroduce the risk that updates may have to
+contend with queries however this may be acceptable if the user interaction is
+rare.</p>
+<p>A potential disadvantage of this topology is lower availability for read/write
+traffic. In the first topology we looked at, availability was the same for both
+types of traffic: a single instance becoming unhealthy would still leave <em>n</em>-1
+instances available to service any request. In the current topology, a failure
+of the dedicated writer instance means that, while read-only requests can still
+be served, the service is unavailable for writes until the writer recovers or
+is replaced. In the case where it must be replaced, the outage will last at
+least as long as it takes to start the new instance and for it to restore the
+persisted data.</p>
+<p>This topology is also well suited to situations where queries and updates
+arrive from different groups of clients. For example, a read-only query service
+provided to a group of users that is regularly refreshed from the output of an
+extract-transform-load (ETL) pipeline. In this case, only the pipeline would
+need access to the read/write load balancer.</p>
+</div>
+<div class="section" id="separate-read-only-and-read-write-services-with-single-group-of-instances">
+<h3><span class="section-number">21.3.3. </span>Separate read-only and read/write Services with Single Group of Instances<a class="headerlink" href="#separate-read-only-and-read-write-services-with-single-group-of-instances" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/load-balancing-separate-services-common-group.png"><img alt="Separate read-only and read/write services with single group of instances" src="_images/load-balancing-separate-services-common-group.png" style="width: 450px;" /></a>
+</div>
+<p>If an application requires better write throughput than the first topology but
+with faster recovery from writer failures than with the second topology,
+read/write requests can be forwarded to one of the instances from the main
+group instead of to a dedicated writer. This is depicted in the image above.
+The selected instance will receive all of the read/write requests plus a share
+of the read-only requests.</p>
+<p>As with the previous topology, this arrangement guarantees that all writes are
+performed by the same RDFox instance. Here, however, recovery from writer
+failures should be faster because the writer responsibility can be simply
+reassigned to another running instance rather than having to wait for a new
+instance to start (this is known as failover). Again, read-your-own-writes
+consistency can be achieved with ETags or by using the read/write service for
+both the update and follow-up query.</p>
+<p>Disadvantages of this setup include the fact that the total workload is not
+evenly distributed and that writes have to contend with queries. There is also
+additional complexity associated with the need to ensure that the read/write
+load balancer knows which <em>one</em> of the running instances it should route
+requests to at any given moment. This could be done manually but if the
+selected instance becomes permanently unavailable, manual intervention will
+then be needed to restore read/write service.</p>
+<p>To assign this responsibility automatically, with automatic failover, a
+standard leader election layer can be added. Although this seems at odds with
+the description of RDFox HA as “leaderless”, there is no contradiction since
+the RDFox instances remain equivalent. This means that there is no risk of a
+problem known as “split brain” where more than one instance thinks that it is
+the leader. In RDFox HA, if the read/write load balancer is temporarily
+configured to route requests to more than one of the instances, no data loss or
+error will occur; the system will gracefully degragde to a situation similar to
+the first topology described above.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="logging.html" class="btn btn-neutral float-left" title="20. Logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="docker.html" class="btn btn-neutral float-right" title="22. RDFox Docker Images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

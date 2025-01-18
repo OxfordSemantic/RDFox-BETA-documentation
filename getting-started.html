@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3. Getting Started &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
+        <script src="_static/sphinx_tabs/tabs.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Servers" href="servers.html" />
+    <link rel="prev" title="2. RDFox Features and Requirements" href="features-and-requirements.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setup">3.1. Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorial-web-console-version">3.2. Tutorial (Web Console version)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-a-data-store">3.2.1. Creating a Data Store</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#importing-data">3.2.2. Importing Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-queries">3.2.3. Running Queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inserting-data-using-sparql">3.2.4. Inserting Data Using SPARQL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-rules">3.2.5. Adding Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-facts">3.2.6. Deleting Facts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exploring-a-data-store">3.2.7. Exploring a Data Store</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorial-shell-version">3.3. Tutorial (Shell version)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">3.3.1. Creating a Data Store</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">3.3.2. Importing Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">3.3.3. Running Queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">3.3.4. Inserting Data Using SPARQL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">3.3.5. Adding Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">3.3.6. Deleting Facts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stopping-and-restarting-rdfox">3.3.7. Stopping and Restarting RDFox</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorial-rest-version">3.4. Tutorial (REST version)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id11">3.4.1. Creating a Data Store</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">3.4.2. Importing Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">3.4.3. Running Queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inserting-data-using-sparql-1">3.4.4. Inserting Data Using SPARQL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id15">3.4.5. Adding Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">3.4.6. Deleting Facts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-example">3.4.7. Python example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">3.5. Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">3. </span>Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="getting-started">
+<span id="id1"></span><h1><span class="section-number">3. </span>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This page will guide you through running the RDFox® executable for the first
+time. It is organised into one section of common setup steps, followed by three
+equivalent sections demonstrating how to access RDFox’s querying and reasoning
+functionality through different interfaces (GUI, CLI and REST API), and finally
+a section of suggestions for how to learn more.</p>
+<p>If you are looking to get started with the Java, or the experimental C or C++
+APIs to RDFox, see instead the appropriate demo program included with each RDFox
+release.</p>
+<div class="section" id="setup">
+<span id="id2"></span><h2><span class="section-number">3.1. </span>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p>Before you begin, make sure that you have downloaded the latest RDFox release
+for your system from <a class="reference external" href="https://www.rdfox.com/downloads">www.rdfox.com/downloads</a> and unzipped it. This will produce a new
+directory containing the RDFox executable (named <code class="docutils literal notranslate"><span class="pre">RDFox</span></code> on Linux and macOS,
+and <code class="docutils literal notranslate"><span class="pre">RDFox.exe</span></code> on Windows) and some other files. The following instructions
+refer to this directory as <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code>.</p>
+<p>You will also need to ensure that RDFox can find a
+valid license key. The quickest way to do this is to add a copy of your license
+key file directly to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> (see <a class="reference internal" href="features-and-requirements.html#rdfox-license-key"><span class="std std-numref">Section 2.4.1.3</span></a>
+for other ways). If you do not have a license key file, you can request one at
+<a class="reference external" href="https://www.rdfox.com/tryrdfoxforfree">https://www.rdfox.com/tryrdfoxforfree</a>.</p>
+<p>The following small RDF graph in <a class="reference external" href="https://www.w3.org/TR/turtle/">Turtle</a>
+format will be used in the instructions below.</p>
+<div class="highlight-turtle notranslate" id="data-ttl"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><span class="k">@prefix</span><span class="w"> </span><span class="nn">:</span><span class="w"> </span><span class="nv">&lt;https://rdfox.com/getting-started/&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">peter</span> <span class="p">:</span><span class="nt">forename</span> <span class="s">&quot;Peter&quot;</span> <span class="p">;</span>
+    <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">marriedTo</span> <span class="p">:</span><span class="nt">lois</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">gender</span> <span class="s">&quot;male&quot;</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">lois</span> <span class="p">:</span><span class="nt">forename</span> <span class="s">&quot;Lois&quot;</span> <span class="p">;</span>
+    <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">gender</span> <span class="s">&quot;female&quot;</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">meg</span> <span class="p">:</span><span class="nt">forename</span> <span class="s">&quot;Meg&quot;</span> <span class="p">;</span>
+    <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">hasParent</span> <span class="p">:</span><span class="nt">lois</span><span class="p">,</span> <span class="p">:</span><span class="nt">peter</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">gender</span> <span class="s">&quot;female&quot;</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">chris</span> <span class="p">:</span><span class="nt">forename</span> <span class="s">&quot;Chris&quot;</span> <span class="p">;</span>
+    <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">hasParent</span> <span class="p">:</span><span class="nt">peter</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">gender</span> <span class="s">&quot;male&quot;</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">stewie</span> <span class="p">:</span><span class="nt">forename</span> <span class="s">&quot;Stewie&quot;</span> <span class="p">;</span>
+    <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">hasParent</span> <span class="p">:</span><span class="nt">lois</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">gender</span> <span class="s">&quot;male&quot;</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">brian</span> <span class="p">:</span><span class="nt">forename</span> <span class="s">&quot;Brian&quot;</span> <span class="p">.</span> <span class="c"># Brian is a dog</span>
+</pre></div></td></tr></table></div>
+</div>
+<p id="has-child-dlog">Additionally, the following Datalog file will be used to demonstrate RDFox’s
+reasoning capabilities.</p>
+<div class="highlight-text notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span>@prefix : &lt;https://rdfox.com/getting-started/&gt; .
+[?p, :hasChild, ?c] :- [?c, :hasParent, ?p] .
+</pre></div></td></tr></table></div>
+</div>
+<p>Download <a class="reference download internal" download="" href="_downloads/a79cc3bac5ba9c627df60e07fc91b8b3/data.ttl"><code class="xref download docutils literal notranslate"><span class="pre">data.ttl</span></code></a> and <a class="reference download internal" download="" href="_downloads/fe08954a223046fef231014b9a9edb28/hasChild.dlog"><code class="xref download docutils literal notranslate"><span class="pre">hasChild.dlog</span></code></a> into <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code>.</p>
+<p>Next, open a terminal, change directory to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code>, and then
+start RDFox as follows:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-0-0 docutils container">
+<div class="docutils container">
+<p>macOS/Linux</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-0-1 docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-0 active docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./RDFox<span class="w"> </span>sandbox
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-1 docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>RDFox.exe<span class="w"> </span>sandbox
+</pre></div>
+</div>
+</div>
+</div>
+<p>You should be presented with a command prompt indicating that you have an
+instance of the RDFox shell awaiting input. If not, you may find <a class="reference external" href="https://www.youtube.com/watch?v=mmoNFRz3-6Y">this video</a> demonstrating how to start the
+executable on Windows and macOS, helpful. Otherwise, run the following command
+to prepare for the main tutorial:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>endpoint start
+</pre></div>
+</div>
+<p>This starts RDFox’s endpoint which serves the REST API, including a SPARQL over
+HTTP endpoint, and RDFox’s graphical web console.</p>
+<p>You are now ready to proceed to the tutorial. There are three versions of the
+tutorial. Each follows the same workflow using a different RDFox interface. To
+complete the tutorial using the web console (GUI) jump to
+<a class="reference internal" href="#tutorial-web-console-version"><span class="std std-numref">Section 3.2</span></a>. To complete the tutorial using the RDFox
+shell (CLI), jump to <a class="reference internal" href="#tutorial-shell-version"><span class="std std-numref">Section 3.3</span></a>. To complete the tutorial
+using REST (API) jump to <a class="reference internal" href="#tutorial-rest-ap-versioni"><span class="std std-numref">Section 3.4</span></a>.</p>
+</div>
+<div class="section" id="tutorial-web-console-version">
+<span id="id3"></span><h2><span class="section-number">3.2. </span>Tutorial (Web Console version)<a class="headerlink" href="#tutorial-web-console-version" title="Permalink to this headline">¶</a></h2>
+<p>Ensure all steps from the <a class="reference internal" href="#setup"><span class="std std-ref">Setup</span></a> chapter have been completed
+and then load the web console by pointing your browser to <a href="http://localhost:12110/console/" target="_blank">http://localhost:12110/console/</a>.</p>
+<div class="section" id="creating-a-data-store">
+<h3><span class="section-number">3.2.1. </span>Creating a Data Store<a class="headerlink" href="#creating-a-data-store" title="Permalink to this headline">¶</a></h3>
+<p>All facts and rules in RDFox live inside a <em>data store</em>. Initially no data
+stores exist so we must create one before we can load any triples. To create a
+data store, click <a class="reference internal" href="_images/create-datastore-landing-image.png"><img alt="CreateDataStoreLanding" src="_images/create-datastore-landing-image.png" style="height: 25px;" /></a> in the welcome dialog to display the data
+store creation dialog. Enter <code class="docutils literal notranslate"><span class="pre">family</span></code> as the name and click <a class="reference internal" href="_images/create-datastore-image.png"><img alt="CreateDataStore" src="_images/create-datastore-image.png" style="height: 25px;" /></a>.</p>
+</div>
+<div class="section" id="importing-data">
+<h3><span class="section-number">3.2.2. </span>Importing Data<a class="headerlink" href="#importing-data" title="Permalink to this headline">¶</a></h3>
+<p>On successfully creating the data store, the console displays an option to
+import data into the data store. Click <a class="reference internal" href="_images/import-content-image.png"><img alt="ImportContent" src="_images/import-content-image.png" style="height: 25px;" /></a> to display the “Add
+content” dialog. Drag the <a class="reference internal" href="#data-ttl"><span class="std std-ref">data.ttl</span></a> file you downloaded
+earlier onto the dialog. The dialog should update to show the pending import.
+Toggle the “Update prefixes” switch to “on” to also load the prefixes stored
+within <a class="reference internal" href="#data-ttl"><span class="std std-ref">data.ttl</span></a>. Prefixes are used to abbreviate IRIs
+(internationalized URIs) so that they are easier to type in queries and other
+commands. To assist in setup, RDFox adds eight default prefixes to every new
+datastore (see <a class="reference internal" href="servers.html#base-iri-and-prefixes"><span class="std std-numref">Section 4.1.5</span></a>). Click <a class="reference internal" href="_images/add-content-image.png"><img alt="AddContent" src="_images/add-content-image.png" style="height: 25px;" /></a> to confirm
+no further data files are to be added for now, in order to proceed with the
+import.</p>
+<p>A status report of the number of facts read (21) and added (21) to the data
+store is displayed. Dismiss the report by clicking <a class="reference internal" href="_images/upload-completed-image.png"><img alt="OK" src="_images/upload-completed-image.png" style="height: 25px;" /></a>.</p>
+</div>
+<div class="section" id="running-queries">
+<h3><span class="section-number">3.2.3. </span>Running Queries<a class="headerlink" href="#running-queries" title="Permalink to this headline">¶</a></h3>
+<p>You are now ready to run your first query!</p>
+<p>The newly created data store is automatically selected and so the SPARQL query
+editor is enabled. <a class="reference external" href="http://www.w3.org/TR/sparql11-query/">SPARQL</a> is the
+primary query language recognized by RDFox.</p>
+<p>Run the default query, which returns all of the triples in the store, by
+clicking <a class="reference internal" href="_images/run-image.png"><img alt="Run" src="_images/run-image.png" style="height: 25px;" /></a>. You should see that 21 answers were retrieved from the server
+and presented in a table below the editor.</p>
+<p>To demonstrate a simple conjunction, print each person’s forename by replacing
+the default query with the query below and clicking <a class="reference internal" href="_images/run-image.png"><img alt="Run" src="_images/run-image.png" style="height: 25px;" /></a> again.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?n
+WHERE {
+    ?p a :Person ;
+        :forename ?n
+}
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">:brian</span></code> is not returned as there is no triple to say that it is of
+type <code class="docutils literal notranslate"><span class="pre">:Person</span></code> as required by the first part of the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> clause.</p>
+</div>
+<div class="section" id="inserting-data-using-sparql">
+<h3><span class="section-number">3.2.4. </span>Inserting Data Using SPARQL<a class="headerlink" href="#inserting-data-using-sparql" title="Permalink to this headline">¶</a></h3>
+<p>It is also possible to modify the contents of the data store using SPARQL
+updates. For example, make the <code class="docutils literal notranslate"><span class="pre">:marriedTo</span></code> relationship symmetric by running:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INSERT { ?x :marriedTo ?y }
+WHERE  { ?y :marriedTo ?x }
+</pre></div>
+</div>
+<p>This adds one new triple to the data store reflecting the fact that Lois is
+married to Peter, which was derived from the fact that Peter is married to Lois.
+Rerunning the first <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> query should now return 22 triples. You can use
+the back button in the browser to return to the original query.</p>
+</div>
+<div class="section" id="adding-rules">
+<h3><span class="section-number">3.2.5. </span>Adding Rules<a class="headerlink" href="#adding-rules" title="Permalink to this headline">¶</a></h3>
+<p>Reasoning is the ability to calculate the logical consequences of applying a set
+of rules to a set of facts. To illustrate how this can be useful, consider a
+query to find a particular person’s children. The above data has the inverse
+information — <em>i.e.</em> only <code class="docutils literal notranslate"><span class="pre">:hasParent</span></code> relationships — so querying for
+<code class="docutils literal notranslate"><span class="pre">:hasChild</span></code>, though more natural for this use case, will return no results.
+We could remodel the data but this could make the phrasing of any queries about
+parents less natural. We could add all the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> relationships as new
+facts in the Turtle file but the dataset would then have a bunch of redundancy
+and we would need to make sure that we always add both relationships together
+when we add new people to the dataset.</p>
+<p>With reasoning we can have the best of both worlds. Keeping the original
+dataset, we add a rule to state that if <code class="docutils literal notranslate"><span class="pre">?c</span></code> has a parent <code class="docutils literal notranslate"><span class="pre">?p</span></code> then <code class="docutils literal notranslate"><span class="pre">?p</span></code>
+has a child <code class="docutils literal notranslate"><span class="pre">?c</span></code>. RDFox can then determine all of the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code>
+relationships itself — including for any new families that we add later on.</p>
+<p>RDFox uses the Datalog language for expressing rules. The rule described above
+is captured in the Datalog file <a class="reference internal" href="#has-child-dlog"><span class="std std-ref">hasChild.dlog</span></a> that you
+downloaded to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> earlier. Import it by clicking on the
+<a class="reference internal" href="_images/add-content-header-image.png"><img alt="AddContentHeader" src="_images/add-content-header-image.png" style="height: 25px;" /></a> button in the header. In the “Add content” dialog that opens,
+click <a class="reference internal" href="_images/choose-file-image.png"><img alt="ChooseFile" src="_images/choose-file-image.png" style="height: 25px;" /></a>, navigate to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code>, select <code class="docutils literal notranslate"><span class="pre">hasChild.dlog</span></code>,
+click to confirm and then click <a class="reference internal" href="_images/add-content-image.png"><img alt="AddContent" src="_images/add-content-image.png" style="height: 25px;" /></a>.</p>
+<p>Importing this file will cause RDFox to run its reasoning algorithms, adding the
+triples that result from applying the loaded rules to the loaded facts to the
+data store as additional facts. Facts loaded explicitly from data are referred
+to as <em>explicit</em> whereas those derived through reasoning are referred to as
+<em>derived</em>.</p>
+<p>To check that we now have some derived triples, run the following query which
+looks for any triple that uses the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> predicate we introduced in the
+Datalog rule:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?c WHERE { ?p :hasChild ?c }
+</pre></div>
+</div>
+<p>Four results are returned, all of which were added by reasoning.</p>
+</div>
+<div class="section" id="deleting-facts">
+<h3><span class="section-number">3.2.6. </span>Deleting Facts<a class="headerlink" href="#deleting-facts" title="Permalink to this headline">¶</a></h3>
+<p>If a fact or rule that was used in the derivation of a derived triple is removed
+from a data store, RDFox will also remove the derived triple. To check that this
+is the case, delete the triple that says <code class="docutils literal notranslate"><span class="pre">:stewie</span></code> has <code class="docutils literal notranslate"><span class="pre">:lois</span></code> as a
+parent by running:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>DELETE DATA { :stewie :hasParent :lois }
+</pre></div>
+</div>
+<p>and then re-query the triples using the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> property with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?c WHERE { ?p :hasChild ?c }
+</pre></div>
+</div>
+<p>Observe that the answer <code class="docutils literal notranslate"><span class="pre">:lois</span> <span class="pre">:stewie</span> <span class="pre">.</span></code>, which was derived from the
+combination of the rule we added <cite>and</cite> the fact we just deleted, no longer
+appears.</p>
+</div>
+<div class="section" id="exploring-a-data-store">
+<h3><span class="section-number">3.2.7. </span>Exploring a Data Store<a class="headerlink" href="#exploring-a-data-store" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the SPARQL runner, the web console provides a way to explore the
+facts in a data store visually. Click the <a class="reference internal" href="_images/explore-image.png"><img alt="Explore" src="_images/explore-image.png" style="height: 25px;" /></a> icon to the right of
+<code class="docutils literal notranslate"><span class="pre">:peter</span></code> where it appears in the results table to switch to begin an
+exploration.</p>
+<p>Initially, a single purple rectangle is displayed representing the node
+<code class="docutils literal notranslate"><span class="pre">:peter</span></code>. The dot icon in the upper right of the purple <code class="docutils literal notranslate"><span class="pre">peter</span></code> node
+indicates that there are links present in the data store that are not being
+visualized. Right-click the node to display a context menu of the connections
+between <code class="docutils literal notranslate"><span class="pre">:peter</span></code> and other entities in this data store.</p>
+<p>Select <code class="docutils literal notranslate"><span class="pre">:gender</span> <span class="pre">&quot;male&quot;</span></code> from “Outbound edges” and <code class="docutils literal notranslate"><span class="pre">:lois</span> <span class="pre">:marriedTo</span></code> from
+“Inbound edges” as seen on the menu and click <a class="reference internal" href="_images/ctx-update-image.png"><img alt="Update" src="_images/ctx-update-image.png" style="height: 25px;" /></a>. The link to the literal
+<code class="docutils literal notranslate"><span class="pre">&quot;male&quot;</span></code> is displayed, as is the link from <code class="docutils literal notranslate"><span class="pre">:lois</span></code> to <code class="docutils literal notranslate"><span class="pre">:peter</span></code>.</p>
+<p>You have now completed the tutorial for the web console. Enter <code class="docutils literal notranslate"><span class="pre">quit</span></code> into the
+RDFox shell to shut the process down then, if you would like to repeat the
+tutorial using a different interface (CLI or REST API), repeat the <a class="reference internal" href="#setup"><span class="std std-ref">setup</span></a> steps and then navigate to the appropriate section. Alternatively, see
+<a class="reference internal" href="#next-steps"><span class="std std-numref">Section 3.5</span></a> for some suggested next steps.</p>
+</div>
+</div>
+<div class="section" id="tutorial-shell-version">
+<span id="id4"></span><h2><span class="section-number">3.3. </span>Tutorial (Shell version)<a class="headerlink" href="#tutorial-shell-version" title="Permalink to this headline">¶</a></h2>
+<p>Ensure all steps from the <a class="reference internal" href="#setup"><span class="std std-ref">Setup</span></a> chapter have been completed
+before proceeding.</p>
+<div class="section" id="id5">
+<h3><span class="section-number">3.3.1. </span>Creating a Data Store<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>All facts and rules in RDFox live inside a <em>data store</em>. Initially no data
+stores exist so we must create one before we can load any triples. To create a
+data store, use the <code class="docutils literal notranslate"><span class="pre">dstore</span></code> command as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dstore create family
+</pre></div>
+</div>
+<p>The above command initializes our <code class="docutils literal notranslate"><span class="pre">family</span></code> data store. To ensure that
+subsequent shell commands address our new data store, we use the <code class="docutils literal notranslate"><span class="pre">active</span></code>
+command to tell the shell to connect to the <code class="docutils literal notranslate"><span class="pre">family</span></code> data store when running
+commands that address a data store:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>active family
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h3><span class="section-number">3.3.2. </span>Importing Data<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Import the <a class="reference internal" href="#data-ttl"><span class="std std-ref">data.ttl</span></a> file you downloaded to
+<code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> earlier with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>import +p data.ttl
+</pre></div>
+</div>
+<p>Using the +p option ensures the prefixes stored within the <a class="reference internal" href="#data-ttl"><span class="std std-ref">data.ttl</span></a> file are also imported. Prefixes are used to abbreviate IRIs
+(internationalized URIs) so that they are easier to type in queries and other
+commands. To assist in setup, RDFox adds eight default prefixes to every new
+datastore (see <a class="reference internal" href="servers.html#base-iri-and-prefixes"><span class="std std-numref">Section 4.1.5</span></a>).</p>
+<p>This command should report the time taken by the import and that 21 data items
+were processed and updated.</p>
+</div>
+<div class="section" id="id7">
+<h3><span class="section-number">3.3.3. </span>Running Queries<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>By default, RDFox does not specify where query answers must be sent. To
+instruct RDFox to print answers to the terminal, run the following command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>set output out
+</pre></div>
+</div>
+<p>You are now ready to run your first query!</p>
+<p>The primary query language recognized by RDFox is <a class="reference external" href="http://www.w3.org/TR/sparql11-query/">SPARQL</a>. SPARQL queries can be typed or
+pasted directly into the shell.</p>
+<p>Copy and paste the following SPARQL into the shell and hit enter to print all
+of the triples in the store:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?S ?P ?O WHERE { ?S ?P ?O }
+</pre></div>
+</div>
+<p>You should see a few lines beginning <code class="docutils literal notranslate"><span class="pre">&#64;prefix</span></code> followed by a blank line and
+then the original 21 triples (facts) from <code class="docutils literal notranslate"><span class="pre">data.ttl</span></code>. After the triples, a
+summary of the number of answers returned and the time taken for the query is
+printed.</p>
+<p>To demonstrate a simple conjunction, print each person’s forename by running the
+following query:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?n WHERE { ?p a :Person . ?p :forename ?n }
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">:brian</span></code> is not returned as there is no triple to say that it is of
+type <code class="docutils literal notranslate"><span class="pre">:Person</span></code> as required by the first part of the <code class="docutils literal notranslate"><span class="pre">where</span></code> clause.</p>
+</div>
+<div class="section" id="id8">
+<h3><span class="section-number">3.3.4. </span>Inserting Data Using SPARQL<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>It is also possible to modify the contents of the data store using SPARQL
+updates. For example, make the <code class="docutils literal notranslate"><span class="pre">:marriedTo</span></code> relationship symmetric by running:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INSERT { ?x :marriedTo ?y } \
+WHERE  { ?y :marriedTo ?x }
+</pre></div>
+</div>
+<p>This adds one new triple to the data store reflecting the fact that Lois is
+married to Peter, which was derived from the fact that Peter is married to Lois.
+Rerunning the first <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> query should now return 22 triples. You can use
+the up arrow key to step back through your command history to find the original
+query.</p>
+</div>
+<div class="section" id="id9">
+<h3><span class="section-number">3.3.5. </span>Adding Rules<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>Reasoning is the ability to calculate the logical consequences of applying a set
+of rules to a set of facts. To illustrate how this can be useful, consider a
+query to find a particular person’s children. The above data has the opposite
+information — <em>i.e.</em> only <code class="docutils literal notranslate"><span class="pre">:hasParent</span></code> relationships — so querying for
+<code class="docutils literal notranslate"><span class="pre">:hasChild</span></code>, though more natural for this use case, will turn up no results.
+We could remodel the data but this could make the phrasing of any queries about
+parents less natural. We could add all the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> relationships as new
+facts in the Turtle file but the dataset would then have a bunch of redundancy
+and we would need to make sure that we always add both relationships together
+when we add new people to the dataset.</p>
+<p>With reasoning we can have the best of both worlds. Keeping the original
+dataset, we add a rule to state that if <code class="docutils literal notranslate"><span class="pre">?c</span></code> has a parent <code class="docutils literal notranslate"><span class="pre">?p</span></code> then <code class="docutils literal notranslate"><span class="pre">?p</span></code>
+has a child <code class="docutils literal notranslate"><span class="pre">?c</span></code>. RDFox can then determine all of the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code>
+relationships itself — including for any new families that we add later on.</p>
+<p>RDFox uses the Datalog language for expressing rules. The rule described above
+is captured in the Datalog file <a class="reference internal" href="#has-child-dlog"><span class="std std-ref">hasChild.dlog</span></a> that you
+downloaded to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> earlier. Import it with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>import hasChild.dlog
+</pre></div>
+</div>
+<p>Importing this file will cause RDFox to run its reasoning algorithms, adding the
+triples that result from applying the loaded rules to the loaded facts to the
+data store as additional facts. Facts loaded explicitly from data are referred
+to as <em>explicit</em> whereas those derived through reasoning are referred to as
+<em>derived</em>.</p>
+<p>To check that we now have some derived triples, run the following query which
+looks for any triple that uses the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> predicate we introduced in the
+Datalog rule:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?c WHERE { ?p :hasChild ?c }
+</pre></div>
+</div>
+<p>Four results are returned, all of which were added by reasoning.</p>
+</div>
+<div class="section" id="id10">
+<h3><span class="section-number">3.3.6. </span>Deleting Facts<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>If a fact or rule that was used in the derivation of a derived triple is removed
+from a data store, RDFox will also remove the derived triple. To check that this
+is the case, delete the triple that says <code class="docutils literal notranslate"><span class="pre">:stewie</span></code> has <code class="docutils literal notranslate"><span class="pre">:lois</span></code> as a
+parent by running:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>DELETE DATA { :stewie :hasParent :lois }
+</pre></div>
+</div>
+<p>and then requery the triples using the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> property with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?c WHERE { ?p :hasChild ?c }
+</pre></div>
+</div>
+<p>Observe that the answer <code class="docutils literal notranslate"><span class="pre">:lois</span> <span class="pre">:stewie</span> <span class="pre">.</span></code>, which was derived from the
+combination of the rule we added <cite>and</cite> the fact we just deleted, no longer
+appears.</p>
+</div>
+<div class="section" id="stopping-and-restarting-rdfox">
+<h3><span class="section-number">3.3.7. </span>Stopping and Restarting RDFox<a class="headerlink" href="#stopping-and-restarting-rdfox" title="Permalink to this headline">¶</a></h3>
+<p>Shut down RDFox by typing the <code class="docutils literal notranslate"><span class="pre">quit</span></code> command. Since RDFox is an in-memory
+database, and because we started the process using the <code class="docutils literal notranslate"><span class="pre">sandbox</span></code> command
+which disables any form of persistence, the contents of the data store will be
+dropped when the process exits. While experimenting with RDFox, it may
+therefore be useful to write the commands to initialize the data store and load
+data into a script which can be passed to RDFox at startup. The following
+script repeats the whole of this tutorial. Save it to a new file
+<code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;/start.rdfox</span></code> and then run it with <code class="docutils literal notranslate"><span class="pre">./RDFox</span> <span class="pre">sandbox</span> <span class="pre">.</span>
+<span class="pre">start</span></code> (on Linux or Mac) or <code class="docutils literal notranslate"><span class="pre">RDFox.exe</span> <span class="pre">sandbox</span> <span class="pre">.</span> <span class="pre">start</span></code> (on
+Windows).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>endpoint start
+dstore create family
+active family
+import +p data.ttl
+set output out
+SELECT ?S ?P ?O WHERE { ?S ?P ?O }
+SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :forename ?n }
+INSERT { ?x :marriedTo ?y } WHERE { ?y :marriedTo ?x }
+import hasChild.dlog
+SELECT ?p ?c WHERE { ?p :hasChild ?c }
+DELETE DATA { :stewie :hasParent :lois }
+SELECT ?p ?c WHERE { ?p :hasChild ?c }
+</pre></div>
+</div>
+<p>For alternative ways of starting RDFox which do not disable persistence, see
+<a class="reference internal" href="rdfox-executable.html#rdfox-executable"><span class="std std-numref">Section 18</span></a>.</p>
+<p>You have now completed the tutorial with the RDFox shell. Enter <code class="docutils literal notranslate"><span class="pre">quit</span></code> to shut
+the process down again then, if you would like to repeat the tutorial using a
+different interface (GUI or REST API), repeat the <a class="reference internal" href="#setup"><span class="std std-ref">setup</span></a> steps and
+then navigate to the appropriate section.</p>
+</div>
+</div>
+<div class="section" id="tutorial-rest-version">
+<span id="tutorial-rest-ap-versioni"></span><h2><span class="section-number">3.4. </span>Tutorial (REST version)<a class="headerlink" href="#tutorial-rest-version" title="Permalink to this headline">¶</a></h2>
+<p>Ensure all steps from the <a class="reference internal" href="#setup"><span class="std std-ref">Setup</span></a> chapter have been completed
+before proceeding.</p>
+<p>The steps in this section use the cURL tool which is normally installed on
+MacOS, Linux and modern versions of Windows. You will need to open a new shell
+to run the cURL commands in addition to the shell where RDFox is running.
+Inside the new shell, change directory to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> so that the
+relative paths in the examples correctly locate the files you downloaded in the
+setup steps.</p>
+<p>At the end of this section, we give an example of achieving the same results
+<a class="reference internal" href="#python-rest"><span class="std std-ref">using Python</span></a>.</p>
+<div class="section" id="id11">
+<h3><span class="section-number">3.4.1. </span>Creating a Data Store<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>All facts and rules in RDFox live inside a <em>data store</em>. Initially no data
+stores exist so we must create one before we can load any triples. To create a
+data store, issue a POST request to path <code class="docutils literal notranslate"><span class="pre">datastores/&lt;data-store-name&gt;</span></code> such
+as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family
+</pre></div>
+</div>
+<p>Note we run cURL with the <code class="docutils literal notranslate"><span class="pre">-i</span></code> option to <em>include</em> the response headers in
+the output which means the output will be similar to:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 13 Jul 2022 15:39:06 GMT</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">RDFox Endpoint</span>
+<span class="na">ETag</span><span class="o">:</span> <span class="l">&quot;09649913528177635553-1&quot;</span>
+<span class="na">Location</span><span class="o">:</span> <span class="l">/datastores/family</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h3><span class="section-number">3.4.2. </span>Importing Data<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Import the <a class="reference internal" href="#data-ttl"><span class="std std-ref">data.ttl</span></a> file you downloaded to
+<code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> earlier, into the data store created above by issuing a
+PATCH request to path <code class="docutils literal notranslate"><span class="pre">datastores/family/content</span></code> path:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>PATCH<span class="w"> </span><span class="s2">&quot;localhost:12110/datastores/family/content?operation=add-content-update-prefixes&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type:&quot;</span><span class="w"> </span>-T<span class="w"> </span>data.ttl
+</pre></div>
+</div>
+<p>This sends the content of the file to RDFox and reports success with:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 13 Jul 2022 15:40:02 GMT</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">RDFox Endpoint</span>
+<span class="na">ETag</span><span class="o">:</span> <span class="l">&quot;09649913528177635553-2&quot;</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=UTF-8</span>
+<span class="na">Vary</span><span class="o">:</span> <span class="l">Accept</span>
+<span class="na">Transfer-Encoding</span><span class="o">:</span> <span class="l">chunked</span>
+
+prefix: : = https://rdfox.com/getting-started/
+prefix: owl: = http://www.w3.org/2002/07/owl#
+prefix: rdf: = http://www.w3.org/1999/02/22-rdf-syntax-ns#
+prefix: rdfox: = https://rdfox.com/vocabulary#
+prefix: rdfs: = http://www.w3.org/2000/01/rdf-schema#
+prefix: sh: = http://www.w3.org/ns/shacl#
+prefix: swrl: = http://www.w3.org/2003/11/swrl#
+prefix: swrlb: = http://www.w3.org/2003/11/swrlb#
+prefix: xsd: = http://www.w3.org/2001/XMLSchema#
+information: #aborted = false
+information: #errors = 0
+information: #warnings = 0
+information: #processed-facts = 21
+information: #changed-facts = 21
+information: #processed-rules = 0
+information: #changed-rules = 0
+information: #processed-axioms = 0
+information: #changed-axioms = 0
+</pre></div>
+</div>
+<p>Note the use of <code class="docutils literal notranslate"><span class="pre">-H</span> <span class="pre">&quot;Content-Type:&quot;</span></code> in the cURL command. By default, cURL
+will set the content type to <code class="docutils literal notranslate"><span class="pre">application/x-www-form-urlencoded</span></code> which is a
+not a supported RDFox <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code>. Using <code class="docutils literal notranslate"><span class="pre">-H</span> <span class="pre">&quot;Content-Type:&quot;</span></code> instructs
+cURL not to set the <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> and allows RDFox to automatically detect
+that we have data in Turtle format. Alternatively, we could explicitly set the
+type using <code class="docutils literal notranslate"><span class="pre">-H</span> <span class="pre">&quot;Content-Type:</span> <span class="pre">text/turtle&quot;</span></code>. For the different formats
+supported by RDFox for encoding data store content, see
+<a class="reference internal" href="import-and-export.html#data-store-content-formats"><span class="std std-numref">Section 8.1</span></a>.</p>
+<p>Including <code class="docutils literal notranslate"><span class="pre">operation=add-content-update-prefixes</span></code> ensures the prefixes stored
+within the <a class="reference internal" href="#data-ttl"><span class="std std-ref">data.ttl</span></a> file are also imported. Prefixes are used
+to abbreviate IRIs (internationalized URIs) so that they are easier to type in
+queries and other commands. To assist in setup, RDFox adds eight default
+prefixes to every new datastore (see <a class="reference internal" href="servers.html#base-iri-and-prefixes"><span class="std std-numref">Section 4.1.5</span></a>).</p>
+</div>
+<div class="section" id="id13">
+<h3><span class="section-number">3.4.3. </span>Running Queries<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>You are now ready to run your first query!</p>
+<p>The primary query language recognized by RDFox is <a class="reference external" href="http://www.w3.org/TR/sparql11-query/">SPARQL</a>. RDFox exposes a fully compliant
+SPARQL-over-HTTP endpoint at path <code class="docutils literal notranslate"><span class="pre">/datastores/&lt;data-store-name&gt;/sparql</span></code>. To
+run a query we send a <code class="docutils literal notranslate"><span class="pre">POST</span></code> request to this path and set the <code class="docutils literal notranslate"><span class="pre">query</span></code>
+parameter to a SPARQL query.</p>
+<p>Run the following cURL command to retrieve all of the triples in the store:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/sparql<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/x.sparql-results+turtle-abbrev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT ?S ?P ?O WHERE { ?S ?P ?O }&quot;</span>
+</pre></div>
+</div>
+<p>After the HTTP response headers you should see a few lines beginning <code class="docutils literal notranslate"><span class="pre">&#64;prefix</span></code>
+followed by a blank line and then the original 21 triples (facts) from
+<code class="docutils literal notranslate"><span class="pre">data.ttl</span></code> in the proprietary format
+<code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+turtle-abbrev</span></code>.</p>
+<p>To demonstrate a simple conjunction, print each person’s forename by running the
+following cURL command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/sparql<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/x.sparql-results+turtle-abbrev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT ?p ?n WHERE { ?p a :Person . ?p :forename ?n }&quot;</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">:brian</span></code> is not returned as there is no triple to say that it is of
+type <code class="docutils literal notranslate"><span class="pre">:Person</span></code> as required by the first part of the <code class="docutils literal notranslate"><span class="pre">where</span></code> clause.</p>
+</div>
+<div class="section" id="inserting-data-using-sparql-1">
+<span id="id14"></span><h3><span class="section-number">3.4.4. </span>Inserting Data Using SPARQL<a class="headerlink" href="#inserting-data-using-sparql-1" title="Permalink to this headline">¶</a></h3>
+<p>It is also possible to modify the contents of the data store using SPARQL
+updates. To run a SPARQL update via REST, we must use the <code class="docutils literal notranslate"><span class="pre">update</span></code> parameter
+rather than the <code class="docutils literal notranslate"><span class="pre">query</span></code> parameter. For example, make the <code class="docutils literal notranslate"><span class="pre">:marriedTo</span></code>
+relationship symmetric by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/sparql<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span><span class="s2">&quot;update=INSERT { ?x :marriedTo ?y } WHERE { ?y :marriedTo ?x }&quot;</span>
+</pre></div>
+</div>
+<p>this returns the no content (204) status code to indicate success:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">No Content</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 13 Jul 2022 16:53:28 GMT</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">RDFox Endpoint</span>
+<span class="na">ETag</span><span class="o">:</span> <span class="l">&quot;09649913528177635553-3&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id15">
+<h3><span class="section-number">3.4.5. </span>Adding Rules<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>Reasoning is the ability to calculate the logical consequences of applying a set
+of rules to a set of facts. To illustrate how this can be useful, consider a
+query to find a particular person’s children. The above data has the opposite
+information — <em>i.e.</em> only <code class="docutils literal notranslate"><span class="pre">:hasParent</span></code> relationships — so querying for
+<code class="docutils literal notranslate"><span class="pre">:hasChild</span></code>, though more natural for this use case, will turn up no results.
+We could remodel the data but this could make the phrasing of any queries about
+parents less natural. We could add all the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> relationships as new
+facts in the Turtle file but the dataset would then have a bunch of redundancy
+and we would need to make sure that we always add both relationships together
+when we add new people to the dataset.</p>
+<p>With reasoning we can have the best of both worlds. Keeping the original
+dataset, we add a rule to state that if <code class="docutils literal notranslate"><span class="pre">?c</span></code> has a parent <code class="docutils literal notranslate"><span class="pre">?p</span></code> then <code class="docutils literal notranslate"><span class="pre">?p</span></code>
+has a child <code class="docutils literal notranslate"><span class="pre">?c</span></code>. RDFox can then determine all of the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code>
+relationships itself — including for any new families that we add later on.</p>
+<p>RDFox uses the Datalog language for expressing rules. The rule described above
+is captured in the Datalog file <a class="reference internal" href="#has-child-dlog"><span class="std std-ref">hasChild.dlog</span></a> that you
+downloaded to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> earlier. Import it with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/content<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/x.datalog&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-T<span class="w"> </span>hasChild.dlog
+</pre></div>
+</div>
+<p>If successful, the <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> response code should be returned.</p>
+<p>Importing this file will cause RDFox to run its reasoning algorithms, adding the
+triples that result from applying the loaded rules to the loaded facts to the
+data store as additional facts. Facts loaded explicitly from data are referred
+to as <em>explicit</em> whereas those derived through reasoning are referred to as
+<em>derived</em>.</p>
+<p>To check that we now have some derived triples, run the following query which
+looks for any triple that uses the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> predicate we introduced in the
+Datalog rule:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/sparql<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/x.sparql-results+turtle-abbrev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT ?p ?c WHERE { ?p :hasChild ?c }&quot;</span>
+</pre></div>
+</div>
+<p>Four results are returned, all of which were added by reasoning.</p>
+</div>
+<div class="section" id="id16">
+<h3><span class="section-number">3.4.6. </span>Deleting Facts<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>If a fact or rule that was used in the derivation of a derived triple is removed
+from a data store, RDFox will also remove the derived triple. To check that this
+is the case, delete the triple that says <code class="docutils literal notranslate"><span class="pre">:stewie</span></code> has <code class="docutils literal notranslate"><span class="pre">:lois</span></code> as a
+parent by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/sparql<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span><span class="s2">&quot;update=DELETE DATA { :stewie :hasParent :lois }&quot;</span>
+</pre></div>
+</div>
+<p>and then requery the triples using the <code class="docutils literal notranslate"><span class="pre">:hasChild</span></code> property with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>localhost:12110/datastores/family/sparql<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/x.sparql-results+turtle-abbrev&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-d<span class="w"> </span><span class="s2">&quot;query=SELECT ?p ?c WHERE { ?p :hasChild ?c }&quot;</span>
+</pre></div>
+</div>
+<p>Observe that the answer <code class="docutils literal notranslate"><span class="pre">:lois</span> <span class="pre">:stewie</span> <span class="pre">.</span></code>, which was derived from the
+combination of the rule we added <cite>and</cite> the fact we just deleted, no longer
+appears.</p>
+</div>
+<div class="section" id="python-example">
+<span id="python-rest"></span><h3><span class="section-number">3.4.7. </span>Python example<a class="headerlink" href="#python-example" title="Permalink to this headline">¶</a></h3>
+<p>The following Python script uses the requests module to reproduce the same
+steps as used in the cURL examples presented previous.</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="c1"># helper function to raise exception if the REST endpoint returns an</span>
+<span class="c1"># unexpected status code</span>
+<span class="k">def</span> <span class="nf">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="n">message</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Status received=</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+
+<span class="n">rdfox_server</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:12110&quot;</span>
+
+<span class="c1"># Create the data store</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family&quot;</span><span class="p">)</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to create datastore.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Add facts</span>
+<span class="n">turtle_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">@prefix : &lt;https://rdfox.com/getting-started/&gt; .</span>
+
+<span class="s2">:peter :forename &quot;Peter&quot; ;</span>
+<span class="s2">    a :Person ;</span>
+<span class="s2">    :marriedTo :lois ;</span>
+<span class="s2">    :gender &quot;male&quot; .</span>
+
+<span class="s2">:lois :forename &quot;Lois&quot; ;</span>
+<span class="s2">    a :Person ;</span>
+<span class="s2">    :gender &quot;female&quot; .</span>
+
+<span class="s2">:meg :forename &quot;Meg&quot; ;</span>
+<span class="s2">    a :Person ;</span>
+<span class="s2">    :hasParent :lois, :peter ;</span>
+<span class="s2">    :gender &quot;female&quot; .</span>
+
+<span class="s2">:chris :forename &quot;Chris&quot; ;</span>
+<span class="s2">    a :Person ;</span>
+<span class="s2">    :hasParent :peter ;</span>
+<span class="s2">    :gender &quot;male&quot; .</span>
+
+<span class="s2">:stewie :forename &quot;Stewie&quot; ;</span>
+<span class="s2">    a :Person ;</span>
+<span class="s2">    :hasParent :lois ;</span>
+<span class="s2">    :gender &quot;male&quot; .</span>
+
+<span class="s2">:brian :forename &quot;Brian&quot; . # Brian is a dog</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;operation&#39;</span><span class="p">:</span> <span class="s1">&#39;add-content-update-prefixes&#39;</span><span class="p">}</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/content&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">turtle_data</span><span class="p">)</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to add facts to data store.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Issue select query</span>
+<span class="n">sparql_text</span> <span class="o">=</span> <span class="s2">&quot;SELECT ?p ?n WHERE { ?p a :Person . ?p :forename ?n }&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/sparql&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">sparql_text</span><span class="p">})</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to run select query.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;== Initial query result ==&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+<span class="c1"># Issue insert</span>
+<span class="n">sparql_insert</span> <span class="o">=</span> <span class="s2">&quot;INSERT { ?x :marriedTo ?y } WHERE { ?y :marriedTo ?x }&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/sparql&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;update&quot;</span><span class="p">:</span> <span class="n">sparql_insert</span><span class="p">})</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to insert fact via sparql.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Add rule</span>
+<span class="n">datalog_rule</span> <span class="o">=</span> <span class="s2">&quot;[?p, :hasChild, ?c] :- [?c, :hasParent, ?p] .&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/content&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">datalog_rule</span><span class="p">)</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to add rule.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Query to confirm rule</span>
+<span class="n">sparql_text</span> <span class="o">=</span> <span class="s2">&quot;SELECT ?p ?c WHERE { ?p :hasChild ?c }&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/sparql&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">sparql_text</span><span class="p">})</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to run select query.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;== Query for derived facts ==&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+<span class="c1"># Delete fact</span>
+<span class="n">datalog_text</span> <span class="o">=</span> <span class="s2">&quot;[:stewie, :hasParent, :lois] .&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/content&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="s2">&quot;delete-content&quot;</span><span class="p">},</span> <span class="n">data</span><span class="o">=</span><span class="n">datalog_text</span><span class="p">)</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to delete fact.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Query to confirm derived facts updated (stewie is no longer a child of lois)</span>
+<span class="n">sparql_text</span> <span class="o">=</span> <span class="s2">&quot;SELECT ?p ?c WHERE { ?p :hasChild ?c }&quot;</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">rdfox_server</span> <span class="o">+</span> <span class="s2">&quot;/datastores/family/sparql&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">sparql_text</span><span class="p">})</span>
+<span class="n">assert_response_ok</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Failed to run select query.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;== Query for updated derived facts ==&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<p>Download: <a class="reference download internal" download="" href="_downloads/2398fd66861d6a9fa056ed1b23f83f0d/pythonRest.py"><code class="xref download docutils literal notranslate"><span class="pre">pythonRest.py</span></code></a>.</p>
+<p>You have now completed the tutorial for the REST API. Enter <code class="docutils literal notranslate"><span class="pre">quit</span></code> into the
+RDFox shell to shut the process down then, if you would like to repeat the
+tutorial using a different interface (CLI or GUI), repeat the <a class="reference internal" href="#setup"><span class="std std-ref">setup</span></a> steps and then navigate to the appropriate section.</p>
+</div>
+</div>
+<div class="section" id="next-steps">
+<span id="id17"></span><h2><span class="section-number">3.5. </span>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>To learn more about RDFox’s shell environment see
+<a class="reference internal" href="rdfox-shell.html#rdfox-shell"><span class="std std-numref">Section 15</span></a>.</p>
+<p>To learn more about how to use RDFox programatically, including via REST or
+Java, see <a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a>.</p>
+<p>To learn how RDFox structures the information loaded into the system, see
+<a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="features-and-requirements.html" class="btn btn-neutral float-left" title="2. RDFox Features and Requirements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="servers.html" class="btn btn-neutral float-right" title="4. Servers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,429 @@
+.. _rdfox-executable:
+
+RDFox Executable
+================
+
+The RDFox® executable is a command-line tool that can be used to initialize and
+launch local RDFox servers, manage background RDFox services, and connect to
+remote RDFox servers for shell access. These capabilities are provided by a
+number of different modes of operation, each of which is documented in the
+following sub-sections. In each case the purpose, syntax, and functionality of
+the mode in question are explained and examples of its use are provided.
+
+In what follows, the placeholder ``<serverParameter>`` is used to denote one
+the server parameters described in :numref:`server-parameters`,
+``<endpointParameter>`` is used to denote one of the endpoint parameters
+described in :numref:`endpoint-parameters`, ``<role>`` and ``<password>`` are
+used to denote a role name and corresponding password, ``<root>`` is used to
+denote the root directory for the RDFox shell, and ``<command>`` is used to
+denote one of the RDFox shell commands described in :numref:`shell-commands`.
+All modes that accept ``-role`` and ``-password`` options, also allow the role
+and password to be specified via the ``RDFOX_ROLE`` and ``RDFOX_PASSWORD``
+environment variables instead. When both the command line option and the
+corresponding environment variable are specified, the command line option takes
+precedence.
+
+Several modes set a default value for the ``server-directory`` server parameter
+if it is not specified explicitly. This is ``$HOME/.RDFox`` on Linux and macOS
+and ``$LOCALAPPDATA\RDFox`` on Windows.
+
+``sandbox``
+~~~~~~~~~~~
+
+``sandbox`` mode is provided to allow users to quickly start in-memory RDFox
+servers for command line and, optionally, REST interaction, with defaults
+suitable for testing and development. The syntax for this mode is:
+
+::
+
+   RDFox [-<serverParameter> <value> ...] [-<endpointParameter> <value> ...] [-role <role>] [-password <password>] sandbox [<root> [<command> ...]]
+
+This instantiates an in-memory RDFox server with an interactive shell and the
+following server parameters, which are aimed at making it convenient for use in
+development and testing:
+
+- The ``server-directory`` parameter is left unset to guarantee that RDFox
+  servers launched in this mode cannot affect any persisted settings or
+  content.
+
+- Filesystem sandboxing is disabled by setting the ``sandbox-directory``
+  parameter to the empty string. This ensures that the server can access any
+  files on the host system (subject to the OS's file permissions).
+
+- The ``allowed-schemes-on-load`` parameter is set to include all supported URL
+  schemes so that the server can load resources with any of these schemes.
+
+In addition the role and password are both defaulted to ``guest``. This allows
+full control of the system via the REST API without authentication, if the
+endpoint is later started with the shell command ``endpoint start``. To allow
+flexibility, the role and password can be set explicitly along with any server
+parameters other than those mentioned above, and all endpoint parameters. The
+syntax also accepts a list of RDFox shell commands to be executed before the
+command prompt is returned for interaction. These are specified after the
+``sandbox`` mode specifier and a root directory for the shell.
+
+.. container:: example
+
+   **Example: Launching in Sandbox Mode**
+
+   The easiest way to launch RDFox in sandbox mode is to run:
+
+   ::
+
+      RDFox sandbox
+
+   It is often convenient to write an RDFox shell script to save typing.
+   Assuming it's saved with name ``start.rdfox``, the above command can be
+   extended to run this script as follows:
+
+   ::
+
+      RDFox sandbox . start
+
+The shell can be closed by issuing the ``quit`` command.
+
+.. _exe-mode-analyze:
+
+``analyze``
+~~~~~~~~~~~
+
+``analyze`` mode is used to check whether a directory is ready to be used as an
+RDFox server directory with the current version of the executable. The syntax
+for this mode is:
+
+::
+
+   RDFox [-server-directory <value>] analyze
+
+This mode will print an error and return a non-zero exit code if the specified
+server directory does not exist. Otherwise, it will print a message detailing
+one of the following outcomes and return a zero exit code:
+
+  - the directory requires initialization using ``init`` mode,
+  - the directory is initialized but requires upgrading using ``upgrade`` mode,
+    or
+  - the directory is ready to be used as a server directory with ``shell`` and
+    ``daemon`` modes.
+
+.. _exe-mode-init:
+
+``init``
+~~~~~~~~
+
+``init`` mode initializes a persistent RDFox server. The syntax for this mode
+is:
+
+::
+
+   RDFox [-<serverParameter> <value> ...] [-<endpointParameter> <value> ...] [-temp-role |[-role <role>] [-password <password>]] init [<root> [<command> ...]]
+
+If the ``server-directory`` parameter is not specified in the command, the
+default value for the OS user account is used (see above). If the
+``persistence`` parameter is not specified, or it is specified with value
+``off`` the process will return an error.
+
+A role and password are required by this mode in order to create the first
+server role. If either are absent from both the command arguments and
+environment variables, and the ``-temp-role`` option is not specified, RDFox
+will prompt for the missing values. If the ``-temp-role`` option is specified,
+a temporary role will be created with a random name and password and installed
+as the first server role. The temporary role will be removed before the command
+completes. This option is provided for cases when the complete access control
+configuration will be established via the shell commands given at the end of
+the command line, for example when initializing a server with content and
+settings :ref:`transcribed <transcribe-command>` from another server.
+
+At this point, all of the specified server and endpoint parameters are recorded
+in :ref:`server <server-parameters-file>` and :ref:`endpoint
+<specifying-endpoint-parameters>` parameters files in the server directory.
+Next, the server's data store catalog persistence is initialized and after that
+the server's access control configuration is initialized using the specified
+role and password. If any of the three role manager configuration parameters
+relating to password hashing (see
+:numref:`role-manager-configuration-parameters`) is zero, access control
+initialization will include a step to automatically determine suitable values
+for all three. This usually takes a few seconds but occasionally takes several
+tens of seconds. Finally, if the command line includes any shell commands these
+are executed.
+
+In the case of any error, including errors raised by shell commands, any
+changes to the file system are rolled back and the process returns a non-zero
+exit code. In the case of a successful initialization, the process returns
+zero.
+
+The server can now be launched in ``daemon`` or ``shell`` modes.
+
+.. container:: example
+
+   **Example: Initializing a Persistent Server on Linux**
+
+   The following Bash-compatible script can be used to initialize a persistent
+   server with no data stores on Linux:
+
+   ::
+
+      export RDFOX_PASSWORD="******"
+      RDFox -server-directory /var/lib/RDFox -persistence file -role admin init
+
+.. _exe-mode-upgrade:
+
+``upgrade``
+~~~~~~~~~~~
+
+``upgrade`` mode upgrades a server directory from an earlier persistence
+version to the current persistence version. The syntax for this mode is:
+
+::
+
+   RDFox [-server-directory <value>] [-persistence.encryption.key <value>] upgrade
+
+See :numref:`persistence-upgrade` for general considerations around upgrade.
+
+.. _exe-mode-daemon:
+
+``daemon``
+~~~~~~~~~~
+
+``daemon`` mode launches an in-memory or persistent RDFox server for REST
+interaction only, with defaults suitable for production. The syntax for this
+mode is:
+
+::
+
+   RDFox [-<serverParameter> <value> ...] [-<endpointParameter> <value> ...] [-role <role>] [-password <password>] daemon [<root> [<command> ...]]
+
+
+If the ``server-directory`` parameter is not specified in the command, the
+default value for the OS user account is used (see above). To launch a
+persistent server in this mode, the server directory must first have been
+initialized using ``init`` mode (see the preceding section). To launch an
+in-memory server, the ``persistence`` server parameter must be left unspecified
+or set to ``off`` (in either the command line arguments or server parameters
+file).
+
+A role and password are required by this mode only if the server is in-memory
+only (not persistent). If either the role of the password is absent from the
+command arguments and environment variables, RDFox will exit with an error.
+
+At this point, the server is started and any persisted data stores loaded. If
+the command line includes any shell commands (in-memory servers only), an RDFox
+shell is created to run them and then immediately closed. Finally the endpoint
+is started. The process will run until it receives ``SIGINT`` or ``SIGTERM``
+which will cause the endpoint to shutdown, disconnecting all clients
+gracefully. Note that, on Unix Systems, ``SIGINT`` can be sent to a process
+attached to a terminal by pressing Ctrl-C.
+
+.. container:: example
+
+   **Example: Launching a Daemon Process**
+
+   The following Bash-compatible command line can be used to start a daemon
+   mode process for REST access to the server initialized in the ``init`` mode
+   example:
+
+   ::
+
+      RDFox -server-directory /var/lib/RDFox daemon
+
+``shell``
+~~~~~~~~~
+
+``shell`` mode launches an in-memory or persistent RDFox server for command
+line and, optionally, REST interaction, with defaults suitable for production.
+The syntax for this mode is:
+
+::
+
+   RDFox [-<serverParameter> <value> ...] [-<endpointParameter> <value> ...] [-role <role>] [-password <password>] shell [<root> [<command> ...]]
+
+
+If the ``server-directory`` parameter is not specified in the command, the
+default value for the OS user account is used (see above). To launch a
+persistent server in this mode, the server directory must first have been
+initialized using ``init`` mode (see the preceding section). To launch an
+in-memory server, the ``persistence`` server parameter must be left unspecified
+or set to ``off`` (in either the command line arguments or server parameters
+file).
+
+A role and password are required by this mode in order to create the first
+server role for an in-memory server, and to login to the shell for both
+in-memory and persistent servers. If either the role or the password is absent
+from the command arguments and environment variables RDFox will prompt for the
+missing values to be given interactively.
+
+At this point, the server is started and any persisted data stores loaded. An
+RDFox shell is then created and the user is logged in with the supplied
+credentials. If the command line includes any shell commands, these are
+executed by the shell before the command prompt is returned for user
+interaction. The shell can be closed by issuing the ``quit`` command.
+
+.. container:: example
+
+   **Example: Launching a Local Shell**
+
+   The following command line can be used to launch a local shell connected to
+   the server initialized in the ``init`` mode example:
+
+   ::
+
+      RDFox -server-directory /var/lib/RDFox shell
+
+.. _remote-shell-client:
+
+``remote``
+~~~~~~~~~~
+
+``remote`` mode launches a client for the remote shell API to provide command
+line interaction with an RDFox server. The server's endpoint must be running
+and reachable from the host running the ``remote`` mode process. The syntax for
+this mode is:
+
+::
+
+   RDFox [-<remoteShellParameter> <value> ...] [-role <role>] [-password <password>] remote <server-url> [<command> ...]
+
+The resulting process will call the remote shell API of the server at
+``<server-url>`` to instantiate a remote shell instance, which will be used to
+run any commands supplied on the command line, and then prompt for further
+commands to run.
+
+The remote shell client can be configured with zero or more parameters, each of
+which is specified as a key-value pair of the form ``-<remoteShellParameter>
+<value>``. The following table describes all available remote shell parameters.
+
+.. table ::
+   :widths: 20,20,50
+
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   |        Option                         |         Value                   |                  Description                    |
+   +=======================================+=================================+=================================================+
+   | ``channel-timeout``                   | A duration of ``1 s`` or more   | Determines the length of time the remote        |
+   |                                       | specified as described in       | shell client will wait for I/O. The             |
+   |                                       | :numref:`specifying-durations`. | default value is ``unlimited`` so that          |
+   |                                       |                                 | commands that don't produce output for          |
+   |                                       |                                 | long periods do not timeout.                    |
+   |                                       |                                 |                                                 |
+   |                                       |                                 |                                                 |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``connect-timeout``                   | A duration of ``1 s`` or more   | Determines the length of time the remote        |
+   |                                       | specified as described in       | shell client will wait for a connection         |
+   |                                       | :numref:`specifying-durations`. | to the server. The default value is             |
+   |                                       |                                 | ``4 s``.                                        |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``credentials``                       | a string                        | Specifies the client certificate and private    |
+   |                                       |                                 | key, and the intermediate certificates as a     |
+   |                                       |                                 | verbatim string in PEM format. The string must  |
+   |                                       |                                 | contain the client’s private key, the client’s  |
+   |                                       |                                 | certificate, and zero or more intermediate      |
+   |                                       |                                 | certificates. See also the documentation for the|
+   |                                       |                                 | :ref:`endpoint parameter <endpoint-parameters>` |
+   |                                       |                                 | with the same name.                             |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``credentials-file``                  | a string                        | Specifies the name of the file whose content    |
+   |                                       |                                 | contains the credentials. The file content must |
+   |                                       |                                 | have the same format as the ``credentials``     |
+   |                                       |                                 | parameter.                                      |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``credentials-passphrase``            | a string                        | Provides the passphrase that can be used to     |
+   |                                       |                                 | decrypt the credentials in case they are        |
+   |                                       |                                 | encrypted. This parameter is optional.          |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``min-secure-protocol``               | ``ssl3``, ``tls1``, ``tls11``,  | Determines the minimum protocol version that    |
+   |                                       | ``tls12``, or ``tls13``         | the client should use.                          |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``trusted-root-certificate``          | a string                        | See documentation for the                       |
+   |                                       |                                 | :ref:`endpoint parameter <endpoint-parameters>` |
+   |                                       |                                 | with the same name.                             |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``trusted-root-certificate-file``     | a string                        | See documentation for the                       |
+   |                                       |                                 | :ref:`endpoint parameter <endpoint-parameters>` |
+   |                                       |                                 | with the same name.                             |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``verify-server-certificates``        | ``true`` or ``false``           | Determines whether the remote shell             |
+   |                                       |                                 | client will attempt to verify the               |
+   |                                       |                                 | server's certificate. The default value         |
+   |                                       |                                 | is ``true``.                                    |
+   +---------------------------------------+---------------------------------+-------------------------------------------------+
+
+A role name and password are required at startup. RDFox will first look for the
+arguments ``-role <role>`` and ``-password <password>``. If one or both of
+these options is missing, RDFox will next inspect the ``RDFOX_ROLE`` and
+``RDFOX_PASSWORD`` environment variables respectively. If after this one or
+both variables remain unset, RDFox will prompt for the missing information.
+
+When invoked from the remote shell, commands will operate in exactly the same
+way as if they were invoked from the local shell (``shell`` and ``sandbox``
+modes) save for the exceptions documented in
+:numref:`REST-remote-shell-limitations`. Interruptible operations may be
+interrupted with Ctrl-C just as in local shells.
+
+File paths embedded within commands are always interpreted with respect to the
+server's file system. The remote shell client does not provide any way of using
+the client's file system (unless the client is running on the same host as the
+server).
+
+Uniquely, as ``remote`` mode does not create an RDFox server instance, no
+license key is required to use the RDFox executable in this mode.
+
+.. container:: example
+
+   **Example: Launching a Remote Shell**
+
+   To connect to a server reachable at http://example.com:12110, run:
+   
+   ::
+
+      RDFox remote http://example.com:12110
+
+``service``
+~~~~~~~~~~~
+
+Manages RDFox as a background service. On UNIX platforms The syntax for this
+mode is:
+
+::
+
+   RDFox service install [user | system] [-<serverParameter> <value> ...] [-<endpointParameter> <value> ...] [daemon [<root> [<command> ...]]]
+   RDFox service uninstall [user | system]
+
+On Windows, the syntax is:
+
+::
+
+   RDFox service install [system] [-<serverParameter> <value> ...] [-<endpointParameter> <value> ...] [daemon [<root> [<command> ...]]]
+   RDFox service {uninstall | start | stop | reload} [system]
+
+The ``install`` sub-command installs RDFox as a background service either for
+the current user or for the system. On Windows, only system services are
+supported. On macOS and Linux, the service is installed for the current user if
+``system`` is not specified explicitly. Installing the service for the system
+requires root or administrative privileges. On all platforms, arguments after
+the optional ``user`` / ``system`` specification will be included in the
+command to launch instances of the service. These must form a valid prefix for
+a ``daemon`` mode command (see :numref:`exe-mode-daemon`).
+
+The ``uninstall`` sub-command uninstalls the service, again requiring root or
+administrator privileges in the case of system services.
+
+On Windows, the ``start``, ``stop``, and ``reload`` sub-commands can be used to
+start, stop, and reload the service respectively. On macOS and Linux,
+instructions for managing the service are printed to the console when the
+service is installed.
+
+.. container:: example
+
+   **Example: Installing and Uninstalling a System-Wide RDFox Service**
+
+   To install RDFox as a system service using the server initialized in the
+   ``init`` mode example, run:
+   
+   ::
+
+      RDFox service install system -server-directory /var/lib/RDFox
+
+   Read the instructions printed to the console for how to start, stop, and
+   reload the service. To uninstall the service, run:
+
+   ::
+
+      RDFox service uninstall system

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>13. Persistence &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="14. Connections" href="connections.html" />
+    <link rel="prev" title="12. Access Control" href="access-control.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">13. Persistence</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-server-directory">13.1. The Server Directory</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#initialization">13.1.1. Initialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#upgrade">13.1.2. Upgrade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backup-and-restore">13.1.3. Backup and Restore</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decommissioning">13.1.4. Decommissioning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">13.2. Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#persistence-options">13.2.1. Persistence Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#file-persistence">13.2.1.1. <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#file-sequence-persistence">13.2.1.2. <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#encryption">13.2.2. Encryption</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">13. </span>Persistence</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="persistence">
+<span id="id1"></span><h1><span class="section-number">13. </span>Persistence<a class="headerlink" href="#persistence" title="Permalink to this headline">¶</a></h1>
+<p>RDFox® is a main-memory system, which means that a full copy of the data loaded
+into the system is always held in main memory to support query answering and
+other operations. It is, however, possible to configure RDFox to incrementally
+save various types of information to persistent storage so that it may be
+restored in a subsequent or concurrent session.</p>
+<p>There are three reasons to enable persistence. The first is when RDFox is being
+used as the <a class="reference external" href="https://en.wikipedia.org/wiki/System_of_record">System of Record</a> for the data it contains. In
+this case, persisting to disk is essential in order to achieve acceptable
+levels of data durability. The second reason is to improve restart performance.
+Using persistence achieves this because it is generally faster for RDFox to
+reload data stored in its native format than it is to import it from other
+formats, or to copy it from another data store. The third reason is so that
+changes to the data store can be continuously replicated amongst several RDFox
+instances. Only the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence type described in
+<a class="reference internal" href="#file-sequence-persistence"><span class="std std-numref">Section 13.2.1.2</span></a> supports this last goal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Persistence does not increase the capacity of an RDFox data store beyond
+what can be stored in memory.</p>
+</div>
+<p>RDFox’s persistence is compliant with the ACID properties described in
+<a class="reference internal" href="transactions.html#transactions"><span class="std std-numref">Section 11</span></a>.</p>
+<p>The persisted state of an RDFox instance consists of the following types of
+information:</p>
+<ul class="simple">
+<li><p>information about all data stores in the system (also known as the <em>server catalog</em>),</p></li>
+<li><p>information about the roles used for access control, and</p></li>
+<li><p>the data loaded into each data store.</p></li>
+</ul>
+<p>Each version of the server catalog is uniquely identified by a server version
+number, and each distinct state of a data store us uniquely identified by a
+data store version number (see <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>). In addition, each distinct
+list of roles used for access control is uniquely identified by a unique <em>role
+manager version number</em>.</p>
+<div class="section" id="the-server-directory">
+<span id="server-directory"></span><h2><span class="section-number">13.1. </span>The Server Directory<a class="headerlink" href="#the-server-directory" title="Permalink to this headline">¶</a></h2>
+<p>In order to use persistence, an RDFox server must be configured with a server
+directory which will contain all of the server’s persisted content and
+settings. See the documentation of the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter in
+<a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a>.</p>
+<p>Care must be taken to ensure that the disk containing the server directory has
+sufficient space to accommodate the persisted data. The amount of space
+required will depend on the size of the data store(s) and the frequency of
+changes to the data. The disk should be continuously monitored to ensure that
+it has sufficient free space to accommodate any new data that will be added.
+Additional disk space is required temporarily when persistent data stores are
+<a class="reference internal" href="data-stores.html#compaction-dead-fact-removal"><span class="std std-ref">compacted</span></a> and when a server directory is
+<a class="reference internal" href="#persistence-upgrade"><span class="std std-ref">upgraded</span></a>.</p>
+<p>To ensure smooth operation, a persistent server should have uninterrupted read
+and write access to its server directory. Specifically, the server must have
+complete freedom to create, delete, or move files in the server directory. If
+other processes access files within a server directory concurrently with an
+RDFox server, the server’s operations may fail or behave unexpectedly. It is
+therefore advised that the server directory should be added to the exclusion
+list of potential programs that would interfere with its file operations. These
+programs can include but are not limited to anti-virus, anti-malware programs,
+security applications, and file indexing services.</p>
+<p>The remaining sub-sections of the current section describe key points in the
+lifecycle of a server directory.</p>
+<div class="section" id="initialization">
+<span id="persistence-initialization"></span><h3><span class="section-number">13.1.1. </span>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h3>
+<p>Before starting a persistent server, its server directory must be initialized
+for the desired <a class="reference internal" href="#persistence-options"><span class="std std-ref">persistence option</span></a>. The
+initialization step creates the server directory, if it does not already exist,
+and creates the necessary files to store the server catalog and roles database.
+Initializing a server directory also captures any server parameters specified
+at the time of initialization into the <a class="reference internal" href="servers.html#server-parameters-file"><span class="std std-ref">server parameters file</span></a> to serve as defaults for future server sessions. When
+initializing a server directory using the RDFox executable, parameters for the
+endpoint are also captured and written to the endpoint parameters file (see
+<a class="reference internal" href="rdfox-endpoint.html#specifying-endpoint-parameters"><span class="std std-numref">Section 19.2.1</span></a>).</p>
+</div>
+<div class="section" id="upgrade">
+<span id="persistence-upgrade"></span><h3><span class="section-number">13.1.2. </span>Upgrade<a class="headerlink" href="#upgrade" title="Permalink to this headline">¶</a></h3>
+<p>RDFox can upgrade the contents of a server directory that has been populated by
+an earlier version so that it can be used with the current version. Upgrade is
+possible for at least the immediately preceding persistence version and
+possibly from versions before that.</p>
+<p>The upgrade procedure uses two auxiliary directories, the <em>new</em> and <em>saved</em>
+directories, both of which are within the same folder as the existing server
+directory. First, the upgraded server directory is created as the new
+directory. This step works by creating, within the new directory, modified
+copies of any files in the existing server directory that need to be changed to
+conform to the new persistence format, and then hard-linking or copying any
+files that do not need to be modified to give a complete, upgraded directory.
+Next, the existing server directory is moved to the saved directory path and
+then the new server directory is moved to the original server directory path.
+Finally, the saved directory is deleted. This process ensures that the server
+directory is always in a recoverable state, even if the upgrade process is
+interrupted.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>While the above procedure has been designed for safety, operators should
+always take a back of the server directory immediately before upgrade as a
+precaution. In the event that you are unable to start the RDFox server after
+the upgrade using either the old or new version, restore the backup, return
+to using the old version, and contact Oxford Semantic Technologies for
+assistance.</p>
+</div>
+<p>The procedure described above results in the following requirements which the
+operator must satisfy in order to successfully perform an upgrade:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>No RDFox server, or other process, can be using the directory to be
+upgraded during any part of the upgrade process.</p></li>
+<li><p>The server directory must be on the same volume as its parent directory so
+that the auxiliary directory paths will be on the same volume as the
+existing directory. This is necessary to ensure that the two move
+operations succeed.</p></li>
+<li><p>The process performing the upgrade must be able to write to the parent
+directory of the server directory in order to create the new directory and
+move the existing and new directories.</p></li>
+<li><p>There should be enough disk space on the volume to hold a complete copy of
+the server directory. This is a worst-case requirement as hard-linking of
+files that do not need to change may substantially reduce the additional
+disk space that is required. Operators should consider compacting all data
+stores using the older RDFox version to reduce the disk space used before
+upgrade begins.</p></li>
+</ul>
+</div></blockquote>
+<p>Upgrade can be invoked using the <code class="docutils literal notranslate"><span class="pre">upgrade</span></code> mode of the RDFox executable (see
+<a class="reference internal" href="rdfox-executable.html#exe-mode-upgrade"><span class="std std-numref">Section 18.4</span></a>) or by using the <code class="docutils literal notranslate"><span class="pre">upgrade(...)</span></code> method of the
+<a class="reference external" href="./_javadoc/tech/oxfordsemantic/jrdfox/client/RDFoxServer.html">RDFoxServer</a>
+class in the Java API.</p>
+</div>
+<div class="section" id="backup-and-restore">
+<h3><span class="section-number">13.1.3. </span>Backup and Restore<a class="headerlink" href="#backup-and-restore" title="Permalink to this headline">¶</a></h3>
+<p>RDFox does not expose any specific functionality for backing up and restoring
+persistent servers but backups can be taken by recursively copying the complete
+server directory to a new location. The server directory can be restored by
+recursively copying a backed-up server version to a new location and specifying
+the new location as the server directory for a new RDFox server instance.</p>
+<p>With the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option, backups can be taken at any
+time, even if replicas are running however with the <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence
+option, backups should only be taken after ensuring that no writes to the
+server directory will take place (for example by shutting down the server).</p>
+</div>
+<div class="section" id="decommissioning">
+<h3><span class="section-number">13.1.4. </span>Decommissioning<a class="headerlink" href="#decommissioning" title="Permalink to this headline">¶</a></h3>
+<p>To decommission a persistent server, simply stop all running replicas and
+delete the server directory.</p>
+</div>
+</div>
+<div class="section" id="configuration">
+<span id="persistence-configuration"></span><h2><span class="section-number">13.2. </span>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>This section describes RDFox’s configuration options related to persistence in
+RDFox.</p>
+<div class="section" id="persistence-options">
+<span id="id2"></span><h3><span class="section-number">13.2.1. </span>Persistence Options<a class="headerlink" href="#persistence-options" title="Permalink to this headline">¶</a></h3>
+<p>The persistence option to be used for a particular server is controlled by the
+<code class="docutils literal notranslate"><span class="pre">persistence</span></code> <a class="reference internal" href="servers.html#server-parameters"><span class="std std-ref">server parameter</span></a>, which can be set
+to <code class="docutils literal notranslate"><span class="pre">off</span></code> (no persistence), <code class="docutils literal notranslate"><span class="pre">file</span></code>, or <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>. The <code class="docutils literal notranslate"><span class="pre">file</span></code> and
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> options are described in the following sections. Even when
+persistence is enabled at the server level, it may be disabled at the data
+store level by setting the <code class="docutils literal notranslate"><span class="pre">persistence</span></code> <a class="reference internal" href="data-stores.html#data-store-parameters"><span class="std std-ref">data store parameter</span></a> to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+<div class="section" id="file-persistence">
+<h4><span class="section-number">13.2.1.1. </span><code class="docutils literal notranslate"><span class="pre">file</span></code> persistence<a class="headerlink" href="#file-persistence" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence option stores the persisted content (the data store
+catalog, the list of available roles, and the content of a data store) in a
+single file. The data store catalog and the list of available roles are always
+saved as a snapshot. The content of a data store is saved as a snapshot
+followed by zero or more deltas. When a data store is compacted, the saved data
+is replaced by a fresh snapshot, which is extended by deltas as further
+transactions are committed on the data store. The process of compacting a data
+store first saves the current snapshot into a new file, and then it atomically
+replaces the old file with the new file. Consequently, compacting a data store
+eventually frees the storage occupied by any deltas written after the snapshot,
+but it may temporarily use additional disk space in order to hold both the old
+and the new files.</p>
+<p>A server directory containing this persistence type can only be used by one
+RDFox server at a time. RDFox ensures that this is the case by seeking an
+exclusive lock on the directory when the server instance is created and exiting
+if the lock cannot be obtained.</p>
+<p>RDFox will update the persisted data in a way that is in most cases resilient
+to RDFox crashing or the system losing power during the saving process.
+Specifically, if saving of a delta is interrupted for any reason, RDFox will
+undo any changes made to the data the next time the RDFox process is restarted;
+in this way, RDFox provides ACID guarantees for transaction updates.</p>
+<p>While RDFox guarantees consistency of persisted data due to RDFox crashes and
+power failure, RDFox is not immune against external damage to persisted files.
+RDFox will attempt to detect such corruption as follows.</p>
+<ul class="simple">
+<li><p>When data is encrypted, the encryption algorithm itself offers protection
+against corruption: decrypting a damaged file will produce data that has a
+very high chance to be detected by RDFox as invalid.</p></li>
+<li><p>When data is not encrypted, RDFox will use the CRC64 checksum algorithm to
+detect data corruption.</p></li>
+</ul>
+<p>RDFox will refuse to start if corruption is detected in any part of the
+persisted data. In such cases, the only possible course of action is to restore
+a recent state of the RDFox database from backup. Consequently, it is highly
+recommended to create periodic backups of the entire server directory. It is
+safe to create copies of the server directory even if an RDFox instance is
+running, provided that the RDFox instance does not write any data during the
+backup period. If RDFox tries to save a transaction or change the server
+catalog while a backup is in progress, the backed up data may be invalid (i.e.,
+it cannot be used in future to restore the state of an RDFox server).
+Consequently, backups of the server directory should only be taken during a
+maintenance window in which no read/write transactions are performed.</p>
+<div class="section" id="system-requirements">
+<h5><span class="section-number">13.2.1.1.1. </span>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h5>
+<p>In order to exclusively lock the server directory , <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence uses
+the <code class="docutils literal notranslate"><span class="pre">flock</span></code> system call with the <code class="docutils literal notranslate"><span class="pre">LOCK_EX</span></code> flag on Linux, and the
+<code class="docutils literal notranslate"><span class="pre">CreateFileW</span></code> system call with the <code class="docutils literal notranslate"><span class="pre">dwShareMode</span></code> set to 0 on Windows. In
+both cases, the underlying file system must faithfully and correctly support
+the locking semantics of those calls.</p>
+<p>Correctness of <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence relies on the following important
+system-level considerations.</p>
+<ul class="simple">
+<li><p>To guard against sudden power failure, RDFox writes data in multiples of disk
+sector size. However, determining the sector size programmatically typically
+requires administrative privileges in modern OSes. Consequently, RDFox relies
+on users to configure the sector size correctly. RDFox will function
+correctly as long as its sector size is a multiple of actual sector size;
+however, using a sector size that size that is larger than what is strictly
+necessary for the disk may waste a very small amount of storage per
+transaction. Most disks available nowadays on the market use sectors of 512
+or 4096 bytes, so RDFox uses a sector size of 4096 by default as this ensures
+correctness on commonly used hardware. If RDFox is used on a disk with a
+different sector size, the correct sector size must be set explicitly using
+the <code class="docutils literal notranslate"><span class="pre">persistence.disk-sector-size</span></code> server parameter.</p></li>
+<li><p>RDFox relies on system calls that ensure that the data is persisted on disk
+(<code class="docutils literal notranslate"><span class="pre">FlushFileBuffers</span></code> on Windows, <code class="docutils literal notranslate"><span class="pre">fcntl</span></code> with the <code class="docutils literal notranslate"><span class="pre">F_BARRIERFSYNC</span></code>
+option on macOS, and <code class="docutils literal notranslate"><span class="pre">fsyncdata</span></code> on Linux). It is well documented that
+certain disks and disk drivers will “lie” to the operating system; for
+example, some disks will report that the data has been fully persisted even
+if the data has not yet been flushed from the disk controller’s cache. Modern
+operating systems do not provide a way of detecting such situations, and so
+RDFox has no choice but to “believe” the operating system. If RDFox is used
+with a disk that “lies” about persistence, data can be lost in case of
+unexpected power failure or kernel crash. Please check with your disk’s
+manufacturer whether their product is safe to be used in a transactional
+application.</p></li>
+<li><p>On macOS, RDFox uses the <code class="docutils literal notranslate"><span class="pre">fcntl</span></code> with the <code class="docutils literal notranslate"><span class="pre">F_BARRIERFSYNC</span></code> option to
+synchronize data with external storage. This system call is <strong>well known</strong> to
+not offer hard persistence guarantees, and in fact it was observed in
+practice that the data can be kept in disk buffers for a few seconds after
+the system call is issued. The <code class="docutils literal notranslate"><span class="pre">F_FULLFSYNC</span></code> option offers stronger
+persistence guarantees, but is known to cause considerable slowdown and can
+introduce considerable wear and tear with Apple’s SSDs; moreover, even that
+system call does not completely guarantee no data loss in case of power
+failure. Please refer to <a class="reference external" href="https://developer.apple.com/documentation/xcode/reducing-disk-writes#">Apple’s documentation</a>
+about these system calls and their recommendation to use <code class="docutils literal notranslate"><span class="pre">F_BARRIERFSYNC</span></code>.
+Consequently, persisted data is not 100% safe from power failure on macOS.
+However, in our experience, Mac computers are rarely used to run
+production-grade databases, and moreover Mac laptops (which are the most
+common form of Mac computers) are equipped with a battery that considerably
+reduces the chances of sudden power failure. Thus, relaxing consistency in
+order to improve performance and reduce wear and tear is acceptable in
+typical usage scenarios of RDFox on macOS. Please contact Oxford Semantic
+Technologies if you plan to use RDFox in production on macOS.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="file-sequence-persistence">
+<span id="id3"></span><h4><span class="section-number">13.2.1.2. </span><code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence<a class="headerlink" href="#file-sequence-persistence" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option stores the persisted content (whether
+it is the data store catalog, roles database, or the content of a data store)
+in a sequence of files with one file per version. The path of each file is
+determined by the relevant version number (server, role manager or data store).</p>
+<p>Unlike with <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence, a server directory using <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>
+persistence may be shared by several RDFox servers at once. So long as the
+underlying file system meets the criteria described in
+<a class="reference internal" href="#file-sequence-file-system-requirements"><span class="std std-numref">Section 13.2.1.2.1</span></a>, any modification successfully
+made via any of these instances will be replicated to the other instances
+eventually. This provides the basis for deploying RDFox in a leaderless, high
+availability (HA) configuration. Please refer to
+<a class="reference internal" href="#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a> for information about replication lag and
+<a class="reference internal" href="high-availability.html#high-availability"><span class="std std-numref">Section 21</span></a> for details of how to setup HA deployments.</p>
+<p>Also unlike the <code class="docutils literal notranslate"><span class="pre">file</span></code> persistence type, <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> server directories
+can be backed up during write operations, removing the need for maintenance
+windows in order to collect backups. This is because the files that form the
+file sequence never contain partial deltas.</p>
+<p>When data stores persisted with this file type are <a class="reference internal" href="data-stores.html#compaction-dead-fact-removal"><span class="std std-ref">compacted</span></a>, old snapshots and deltas are replaced with a
+small file indicating that original file content has been deleted from the
+disk, known as a tombstone.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to use the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option, the license key
+provided at startup must explicitly support the feature.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option is <code class="docutils literal notranslate"><span class="pre">EXPERIMENTAL</span></code> on Windows and
+macOS.</p>
+</div>
+<div class="section" id="file-sequence-file-system-requirements">
+<span id="id4"></span><h5><span class="section-number">13.2.1.2.1. </span>System Requirements<a class="headerlink" href="#file-sequence-file-system-requirements" title="Permalink to this headline">¶</a></h5>
+<p>In order to make it safe for <strong>any</strong> of the RDFox instances sharing a server
+directory to persist new transactions, each instance must add files to file
+sequences in a way that will fail if the version they are trying to create has
+already been created by another instance. This requires that the file system
+containing the server directory supports an atomic move or link operation that
+returns a distinct error code when the target path is already occupied.</p>
+<p>The Network File System (NFS) protocol meets the above requirement through the
+<code class="docutils literal notranslate"><span class="pre">LINK</span></code> operation (documented, in <cite>Section 18.9 of RFC5661
+&lt;https://datatracker.ietf.org/doc/html/rfc5661#section-18.9&gt;</cite>). Oxford Semantic
+Technologies has successfully tested the <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option
+under sustained write contention on the following managed NFS services:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://aws.amazon.com/efs/">Amazon Elastic File System</a></p></li>
+<li><p><a class="reference external" href="https://learn.microsoft.com/en-us/azure/storage/files/storage-files-introduction">Azure Files</a>
+and <a class="reference external" href="https://azure.microsoft.com/en-gb/products/netapp">Azure NetApp Files</a></p></li>
+<li><p><a class="reference external" href="https://cloud.google.com/filestore">Google Cloud Filestore</a></p></li>
+</ul>
+<p>In each case, testing was performed by provisioning an instance of the file
+system and mounting it to three Linux hosts in separate availability zones
+using the mounting procedure recommended by the service provider. An instance
+of RDFox was then started in <code class="docutils literal notranslate"><span class="pre">shell</span></code> mode on each host with the
+<code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter pointing to the same directory on the NFS file
+system. Using one of the instances, a data store was created with the following
+command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dstore create default
+</pre></div>
+</div>
+<p>Next, the following commands were run on each host:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>set output out
+rwtest 500 5000
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">rwtest</span></code> shell command has been designed specifically to detect
+replication errors and is described fully in <a class="reference internal" href="rdfox-shell.html#rwtest"><span class="std std-numref">Section 15.2.42</span></a>. When invoked as
+shown, the test attempts to commit a transaction every 2.75 s on average.
+Running the command on three instances simultaneously results in frequent write
+contention events.</p>
+<p>After 72 hours, the <code class="docutils literal notranslate"><span class="pre">rwtest</span></code> command was interrupted by issuing <code class="docutils literal notranslate"><span class="pre">Ctrl-C</span></code> in
+the terminal on each host. This produces a final report that shows the total
+number of transactions successfully committed by each instance. The sum of
+these numbers was found to match the data store version minus 1 (the initial
+data store version) as expected. If more than one of the instances had
+concluded that it had successfully created any given version, the sum of these
+numbers would be higher. If in any iteration of the test loop on any of the
+three instances the content of the data store differed from the expected
+content, which is known for each data store version, the test would have
+stopped with an error.</p>
+<p>The above procedure constitutes a minimum test for qualifying file systems (and
+the associated configuration options) for production use in scenarios where
+write contention may occur. Users planning deployments of RDFox that use the
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence option are advised to conduct their own testing
+using this procedure. The degree of write contention can be varied in the test
+by changing the numeric parameters to the command which represent the minimum
+and maximum duration in milliseconds between iterations of the test loop.</p>
+<p>It is worth noting that the atomic operation described above is only required
+in situations where there is a risk of write contention and that a broader
+range of file systems may be safe to use under the constraint that write
+contention will not occur. This can be achieved by ensuring (externally) that
+all writes will be committed via the same nominated instance. Some approaches
+to this are reviewed in <a class="reference internal" href="high-availability.html#suggested-load-balancing-approaches"><span class="std std-numref">Section 21.3</span></a>. To
+qualify file systems for use in such setups, the <code class="docutils literal notranslate"><span class="pre">rwtest</span></code> command can be
+invoked with the <code class="docutils literal notranslate"><span class="pre">read-only</span></code> argument on all but one of the hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On UNIX operating systems, RDFox uses the <code class="docutils literal notranslate"><span class="pre">link</span></code> system call as the
+atomic commit operation, while on Windows <code class="docutils literal notranslate"><span class="pre">MoveFileW</span></code> is used. The
+<code class="docutils literal notranslate"><span class="pre">EEXISTS</span></code> (UNIX) and <code class="docutils literal notranslate"><span class="pre">ERROR_ALREADY_EXISTS</span></code> (Windows) error codes are
+interpreted to mean that the commit has failed because another instance
+successfully committed a change first.</p>
+</div>
+</div>
+<div class="section" id="replication-performance">
+<span id="id5"></span><h5><span class="section-number">13.2.1.2.2. </span>Replication Performance<a class="headerlink" href="#replication-performance" title="Permalink to this headline">¶</a></h5>
+<p>In order for a change to be replicated between instances, the instance writing
+the change must successfully commit it to the path reserved for the new version
+number, and the other instances must then discover it and apply the changes to
+their own in-memory copies of the data. The time taken for this process is
+called replication <em>lag</em>.</p>
+<p>In all, there are three mechanisms by which a receiving instance can discover
+new version files. The first is through polling. The poll interval is
+controlled by the <code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code> server parameter
+which has a default of 60 s. A separate poll interval is established for each
+persisted component. This means that, in the case of a server with three
+persisted data stores, the file system will be polled five times in each
+interval: once for new server versions, once for new role manager versions, and
+once for each of the three data stores. It is generally desirable to keep
+polling intervals long to minimise load on the file system so, while this
+mechanism helps bound worst-case replication lag, it is unsuitable for
+achieving low average-case replication lag.</p>
+<p>The second mechanism by which new version files are discovered is when a commit
+fails because the local version has fallen behind the highest persisted
+version. In this case, the instance will apply the new version and any others
+that have been created since as soon as the failed transaction has been rolled
+back. This mechanism is provided to reduce the time taken for an instance to
+catch up with the latest changes after a commit fails due to write contention.
+It will not, in most cases, be useful for achieving low average-case
+replication lag.</p>
+<p>The third mechanism for new version files to be discovered is by notification
+over UDP. This mechanism gives the lowest possible average-case replication
+lag. To activate this mechanism, the <code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code>
+server parameter must be set to a host name and UDP port number separated by a
+plus (<code class="docutils literal notranslate"><span class="pre">+</span></code>) symbol. An instance configured this way will register itself for
+notifications by writing the given notifications address to the server
+directory itself. For the mechanism to work, the host name must be resolvable
+by the other instances that share the server directory and UDP packets must be
+able to flow freely from the other instances to the specified port. With this
+mechanism in place, it should be possible to achieve sub-second replication lag
+for instances within the same data center assuming that changes are small.</p>
+</div>
+</div>
+</div>
+<div class="section" id="encryption">
+<h3><span class="section-number">13.2.2. </span>Encryption<a class="headerlink" href="#encryption" title="Permalink to this headline">¶</a></h3>
+<p>When using any form of persistence, a RDFox server can be configured to encrypt
+and decrypt the data stored in the server directory by supplying a
+base64-encoded key via the <code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code> server parameter. By
+default the <code class="docutils literal notranslate"><span class="pre">AES-256-CBC</span></code> cipher, which requires a 256-bit AES key, is used
+but this can be changed by setting the <code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code>
+parameter. See the full documentation of the above parameters in
+<a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a> for more details.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="access-control.html" class="btn btn-neutral float-left" title="12. Access Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="connections.html" class="btn btn-neutral float-right" title="14. Connections" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

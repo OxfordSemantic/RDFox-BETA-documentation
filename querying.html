@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9. Querying &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="10. Reasoning" href="reasoning.html" />
+    <link rel="prev" title="8. Import and Export" href="import-and-export.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">9. Querying</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sparql-1-1-support">9.1. SPARQL 1.1 Support</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#query-language">9.1.1. Query Language</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#query-answer-formats">9.1.2. Query Answer Formats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update-language">9.1.3. Update Language</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-functions">9.2. Built-In Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#operators">9.2.1. Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions-on-terms">9.2.2. Functions on Terms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#constructor-functions">9.2.3. Constructor Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iri-and-string-functions">9.2.4. IRI and String Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hash-functions">9.2.5. Hash Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mathematical-functions">9.2.6. Mathematical Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#date-and-time-functions">9.2.7. Date and Time Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-agent-function">9.2.8. The <code class="docutils literal notranslate"><span class="pre">AGENT()</span></code> Function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#aggregate-functions">9.3. Aggregate Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#querying-tuple-tables">9.4. Querying Tuple Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#distinguishing-explicit-and-derived-facts-in-queries">9.5. Distinguishing Explicit and Derived Facts in Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring-query-evaluation">9.6. Monitoring Query Evaluation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#query-plans">9.6.1. Query Plans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#query-profiling">9.6.2. Query Profiling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#access-control">9.7. Access Control</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">9. </span>Querying</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="querying">
+<span id="id1"></span><h1><span class="section-number">9. </span>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h1>
+<p>RDFox® supports most <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/">SPARQL 1.1 Query Language</a> features, and it
+fully supports the <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">SPARQL 1.1 Update Language</a>. It also
+implements a few proprietary built-in functions that are not part of SPARQL
+1.1.</p>
+<p>In this section, we describe in detail the support in RDFox for the <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/">SPARQL 1.1
+standard specification</a>, and the
+built-in functions that are specific to RDFox.</p>
+<p>Finally, we also describe the functionality implemented in RDFox for monitoring
+query execution.</p>
+<div class="section" id="sparql-1-1-support">
+<h2><span class="section-number">9.1. </span>SPARQL 1.1 Support<a class="headerlink" href="#sparql-1-1-support" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/">SPARQL 1.1 specification</a> provides a
+suite of languages and protocols for querying and manipulating RDF graph data.</p>
+<div class="section" id="query-language">
+<h3><span class="section-number">9.1.1. </span>Query Language<a class="headerlink" href="#query-language" title="Permalink to this headline">¶</a></h3>
+<p>The core of the specification is the <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/">SPARQL 1.1 Query Language</a>, which specifies
+the syntax and semantics of allowed queries. The SPARQL 1.1 query language
+extends the <a class="reference external" href="https://www.w3.org/TR/rdf-sparql-query/">previous version of SPARQL</a> with a number of important
+features for applications, including nested <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#subqueries">subqueries</a>,
+<a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#aggregates">aggregation</a>,
+<a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#negation">negation</a>,
+<a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#assignment">creating values by expressions</a>,
+<a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#namedGraphs">named graphs</a>, and
+<a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#propertypaths">property paths</a>.
+RDFox also implements the following
+<a class="reference external" href="https://afs.github.io/sparql-agg-group-empty.html">modification to the semantics of aggregate queries with empty GROUP BY clauses</a>; this variant of the
+semantics was found critical to provide intuitive answers to queries such as
+<code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">(COUNT(*)</span> <span class="pre">AS</span> <span class="pre">?C)</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">?Z</span> <span class="pre">}</span></code> and has been adopted by most, if
+not all RDF systems on the market.</p>
+<p>RDFox provides full support of the SPARQL 1.1 query language with the
+exception of the
+variant of the <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bnode">BNODE function</a> that
+takes a single string argument and the
+nonnormative <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#describe">DESCRIBE query form</a>.
+The intended semantics of <code class="docutils literal notranslate"><span class="pre">BNODE</span></code> and <code class="docutils literal notranslate"><span class="pre">DESCRIBE</span></code>
+is, in our opinion, not sufficiently specified in the standard, which is why
+those features have not yet been implemented in RDFox.</p>
+<p>Although RDFox supports SPARQL 1.1 property paths, in many situations it might be beneficial
+to use reasoning instead. This is explained further in <a class="reference internal" href="reasoning.html#representing-property-paths"><span class="std std-numref">Section 10.5.3</span></a></p>
+</div>
+<div class="section" id="query-answer-formats">
+<span id="id2"></span><h3><span class="section-number">9.1.2. </span>Query Answer Formats<a class="headerlink" href="#query-answer-formats" title="Permalink to this headline">¶</a></h3>
+<p>RDFox supports the following formats for encoding the answers to SPARQL queries.</p>
+<ul class="simple">
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/sparql11-results-csv-tsv/">SPARQL 1.1 TSV Format</a> has MIME type
+<code class="docutils literal notranslate"><span class="pre">text/tab-separated-values</span></code>.</p></li>
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/sparql11-results-csv-tsv/">SPARQL 1.1 CSV Format</a> has MIME type
+<code class="docutils literal notranslate"><span class="pre">text/csv</span></code>.</p></li>
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL 1.1 XML Format</a> has
+MIME type <code class="docutils literal notranslate"><span class="pre">application/sparql-results+xml</span></code>.</p></li>
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/sparql11-results-json/">SPARQL 1.1 JSON Format</a>
+has MIME type <code class="docutils literal notranslate"><span class="pre">application/sparql-results+json</span></code>.</p></li>
+<li><p>The proprietary format with MIME type <code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+turtle</span></code>
+outputs each query answer in a single line that resembles Turtle. If the
+query has exactly three answer variables, then query answers in this format
+can be passed to API calls that expect Turtle data.</p></li>
+<li><p>Proprietary formats with MIME types <code class="docutils literal notranslate"><span class="pre">text/x.tab-separated-values-abbrev</span></code>,
+<code class="docutils literal notranslate"><span class="pre">text/x.csv-abbrev</span></code>, <code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+xml-abbrev</span></code>,
+<code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+json-abbrev</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+turtle-abbrev</span></code> follow the same structure as
+the formats mentioned above, with the difference that all IRIs are
+abbreviated using prefixes of the data store that the query was evaluated
+over. Hence, these formats provide a more user-friendly representation of
+query results.</p></li>
+<li><p>The proprietary format with MIME type <code class="docutils literal notranslate"><span class="pre">application/x.sparql-results+null</span></code>
+simply discards all answers. This can be useful in situations such as query
+benchmarking, where one may want to measure the speed of query processing
+without taking into account the often considerable overhead of serializing
+query results and transporting them over the network.</p></li>
+<li><p>Each format from <a class="reference internal" href="import-and-export.html#data-store-content-formats"><span class="std std-numref">Section 8.1</span></a> for
+triples/quads can be used as a query answer format for queries that return
+variables <code class="docutils literal notranslate"><span class="pre">?S</span></code>, <code class="docutils literal notranslate"><span class="pre">?P</span></code>, <code class="docutils literal notranslate"><span class="pre">?O</span></code>, and optionally <code class="docutils literal notranslate"><span class="pre">?G</span></code>. In such a case, each
+query answer is serialized as one triple/quad (where an answer is interpreted
+as a quad whenever variable <code class="docutils literal notranslate"><span class="pre">?G</span></code> is bound).</p></li>
+</ul>
+</div>
+<div class="section" id="update-language">
+<h3><span class="section-number">9.1.3. </span>Update Language<a class="headerlink" href="#update-language" title="Permalink to this headline">¶</a></h3>
+<p>RDFox fully supports the SPARQL 1.1 <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/">update language</a>. In particular,
+this language allows users to insert triples into a store, delete triples from
+a store, load an RDF graph into a store, clear an RDF graph in a store, create
+a new RDF graph in a store, drop an RDF graph from a store, copy (move or add)
+the content of one graph to another, and perform a group of update operations
+as a single action.</p>
+</div>
+</div>
+<div class="section" id="built-in-functions">
+<span id="id3"></span><h2><span class="section-number">9.2. </span>Built-In Functions<a class="headerlink" href="#built-in-functions" title="Permalink to this headline">¶</a></h2>
+<p>RDFox supports a wide range of built-in operators and functions that can be
+used during query answering and reasoning. Concretely, RDFox supports all
+<a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#expressions">SPARQL 1.1 Functions and Operators</a>, with
+the exception of the variant of the <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bnode">BNODE function</a> that
+takes a single string argument, whose semantics is unclear. In addition to
+that, RDFox also supports most of the <a class="reference external" href="https://www.w3.org/TR/xpath-functions-31/">XPath and XQuery Functions and Operators</a>. Finally, RDFox also provides a
+number of proprietary functions that are useful in practice.</p>
+<p>There is a large overlap between the functions and operators defined in
+SPARQL 1.1 and XPath and XQuery. As a result most functions supported by RDFox
+can be accessed using their short names, as specified in SPARQL 1.1, as well as
+their IRI name, as specified in XPath and XQuery. RDFox also provides a short
+name for many of the XPath and XQuery functions that have no SPARQL equivalent.</p>
+<p>RDFox often provides additional overloads for the functions and operators from
+the SPARQL and the XPath and XQuery specifications, which improves usability.
+So, for example, one can extract the year of an <code class="docutils literal notranslate"><span class="pre">xsd:gYearMonth</span></code> value, and
+can also compare without restrictions two <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> values according to
+the partial order on durations. All such extensions are documented where the
+respective functions and operators are introduced.</p>
+<p>A full list of the RDFox built-in functions and operators is given in the
+following sections. Functions will be presented with all their available names.
+If present, short names will precede the IRI names. If a function name is part
+of the SPARQL 1.1 specification or the XPath and XQuery specification, the name
+will be given as a link pointing to the respective part of the specification.
+We will assume the following prefix definitions.</p>
+<table class="colwidths-given docutils align-center" id="id6">
+<caption><span class="caption-text">XPath/XQuery Function Name Prefixes</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">xsd:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fn:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;http://www.w3.org/2005/xpath-functions#&gt;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">math:</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;http://www.w3.org/2005/xpath-functions/math#&gt;</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>All RDFox functions and operators can be used in SPARQL queries. Furthermore,
+all RDFox functions and operators can also be used in rules, with the exception
+of <code class="docutils literal notranslate"><span class="pre">NOW</span></code>, <code class="docutils literal notranslate"><span class="pre">RAND</span></code>, <code class="docutils literal notranslate"><span class="pre">UUID</span></code>, and <code class="docutils literal notranslate"><span class="pre">STRUUID</span></code>, whose values are not
+determined by their arguments.</p>
+<div class="section" id="operators">
+<h3><span class="section-number">9.2.1. </span>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h3>
+<p>The RDFox operators are listed in the following table and discussed in detail
+next.</p>
+<table class="docutils align-center" id="id7">
+<caption><span class="caption-text">RDFox Operators</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">!</span></code> &nbsp;&nbsp;&nbsp;&nbsp; unary logical-not</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary logical-and</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">||</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary logical-or</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary less-equal-than</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary greater-equal-than</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">=</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary equal</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary less-than</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary greater-than</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">!=</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary not-equal</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary add</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary multiply</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">+</span></code> &nbsp;&nbsp;&nbsp;&nbsp; unary plus</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary subtract</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/</span></code> &nbsp;&nbsp;&nbsp;&nbsp; binary divide</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-</span></code> &nbsp;&nbsp;&nbsp;&nbsp; unary minus</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">idiv</span></code> &nbsp;&nbsp;&nbsp;&nbsp; integer division</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mod</span></code> &nbsp;&nbsp;&nbsp;&nbsp; modulo operator</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>Boolean operators</strong> in RDFox are the <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-not">logical not</a> ( <code class="docutils literal notranslate"><span class="pre">!</span></code> ), <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-logical-and">logical and</a>
+( <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code> ), and <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-logical-or">logical or</a> (
+<code class="docutils literal notranslate"><span class="pre">||</span></code> ), which behave as defined in SPARQL 1.1.</p>
+<p>The <strong>comparison operators</strong> in RDFox are <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">=</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>. These operators have been significantly extended when compared to
+the respective operators in SPARQL 1.1 and in XPath/XQuery. When compared to
+SPARQL, the comparison operators in RDFox have additional overloads for all the
+date/time and duration datatypes. When compared to XPath/XQuery, which also
+defines such overloads, RDFox has the following differences.</p>
+<ul class="simple">
+<li><p>Operators <code class="docutils literal notranslate"><span class="pre">=</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code> are can be used to compare IRIs, blank nodes, and
+literals regardless of their type. For example, it is possible to compare an
+IRI with a blank node, or to compare two literals of different datatypes.</p></li>
+<li><p>In RDFox, <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> values are compared according to the partial order
+defined in the <a class="reference external" href="https://www.w3.org/TR/xmlschema-2/#duration-order">XML Schema specification</a>. In contrast, in
+XPath/XQuery, the operators <code class="docutils literal notranslate"><span class="pre">&lt;,</span> <span class="pre">&lt;=,</span> <span class="pre">=&gt;,</span> <span class="pre">&gt;</span></code> are only defined for the
+subtypes <code class="docutils literal notranslate"><span class="pre">xsd:dayTimeDuration</span></code> and <code class="docutils literal notranslate"><span class="pre">xsd:yearMonthDuration</span></code>.</p></li>
+<li><p>Similarly, in RDFox date and time values are compared according to the
+partial order on dates and times defined in the <a class="reference external" href="https://www.w3.org/TR/xmlschema-2/#dateTime-order">XML Schema</a>. In contrast,
+XPath/XQuery imposes various restrictions on the allowed comparisons.</p></li>
+</ul>
+<p>The <strong>mathematical operators</strong> in RDFox are the unary <code class="docutils literal notranslate"><span class="pre">+</span></code> and <code class="docutils literal notranslate"><span class="pre">-</span></code>
+operators, and the binary addition <code class="docutils literal notranslate"><span class="pre">+</span></code>, subtraction <code class="docutils literal notranslate"><span class="pre">-</span></code>, multiplication
+<code class="docutils literal notranslate"><span class="pre">*</span></code>, division <code class="docutils literal notranslate"><span class="pre">/</span></code>, integer division <code class="docutils literal notranslate"><span class="pre">idiv</span></code>, and modulo <code class="docutils literal notranslate"><span class="pre">mod</span></code> operators.</p>
+<p>SPARQL 1.1 defines only a subset of the above operators and their overloads in
+comparison to XPath/XQuery (e.g. <code class="docutils literal notranslate"><span class="pre">idiv</span></code> and <code class="docutils literal notranslate"><span class="pre">mod</span></code> are not in SPARQL 1.1).
+RDFox extends the XPath/XQuery behavior of these operators as outlined next.</p>
+<ul class="simple">
+<li><p>The unary <code class="docutils literal notranslate"><span class="pre">+</span></code> and <code class="docutils literal notranslate"><span class="pre">-</span></code> operators have been extended to the datatype
+<code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code>.</p></li>
+<li><p>The binary subtraction operator <code class="docutils literal notranslate"><span class="pre">-</span></code> has been extended to all compatible
+date and time datatypes. The result of such operation is an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code>.</p></li>
+<li><p>The binary addition and subtraction operators have been extended so that
+durations can be added to and subtracted from values of any of the date and
+time datatypes.</p></li>
+</ul>
+</div>
+<div class="section" id="functions-on-terms">
+<h3><span class="section-number">9.2.2. </span>Functions on Terms<a class="headerlink" href="#functions-on-terms" title="Permalink to this headline">¶</a></h3>
+<p>The following table lists the RDF functions on terms. Most of the functions
+behave as specified in SPARQL 1.1. One difference is the addition of the two
+Boolean functions <code class="docutils literal notranslate"><span class="pre">isInteger</span></code> and <code class="docutils literal notranslate"><span class="pre">isDecimal</span></code>. The function <code class="docutils literal notranslate"><span class="pre">isInteger</span></code>
+returns true if the argument has one of the integer datatypes, while the
+<code class="docutils literal notranslate"><span class="pre">isDecimal</span></code> function returns true if its argument is of type <code class="docutils literal notranslate"><span class="pre">xsd:decimal</span></code>.
+Another change concerns the functions <code class="docutils literal notranslate"><span class="pre">IRI</span></code> and <code class="docutils literal notranslate"><span class="pre">URI</span></code>, which take an
+optional second argument that specify the base against which the first argument
+is resolved. If not provided, the default base is used. Furthermore, the
+<code class="docutils literal notranslate"><span class="pre">BOUND</span></code> function has been extended to operate on arbitrary expressions. The
+function returns <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;^^xsd:boolean</span></code>, when the input expression can be
+successfully evaluated. In particular, when the expression is a variable, its
+evaluation succeeds when the variable is bound. Finally, function <code class="docutils literal notranslate"><span class="pre">STREX</span></code>
+extends the SPARQL function <code class="docutils literal notranslate"><span class="pre">STR</span></code> with the ability to compute a string
+representation of arbitrary RDF terms.</p>
+<table class="docutils align-center" id="id8">
+<caption><span class="caption-text">Functions on terms</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bound">BOUND</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isIRI">isIRI</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isIRI">isURI</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isBlank">isBlank</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isLiteral">isLiteral</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isNumeric">isNumeric</a></p></td>
+<td><p>isInteger</p></td>
+<td><p>isDecimal</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sameTerm">sameTerm</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-iri">IRI</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-str">STR</a></p></td>
+<td><p>STREX</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-iri">URI</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bnode">BNODE</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strdt">STRDT</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strlang">STRLANG</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-uuid">UUID</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-struuid">STRUUID</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lang">LANG</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-datatype">DATATYPE</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="constructor-functions">
+<h3><span class="section-number">9.2.3. </span>Constructor Functions<a class="headerlink" href="#constructor-functions" title="Permalink to this headline">¶</a></h3>
+<p>RDFox has a number of constructor functions that allow users to create a value
+of a particular type. The following table lists the constructor functions
+defined in <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#FunctionMapping">SPARQL 1.1</a>.</p>
+<table class="docutils align-center" id="id9">
+<caption><span class="caption-text">RDFox Constructor Functions</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>xsd:anyURI</p></td>
+<td><p>xsd:boolean</p></td>
+<td><p>xsd:date</p></td>
+<td><p>xsd:dateTime</p></td>
+</tr>
+<tr class="row-even"><td><p>xsd:dateTimeStamp</p></td>
+<td><p>xsd:dayTimeDuration</p></td>
+<td><p>xsd:decimal</p></td>
+<td><p>xsd:double</p></td>
+</tr>
+<tr class="row-odd"><td><p>xsd:duration</p></td>
+<td><p>xsd:float</p></td>
+<td><p>xsd:gDay</p></td>
+<td><p>xsd:gMonth</p></td>
+</tr>
+<tr class="row-even"><td><p>xsd:gMonthDay</p></td>
+<td><p>xsd:gYear</p></td>
+<td><p>xsd:gYearMonth</p></td>
+<td><p>xsd:integer</p></td>
+</tr>
+<tr class="row-odd"><td><p>xsd:string</p></td>
+<td><p>xsd:time</p></td>
+<td><p>xsd:yearMonthDuration</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>RDFox additionally provides the following constructor functions for the
+date/time datatypes. The offset parameter in all functions is optional except
+in the case of <code class="docutils literal notranslate"><span class="pre">DATE_TIME_STAMP</span></code>.</p>
+<table class="colwidths-given docutils align-center" id="id10">
+<caption><span class="caption-text">RDFox Constructor Functions for Date/Time datatypes.</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 60%" />
+<col style="width: 40%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>DURATION ( year, month, day, hours, minutes, seconds )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>YEAR_MONTH_DURATION ( year, month )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DAY_TIME_DURATION ( day, hours, minutes, seconds )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>DATE_TIME ( year, month, day, hour, minute, second, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:dateTime</span></code> value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DATE_TIME_STAMP ( year, month, day, hour, minute, second, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:dateTimeStamp</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>TIME ( hour, minute, second, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:time</span></code> value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DATE ( year, month, day, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:date</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>G_DAY ( day, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:gDay</span></code> value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>G_MONTH ( month, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:gMonth</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>G_MONTH_DAY ( month, day, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:gMonthDay</span></code> value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>G_YEAR_MONTH ( year, month, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:gYearMonth</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>G_YEAR ( year, offset )</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:gYear</span></code> value.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="iri-and-string-functions">
+<h3><span class="section-number">9.2.4. </span>IRI and String Functions<a class="headerlink" href="#iri-and-string-functions" title="Permalink to this headline">¶</a></h3>
+<p>The IRI and string functions in SPARQL 1.1 and XPath/XQuery almost fully
+overlap, and RDFox provides full support for them, with the exception of
+<cite>fn:contains</cite>, which only supports the variant with two arguments.</p>
+<table class="docutils align-center" id="id11">
+<caption><span class="caption-text">IRI and String Functions</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-encode">ENCODE_FOR_URI</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-encode-for-uri">fn:encode-for-uri</a> )</p></td>
+<td><p>ESCAPE_HTML_URI &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-escape-html-uri">fn:escape-html-uri</a> )</p></td>
+<td><p>IRI_TO_URI &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-iri-to-uri">fn:iri-to-uri</a> )</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-contains">CONTAINS</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-contains">fn:contains</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strends">STRENDS</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-ends-with">fn:ends-with</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lcase">LCASE</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-lower-case">fn:lower-case</a> )</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strstarts">STRSTARTS</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-starts-with">fn:starts-with</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strlen">STRLEN</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-string-length">fn:string-length</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-substr">SUBSTR</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-substring">fn:substring</a> )</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strafter">STRAFTER</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-substring-after">fn:substring-after</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strbefore">STRBEFORE</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-substring-before">fn:substring-before</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-ucase">UCASE</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-upper-case">fn:upper-case</a> )</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-concat">CONCAT</a>  &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-concat">fn:concat</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-langMatches">langMatches</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-regex">REGEX</a>  &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-matches">fn:matches</a> )</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-replace">REPLACE</a>  &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-replace">fn:replace</a> )</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="hash-functions">
+<h3><span class="section-number">9.2.5. </span>Hash Functions<a class="headerlink" href="#hash-functions" title="Permalink to this headline">¶</a></h3>
+<p>The RDFox hash functions are the ones specified in SPARQL 1.1 and are given in
+the following table.</p>
+<table class="docutils align-center" id="id12">
+<caption><span class="caption-text">RDFox Hash Functions</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-md5">MD5</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha1">SHA1</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha256">SHA256</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha384">SHA384</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha512">SHA512</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mathematical-functions">
+<h3><span class="section-number">9.2.6. </span>Mathematical Functions<a class="headerlink" href="#mathematical-functions" title="Permalink to this headline">¶</a></h3>
+<p>RDFox supports all mathematical functions from SPARQL 1.1 and most of the
+mathematical functions in XPath/XQuery. RDFox also provides additional
+functions that are useful in practice. The only nonstandard functions are
+<code class="docutils literal notranslate"><span class="pre">MAXFN</span></code> and <code class="docutils literal notranslate"><span class="pre">MINFN</span></code>, which take any number of arguments and return the
+maximum and the minimum value, respectively.</p>
+<table class="docutils align-center" id="id13">
+<caption><span class="caption-text">Basic Functions</span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-if">IF</a></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-coalesce">COALESCE</a></p></td>
+</tr>
+<tr class="row-even"><td><p>MINFN</p></td>
+<td><p>MAXFN</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-abs">ABS</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-abs">fn:abs</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-round">ROUND</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-round">fn:round</a> )</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-ceil">CEIL</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-ceiling">fn:ceiling</a> )</p></td>
+<td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-floor">FLOOR</a> &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-floor">fn:floor</a> )</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#idp2130040">RAND</a></p></td>
+<td><p>PI &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-pi">math:pi</a> )</p></td>
+</tr>
+</tbody>
+</table>
+<table class="colwidths-given docutils align-center" id="id14">
+<caption><span class="caption-text">Exponential and Power Functions</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 36%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>POW &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-pow">math:pow</a> )</p></td>
+<td><p>SQRT &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-sqrt">math:sqrt</a> )</p></td>
+<td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Cube_root">CBRT</a></p></td>
+<td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Hypot">HYPOT</a></p></td>
+</tr>
+<tr class="row-even"><td><p>LOG &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-log">math:log</a> )</p></td>
+<td><p>LOG10 &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-log10">math:log10</a> )</p></td>
+<td><p>LOG2 &nbsp;&nbsp;&nbsp;&nbsp;</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EXP &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-exp">math:exp</a> )</p></td>
+<td><p>EXP10 &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-exp10">math:exp10</a> )</p></td>
+<td><p>EXP2</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-center" id="id15">
+<caption><span class="caption-text">Trigonometric Functions</span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>SIN &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-sin">math:sin</a> )</p></td>
+<td><p>COS &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-cos">math:cos</a> )</p></td>
+</tr>
+<tr class="row-even"><td><p>ASIN &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-asin">math:asin</a> )</p></td>
+<td><p>ACOS &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-acos">math:acos</a> )</p></td>
+</tr>
+<tr class="row-odd"><td><p>TAN &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-tan">math:tan</a> )</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ATAN &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-atan">math:atan</a> )</p></td>
+<td><p>ATAN2 &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-math-atan2">math:atan2</a> )</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-center" id="id16">
+<caption><span class="caption-text">Hyperbolic Functions</span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>SINH</p></td>
+<td><p>COSH</p></td>
+<td><p>TANH</p></td>
+<td><p>ASINH</p></td>
+<td><p>ACOSH</p></td>
+<td><p>ATANH</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-center" id="id17">
+<caption><span class="caption-text">Error and Gamma Functions</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Error_function">ERF</a></p></td>
+<td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Error_function#Complementary_error_function">ERFC</a></p></td>
+<td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Gamma_function">GAMMA</a></p></td>
+<td><p><a class="reference external" href="https://en.wikipedia.org/wiki/Gamma_function#The_log-gamma_function">LGAMMA</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="date-and-time-functions">
+<h3><span class="section-number">9.2.7. </span>Date and Time Functions<a class="headerlink" href="#date-and-time-functions" title="Permalink to this headline">¶</a></h3>
+<p>This section describes the RDFox functions on dates, times and durations. RDFox
+supports all SPARQL 1.1 date time functions and most XPath/XQuery date time
+functions. In RDFox, many of these functions have been extended to apply to all
+date/time values.</p>
+<table class="colwidths-given docutils align-center" id="id18">
+<caption><span class="caption-text">RDFox Date Time Functions</span><a class="headerlink" href="#id18" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 83%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-now">NOW</a></p></td>
+<td><p>Returns an xsd:dateTime value representing the current moment in time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-year">YEAR</a></p></td>
+<td><p>Returns the year component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-year-from-dateTime">fn:year-from-dateTime</a> and
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-year-from-date">fn:year-from-date</a>
+to all date/time datatypes with a valid year component.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-month">MONTH</a></p></td>
+<td><p>Returns the month component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-month-from-dateTime">fn:month-from-dateTime</a> and
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-month-from-date">fn:month-from-date</a>
+to data/time datatypes with a valid month component.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-day">DAY</a></p></td>
+<td><p>Returns the day component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-day-from-dateTime">fn:day-from-dateTime</a> and
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-day-from-date">fn:day-from-date</a>
+to date/time datatypes with a valid day component.</p></td>
+</tr>
+<tr class="row-odd"><td><p>YEARS</p></td>
+<td><p>Returns the number of years in a duration:
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-years-from-duration">fn:years-from-duration</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>MONTHS</p></td>
+<td><p>Returns the number of months in a duration:
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-months-from-duration">fn:months-from-duration</a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DAYS</p></td>
+<td><p>Returns the number of days in a duration:
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-day-from-duration">fn:days-from-duration</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-hours">HOURS</a></p></td>
+<td><p>Returns the hours component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-hours-from-dateTime">fn:hours-from-dateTime</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-hours-from-time">fn:hours-from-time</a>, and
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-hours-from-duration">fn:hours-from-duration</a>
+to date/time datatypes with a valid hours component.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-minutes">MINUTES</a></p></td>
+<td><p>Returns the minutes component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-minutes-from-dateTime">fn:minutes-from-dateTime</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-minutes-from-time">fn:minutes-from-time</a>, and
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-minutes-from-duration">fn:minutes-from-duration</a>
+to date/time datatypes with a valid minutes component.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-seconds">SECONDS</a></p></td>
+<td><p>Returns the seconds component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-seconds-from-dateTime">fn:seconds-from-dateTime</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-seconds-from-time">fn:seconds-from-time</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-seconds-from-duration">fn:seconds-from-duration</a>
+to date/time datatypes with a valid seconds component.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-timezone">TIMEZONE</a></p></td>
+<td><p>Returns the timezone component of a date/time value. Extends
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-timezone-from-dateTime">fn:timezone-from-dateTime</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-timezone-from-date">fn:timezone-from-date</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-timezone-from-time">fn:timezone-from-time</a>
+to date/time datatypes with a valid timezone component.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-tz">TZ</a></p></td>
+<td><p>Returns the timezone component of a date/time value as a simple literal. Extended to date/time values with a valid timezone component.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DURATION_MONTHS</p></td>
+<td><p>Returns the number of months in the internal representation <code class="docutils literal notranslate"><span class="pre">($months,</span> <span class="pre">$seconds)</span></code> of an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
+</tr>
+<tr class="row-even"><td><p>DURATION_SECONDS</p></td>
+<td><p>Returns the number of seconds in the internal representation <code class="docutils literal notranslate"><span class="pre">($months,</span> <span class="pre">$seconds)</span></code> of an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value,</p></td>
+</tr>
+<tr class="row-odd"><td><p>TIME_ON_TIMELINE</p></td>
+<td><p>Returns the decimal number representing a date time value on the timeline. Note that this is the number of seconds elapsed since 0001-01-01T00:00:00 in accordance with the <a class="reference external" href="https://www.w3.org/TR/xmlschema11-2/#vp-dt-timeOnTimeline">W3C XML Schema Definition</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p>TO_TIMEZONE</p></td>
+<td><p>Adjusts the time zone of a date/time value. An extension of
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-adjust-dateTime-to-timezone">fn:adjust-dateTime-to-timezone</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-adjust-date-to-timezone">fn:adjust-date-to-timezone</a>,
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-adjust-time-to-timezone">fn:adjust-time-to-timezone</a>,
+to all date/time datatypes. The function takes two arguments: a
+mandatory date/time value and an optional timezone value. If the
+timezone value is provided, the function returns a date/time value in
+the specified timezone that is equivalent to the first argument. If the
+timezone is not provided, the function returns the local value of its
+first argument with no timezone.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DAY_OF_THE_WEEK</p></td>
+<td><p>Returns an integer representing the day of the week for an <code class="docutils literal notranslate"><span class="pre">xsd:date</span></code>, <code class="docutils literal notranslate"><span class="pre">xsd:dateTime</span></code>, or <code class="docutils literal notranslate"><span class="pre">xsd:dateTimeStamp</span></code> value in the local time of the date. The function returns a weekday number compliant with the ISO 8601 standard: 1 represents Monday, 2 represents Tuesday, and so on, up to 7 which represents Sunday.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-agent-function">
+<h3><span class="section-number">9.2.8. </span>The <code class="docutils literal notranslate"><span class="pre">AGENT()</span></code> Function<a class="headerlink" href="#the-agent-function" title="Permalink to this headline">¶</a></h3>
+<p>RDFox supports a proprietary built-in function for use in audit logging:
+<code class="docutils literal notranslate"><span class="pre">AGENT</span></code>. This function returns an <code class="docutils literal notranslate"><span class="pre">xsd::string</span></code> containing the name of the
+<a class="reference internal" href="access-control.html#agents"><span class="std std-ref">agent</span></a> that owns the connection on which SPARQL evaluation is
+taking place.</p>
+</div>
+</div>
+<div class="section" id="aggregate-functions">
+<span id="id4"></span><h2><span class="section-number">9.3. </span>Aggregate Functions<a class="headerlink" href="#aggregate-functions" title="Permalink to this headline">¶</a></h2>
+<p>Aggregate functions differ from normal functions in that they perform
+computations on sets of values rather than on individual values. In SPARQL,
+aggregate functions are applied either to the set of results of a given query
+or to a subset of results obtained using the <code class="docutils literal notranslate"><span class="pre">GROUP_BY</span></code> construct. RDFox
+supports the following list of aggregate functions, which includes all
+aggregate functions in SPARQL 1.1.</p>
+<table class="colwidths-given docutils align-center" id="id19">
+<caption><span class="caption-text">RDFox Aggregate Functions</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggCount">COUNT(V)</a></p></td>
+<td><p>Returns the number of results in which V is defined (i.e. not <code class="docutils literal notranslate"><span class="pre">UNDEF</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggSum">SUM(V)</a></p></td>
+<td><p>Returns the sum of all values V in the set of results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggAvg">AVG(V)</a></p></td>
+<td><p>Returns the average of all values V in the set of results.</p></td>
+</tr>
+<tr class="row-even"><td><p>MUL(V)</p></td>
+<td><p>Returns the product of all values V in the set of results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggMin">MIN(V)</a></p></td>
+<td><p>Returns the smallest value V in the set of results.</p></td>
+</tr>
+<tr class="row-even"><td><p>COUNT_MIN(V)</p></td>
+<td><p>Returns the number of results that have the smallest value of V.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SAMPLE_ARGMIN(A, V)</p></td>
+<td><p>Returns the value of A in the first result that has the smallest value of V.</p></td>
+</tr>
+<tr class="row-even"><td><p>MIN_ARGMIN(A, V)</p></td>
+<td><p>Returns the smallest value of A in the results that have the smallest value of V.</p></td>
+</tr>
+<tr class="row-odd"><td><p>MAX_ARGMIN(A, V)</p></td>
+<td><p>Returns the largest value of A in the results that have the smallest value of V.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggMax">MAX(V)</a></p></td>
+<td><p>Returns the largest value in the set of results.</p></td>
+</tr>
+<tr class="row-odd"><td><p>COUNT_MAX(V)</p></td>
+<td><p>Returns the number of results that have the largest value of V.</p></td>
+</tr>
+<tr class="row-even"><td><p>SAMPLE_ARGMAX(A, V)</p></td>
+<td><p>Returns the value of A in the first result that has the largest value of V.</p></td>
+</tr>
+<tr class="row-odd"><td><p>MIN_ARGMAX(A, V)</p></td>
+<td><p>Returns the smallest value of A in the results that have the largest value of V.</p></td>
+</tr>
+<tr class="row-even"><td><p>MAX_ARGMAX(A, V)</p></td>
+<td><p>Returns the largest value of A in the results that have the largest value of V.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggGroupConcat">GROUP_CONCAT(V; SEPARATOR=…)</a></p></td>
+<td><p>Returns the concatenation (in some order) of the values V in the set of results using the given separator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/sparql11-query/#defn_aggSample">SAMPLE(V)</a></p></td>
+<td><p>Returns the first defined value of V in the set of results, if one exists, or <code class="docutils literal notranslate"><span class="pre">UNDEF</span></code>, otherwise.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="querying-tuple-tables">
+<span id="id5"></span><h2><span class="section-number">9.4. </span>Querying Tuple Tables<a class="headerlink" href="#querying-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<p>RDFox organizes information in a data store using tuple tables, as described in
+more detail in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>. There are two ways of referring to tuple
+tables in queries: one uses the proprietary operator <code class="docutils literal notranslate"><span class="pre">TT</span></code> and the other uses
+the reserved IRI <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code>.</p>
+<p><strong>Querying Tuple Tables Using</strong> <code class="docutils literal notranslate"><span class="pre">TT</span></code> <strong>Expressions</strong></p>
+<p>RDFox provides a proprietary <code class="docutils literal notranslate"><span class="pre">TT</span></code> operator to access data stored in tuple
+tables, as shown in the following example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Assume that a binary tuple table <code class="docutils literal notranslate"><span class="pre">EmployeeName</span></code> is
+mounted from an external data source (e.g., a database), and that it
+contains pairs that relate employee IDs to their names. The following query
+retrieves all pairs whose ID is contained in the <code class="docutils literal notranslate"><span class="pre">:Manager</span></code> class.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?id ?name
+WHERE {
+    ?id rdf:type :Manager .
+    TT EmployeeName { ?id ?name }
+}
+</pre></div>
+</div>
+</div>
+<p>In the above example, <code class="docutils literal notranslate"><span class="pre">TT</span> <span class="pre">EmployeeName</span> <span class="pre">{</span> <span class="pre">?id</span> <span class="pre">?name</span> <span class="pre">}</span></code> retrieves all pairs of
+IDs and names stored in the <code class="docutils literal notranslate"><span class="pre">EmployeeName</span></code> tuple table. Since the tuple
+table is binary, only two terms (i.e., <code class="docutils literal notranslate"><span class="pre">?id</span></code> and <code class="docutils literal notranslate"><span class="pre">?name</span></code> ) are allowed to
+occur inside the <code class="docutils literal notranslate"><span class="pre">TT</span></code> expression. This is analogous to named graphs, where
+<code class="docutils literal notranslate"><span class="pre">GRAPH</span> <span class="pre">:G</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">?Z</span> <span class="pre">}</span></code> accesses all triples in a named graph <code class="docutils literal notranslate"><span class="pre">:G</span></code>. The
+difference to <code class="docutils literal notranslate"><span class="pre">GRAPH</span></code> expressions can be summarized as follows.</p>
+<ul class="simple">
+<li><p>The number of terms inside <code class="docutils literal notranslate"><span class="pre">TT</span></code> must match with the arity (i.e., the number
+of positions) of the tuple table.</p></li>
+<li><p>Each <code class="docutils literal notranslate"><span class="pre">TT</span></code> expression represents exactly one reference to a tuple table. For
+example, to retrieve pairs of employee IDs with the same name, one can use
+<code class="docutils literal notranslate"><span class="pre">TT</span> <span class="pre">EmployeeName</span> <span class="pre">{</span> <span class="pre">?id1</span> <span class="pre">?name</span> <span class="pre">}</span> <span class="pre">.</span> <span class="pre">TT</span> <span class="pre">EmployeeName</span> <span class="pre">{</span> <span class="pre">?id2</span> <span class="pre">?name</span> <span class="pre">}</span></code>
+(whereas <code class="docutils literal notranslate"><span class="pre">TT</span> <span class="pre">EmployeeName</span> <span class="pre">{</span> <span class="pre">?id1</span> <span class="pre">?name</span> <span class="pre">.?id2</span> <span class="pre">?name</span> <span class="pre">}</span></code> is syntactically
+invalid).</p></li>
+<li><p>Variables cannot be used in place of tuple table names. For example, <code class="docutils literal notranslate"><span class="pre">TT</span> <span class="pre">?T</span>
+<span class="pre">{</span> <span class="pre">?id</span> <span class="pre">?name</span> <span class="pre">}</span></code> is syntactically invalid.</p></li>
+</ul>
+<p><strong>Querying Tuple Tables Using</strong> <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code></p>
+<p>The use of the proprietary operator <code class="docutils literal notranslate"><span class="pre">TT</span></code> is a syntactic extension of the
+SPARQL language and may result in queries being rejected by third-party
+libraries. To address this, RDFox provides an additional method for accessing
+tuple tables, which stays within the syntactic rules of the SPARQL language.
+This method specifies tuple table atoms using the reserved IRI <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code> and
+<a class="reference external" href="https://www.w3.org/TR/sparql11-query/#collections">RDF Collections</a>, as
+shown in the following example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Consider again the tuple table <code class="docutils literal notranslate"><span class="pre">EmployeeName</span></code>. We can
+retrieve all pairs whose ID is contained in the <code class="docutils literal notranslate"><span class="pre">:Manager</span></code> class using
+the following query.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?id ?name
+WHERE {
+    ?id rdf:type :Manager .
+     (?id ?name) rdfox:TT &quot;EmployeeName&quot;
+}
+</pre></div>
+</div>
+<p>The reserved IRI <code class="docutils literal notranslate"><span class="pre">rdfox::TT</span></code> links the tuple table name <code class="docutils literal notranslate"><span class="pre">EmployeeName</span></code>
+with the tuple table arguments encoded as an <a class="reference external" href="https://www.w3.org/TR/sparql11-query/#collections">RDF Collection</a> (i.e. <code class="docutils literal notranslate"><span class="pre">(?id</span>
+<span class="pre">?name)</span></code>).  The query can also be given in its equivalent expanded form.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?id ?name
+WHERE {
+    ?id rdf:type :Manager .
+    _:b0 rdfox:TT &quot;EmployeeName&quot; .
+    _:b0 rdf:first ?id ;
+         rdf:rest _:b1.
+    _:b1 rdf:first ?name ;
+         rdf:rest rdf:nil.
+}
+</pre></div>
+</div>
+</div>
+<p>In its expanded form, a tuple table atom is encoded using multiple triple
+patterns and, as a result, its position in the query body may be ambiguous. To
+avoid ambiguity, RDFox determines the position of the tuple table atom using
+the position of the triple pattern with subject <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code>. In the above
+example the position of the tuple table atom is determined by the position of
+the triple pattern triple <code class="docutils literal notranslate"><span class="pre">_:b0</span> <span class="pre">rdfox:TT</span> <span class="pre">&quot;EmployeeName&quot;</span> <span class="pre">.</span></code></p>
+<p>The following restrictions apply to the use of <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code>.</p>
+<ul class="simple">
+<li><p>The object of the triple pattern with subject <code class="docutils literal notranslate"><span class="pre">rdfox:TT</span></code> should be a
+well-formed RDF collection.</p></li>
+<li><p>The RDF collection that encodes the tuple table arguments should be of size
+equal to the arity of the tuple table.</p></li>
+<li><p>Variables cannot be used in place of tuple table names. For example, the use
+of <code class="docutils literal notranslate"><span class="pre">(?id</span> <span class="pre">?name)</span> <span class="pre">rdfox:TT</span> <span class="pre">?T</span></code> is invalid.</p></li>
+</ul>
+</div>
+<div class="section" id="distinguishing-explicit-and-derived-facts-in-queries">
+<h2><span class="section-number">9.5. </span>Distinguishing Explicit and Derived Facts in Queries<a class="headerlink" href="#distinguishing-explicit-and-derived-facts-in-queries" title="Permalink to this headline">¶</a></h2>
+<p>As described in <a class="reference internal" href="reasoning.html#reasoning"><span class="std std-numref">Section 10</span></a>, RDFox supports reasoning, by which it can
+use Datalog rules to derive additional facts from the facts explicitly given in
+the input. Sometimes, it can be useful to distinguish in the query whether a
+fact has been explicitly given in the input, or whether it has been derived by
+a rule. To facilitate this, RDFox provides a proprietary extension of the
+SPARQL 1.1 syntax. The following example demonstrates this.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> Assume that the following triples are loaded into the data store.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:brian rdf:type :LivingThing .
+:peter rdf:type :Person .
+</pre></div>
+</div>
+<p>If the data store contains rule <code class="docutils literal notranslate"><span class="pre">:LivingThing[?X]</span> <span class="pre">:-</span> <span class="pre">:Person[?X]</span> <span class="pre">.</span></code>, then
+the following triple is going to be derived.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:peter rdf:type :LivingThing .
+</pre></div>
+</div>
+<p>The following query retrieves all facts of the form <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">rdf:type</span>
+<span class="pre">:LivingThing</span></code>, together with a Boolean flag which is set to <code class="docutils literal notranslate"><span class="pre">true</span></code> if
+the fact is explicitly given in the input.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?id ?e
+WHERE {
+    ?id rdf:type :LivingThing EXPLICIT ?e
+}
+</pre></div>
+</div>
+<p>Our our example data, this query returns one answer where <code class="docutils literal notranslate"><span class="pre">?id</span></code> is mapped
+to <code class="docutils literal notranslate"><span class="pre">:brian</span></code> and <code class="docutils literal notranslate"><span class="pre">?e</span></code> is mapped to <code class="docutils literal notranslate"><span class="pre">true</span></code>, and another answer where
+<code class="docutils literal notranslate"><span class="pre">?id</span></code> is mapped to <code class="docutils literal notranslate"><span class="pre">:peter</span></code> and <code class="docutils literal notranslate"><span class="pre">?e</span></code> is mapped to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">TT</span></code> pattern provides an analogous extension. Moreover, variables bound
+by <code class="docutils literal notranslate"><span class="pre">EXPLICIT</span></code> can be used in the rest of the query like any other variable;
+for example, they can be used in other triple patterns to facilitate joins.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> The query for employees from <a class="reference internal" href="#querying-tuple-tables"><span class="std std-numref">Section 9.4</span></a>
+can be modified as follows to compute the join between managers and their
+names, while requiring both facts to be either explicit or derived.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?id ?name
+WHERE {
+    ?id rdf:type :Manager EXPLICIT ?e .
+    TT EmployeeName { ?id ?name EXPLICIT ?e }
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="monitoring-query-evaluation">
+<span id="query-monitoring"></span><h2><span class="section-number">9.6. </span>Monitoring Query Evaluation<a class="headerlink" href="#monitoring-query-evaluation" title="Permalink to this headline">¶</a></h2>
+<p>RDFox provides different ways of analyzing query evaluation. In particular,
+users can gain access to query plans generated by the RDFox query optimizer as
+well as to useful statistics about the execution of such plans.</p>
+<p>Suppose that we initialize a data store with the example <a class="reference internal" href="getting-started.html#data-ttl"><span class="std std-ref">data</span></a>
+from our <a class="reference internal" href="getting-started.html#getting-started"><span class="std std-ref">Getting Started</span></a> guide. Furthermore, consider
+the SPARQL query</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :forename ?n. ?p :hasParent ?z }
+</pre></div>
+</div>
+<p>which returns the following four answers:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:meg &quot;Meg&quot; .
+:stewie &quot;Stewie&quot; .
+:chris &quot;Chris&quot; .
+:meg &quot;Meg&quot; .
+</pre></div>
+</div>
+<p>Next we discuss two ways of analyzing how RDFox evaluates the above query using
+query plans and query profiling, respectively.</p>
+<div class="section" id="query-plans">
+<h3><span class="section-number">9.6.1. </span>Query Plans<a class="headerlink" href="#query-plans" title="Permalink to this headline">¶</a></h3>
+<p>Query plans provide insights into the order in which RDFox evaluates the
+different parts of the query. They are determined by the query optimizer in
+RDFox based on the shape of the query and the statistical properties of the
+data present in the store at the time of planning. To see the query plan that
+RDFox uses to evaluate a given query, one needs to set the shell variable
+<code class="docutils literal notranslate"><span class="pre">query.explain</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code>, as shown next.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>set query.explain true
+</pre></div>
+</div>
+<p>The next time we evaluate the above query, the shell will also display the
+following query plan.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>QUERY ?p ?n                                                            QueryIterator
+    PROJECT ?n ?p                      {          --&gt;    ?n ?p }
+        CONJUNCTION                    {          --&gt;    ?n ?p ?z }    NestedIndexLoopJoinIterator
+            [?p, :hasParent, ?z]       {          --&gt;    ?p ?z }       TripleTableIterator
+            [?p, rdf:type, :Person]    { ?p ?z    --&gt;    ?p ?z }       TripleTableIterator
+            [?p, :forename, ?n]        { ?p ?z    --&gt;    ?n ?p ?z }    TripleTableIterator
+</pre></div>
+</div>
+<p>The query plan is executed top-down in a depth-first-search manner and we can
+think of solution variable bindings as being generated one-at-a-time. It is
+useful to go in more detail through the execution of the plan for a given
+solution binding.</p>
+<p>When we first “visit” the <code class="docutils literal notranslate"><span class="pre">PROJECT</span></code> block, we haven’t obtained any variable
+bindings yet (hence the empty space left of the “–&gt;”symbol); in
+contrast, by the time we have finished executing the subplan underneath, we
+will have obtained a binding of variables <code class="docutils literal notranslate"><span class="pre">?n</span></code> and <code class="docutils literal notranslate"><span class="pre">?p</span></code> and hence an answer
+to the query (as reflected on the right-hand side of the “–&gt;” symbol).
+Similarly, when we first visit the <code class="docutils literal notranslate"><span class="pre">CONJUNCTION</span></code> block, which performs the
+join of the query, we have an empty binding and, by the time we return from it,
+we will have a binding for <code class="docutils literal notranslate"><span class="pre">?n</span></code>, <code class="docutils literal notranslate"><span class="pre">?p</span></code> and <code class="docutils literal notranslate"><span class="pre">?z</span></code>. The join is performed
+also top-down. First, we obtain a binding for <code class="docutils literal notranslate"><span class="pre">?p</span></code> and <code class="docutils literal notranslate"><span class="pre">?z</span></code> by matching the
+triple pattern <code class="docutils literal notranslate"><span class="pre">[?p,</span> <span class="pre">:hasParent,</span> <span class="pre">?z]</span></code>. We then consider the second triple
+pattern <code class="docutils literal notranslate"><span class="pre">[?p,</span> <span class="pre">rdf:type,</span> <span class="pre">:Person]</span></code> and finally the third triple pattern <code class="docutils literal notranslate"><span class="pre">[?p,</span>
+<span class="pre">:forename,</span> <span class="pre">?n]</span></code>, which extends the binding by providing also a value for
+variable <code class="docutils literal notranslate"><span class="pre">?n</span></code>.</p>
+<p>Let us consider a slightly more complex query, which uses the <code class="docutils literal notranslate"><span class="pre">OPTIONAL</span></code>
+operator in SPARQL.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :hasParent ?z . OPTIONAL { ?p :forename ?n } }
+</pre></div>
+</div>
+<p>RDFox will execute the following query plan:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>QUERY ?p ?n                                                                  QueryIterator
+    PROJECT ?n ?p                          {          --&gt;    ?p | ?n }
+        OPTIONAL                           {          --&gt;    ?p ?z | ?n }    OptionalIterator
+            CONJUNCTION                    {          --&gt;    ?p ?z }         NestedIndexLoopJoinIterator
+                [?p, :hasParent, ?z]       {          --&gt;    ?p ?z }         TripleTableIterator
+                [?p, rdf:type, :Person]    { ?p ?z    --&gt;    ?p ?z }         TripleTableIterator
+            FILTER true
+                [?p, :forename, ?n]        { ?p ?z    --&gt;    ?n ?p ?z }      TripleTableIterator
+</pre></div>
+</div>
+<p>The important difference to notice in this plan is the use of the ” | ”
+symbol. The variables on the left-hand-side of “|” are always bound by the
+corresponding block, whereas those indicated on the right-hand-side may or may
+not be returned.</p>
+</div>
+<div class="section" id="query-profiling">
+<h3><span class="section-number">9.6.2. </span>Query Profiling<a class="headerlink" href="#query-profiling" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the ordering of the plan nodes of a given query specified in a
+query plan, users can also obtain runtime information about the number of
+operations performed on each of them. This information could be useful when
+debugging potential performance issues with query evaluation.</p>
+<p>To obtain such runtime information, one needs to enable a query profiler using
+the following command.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>set query.monitor profile
+</pre></div>
+</div>
+<p>When evaluating our original query</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :forename ?n. ?p :hasParent ?z }
+</pre></div>
+</div>
+<p>with query profiler enabled, RDFox will print the following output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>== QUERY EVALUATION STATISTICS ==
+
+Statistics after 0 (s)
++-----------------------------------------------------------------------------------------------------------------------------------------
+| Sample Count   Iterator Open   Iterator Advance    Plan Node
++-----------------------------------------------------------------------------------------------------------------------------------------
+|            0               0                  0    QUERY ?p ?n                                                            QueryIterator
+|            0               0                  0        PROJECT ?n ?p                      {          --&gt;    ?n ?p }
+|            0               1                  4            CONJUNCTION                    {          --&gt;    ?n ?p ?z }    NestedIndexLoopJoinIterator
+|            0               1                  4                [?p, :hasParent, ?z]       {          --&gt;    ?p ?z }       TripleTableIterator
+|            0               4                  4                [?p, rdf:type, :Person]    { ?p ?z    --&gt;    ?p ?z }       TripleTableIterator
+|            0               4                  4                [?p, :forename, ?n]        { ?p ?z    --&gt;    ?n ?p ?z }    TripleTableIterator
++-----------------------------------------------------------------------------------------------------------------------------------------
+
+=================================
+</pre></div>
+</div>
+<p>The output is an enriched version of the query plan with
+sampling information of query evaluation and information about the
+number of times the iterator of each plan node was accessed, i.e. was
+<code class="docutils literal notranslate"><span class="pre">opened</span></code> and <code class="docutils literal notranslate"><span class="pre">advanced</span></code>. For example, the iterator for <code class="docutils literal notranslate"><span class="pre">[?p,</span> <span class="pre">:hasParent,</span>
+<span class="pre">?z]</span></code> was <code class="docutils literal notranslate"><span class="pre">opened</span></code> once (successfully), and advanced four times (three times
+successfully and once unsuccessfully), signified as <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">4</span></code>. For each of the
+four successful operations on the iterator of <code class="docutils literal notranslate"><span class="pre">[?p,</span> <span class="pre">:hasParent,</span> <span class="pre">?z]</span></code>, the
+iterator for <code class="docutils literal notranslate"><span class="pre">[?p,</span> <span class="pre">rdf:type,</span> <span class="pre">:Person]</span></code> is <code class="docutils literal notranslate"><span class="pre">opened</span></code> once (each time
+successfully) and advanced once (each time unsuccessfully), signified as <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">/</span>
+<span class="pre">4</span></code>. The statistics for the other plan nodes are determined in the same way
+with the exception of the top level plan nodes. The statistics for those plan
+nodes are unavailable, due to their special handling, but they can be inferred
+from the number of query results: the iterators of these plan nodes are opened
+once, and advanced as many times as the number of query results. In addition,
+the output contains the column sample count, which provides indication of the
+relative time spent for the evaluation of each plan node. The larger the number
+of samples a plan node has, the more time has been spent on its evaluation. The
+sample count column is useful for queries with non-trivial evaluation time. The
+sampling frequency of the profiler is controlled by the shell parameter
+<code class="docutils literal notranslate"><span class="pre">query.profiler.sampling-frequency</span></code>.</p>
+<p>By default, the query profiler prints statistics only once, at the end of query
+evaluation. Alternatively, it can be configured to print statistics at a given
+frequency using the shell variable <code class="docutils literal notranslate"><span class="pre">log-frequency</span></code>. This can be useful when
+fixing problematic queries with long evaluation times.</p>
+</div>
+</div>
+<div class="section" id="access-control">
+<h2><span class="section-number">9.7. </span>Access Control<a class="headerlink" href="#access-control" title="Permalink to this headline">¶</a></h2>
+<p>Like all operations, the evaluation of SPARQL requests (i.e. queries and
+updates) is subject to the rules of RDFox’s access control system (see
+<a class="reference internal" href="access-control.html#access-control"><span class="std std-numref">Section 12</span></a>). When specifying access control policies at the
+granularity of named graphs, it is important to be aware that triples in
+unreadable named graphs are silently skipped during query evaluation. For a
+more detailed explanation of this see <a class="reference internal" href="access-control.html#named-graph-access-control"><span class="std std-numref">Section 12.1.6.2.2</span></a>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="import-and-export.html" class="btn btn-neutral float-left" title="8. Import and Export" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reasoning.html" class="btn btn-neutral float-right" title="10. Reasoning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

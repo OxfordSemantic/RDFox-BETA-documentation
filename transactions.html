@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>11. Transactions &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="12. Access Control" href="access-control.html" />
+    <link rel="prev" title="10. Reasoning" href="reasoning.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">11. Transactions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#types-of-transactions">11.1. Types of Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concurrent-execution-of-transactions">11.2. Concurrent Execution of Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#explicit-and-implicit-transactions">11.3. Explicit and Implicit Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recoverable-and-non-recoverable-errors-within-read-write-transactions">11.4. Recoverable and Non-recoverable Errors Within Read/Write Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constraining-data-store-content">11.5. Constraining Data Store Content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#commit-procedure-experimental">11.6. Commit Procedure (EXPERIMENTAL)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#outline-of-transaction-commit-process">11.6.1. Outline of Transaction Commit Process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-considerations">11.6.2. Performance Considerations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#delta-queries">11.7. Delta Queries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">11.7.1. Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restrictions">11.7.2. Restrictions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">11.7.3. Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">11. </span>Transactions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="transactions">
+<span id="id1"></span><h1><span class="section-number">11. </span>Transactions<a class="headerlink" href="#transactions" title="Permalink to this headline">¶</a></h1>
+<p>All operations that read or change the state of an RDFox® server are grouped
+into <em>transactions</em> — units of work that must be executed atomically and in
+apparent isolation from other transactions. Each transaction in RDFox operates
+on a single data store — that is, transactions cannot span several data
+stores within a single server or data stores in different servers. A
+transaction can be rolled back (i.e., aborted without changing the data store)
+or committed. Transactions in RDFox satisfy the well-known <em>ACID</em> properties:</p>
+<dl class="simple">
+<dt>Atomicity</dt><dd><p>If an operation inside a transaction starts changing the store but then
+fails in the middle, the transaction will be rolled back and hence an
+operation in a transaction cannot be partially executed.</p>
+</dd>
+<dt>Consistency</dt><dd><p>A transaction can only bring the store from a consistent state to another
+consistent state. In RDFox, consistency means that 1) every implicit fact
+that logically follows from the given rules and explicit facts has been
+materialized and 2) each constraint defined on the data store content is
+satisfied (see <a class="reference internal" href="#constraining-data-store-content"><span class="std std-numref">Section 11.5</span></a>).</p>
+</dd>
+<dt>Isolation</dt><dd><p>Transactions appear to be executed as if no other transaction was being
+executing at the same time.</p>
+</dd>
+<dt>Durability</dt><dd><p>The effect of a committed transaction is never lost; in particular, once a
+transaction has been committed RDFox ensures that the state of the relevant
+data store will be persisted on disk. Durability is configurable in RDFox:
+see <a class="reference internal" href="persistence.html#persistence"><span class="std std-numref">Section 13</span></a> for details.</p>
+</dd>
+</dl>
+<div class="section" id="types-of-transactions">
+<h2><span class="section-number">11.1. </span>Types of Transactions<a class="headerlink" href="#types-of-transactions" title="Permalink to this headline">¶</a></h2>
+<p>Transactions in RDFox can be <em>read/write</em> or <em>read-only</em>. A data store can be
+updated only by a read/write transaction. Changes made by a read/write
+transaction are immediately visible to the transaction that made the change;
+this includes any new facts derived from reasoning.</p>
+<div class="example docutils container">
+<p><strong>Example</strong> <em>Read/write transaction</em></p>
+<p>Consider again the Family Guy example. We first initialize a store in the
+shell and load the data as we did in the <a class="reference internal" href="getting-started.html#getting-started"><span class="std std-ref">Getting Started</span></a> guide:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dstore create family
+active family
+import data.ttl
+set output out
+</pre></div>
+</div>
+<p>We can group in a read/write transaction a write operation that imports
+rules and a read operation that performs a query as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin
+import ! [?p, :hasChild, ?c] :- [?c, :hasParent, ?p] .
+select ?p ?c where { ?p :hasChild ?c }
+commit
+</pre></div>
+</div>
+<p>Consequences derived by the imported rule will be derived automatically
+before the query is evaluated. Hence, this sequence of commands produces the
+following query results.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>:lois :meg .
+:peter :meg .
+:peter :chris .
+:lois :stewie .
+</pre></div>
+</div>
+<p>If an operation of a transaction fails after it has already changed parts of
+the data store, the transaction will be rolled back. For example, assume
+that reasoning in our running example derives several facts and then fails
+(e.g., because of memory exhaustion). In order to not leave the data store
+in an inconsistent state (i.e., containing just some of the required
+consequences), the transaction is rolled back — that is, the imported rule
+and all all facts derived thus far are removed.</p>
+<p>In contrast, if an error is encountered at the point when the data store has
+not been updated yet, then the transaction can in most cases continue. This
+is illustrated by the following sequence of commands.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin
+import ! [?p, :hasDescendant, ?c] :- [?c, :hasParent, ?p] .
+import ! [?x, :marriedTo ?y] - [?y, :marriedTo, ?x] .
+commit
+</pre></div>
+</div>
+<p>In this transaction, the first rule is syntactically correct and is imported
+without any problems. In other words, the first operation is completed fully
+and without any errors. In contrast, RDFox reports an error when evaluating
+the second import operation since the rule is syntactically invalid. Now
+this error is detected before any changes to the state of the data store are
+made, and so the second import operation fails as a unit without leaving the
+data store in an inconsistent state. Consequently, the <code class="docutils literal notranslate"><span class="pre">commit</span></code> command
+will succeed, and the transaction will result in adding the first rule to
+the data store. At this point, query</p>
+<div class="highlight-sparql notranslate"><div class="highlight"><pre><span></span><span class="k">select</span> <span class="nv">?x</span> <span class="nv">?y</span> <span class="k">where</span> <span class="p">{</span><span class="nv">?x</span> <span class="p">:</span><span class="nt">hasDescendant</span> <span class="nv">?y</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>returns four answers, showing that the first rule has taken effect.</p>
+</div>
+<p>Read-only transactions are only allowed to query a data store and cannot update
+its contents in any way. Their use is demonstrated in the following example.</p>
+<div class="example docutils container">
+<p><strong>Example</strong> <em>Read-only transactions</em></p>
+<p>Building on the previous example, the following shell commands produce a
+read-only transaction consisting of two queries.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin read
+select ?p ?n where { ?p rdf:type :Person . ?p :forename ?n }
+select ?x ?y where { ?x :marriedTo ?y }
+commit
+</pre></div>
+</div>
+<p>The motivation for doing so is to ensure that both queries operate on the
+same data. That is, a read-only transaction isolates the operations in the
+transaction from any updates being performed on the same data store: both
+queries are evaluated with respect to the information present at the moment
+in time when the transaction was started.</p>
+<p>Attempting to update (as shown below) the data store in a read-only
+transaction leads to an error indicating that read-only transactions do not
+support updates.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>begin read
+import ! [?p, :hasChild, ?c] :- [?p, :hasDescendant, ?c] .
+commit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="concurrent-execution-of-transactions">
+<span id="id2"></span><h2><span class="section-number">11.2. </span>Concurrent Execution of Transactions<a class="headerlink" href="#concurrent-execution-of-transactions" title="Permalink to this headline">¶</a></h2>
+<p>At any point in time, an arbitrary number of read-only transactions and at most
+one read/write transaction can be active on any data store. In addition, some
+operations (e.g., creation of tuple tables or replaying snapshots in an HA
+cluster) might require exclusive access to a data store.</p>
+<p>Each read-only transaction sees the snapshot of the data store at the point
+when the transaction was started; thus, all read/only transactions read only
+committed data and all reads are repeatable. Combined with the fact that only
+one writer is allowed to update the data store at any point in time, RDFox
+achieves the serializability isolation level between transactions — that is,
+each set of concurrently running transactions has the same effect on a data
+store as some serial execution of the same transactions.</p>
+</div>
+<div class="section" id="explicit-and-implicit-transactions">
+<span id="id3"></span><h2><span class="section-number">11.3. </span>Explicit and Implicit Transactions<a class="headerlink" href="#explicit-and-implicit-transactions" title="Permalink to this headline">¶</a></h2>
+<p>Each data store operation takes place in a transaction. In the examples above,
+transactions are explicitly started using the <code class="docutils literal notranslate"><span class="pre">begin</span></code> shell command and
+finished using the <code class="docutils literal notranslate"><span class="pre">commit</span></code> shell command. If an operation is started when no
+transaction is active the active <a class="reference internal" href="connections.html#connections"><span class="std std-ref">connection</span></a>, RDFox will
+execute the operation in the context of an implicit transaction. If the
+operation in question only needs to read data, the implicit transaction will be
+a read-only transaction, and otherwise it will be a read/write transaction.
+Once the operation has completed, the implicit transaction is rolled back if
+the operation is unsuccessful, and it is committed if no errors were
+encountered.</p>
+</div>
+<div class="section" id="recoverable-and-non-recoverable-errors-within-read-write-transactions">
+<span id="recoverable-and-non-recoverable-errors"></span><h2><span class="section-number">11.4. </span>Recoverable and Non-recoverable Errors Within Read/Write Transactions<a class="headerlink" href="#recoverable-and-non-recoverable-errors-within-read-write-transactions" title="Permalink to this headline">¶</a></h2>
+<p>Errors occurring within a read/write transaction are classified as either
+<em>recoverable</em> or <em>unrecoverable</em>. As the name suggests, unrecoverable errors
+put the transaction into an error state which mean that it cannot be committed
+and must instead be rolled back.</p>
+</div>
+<div class="section" id="constraining-data-store-content">
+<span id="id4"></span><h2><span class="section-number">11.5. </span>Constraining Data Store Content<a class="headerlink" href="#constraining-data-store-content" title="Permalink to this headline">¶</a></h2>
+<p>Transactions in which the default RDF graph contains at least one instance of
+the class <code class="docutils literal notranslate"><span class="pre">&lt;https://rdfox.com/vocabulary#ConstraintViolation&gt;</span></code> cannot be
+committed. Since RDFox runs incremental materialization prior to committing
+each <em>Read/Write</em> transaction, rules which derive an instance of the above
+class act as constraints on a data store’s content.</p>
+<p>When an attempt to commit a transaction fails due to constraint violations, the
+resulting error message will include up to ten properties of up to ten of the
+violations to aid diagnosis of the problem.</p>
+<p>The following examples use the prefix <code class="docutils literal notranslate"><span class="pre">rdfox:</span></code> to represent
+<code class="docutils literal notranslate"><span class="pre">&lt;https://rdfox.com/vocabulary#&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">:</span></code> to represent
+<code class="docutils literal notranslate"><span class="pre">&lt;http://example.com/&gt;</span></code>.</p>
+<div class="example docutils container">
+<p><strong>Example</strong> <em>Mandatory property constraint</em></p>
+<p>The following rule prevents instances of class <code class="docutils literal notranslate"><span class="pre">foaf:Person</span></code> from being
+added to the default graph unless they have at least one <code class="docutils literal notranslate"><span class="pre">foaf:mbox</span></code>
+property.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[?person, a, rdfox:ConstraintViolation] :-
+    [?person, a, foaf:Person],
+    NOT EXIST ?mbox IN [?person, foaf:mbox, ?mbox] .
+</pre></div>
+</div>
+<p>With this rule loaded, attempting to import the following triples will fail
+with the message shown underneath.</p>
+<div class="highlight-turtle notranslate"><div class="highlight"><pre><span></span><span class="p">:</span><span class="nt">alice</span> <span class="kt">a</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">Person</span><span class="p">;</span> <span class="nn">foaf</span><span class="p">:</span><span class="nt">name</span> <span class="s">&quot;Alice&quot;</span> <span class="p">.</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>The transaction could not be committed because it would have introduced
+the following constraint violation:
+
+&lt;http://example.com/alice&gt; &lt;http://xmlns.com/foaf/0.1/name&gt; &quot;Alice&quot;;
+    rdf:type &lt;http://xmlns.com/foaf/0.1/Person&gt; .
+</pre></div>
+</div>
+</div>
+<p>Although it is possible to make existing resources members of the constraint
+violation class, as in the example above, more informative failure messages can
+be obtained by ensuring that each separate violation has a unique resource to
+represent it. The built-in tuple-table <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> can be used to generate blank
+nodes for this purpose.</p>
+<p>Once each violation has its own resource, it is safe to add further atoms to
+the rule head to associate with the violation any additional information that
+will help the reader of the error message understand what is wrong.</p>
+<div class="example docutils container">
+<p><strong>Example</strong> <em>Improved mandatory property constraint</em></p>
+<p>As in the previous example, the following rule prevents insertion of
+<code class="docutils literal notranslate"><span class="pre">foaf:Person</span></code> instances with no <code class="docutils literal notranslate"><span class="pre">foaf:mbox</span></code> property but this time using
+<code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>PREFIX rdfox: &lt;https://rdfox.com/vocabulary#&gt;
+[?v, a, rdfox:ConstraintViolation],
+[?v, :mboxMissingFrom, ?person],
+[?v, :constraintDescription, &quot;Every foaf:Person must have at least one foaf:mbox property.&quot;] :-
+    [?person, a, foaf:Person],
+    NOT EXIST ?mbox IN [?person, foaf:mbox, ?mbox],
+    SKOLEM(&quot;MissingMbox&quot;, ?person, ?v) .
+</pre></div>
+</div>
+<p>The rule head classifies the blank node bound to <code class="docutils literal notranslate"><span class="pre">?v</span></code> via the <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>
+tuple table as a constraint violation and gives it additional properties
+identifying the deficient <code class="docutils literal notranslate"><span class="pre">foaf:Person</span></code> node and describing the constraint
+it violates in natural language. With this rule loaded, the failure message
+for importing the same data as in the previous example is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>The transaction could not be committed because it would have introduced
+the following constraint violation:
+
+_:__05TWlzc2luZ01ib3gA_02aHR0cDovL2V4YW1wbGUuY29tL2FsaWNlAA-- &lt;http://example.com/constraintDescription&gt; &quot;Every foaf:Person must have at least one foaf:mbox property.&quot;;
+  &lt;http://example.com/mboxMissingFrom&gt; &lt;http://example.com/alice&gt; .
+</pre></div>
+</div>
+</div>
+<p>The presence of constraint violations at the moment a transaction commit is
+attempted results in a _recoverable_ error. That is, if the transaction has
+been explicitly opened, it is possible to attempt to fix the data so that it no
+longer violates the constraint, and to then retry the commit.</p>
+</div>
+<div class="section" id="commit-procedure-experimental">
+<span id="commit-procedure"></span><h2><span class="section-number">11.6. </span>Commit Procedure (EXPERIMENTAL)<a class="headerlink" href="#commit-procedure-experimental" title="Permalink to this headline">¶</a></h2>
+<p>It is often useful for the data added explicitly to a data store to be
+automatically expanded in some way. In the vast majority of cases, the best way
+to achieve this in RDFox is through <a class="reference internal" href="reasoning.html#reasoning"><span class="std std-ref">reasoning</span></a>. There are,
+however, a few situations where reasoning is not suitable and, for these
+cases, RDFox provides a second mechanism for automatically deriving additional
+information from each transaction’s data: the <cite>commit procedure</cite>.</p>
+<p>A commit procedure is a user-specified sequence of zero or more SPARQL
+<code class="docutils literal notranslate"><span class="pre">DELETE-INSERT</span></code> statements that are evaluated as part of committing each and
+every read/write transaction on a data store. As with rules, a commit procedure
+can match data in the store and introduce additional facts derived from the
+matched data. Unlike rules, facts added by a commit procedure are added to the
+<code class="docutils literal notranslate"><span class="pre">explicit</span></code> rather than the <code class="docutils literal notranslate"><span class="pre">derived</span></code> <a class="reference internal" href="tuple-tables.html#fact-domains"><span class="std std-ref">fact domain</span></a> and
+won’t be retracted if the supporting facts are later deleted. This is useful in
+the audit logging example given below.</p>
+<p>Some other differences between rules and commit procedures are:</p>
+<ul class="simple">
+<li><p>commit procedures may use built-in functions (such as <code class="docutils literal notranslate"><span class="pre">NOW()</span></code>, <code class="docutils literal notranslate"><span class="pre">ROLE()</span></code>
+and <code class="docutils literal notranslate"><span class="pre">RAND()</span></code>) and tuple tables (such as <code class="docutils literal notranslate"><span class="pre">SHACL</span></code>) that are not supported
+in Datalog rules,</p></li>
+<li><p>commit procedures can delete as well as add facts facts whereas rules can
+only add facts,</p></li>
+<li><p>commit procedures are only evaluated at commit time whereas rules may be
+evaluated during a read/write transaction if a query is received,</p></li>
+<li><p>after the initial materialization, rules are evaluated using incremental
+reasoning whereas commit procedures are always evaluated over the whole
+stored data set.</p></li>
+</ul>
+<p>A commit procedure can be set on a data store using the <code class="docutils literal notranslate"><span class="pre">commitproc</span></code> shell
+command (see <a class="reference internal" href="rdfox-shell.html#commitproc-command"><span class="std std-numref">Section 15.2.8</span></a>) or using an API call (see
+<a class="reference internal" href="apis.html#apis-data-store-commit-procedure"><span class="std std-numref">Section 16.8</span></a>). Most API calls allow the commit
+procedure to be specified using a string consisting of zero or more
+<code class="docutils literal notranslate"><span class="pre">DELETE-INSERT</span></code> statements separated by a semicolon.</p>
+<div class="section" id="outline-of-transaction-commit-process">
+<h3><span class="section-number">11.6.1. </span>Outline of Transaction Commit Process<a class="headerlink" href="#outline-of-transaction-commit-process" title="Permalink to this headline">¶</a></h3>
+<p>For each read/write transaction that is committed, whether explicit or
+implicit, RDFox performs the following steps:</p>
+<ol class="arabic simple">
+<li><p>For each step in the (possibly empty) commit procedure,</p>
+<ol class="arabic simple">
+<li><p>ensure materialization is up-to-date, and</p></li>
+<li><p>evaluate the step, deleting and inserting facts as necessary.</p></li>
+</ol>
+</li>
+<li><p>Ensure materialization is up to date.</p></li>
+<li><p>For each step in the commit procedure,</p>
+<ol class="arabic simple">
+<li><p>re-evaluate the step, counting how many fresh deletions or insertions take place, and</p></li>
+<li><p>report an error if there were any fresh deletions or insertions,</p></li>
+</ol>
+</li>
+<li><p>Query the default graph for triples matching <code class="docutils literal notranslate"><span class="pre">?v</span> <span class="pre">a</span>
+<span class="pre">rdfox:ConstraintViolation</span></code>, and raise an error if the query returns one or
+more matches.</p></li>
+<li><p>Persist the transaction according to the persistence setting for the data store.</p></li>
+</ol>
+<p>Step 3 guards against instabilities that can arise from the combination of a
+set of Datalog rules and a commit procedure. In this context, instability
+refers to the possibility for reasoning to derive new facts that match the
+commit procedure’s <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> clause leading to insertion of additional new
+facts which create yet more rule applications and resulting facts, and so on.
+Without the convergence check implemented in step 3, this could lead to a
+situation where the evaluation of a commit procedure from one transaction would
+create latent materialization work for the next transaction. In that case,
+simply opening and immediately committing a transaction would lead to new facts
+appearing in the data store even though no new facts were added by the user.
+Note that the error thrown in this situation (step 3.1.1) is unrecoverable.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>RDFox’s mechanism for detecting instability between rules and commit
+procedures relies on the presence of data that triggers the divergent
+behaviour. This means that is possible to add an intrinsically unstable
+combination of rules and commit procedure while there is no data present.
+The problem would then go undetected until such a time as the right data
+pattern is inserted to trigger the convergence check. To avoid encountering
+these problems in production settings, it is vital that the developers of
+the rules and commit procedure carefully analyze them to ensure that they do
+not interact in the way described above.</p>
+</div>
+</div>
+<div class="section" id="performance-considerations">
+<h3><span class="section-number">11.6.2. </span>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this headline">¶</a></h3>
+<p>As already mentioned, with the exception of the initial materialization step, a
+data store’s rules are re-evaluated in each commit using RDFox’s efficient
+incremental reasoning algorithms. This stops the cost of maintaining the
+correct set of derived facts from growing as the total number of rule body
+matches grows. Instead the cost remains proportional to the number of <em>new</em>
+matches due to the changes in the current transaction.</p>
+<p>By contrast, SPARQL updates and, by extension, data store commit procedures,
+are always evaluated over the entire data set. Used naively, a commit procedure
+could therefore take longer and longer to evaluate as the data set grows. This
+bad scaling behaviour can, however, be avoided by using Datalog rules to find
+the parts of the data where the commit procedure should apply. This is
+demonstrated in the following example.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Audit logging with commit procedures</em>.</p>
+<p>In this example we will use a commit procedure to establish audit logging
+for some class of entities within a data store. To begin with, we will use a
+naive commit procedure and then adapt it to show how to avoid performance
+problems.</p>
+<p>We begin by defining a class, <code class="docutils literal notranslate"><span class="pre">:Action</span></code>, on which we want to perform audit
+logging — that is to track who inserted each instance into the data store
+and when. We assume that access control is configured such that the users we
+are tracking have read and write access to the default graph in the data
+store but no access to any named graphs or the data store’s rules or commit
+procedure. Given this we can achieve what we want by setting the following
+SPARQL update as our commit procedure:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INSERT {
+   GRAPH :actionLog {
+      ?action :actionTakenBy ?role ;
+         :actionTakenAt ?now .
+   }
+}
+WHERE {
+   ?action a :Action .
+   FILTER(NOT EXISTS {
+      GRAPH :actionLog {
+         ?action :actionTakenBy ?anyRole .
+      }
+   })
+   BIND(ROLE() AS ?role)
+   BIND(NOW() AS ?now)
+}
+</pre></div>
+</div>
+<p>This finds each instance of the <code class="docutils literal notranslate"><span class="pre">:Action</span></code> class that doesn’t have an
+<code class="docutils literal notranslate"><span class="pre">:actionTakenBy</span></code> property in the <code class="docutils literal notranslate"><span class="pre">:actionLog</span></code> graph, and inserts both
+<code class="docutils literal notranslate"><span class="pre">:actionTakenBy</span></code> and <code class="docutils literal notranslate"><span class="pre">:actionTakenAt</span></code> properties using the values
+returned by the <code class="docutils literal notranslate"><span class="pre">ROLE()</span></code> and <code class="docutils literal notranslate"><span class="pre">NOW()</span></code> built-in functions respectively.
+Assuming that this is saved to file <code class="docutils literal notranslate"><span class="pre">commit-procedure.rq</span></code>, we can set it
+as the active data store’s commit procedure with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>commitproc set commit-procedure.rq
+</pre></div>
+</div>
+<p>We can test that this has worked by inserting a triple matching <code class="docutils literal notranslate"><span class="pre">?a</span> <span class="pre">a</span>
+<span class="pre">:Action</span></code> into the data store and then querying the <code class="docutils literal notranslate"><span class="pre">:actionLog</span></code> named
+graph. This is demonstrated in the following excerpt from and RDFox shell
+session:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; import ! :anAction a :Action .
+Adding data.
+Import operation took 0.016 s.
+Processed 1 fact, of which 1 was updated.
+&gt; set output out
+output = &quot;out&quot;
+&gt; SELECT * WHERE { GRAPH :actionLog { ?S ?P ?O } }
+@prefix : &lt;http://rdfox.com/examples/commitprocedure#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+:anAction :actionTakenAt &quot;2023-06-05T17:58:27.991+01:00&quot;^^xsd:dateTime .
+:anAction :actionTakenBy &quot;guest&quot; .
+Number of query answers:        2
+Total number of query answers:  2
+Total statement evaluation time: 0 s
+</pre></div>
+</div>
+<p>This achieves our functional aims but we must also consider performance.
+Evaluation of the <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> clause of the commit procedure above will
+iterate over every historical instance of the <code class="docutils literal notranslate"><span class="pre">:Action</span></code> class on each
+commit, even if no new instances have been inserted. Initially, when there
+are few instances, the cost of this will be negligible but over time this
+may become problematic.</p>
+<p>We can solve this scaling challenge using rules and incremental reasoning.
+Instead of using <code class="docutils literal notranslate"><span class="pre">FILTER(NOT</span> <span class="pre">EXISTS</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">})</span></code> in SPARQL to find
+newly-added actions, we install the following Datalog rule to add each of
+them to the class, <code class="docutils literal notranslate"><span class="pre">:NewAction</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[?a, a, :NewAction] :-
+   [?a, a, :Action],
+   NOT EXISTS ?anyRole IN (
+      [?a, :actionTakenBy, ?anyRole] :actionLog
+   ) .
+</pre></div>
+</div>
+<p>Because rules are evaluated incrementally, the cost of identifying the new
+actions in each transaction will now be proportional to the number of new
+instances rather than the total number of instances in the data store. The
+commit procedure can then be simplified to iterate over just the instances
+of the incrementally evaluated <code class="docutils literal notranslate"><span class="pre">:NewAction</span></code> class:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INSERT {
+   GRAPH :actionLog {
+      ?action :actionTakenBy ?role ;
+         :actionTakenAt ?now .
+   }
+}
+WHERE {
+   ?action a :NewAction .
+   BIND(ROLE() AS ?role)
+   BIND(NOW() AS ?now)
+}
+</pre></div>
+</div>
+<p>Note that this example is only for demonstration purposes and does not
+constitute a production-ready audit logging feature. For advice on achieving
+a more robust setup, please contact Oxford Semantic Technologies for
+support.</p>
+</div>
+<p>RDFox will try to detect read/write transactions that do not change the state
+of a data store (i.e., adding facts that are already contained in the data
+store) in order to avoid incrementing the data store version. However, in
+certain cases, even a vacuous (successful) transaction may increment the data
+store version.</p>
+</div>
+</div>
+<div class="section" id="delta-queries">
+<span id="id5"></span><h2><span class="section-number">11.7. </span>Delta Queries<a class="headerlink" href="#delta-queries" title="Permalink to this headline">¶</a></h2>
+<p>In complex data management scenarios, the efficient tracking of changes within
+a knowledge graph can be crucial for applications that depend on up-to-date and
+accurate information. This includes event-driven applications and applications
+that require efficient synchronization with relevant parts of the knowledge
+graph. Change identification is a complex task, particularly in the presence of
+reasoning. Delta queries is a feature in RDFox that allows tracking of changes
+to query answers over the user-provided data and the data derived through
+reasoning with rules and axioms. They enable developers to build robust
+applications that require real-time or historical insight into knowledge graph
+modifications.</p>
+<div class="section" id="overview">
+<h3><span class="section-number">11.7.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<p>A <em>delta query</em> in RDFox is a SPARQL query that is registered with the data
+store for continuous evaluation against incoming transactions. A data store can
+have any number of registered delta queries. Upon registration of a delta
+query, RDFox captures a full snapshot of the query answers at that point. As
+subsequent write transactions are committed to the data store, RDFox
+efficiently computes and records changes to the query answers as additions and
+deletions. These changes are computed incrementally, thus avoiding full query
+evaluation. The answer changes are stored alongside the original query answers.
+Users also have the option to trigger a full snapshot of the query answers at
+any time. All delta query answers (snapshots, additions, and deletions) are
+stored and retrievable until they are explicitly removed. This ensures
+historical tracking and traceability of changes over time.</p>
+<p>For each delta query, answers for a given transaction are computed at the end
+of commiting the transaction. In particular, the evaluation follows the update
+of the materialization (incremental reasoning), as well as the evaluation of
+the commit procedure. This ensures that the changes are computed with respect
+to the data store content that will be availbe after commit.</p>
+<p>The size of the produced snapshots, deletions and additions can be limited at
+delta query registration. Answers of a given type can also be completely
+disabled by providing a limit of 0 for that type. This is useful in cases where
+we are interested only in additions and/or deletions.</p>
+</div>
+<div class="section" id="restrictions">
+<h3><span class="section-number">11.7.2. </span>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h3>
+<p>Delta queries only support a limitted fragment of SPARQL. In particular, delta
+queries can only use triple patterns, quad patterns, <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> patterns,
+<code class="docutils literal notranslate"><span class="pre">BIND</span></code> patterns and <code class="docutils literal notranslate"><span class="pre">VALUES</span></code> patterns. As with rules, the use of
+non-deterministic functions <code class="docutils literal notranslate"><span class="pre">NOW</span></code>, <code class="docutils literal notranslate"><span class="pre">RAND</span></code>, <code class="docutils literal notranslate"><span class="pre">UUID</span></code> and <code class="docutils literal notranslate"><span class="pre">STRUUID</span></code> and the
+functions <code class="docutils literal notranslate"><span class="pre">EXISTS</span></code> and <code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">EXISTS</span></code> is not allowed. Finally, the use of tuple
+tables is limitted to memory tuple tables and the built-in tuple table <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code>.</p>
+</div>
+<div class="section" id="usage">
+<h3><span class="section-number">11.7.3. </span>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>To enable the use of delta queries, one of the server parameters
+<code class="docutils literal notranslate"><span class="pre">delta-queries.answers-directory</span></code> or <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> has to point to a
+valid directory. The management of delta queries is done using the
+<code class="docutils literal notranslate"><span class="pre">deltaquery</span></code> shell command (see <a class="reference internal" href="rdfox-shell.html#deltaquery-command"><span class="std std-numref">Section 15.2.12</span></a>) or the relevant
+API calls (see <a class="reference internal" href="apis.html#apis-data-store-delta-queries"><span class="std std-numref">Section 16.7</span></a>). Management of delta
+query answers is done using the <code class="docutils literal notranslate"><span class="pre">deltaqueryanswer</span></code> shell command (see
+<a class="reference internal" href="rdfox-shell.html#deltaqueryanswer-command"><span class="std std-numref">Section 15.2.13</span></a>) or the relevant API calls (see
+<a class="reference internal" href="apis.html#apis-data-store-delta-queries"><span class="std std-numref">Section 16.7</span></a>).</p>
+<p>The following example demonstrates the use of delta queries in the context of
+friend recommendations.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> <em>Friend recommendations</em>.</p>
+<p>Initilaize a data store and load the following RDF data that represents
+people with their hobbies.</p>
+<blockquote>
+<div><div class="highlight-turtle notranslate"><div class="highlight"><pre><span></span><span class="p">:</span><span class="nt">Lucy</span> <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">likes</span> <span class="p">:</span><span class="nt">indoorSwimming</span><span class="p">,</span> <span class="p">:</span><span class="nt">outdoorSwimming</span><span class="p">,</span> <span class="p">:</span><span class="nt">tv</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">John</span> <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">likes</span> <span class="p">:</span><span class="nt">boardGames</span><span class="p">,</span> <span class="p">:</span><span class="nt">movies</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">George</span> <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">likes</span> <span class="p">:</span><span class="nt">boardGames</span><span class="p">,</span> <span class="p">:</span><span class="nt">movies</span><span class="p">,</span> <span class="p">:</span><span class="nt">indoorSwimming</span> <span class="p">.</span>
+
+<span class="p">:</span><span class="nt">David</span> <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">likes</span> <span class="p">:</span><span class="nt">cooking</span><span class="p">,</span> <span class="p">:</span><span class="nt">movies</span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">Alex</span> <span class="kt">a</span> <span class="p">:</span><span class="nt">Person</span> <span class="p">;</span>
+    <span class="p">:</span><span class="nt">likes</span> <span class="p">:</span><span class="nt">cooking</span><span class="p">,</span> <span class="p">:</span><span class="nt">podcasts</span><span class="p">,</span> <span class="p">:</span><span class="nt">movies</span><span class="p">.</span>
+</pre></div>
+</div>
+<p>Next, import the following datalog rule that identifies people who
+share multiple hobbies.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[?person1, :hasMultipleCommonInterestsWith, ?person2] :-
+    [?person1, a, :Person],
+    [?person2, a, :Person],
+    [?person1, :likes, ?hobby1],
+    [?person2, :likes, ?hobby1],
+    [?person1, :likes, ?hobby2],
+    [?person2, :likes, ?hobby2],
+    FILTER(!sameTerm(?hobby1, ?hobby2)),
+    FILTER(!sameTerm(?person1, ?person2)).
+</pre></div>
+</div>
+<p>Register a delta query that tracks the people who share multiple
+hobbies using the shell command <code class="docutils literal notranslate"><span class="pre">deltaquery</span></code> as shown next.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>deltaquery register FriendSuggestions text/x.csv-abbrev !  \
+    SELECT * WHERE {                                       \
+        ?person1 :hasMultipleCommonInterestsWith ?person2  \
+        FILTER(?person1 &lt; ?person2)                        \
+    }
+</pre></div>
+</div>
+<p>The delta query is registered under the name <code class="docutils literal notranslate"><span class="pre">FriendSuggestions</span></code> with
+query answer format <code class="docutils literal notranslate"><span class="pre">text/x.csv-abbrev</span></code>. No limits are set for the size
+of the query’s snapshots, additions, and deletions. The query itself
+selects pairs of people who share multiple hobbies and ensures that each
+pair is reported only once.</p>
+<p>We can now list the registered delta queries using the <code class="docutils literal notranslate"><span class="pre">deltaquery</span> <span class="pre">list</span></code>
+command to obtain the following output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>===========================================================================================
+  Name               Format             Latest snapshot  Latest deletion  Latest addition
+-------------------------------------------------------------------------------------------
+  FriendSuggestions  text/x.csv-abbrev                5              N/A              N/A
+===========================================================================================
+</pre></div>
+</div>
+<p>The output indicates that the delta query <code class="docutils literal notranslate"><span class="pre">FriendSuggestions</span></code> has been
+registered, a snapshot has been taken, and no deletions or additions have
+been recorded yet.</p>
+<p>We can show the snapshot of the delta query using the command
+<code class="docutils literal notranslate"><span class="pre">deltaqueryanswer</span> <span class="pre">show</span> <span class="pre">FriendSuggestions</span> <span class="pre">5</span> <span class="pre">snapshot</span></code> to obtain the
+following output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>person1,person2
+:George,:John
+:Alex,:David
+</pre></div>
+</div>
+<p>Next, we update the hobbies of <code class="docutils literal notranslate"><span class="pre">:George</span></code> as follows.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>import - ! :George :likes :boardGames .
+import + ! :George :likes :tv .
+</pre></div>
+</div>
+<p>We can now list the answers for the delta query <code class="docutils literal notranslate"><span class="pre">FriendSuggestions</span></code>
+using the command <code class="docutils literal notranslate"><span class="pre">deltaqueryanswer</span> <span class="pre">list</span> <span class="pre">name</span> <span class="pre">FriendSuggestions</span></code> to
+obtain the following output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>================================================================================================================================================================================================================
+  Delta query name   Data store version  Answer type  Path                                                                                                                                   Format
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  FriendSuggestions                   5  snapshot     17919880869262749985/delta-query-answers/00000000000000000001_06427138968738186804/00000000000000000005.snapshot.06427138968738186804  text/x.csv-abbrev
+  FriendSuggestions                   6  deletion     17919880869262749985/delta-query-answers/00000000000000000001_06427138968738186804/00000000000000000006.deletion.06427138968738186804  text/x.csv-abbrev
+  FriendSuggestions                   7  addition     17919880869262749985/delta-query-answers/00000000000000000001_06427138968738186804/00000000000000000007.addition.06427138968738186804  text/x.csv-abbrev
+================================================================================================================================================================================================================
+</pre></div>
+</div>
+<p>In addition to the snapshot at version 5, we now have a deletion at version
+6 and an addition at version 7.</p>
+<p>We can show the deletion by using the command <code class="docutils literal notranslate"><span class="pre">deltaqueryanswer</span> <span class="pre">show</span>
+<span class="pre">FriendSuggestions</span> <span class="pre">6</span> <span class="pre">deletion</span></code> to obtain the following output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>person1,person2
+:George,:John
+</pre></div>
+</div>
+<p>Likewise, we can show the addition by using the command
+<code class="docutils literal notranslate"><span class="pre">deltaqueryanswer</span> <span class="pre">show</span> <span class="pre">FriendSuggestions</span> <span class="pre">7</span> <span class="pre">addition</span></code> to obtain the
+following output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>person1,person2
+:George,:Lucy
+</pre></div>
+</div>
+<p>Assume that we have processed the delta query answers for versions 5 and 6
+and that we want to remove them. We can do this using the command
+<code class="docutils literal notranslate"><span class="pre">deltaqueryanswer</span> <span class="pre">delete</span> <span class="pre">name</span> <span class="pre">FriendSuggestions</span> <span class="pre">from</span> <span class="pre">5</span> <span class="pre">to</span> <span class="pre">6</span></code>. After a
+confirmation, we get the following output: <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">delta</span> <span class="pre">query</span> <span class="pre">answers</span> <span class="pre">were</span>
+<span class="pre">deleted.</span></code></p>
+<p>Running the command <code class="docutils literal notranslate"><span class="pre">deltaquery</span> <span class="pre">list</span></code> now shows that we are only left
+with the addition at version 7.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>===========================================================================================
+  Name               Format             Latest snapshot  Latest deletion  Latest addition
+-------------------------------------------------------------------------------------------
+  FriendSuggestions  text/x.csv-abbrev              N/A              N/A                7
+===========================================================================================
+</pre></div>
+</div>
+<p>Finally, we can remove the delta query using the command <code class="docutils literal notranslate"><span class="pre">deltaquery</span>
+<span class="pre">deregister</span> <span class="pre">FriendSuggestions</span></code>.</p>
+</div></blockquote>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reasoning.html" class="btn btn-neutral float-left" title="10. Reasoning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="access-control.html" class="btn btn-neutral float-right" title="12. Access Control" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>8. Import and Export &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="9. Querying" href="querying.html" />
+    <link rel="prev" title="7. Data Sources" href="data-sources.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-stores.html">5. Data Stores</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">8. Import and Export</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-store-content-formats">8.1. Data Store Content Formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#import">8.2. Import</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#import-parameters">8.2.1. Import Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parallelization-of-imports">8.2.2. Parallelization of Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#export">8.3. Export</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#export-parameters">8.3.1. Export Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#access-control">8.4. Access Control</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">8. </span>Import and Export</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="import-and-export">
+<span id="id1"></span><h1><span class="section-number">8. </span>Import and Export<a class="headerlink" href="#import-and-export" title="Permalink to this headline">¶</a></h1>
+<p>In order to apply RDFox®’s querying and reasoning capabilities to a given data
+set, the data must first be loaded into RDFox together with any applicable
+rules and axioms. Small amounts of data may be loaded using SPARQL <code class="docutils literal notranslate"><span class="pre">INSERT</span>
+<span class="pre">DATA</span></code> statements, but in most cases it is preferable to <em>import</em> the content
+from one of the supported formats. Later, it may be necessary to extract
+content from RDFox in one of these formats, and the most efficient way of
+achieving this is to use the <em>export</em> operation. This section begins by listing
+the formats supported by RDFox for import and export and then looks at the
+specifics of each of these operations in turn.</p>
+<div class="section" id="data-store-content-formats">
+<span id="id2"></span><h2><span class="section-number">8.1. </span>Data Store Content Formats<a class="headerlink" href="#data-store-content-formats" title="Permalink to this headline">¶</a></h2>
+<p>The following formats can be imported into or exported from RDFox data stores.</p>
+<ul class="simple">
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/n-triples/">N-Triples</a> format has MIME type
+<code class="docutils literal notranslate"><span class="pre">application/n-triples</span></code>.</p></li>
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/turtle/">Turtle</a> format has MIME type
+<code class="docutils literal notranslate"><span class="pre">text/turtle</span></code>.</p></li>
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/n-quads/">N-Quads</a> format has MIME type
+<code class="docutils literal notranslate"><span class="pre">application/n-quads</span></code>.</p></li>
+<li><p>The <a class="reference external" href="http://www.w3.org/TR/trig/">TriG</a> format has MIME type
+<code class="docutils literal notranslate"><span class="pre">application/trig</span></code>.</p></li>
+<li><p>The <a class="reference external" href="https://www.w3.org/TR/owl2-syntax/">OWL 2 Functional-Style Syntax</a>
+format has the MIME type <code class="docutils literal notranslate"><span class="pre">text/owl-functional</span></code>.</p></li>
+<li><p>RDFox supports  proprietary formats <code class="docutils literal notranslate"><span class="pre">application/x.gen-n-triples</span></code>,
+<code class="docutils literal notranslate"><span class="pre">text/x.gen-turtle</span></code>, <code class="docutils literal notranslate"><span class="pre">application/x.gen-n-quads</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">application/x.gen-trig</span></code> which extend the corresponding standard formats
+by support for generalized triples and quads (i.e., triples/quads where any
+component can be an IRI, a blank node, or a literal).</p></li>
+<li><p>RDFox uses a proprietary format described in <a class="reference internal" href="reasoning.html#rdfox-datalog"><span class="std std-numref">Section 10.4</span></a> to
+capture datalog rules and facts. The MIME type of this format is
+<code class="docutils literal notranslate"><span class="pre">application/x.datalog</span></code>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The list of MIME types supported for import and export of data store content
+can also be viewed using the <code class="docutils literal notranslate"><span class="pre">help</span></code> command in the <a class="reference internal" href="rdfox-shell.html#rdfox-shell"><span class="std std-ref">RDFox shell</span></a>.</p>
+</div>
+</div>
+<div class="section" id="import">
+<span id="id3"></span><h2><span class="section-number">8.2. </span>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h2>
+<p>This section describes how facts, rules and axioms may be imported into RDFox
+data stores. The goal is to help users understand those aspects of import
+operations that are true no matter which interface (such as the RDFox shell,
+REST or Java) is used. If you are looking for details of how to perform an
+import using a specific interface, please refer to <a class="reference internal" href="rdfox-shell.html#import-command"><span class="std std-numref">Section 15.2.26</span></a> for
+the RDFox shell or to <a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.9</span></a> for the REST or Java
+APIs. Reading this section first will help you make sense of the various
+options available in those sections.</p>
+<p>RDFox uses the concept of <em>domains</em> to segregate content according to how it
+came to be present in the system. Facts are imported into the <code class="docutils literal notranslate"><span class="pre">explicit</span></code>
+<a class="reference internal" href="tuple-tables.html#fact-domains"><span class="std std-ref">fact domain</span></a>. Rules are imported into the <code class="docutils literal notranslate"><span class="pre">user</span></code>
+<a class="reference internal" href="servers.html#rule-domains"><span class="std std-ref">rule domain</span></a>.</p>
+<div class="section" id="import-parameters">
+<span id="id4"></span><h3><span class="section-number">8.2.1. </span>Import Parameters<a class="headerlink" href="#import-parameters" title="Permalink to this headline">¶</a></h3>
+<p>This section describes the parameters of each import operation. Other aspects
+of import are determined by the configuration of the data store that is
+receiving the content; for details, please refer to the data store parameters
+in <a class="reference internal" href="data-stores.html#data-store-parameters"><span class="std std-numref">Section 5.4.1</span></a> whose names begin with <code class="docutils literal notranslate"><span class="pre">import.</span></code>.</p>
+<dl>
+<dt>Target Default Graph</dt><dd><p>According to the RDF 1.1 standards, an <a class="reference external" href="https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/Overview.html#dfn-rdf-dataset">RDF dataset</a>
+includes a <em>default</em> graph, which has no name, and zero or more named graphs.
+While only some of the formats supported by RDFox have a syntax for
+specifying named graphs, all of them have a syntax for the default graph. For
+each import operation, RDFox allows the user to specify a named graph to act
+as the default graph. For facts, this determines the graph that receives the
+imported content’s default graph triples. For rules, it determines the graph
+that <a class="reference internal" href="reasoning.html#default-graph-atom"><span class="std std-ref">default graph atoms</span></a> refer to. For OWL
+axioms, it determines in which graph the axioms will be applied. Note that
+the data store parameter <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code>, if set, supplies a default
+value for this import parameter. If no value is available for the target
+default graph, default graph triples are written to the data store’s
+<code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> tuple table if it exists or cause an error to be raise if
+not. See also <a class="reference internal" href="data-stores.html#organization-of-rdf-data"><span class="std std-numref">Section 5.2</span></a>.</p>
+</dd>
+<dt>Add or Delete</dt><dd><p>RDFox can import content for the purpose of adding it to or deleting it from
+a data store. When content is being added, it is possible to also add any
+prefix definitions found in the content to the data store’s prefixes. These
+definitions override any existing definitions where there is a conflict.</p>
+</dd>
+<dt>Content Sources</dt><dd><p>For each import operation, the source or sources of the content to add or
+delete must be specified. All interfaces provide ways to supply the content
+directly, or as a list of file paths or URIs. Please refer to the
+<code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code> and <code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code> <a class="reference internal" href="servers.html#server-parameters"><span class="std std-ref">server parameters</span></a> that, for security purposes, restrict the URI schemes
+and file paths that can be used in an import operation.</p>
+</dd>
+<dt>Content Format</dt><dd><p>It is possible to explicitly specify the format of the content being imported
+or allow RDFox to “guess” the format by inspecting the content. When a format
+is specified using its MIME type, an error will result if the content in any
+of the specified sources does not conform to that format. If the content type
+is not specified explicitly, RDFox will try to parse the beginning of the
+content from each specified content source in each of its supported formats
+to determine which format does not result in an error, and then proceeds to
+import the content in that format.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When importing data in N-Quads, the content type (<code class="docutils literal notranslate"><span class="pre">application/n-quads</span></code>)
+must be specified explicitly.</p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="parallelization-of-imports">
+<h3><span class="section-number">8.2.2. </span>Parallelization of Imports<a class="headerlink" href="#parallelization-of-imports" title="Permalink to this headline">¶</a></h3>
+<p>RDFox will always attempt to parallelize the import of facts using the
+available server threads (see the <a class="reference internal" href="servers.html#num-threads-server-param"><span class="std std-ref">num-threads</span></a>
+server parameter). If only one source is given, the available threads will be
+divided between parsing the content and loading the parsed facts into tuple
+tables. If multiple sources are given, each will be assigned to a thread that
+is then responsible for both parsing and loading facts from that source.</p>
+</div>
+</div>
+<div class="section" id="export">
+<span id="id5"></span><h2><span class="section-number">8.3. </span>Export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h2>
+<p>This section describes how facts, rules and axioms may be exported from RDFox
+data stores. The goal is to help users understand those aspects of the export
+operation which are true no matter which interface (RDFox shell, REST or Java)
+is used. If you are looking for details of how to perform an export in the
+RDFox shell or using an API, please refer to <a class="reference internal" href="rdfox-shell.html#export-command"><span class="std std-numref">Section 15.2.23</span></a> or
+<a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.9</span></a>, respectively. Reading this section first will
+help you make sense of the various options available in those sections.</p>
+<div class="section" id="export-parameters">
+<h3><span class="section-number">8.3.1. </span>Export Parameters<a class="headerlink" href="#export-parameters" title="Permalink to this headline">¶</a></h3>
+<p>This section describes the parameters that control the behaviour of export
+operations.</p>
+<dl class="simple">
+<dt>Destination</dt><dd><p>For each export operation, the user must specify the destination. All
+interfaces provide ways to either receive the content directly or specify the
+path to which RDFox should write the output file. See the
+<code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code> <a class="reference internal" href="servers.html#server-parameters"><span class="std std-ref">server parameter</span></a> which
+restricts, for security purposes, the file paths to which a server can write.</p>
+</dd>
+<dt>Content Format</dt><dd><p>The format for the export must be specified using its MIME type. Some
+interfaces satisfy this requirement by having their own default value. The
+choice of the format determines which portion of the data store content is
+exported. For RDF formats that do not support named graphs (specifically
+Turtle, N-Triples and their generalized equivalents), only the triples from
+the default graph will be exported (exporting specific named graphs into
+these formats can be achieved using a query that has variables <code class="docutils literal notranslate"><span class="pre">?S</span></code>,
+<code class="docutils literal notranslate"><span class="pre">?P</span></code>, and <code class="docutils literal notranslate"><span class="pre">?O</span></code>). For RDF formats that do support named graphs
+(specifically TriG, N-Quads and their generalized equivalents), both the
+default graph triples and named-graph quads are exported. If the Datalog
+format is specified, the data store’s rules are exported. If OWL 2
+Functional-Style syntax is specified, the data store’s axioms are exported.</p>
+</dd>
+<dt>Fact or Rule Domain</dt><dd><p>RDFox supports restricting imports by fact or rule domain. When exporting
+RDF, the triples or quads from the <code class="docutils literal notranslate"><span class="pre">explicit</span></code> domain are exported by
+default. This can be overridden by specifying a single fact domain. When
+exporting Datalog, the rules from the <code class="docutils literal notranslate"><span class="pre">user</span></code> domain are exported by default
+but this can be overridden by specifying a space-separated list of rule
+domains.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="access-control">
+<h2><span class="section-number">8.4. </span>Access Control<a class="headerlink" href="#access-control" title="Permalink to this headline">¶</a></h2>
+<p>Like all operations, import and export are subject to the rules of RDFox’s
+access control system (see <a class="reference internal" href="access-control.html#access-control"><span class="std std-numref">Section 12</span></a>). When specifying access
+control policies at the granularity of named graphs, it is important to be
+aware that triples in unreadable named graphs are silently skipped during
+export. For a more detailed explanation of this see
+<a class="reference internal" href="access-control.html#named-graph-access-control"><span class="std std-numref">Section 12.1.6.2.2</span></a>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data-sources.html" class="btn btn-neutral float-left" title="7. Data Sources" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="querying.html" class="btn btn-neutral float-right" title="9. Querying" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,775 @@
+.. _data-sources:
+
+Data Sources
+============
+
+As explained in :numref:`servers`, a *data source* can be registered with a
+data store to provide access to an external, non-RDF source of data, such as a
+relational database, a CSV file, or an Apache Solr index. This data can then be
+used in queries and rules, this allowing for an integration of heterogenous data
+within RDFox®. Data sources also allow users to use specialist query engines such
+as Solr for indexed text searches within RDFox queries.
+
+Accessing external data is typically a two-step process.
+
+- First, a data source is registered with a data store. This involves
+  specifying the data source name, data source type, and configuration
+  parameters. The supported data source types and the configuration parameters
+  available for each type are documented in :numref:`registering-data-sources`.
+
+- Second, one or more *data source tuple tables* are created, which provide
+  suitable 'views' into the data of the data source (see
+  :numref:`types-of-tuple-tables`). Such tuple tables can be used in used in
+  queries and rules in exactly the same way as all other tuple tables (see
+  :numref:`using-tuple-tables`). To create a data source tuple table, one must
+  specify parameters that govern how external data is transformed to be
+  compatible with RDF. The available parameters depend on the type of data
+  source, and are described in detail in
+  :numref:`creating-data-source-tuple-tables`.
+
+Data sources and their tuple tables can be managed using any of the available
+APIs (see :numref:`APIs-data-sources`.). In the RDFox shell, management is
+achieved using the ``dsource`` (see :numref:`dsource-command`) and
+``tupletable`` (see :numref:`tupletable-command`) commands.
+
+.. _registering-data-sources:
+
+Registering Data Sources
+------------------------
+
+This section documents the types of data source that can be registered with
+RDFox along with their configuration options.
+
+When registering a data source, the parameter ``type`` is always required. The
+following sections describe the possible values for the ``type`` parameter as
+well as the parameters specific to each type.
+
+.. _registering-delimited-file-data-sources:
+
+Registering Delimited File Data Sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CSV and other delimited file types are registered as type ``delimitedFile``.
+The parameters for registering this type of data source are described below.
+
+.. table ::
+   :widths: 9,10,50
+
+   +-----------------+-----------------------+----------------------------------------+
+   |    Parameter    |    Default value      |             Description                |
+   +=================+=======================+========================================+
+   | ``delimiter``   | ``,``                 | Specifies the character used to        |
+   |                 |                       | delimit the cells in the file.         |
+   |                 |                       |                                        |
+   |                 |                       | Space can be specified with ``<space>``|
+   |                 |                       | and tab can be specified with ``<tab>``|
+   |                 |                       | .                                      |
+   +-----------------+-----------------------+----------------------------------------+
+   | ``file``        | (none)                | The path to the delimited file to add. |
+   |                 |                       |                                        |
+   |                 |                       | This parameter must be specified.      |
+   +-----------------+-----------------------+----------------------------------------+
+   | ``header``      | ``false``             | Boolean parameter specifying whether   |
+   |                 |                       | the file has a header or not           |
+   +-----------------+-----------------------+----------------------------------------+
+   | ``quote``       | ``"``                 | Specifies the character used to        |
+   |                 |                       | quote strings in the file.             |
+   +-----------------+-----------------------+----------------------------------------+
+
+.. container:: example
+
+   **Example: Registering a CSV file as a Data Source using the Shell**
+
+   Assume the following short CSV file exists as ``people.csv`` in our shell
+   root directory. ::
+
+      First Name,Last Name,Sex,Age
+      Beverly,Strickland,F,33
+      Thomas,Peterson,M,
+      Urs,Andresson,M,63
+      Abigail,Edwards,F,52
+      Abigail,Edwards,,36
+
+   The following command registers the file as a ``delimitedFile`` data source
+   with name ``peopleDS``. ::
+
+      dsource register "peopleDS"     \
+         type delimitedFile           \
+         file "$(dir.root)people.csv" \
+         header true
+
+   Once added the data source can be inspected with the following command. ::
+
+      dsource show personDS
+
+   It is also possible to sample the native data source table. The following
+   command samples the first three rows. ::
+
+      dsource sample peopleDS "$(dir.root)people.csv" 3
+
+   The second parameter to the ``dsource sample`` command is the name of the
+   table to sample. In the case of ``delimitedFile`` data sources, there is
+   only one choice of table but the parameter is nonetheless required. The path
+   of the file is used in this case.
+
+.. _registering-postgresql-data-sources:
+
+Registering PostgreSQL Data Sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+PostgreSQL data sources are registered as type ``PostgreSQL``. The parameters
+for registering this type of data source are described below.
+
+Registering this type of data source requires `libpq
+<https://www.postgresql.org/docs/current/libpq.html>`__. See
+:numref:`third-party-software` for more detail.
+
+.. table ::
+   :widths: 9,16,44
+
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   |       Parameter                   |                  Default value                  |               Description                         |
+   +===================================+=================================================+===================================================+
+   | ``connection-keep-alive-time``    | ``60 s``                                        | A duration specified as described in              |
+   |                                   |                                                 | :numref:`specifying-durations`, which determines  |
+   |                                   |                                                 | how long unused database connections are kept     |
+   |                                   |                                                 | alive before they are closed. A value of ``0``    |
+   |                                   |                                                 | disables caching of database connections.         |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   | ``connection-string``             | The empty string                                | The connection string RDFox should use to connect |
+   |                                   |                                                 | to the ODBC instance.                             |
+   |                                   |                                                 |                                                   |
+   |                                   |                                                 | This parameter must be specified.                 |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+
+.. _registering-odbc-data-sources:
+
+Registering ODBC Data Sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ODBC data sources are registered as type ``ODBC``. The parameters for
+registering this type of data source are described below.
+
+Registering this type of data source requires either `iODBC
+<https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors>`__
+or `unixODBC <http://www.unixodbc.org/>`__. See :numref:`third-party-software`
+for more detail.
+
+
+.. table ::
+   :widths: 9,25,35
+
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   |       Parameter                   |                  Default value                  |               Description                         |
+   +===================================+=================================================+===================================================+
+   | ``connection-keep-alive-time``    | ``60 s``                                        | A duration specified as described in              |
+   |                                   |                                                 | :numref:`specifying-durations`, which determines  |
+   |                                   |                                                 | how long unused database connections are kept     |
+   |                                   |                                                 | alive before they are closed. A value of ``0``    |
+   |                                   |                                                 | disables caching of database connections.         |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   | ``connection-string``             | The empty string                                | The connection string RDFox should use to connect |
+   |                                   |                                                 | to the ODBC instance.                             |
+   |                                   |                                                 |                                                   |
+   |                                   |                                                 | This parameter must be specified.                 |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   | ``default-schema``                | The empty string                                | The name of the schema that the SQL database uses |
+   |                                   |                                                 | to interpret unqualified references to tables.    |
+   |                                   |                                                 | The value of this parameter should be determined  |
+   |                                   |                                                 | by inspecting the configuration of the database   |
+   |                                   |                                                 | being connected to. For example, in PostgreSQL,   |
+   |                                   |                                                 | the required value of this paramerter can be      |
+   |                                   |                                                 | determined by running the                         |
+   |                                   |                                                 | ``SELECT current_schema()`` SQL query.            |
+   |                                   |                                                 | Unfortunately, there is no standard way to        |
+   |                                   |                                                 | retrieve the required value for this parameter.   |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   | ``quoted-identifier-quote``       | ``"``                                           | The character used as the quote mark for          |
+   |                                   |                                                 | `quoted identifiers` in SQL statements used to    |
+   |                                   |                                                 | interrogate the data source.                      |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   | ``quoted-identifier-quote-open``  | ``quoted-identifier-quote``                     | The character used as the opening quote mark for  |
+   |                                   |                                                 | `quoted identifiers` in SQL statements used to    |
+   |                                   |                                                 | interrogate the data source.                      |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+   | ``quoted-identifier-quote-close`` | ``quoted-identifier-quote``                     | The character used as the closing quote mark for  |
+   |                                   |                                                 | `quoted identifiers` in SQL statements used to    |
+   |                                   |                                                 | interrogate the data source.                      |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
+
+Registering Solr Data Sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Solr Data Sources are registered as type ``solr``. The parameters for
+registering this type of data source are described below.
+
+.. table ::
+   :widths: 9,10,50
+
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   |            Parameter           |    Default value      |             Description                                                        |
+   +================================+=======================+================================================================================+
+   | ``channel``                    | ``unsecure``          | Specifies the channel type used to  connect to the Solr instance.              |
+   |                                |                       |                                                                                |
+   |                                |                       | Valid values for this parameter are:                                           |
+   |                                |                       |                                                                                |
+   |                                |                       | ``unsecure``: no TLS.                                                          |
+   |                                |                       |                                                                                |
+   |                                |                       | ``open-ssl``: use OpenSSL for TLS.                                             |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``channel-timeout``            | ``60 s``              | A duration specified as described in :numref:`specifying-durations`, which     |
+   |                                |                       | determines the length of time that RDFox will wait for I/O while communicating |
+   |                                |                       | with the Solr server. This parameter can be set to ``unlimited``, in which     | 
+   |                                |                       | case, the HTTP client will wait forever for each I/O.                          |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``credentials``                | (none)                | Specifies the private key, client certificate and intermediate certificates    |
+   |                                |                       | used when connecting to a Solr server configured for mutual TLS. The content   |
+   |                                |                       | is provided as a verbatim string in PEM format. See the example in the         |
+   |                                |                       | documentation of the endpoint parameter of the same name (see                  |
+   |                                |                       | :numref:`endpoint-parameters`).                                                |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``credentials-file``           | (none)                |  Specifies the name of the file whose content contains the credentials.        |
+   |                                |                       |  The file content must have the same format as the ``credentials`` parameter.  |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``credentials-name``           | (none)                |  Specifies the comma-separated list of names of items in the system’s keystore.|
+   |                                |                       |  The first name must identify a certificate and a private key, which are used  |
+   |                                |                       |  as a main identity of the client. The remaining names identify intermediate   |
+   |                                |                       |  certificates. This option is available only on macOS, where the keystore is   |
+   |                                |                       |  the system’s keychain.                                                        |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``credentials-passphrase``     | (none)                |  Provides the passphrase that can be used to unlock the credentials in         |
+   |                                |                       |  case they are encrypted. This parameter is optional.                          |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``min-secure-protocol``        | ``tls12``             | Determines the minimum protocol version that RDFox should use when             |
+   |                                |                       | communicating with the  Solr server via HTTPS. The allowed values are ``ssl2``,|
+   |                                |                       | ``ssl3``, ``tls1``, ``tls11``, ``tls12``, and ``tls13``.                       |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``connection-keep-alive-time`` | ``60 s``              | A duration specified as described in :numref:`specifying-durations`, which     |
+   |                                |                       | determines how long HTTP connections are kept alive in the connection pool for |
+   |                                |                       | the Solr instance. Value ``0`` disables the caching of HTTP connections.       |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``host``                       | ``localhost``         | The name or IP address of the host                                             |
+   |                                |                       | running the Solr instance.                                                     |
+   |                                |                       |                                                                                |
+   |                                |                       | This parameter must be specified.                                              |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``indexes``                    | (none)                | A comma-separated list of index names                                          |
+   |                                |                       | in the Solr instance that will be                                              |
+   |                                |                       | accessible from the defined data                                               |
+   |                                |                       | source.                                                                        |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``port``                       | ``8983``              | Port number on ``host`` to connect to                                          |
+   |                                |                       | the Solr instance.                                                             |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``protocol``                   | ``IPv4``              | Specifies the network layer protocol to be used for connecting to the Solr     |
+   |                                |                       | instance.                                                                      |
+   |                                |                       |                                                                                |
+   |                                |                       | Valid values for this parameter are:                                           |
+   |                                |                       |                                                                                |
+   |                                |                       | ``IPv4``: use IP version 4                                                     |
+   |                                |                       |                                                                                |
+   |                                |                       | ``IPv6``: use IP version 6                                                     |
+   |                                |                       |                                                                                |
+   |                                |                       | ``IPv6-v4``: try to use IP version 6 falling back to IP version 4 if           |
+   |                                |                       | unsuccessful.                                                                  |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+   | ``verify-server-certificates`` | ``true``              | Controls whether the server's TLS certificate should be verified.              |
+   |                                |                       | The setting will be ignored if ``channel`` is ``unsecure``.                    |
+   +--------------------------------+-----------------------+--------------------------------------------------------------------------------+
+
+.. _creating-data-source-tuple-tables:
+
+Creating Data Source Tuple Tables
+---------------------------------
+
+Creating a data source tuple table requires a table name and a set of
+parameters specifying how to construct the table's values from one of the data
+store's registered data sources.
+
+The parameters specifying a data source tuple table can be broken into two
+groups. The first group determines the exact *source table* the tuple table
+will be bound to. The source table could be one of the data source's tables or,
+depending on the type of data source, the result of a query against the data
+source as a whole. With the exception of ``data-source-name``, parameters in
+this group are specific to each type of data source. The second group of
+parameters determines how the columns of the tuple table are formed from the
+columns of the source table. These parameters are the same for all data source
+types. The following diagram illustrates the relationships between data source
+tables, data source tuple tables, queries and source tables.
+
+.. figure:: SourceTable.svg
+   :align: center
+   :alt: SourceTable
+
+This section will first document the tuple table creation parameters common to
+all types of data source, and proceed to documenting the specifics of creating
+tuple tables for each of the supported data source types.
+
+.. note::
+
+   In this section, angle brackets are used to denote a variable portion of a
+   parameter or placeholder name. Furthermore, ``<n>`` is used to denote a
+   1-based column index into the source table, ``<N>`` is used to denote the
+   total number of columns the source table and ``<k>`` is used to denote a
+   1-based column index into the data source tuple table to be created.
+
+General Data Source Tuple Table Creation Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Creating a data source tuple table for any type of data source requires a
+description of how to map the columns of the source table (specified by the
+parameter ``data-source-name`` in combination with other type-specific
+parameters) to the columns of the tuple table to be created. The parameters for
+specifying this mapping, which are common to all types of data source, are as
+follows.
+
+.. table ::
+   :widths: 20,10,50
+
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   |           Parameter            | Default value                       |       Description                                   |
+   +================================+=====================================+=====================================================+
+   | ``columns``                    | ``<N>``                             | The number of columns the data source tuple table   |
+   |                                |                                     | will have.                                          |
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   | ``data-source-name``           | (none)                              | The name of the data source.                        |
+   |                                |                                     |                                                     |
+   |                                |                                     | This parameter must be specified.                   |
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   | ``<k>`` where 1 <= ``<k>``     | ``{<k>}``                           | Template for the lexical form of values in the      |
+   | <= ``columns``                 |                                     | ``<k>``-th column. See below for details.           |
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   | ``<k>.datatype``               | ``<n>.datatype`` if ``<k>`` is      | The datatype of values in the ``<k>``-th column. The|
+   |                                | ``{<n>}``, otherwise ``string``.    | valid values for this parameter are those listed    |
+   |                                |                                     | in :numref:`literal-data-types` plus ``bnode`` for  |
+   |                                |                                     | blank nodes ``iri`` for IRIs.                       |
+   |                                |                                     | Type names may be abbreviated using the standard    |
+   |                                |                                     | standard prefixes ``xsd:``, ``rdf:`` and ``rdfs:``. |
+   |                                |                                     | Moreover, ``xsd:string``, ``xsd:integer`` and       |
+   |                                |                                     | ``xsd:double`` may be further abbreviated to        |
+   |                                |                                     | ``string``, ``double`` and ``integer`` respectively.|
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   | ``<k>.default``                | ``0`` if ``<k>.datatype`` specifies | The default value for the ``<k>``-th column of the  |
+   |                                | a numeric type, otherwise the       | data source tuple table. See also ``<k>.if-empty``. |
+   |                                | empty string                        |                                                     |
+   |                                |                                     | Note that the default value for this parameter is   |
+   |                                |                                     | not guaranteed to be valid for the associated       |
+   |                                |                                     | datatype. For example the empty string is not a     |
+   |                                |                                     | valid ``xsd:dateTime``. In such cases, a value must |
+   |                                |                                     | be specified if the corresponding ``<k>.if-empty``  |
+   |                                |                                     | policy is ``default``.                              |
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   | ``<k>.if-empty``               | ``default``                         | Specifies the policy for dealing with empty values  |
+   |                                |                                     | in input columns. This policy is only consulted if  |
+   |                                |                                     | `all` of the source table or query values           |
+   |                                |                                     | referred to within the lexical form template ``<k>``|
+   |                                |                                     | are empty.                                          |
+   |                                |                                     |                                                     |
+   |                                |                                     | Valid values for this parameter are:                |
+   |                                |                                     |                                                     |
+   |                                |                                     | ``absent``: treat the field as absent. This will    |
+   |                                |                                     | result in a hole appearing in the corresponding row |
+   |                                |                                     | in the data source tuple table.                     |
+   |                                |                                     |                                                     |
+   |                                |                                     | ``leave``: leave as is. This will result in the     |
+   |                                |                                     | empty string being substituted for each placeholder |
+   |                                |                                     | in the lexical form template. For example, if       |
+   |                                |                                     | ``<k>`` is ``"{1} abc {2}"``, the resulting value   |
+   |                                |                                     | will be ``" abc "``.                                |
+   |                                |                                     |                                                     |
+   |                                |                                     | ``default``: use ``<k>.default`` as the value. This |
+   |                                |                                     | is the default value.                               |
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+   | ``<k>.invalid-literal-policy`` | ``error``                           | Specifies the action to take when the lexical form  |
+   |                                |                                     | of a value calculated for the ``<k>``-th column is  |
+   |                                |                                     | not a valid literal of the type specified by        |
+   |                                |                                     | ``<k>.datatype``.                                   |
+   |                                |                                     |                                                     |
+   |                                |                                     | Valid values for this parameter are:                |
+   |                                |                                     |                                                     |
+   |                                |                                     | ``error``: treat such cases as errors, causing the  |
+   |                                |                                     | current operation to fail.                          |
+   |                                |                                     |                                                     |
+   |                                |                                     | ``as-string-silent``: silently convert offending    |
+   |                                |                                     | values to strings, allowing the current operation   |
+   |                                |                                     | to proceed.                                         |
+   |                                |                                     |                                                     |
+   +--------------------------------+-------------------------------------+-----------------------------------------------------+
+
+To determine the lexical form of each value of the ``<k>``-th column of a data
+source tuple table, RDFox applies basic string interpolation to the lexical
+form template specified via parameter ``<k>``. The following table lists the
+available placeholder names which RDFox will replace with the appropriate value
+for each row. Placeholder names should be be enclosed in braces ``{}`` within
+the lexical form template.
+
+.. table ::
+   :widths: 30,50
+
+   +---------------------------+----------------------------------------------------+
+   |      Placeholder          |                     Meaning                        |
+   +===========================+====================================================+
+   | ``<n>`` where 1 <= ``<n>``| The lexical form of the value in the ``<n>``-th    |
+   | <= ``N``                  | column ``<n>`` of the source table.                |
+   +---------------------------+----------------------------------------------------+
+   | ``<name>``                | The lexical form of the value in the column with   |
+   |                           | name ``<name>`` of the source table. This          |
+   |                           | placeholder cannot be used with delimited file     |
+   |                           | data sources that do not have a header.            |
+   +---------------------------+----------------------------------------------------+
+   | ``row#``                  | The index of the current row (``delimitedFile``    |
+   |                           | and ``solr`` data sources only).                   |
+   +---------------------------+----------------------------------------------------+
+
+.. note::
+
+   In the case of IRIs, no validation is performed on strings created from the
+   lexical form template and there is no resolution against a base
+   IRI. It is the user's responsibility to ensure that the resulting values are
+   valid IRIs, if that is required.
+
+Creating Delimited File Data Source Tuple Tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since data sources of type ``delimitedFile`` only have one possible source
+table and do not support queries, creating associated tuple tables does not
+require any special parameters.
+
+.. container:: example
+
+   **Example: Creating a CSV Data Source Tuple Table using the Shell**
+
+   Continuing from the example in
+   :numref:`registering-delimited-file-data-sources`, a data source tuple table
+   with name ``people``, can be created as follows.
+
+   .. code-block::
+      :linenos:
+
+         tupletable create people               \
+            data-source-name "peopleDS"         \
+            "columns" 5                         \
+            "1" "http://fg.com/{1}_{2}_{row#}"  \
+            "1.datatype" "iri"                  \
+            "2" "{First Name}"                  \
+            "2.datatype" "string"               \
+            "3" "{Last Name}"                   \
+            "3.datatype" "string"               \
+            "4" "{Sex}"                         \
+            "4.datatype" "string"               \
+            "4.if-empty" "default"              \
+            "4.default" "F"                     \
+            "5" "{ 4 }"                         \
+            "5.datatype" "integer"              \
+            "5.if-empty" "absent"
+
+   Although the source table contains only four columns, the tuple table
+   created by the above command will have five. The extra column will be in
+   position ``1`` and will contain a unique ID for each row of the CSV file.
+   These IDs (IRIs) are constructed from the person's first and last names as
+   well as the row number within the file. Including the row number avoids
+   using the same IRI for two people that have the same first and last names
+   (such as the two "Abigail Edwards" entries in the file).
+
+   Note that the lexical form templates in the example use a mixture of
+   position- and name-based placeholders to refer to source columns:
+   position-based for column ``1`` (line 4) and name-based for columns ``2``,
+   ``3`` and ``4`` (lines 6, 8 and 10 respectively). Also, note that column
+   ``4`` has default ``F`` (i.e., if no sex is specified, then ``F`` is used as
+   a default), and that column ``5`` is treated as absent if the corresponding
+   input field is empty.
+
+   Querying this tuple table returns the following tuples. ::
+
+      <http://fg.com/Beverly_Strickland_1> "Beverly" "Strickland" "F" 33 .
+      <http://fg.com/Thomas_Peterson_2> "Thomas" "Peterson" "M" UNDEF .
+      <http://fg.com/Urs_Andresson_3> "Urs" "Andresson" "M" 63 .
+      <http://fg.com/Abigail_Edwards_4> "Abigail" "Edwards" "F" 52 .
+      <http://fg.com/Abigail_Edwards_5> "Abigail" "Edwards" "F" 36 .
+
+
+Creating PostgreSQL Data Source Tuple Tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The parameters for creating a data source tuple table for a data source of type
+``PostgreSQL`` are as follows.
+
+.. table ::
+   :widths: 9,10,50
+
+   +---------------------------+----------------------------+------------------------------------------+
+   |       Parameter           |    Default value           |             Description                  |
+   +===========================+============================+==========================================+
+   | ``table.name``            | (none)                     | The name of a data source table to       |
+   |                           |                            | use as the source table for the tuple    |
+   |                           |                            | table being created.                     |
+   |                           |                            |                                          |
+   |                           |                            | Either this `or` ``query`` must be       |
+   |                           |                            | specified.                               |
+   +---------------------------+----------------------------+------------------------------------------+
+   | ``table.<n>.nullable``    | Value reported by the      | Specifies whether the ``<n>``-th column  |
+   |                           | PostgreSQL instance.       | of the table identified by ``table.name``|
+   |                           |                            | and ``table.schema`` should be treated   |
+   |                           |                            | as nullable or not.                      |
+   +---------------------------+----------------------------+------------------------------------------+
+   | ``table.schema``          | ``public``                 | Specifies the schema to which            |
+   |                           |                            | ``table.name`` belongs.                  |
+   +---------------------------+----------------------------+------------------------------------------+
+   | ``query``                 | (none)                     | An SQL query used to generated the source|
+   |                           |                            | table for the tuple table being created. |
+   |                           |                            |                                          |
+   |                           |                            | Either this `or` ``table.name`` must be  |
+   |                           |                            | specified.                               |
+   +---------------------------+----------------------------+------------------------------------------+
+   | ``query.<n>.nullable``    | Value reported by the      | Specifies whether the ``<n>``-th column  |
+   |                           | PostgreSQL instance.       | of an answer to query ``query`` should   |
+   |                           |                            | be treated as nullable or not.           |
+   +---------------------------+----------------------------+------------------------------------------+
+
+Creating ODBC Data Source Tuple Tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The parameters for creating a data source tuple table for a data source of type
+``ODBC`` are as follows.
+
+.. table ::
+   :widths: 9,10,50
+
+   +-----------------------------+----------------------------+------------------------------------------+
+   |       Parameter             |    Default value           |             Description                  |
+   +=============================+============================+==========================================+
+   | ``table.name``              | (none)                     | The name of a data source table to       |
+   |                             |                            | use as the source table for the tuple    |
+   |                             |                            | table being created.                     |
+   |                             |                            |                                          |
+   |                             |                            | Either this `or` ``query`` must be       |
+   |                             |                            | specified.                               |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``table.<n>.nullable``      | Value reported by the      | Specifies whether the ``<n>``-th column  |
+   |                             | ODBC instance.             | of the table identified by ``table.name``|
+   |                             |                            | and ``table.schema`` should be treated   |
+   |                             |                            | as nullable or not.                      |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``table.<n>.time-zone``     | (none)                     | The time zone RDFox should apply to      |
+   |                             |                            | values that include times in the         |
+   |                             |                            | ``<n>``-th column of the table identified|
+   |                             |                            | by ``table.name`` and ``table.schema``.  |
+   |                             |                            |                                          |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``table.schema``            | (none)                     | Specifies the schema to which            |
+   |                             |                            | ``table.name`` belongs.                  |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``query``                   | (none)                     | An SQL query used to generated the source|
+   |                             |                            | table for the tuple table being created. |
+   |                             |                            |                                          |
+   |                             |                            | Either this `or` ``table.name`` must be  |
+   |                             |                            | specified.                               |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``query.<n>.buffer-length`` | Column width reported by   | The size in bytes of the buffer reserved |
+   |                             | the ODBC instance plus one,| for string values in the ``<n>``-th      |
+   |                             | all multiplied by the      | column of an answer to query ``query``.  |
+   |                             | width of the instance's    |                                          |
+   |                             | character type in bytes.   |                                          |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``query.<n>.nullable``      | Value reported by the      | Specifies whether the ``<n>``-th column  |
+   |                             | ODBC instance.             | of an answer to query ``query`` should   |
+   |                             |                            | be treated as nullable or not.           |
+   +-----------------------------+----------------------------+------------------------------------------+
+   | ``query.<n>.time-zone``     | (none)                     | The time zone RDFox should apply to      |
+   |                             |                            | values that include times in the         |
+   |                             |                            | ``<n>``-th column of an answer to query  |
+   |                             |                            | ``query``.                               |
+   +-----------------------------+----------------------------+------------------------------------------+
+
+Creating Solr Data Source Tuple Tables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The parameters for creating a data source tuple table for a data source of type
+``solr`` are as follows.
+
+.. table ::
+   :widths: 25,16,44
+
+   +--------------------------------------+----------------------+------------------------------------------------------------------------------------------------+
+   |       Parameter                      |    Default value     |             Description                                                                        |
+   +======================================+======================+================================================================================================+
+   | ``index``                            | (none)               | The name of the Solr index to query.                                                           |
+   |                                      |                      |                                                                                                |
+   |                                      |                      | This parameter must be specified.                                                              |
+   +--------------------------------------+----------------------+------------------------------------------------------------------------------------------------+
+   | ``<k>.type``                         | ``variable``         | Specifies the type of the ``<k>``-th column.                                                   |
+   |                                      |                      |                                                                                                |
+   |                                      |                      | Valid values for this parameter are:                                                           |
+   |                                      |                      |                                                                                                |
+   |                                      |                      | ``variable``: the column can accept both variables and values when the table is accessed.      |
+   |                                      |                      |                                                                                                |
+   |                                      |                      | ``parameter``: the column can accept only values when the table is accessed.                   |
+   |                                      |                      |                                                                                                |
+   |                                      |                      | See the following discussion of the significance of this parameter.                            |
+   |                                      |                      |                                                                                                |
+   +--------------------------------------+----------------------+------------------------------------------------------------------------------------------------+
+   | ``solr.<param>`` where ``<param>``   | (none)               | This parameter template provides a mechanism for specifying Solr query options which will be   |
+   | is one of the query parameters       |                      | passed through directly with the noted exceptions. See                                         |
+   | supported by Solr other than ``wt``, |                      | `Solr parameters <https://lucene.apache.org/solr/guide/8_6/common-query-parameters.html>`_.    |
+   | ``fl`` or ``omitHeader`` which are   |                      |                                                                                                |
+   | reserved by RDFox.                   |                      | All Solr paramters are optional but failing to specify ``q`` will result in an empty result    |
+   |                                      |                      | set. See the following discussion for details of how to determine the value of this parameter. |
+   +--------------------------------------+----------------------+------------------------------------------------------------------------------------------------+
+
+The Solr data source introduces the notion of *parameter* columns, which can be
+used in the definition of Solr query parameters. A column with index ``<k>``
+may be specified as a parameter column by setting the value of ``<k>.type`` to
+``parameter``. The values of parameter columns are determined dynamically
+during the evaluation of queries or rules. Once determined, RDFox will
+interpolate the values of the parameter columns into the Solr query parameters
+so that it can make the appropriate Solr request. Parameterized Solr tuple
+tables can only be used in queries and rules in which the values of parameter
+columns are determined either directly, using an RDF resource, or indirectly,
+using a variable whose value can be bound by the rest of the query or rule.
+
+Note that use of parameter columns is not mandatory - users may specify a
+static value for the ``solr.q`` parameter in which case all columns may be of
+type variable.
+
+.. container:: example
+
+   **Example: Creating a Solr Data Source Tuple Table With a Dynamic Query using the Shell**
+
+   Consider the following command, which assumes the prior registration of a
+   Solr data source named ``companiesDS`` and creates a tuple table
+   ``companyNameByAddress``, with two columns.
+
+   ::
+
+      tupletable create companyNameByAddress    \
+         data-source-name "companiesDS"         \
+         "index" "companies"                    \
+         "solr.q" "address:\"*{2}*\""           \
+         "solr.rows" 1000                       \
+         "columns" 2                            \
+         "1" "{company_name}"                   \
+         "2.type" "parameter"
+
+   At the beginning of each iteration of this table, RDFox will substitute the
+   value from parameter column in position ``2`` into the template
+   ``"address:\"*{2}*\""`` to form the query to send to the Solr instance
+   registered as ``companiesDS``.
+
+   The following SPARQL query, which references the tuple table, will return
+   the names of the first 1000 companies whose addresses contain either "CA" or
+   "NY".
+
+   ::
+
+      SELECT ?name WHERE {
+         VALUES ?address { "CA" "NY"}
+         TT companyNameByAddress{ ?name ?address }
+         }
+
+   Note that the values passed to parameter columns need not be constants in
+   the query, but can also be dynamically bound from the data, as shown in the
+   following query.
+
+   ::
+
+      SELECT ?name WHERE {
+         ?address a fg:addressPattern .
+         TT companyNameByAddress{ ?name ?address }
+         }
+
+By default, RDFox escapes `Solr special characters
+<https://lucene.apache.org/solr/guide/8_6/the-standard-query-parser.html#escaping-special-characters>`_
+in lexical forms during parameter expansion. In some cases, however, the
+escaping of Solr special characters may not be the desired behavior, like, for
+example, when the entire Solr query is parameterized. To indicate that a
+reference to a parameter column with index ``<k>`` should not be escaped during
+expansion, one needs to prefix it using the ``+`` sign, as shown in the
+following example.
+
+.. container:: example
+
+   **Example: Creating a Solr Data Source Tuple Table With Unescaped Queries using the Shell**
+
+   The following command demonstrates the syntax for suppressing escaping
+   during parameter expansion.
+
+   ::
+
+      tupletable create companyNameGeneralQuery \
+         data-source-name "companiesDS          \
+         "index" "companies"                    \
+         "solr.q" "{+2}"                        \
+         "solr.rows" 1000                       \
+         "columns" 2                            \
+         "1" "{company_name}"                   \
+         "2.type" "parameter"
+
+   We can now ask for all companies that have "CA" in their addresses as
+   follows.
+
+   ::
+
+      SELECT ?name WHERE {
+         VALUES ?solrQuery { "address:*CA*" }
+         TT companyNameGeneralQuery{ ?name ?solrQuery }
+         }
+
+   Note that, if we instead use the reference ``{2}``, the query would fail,
+   because RDFox will escape the special characters ``:`` and ``*``.
+
+
+A number of restrictions apply to the use of parameter columns, which we
+outline next.
+
+-  A tuple table can have any number of parameter columns.
+
+-  Parameter columns can be used in any Solr parameter (e.g. ``rows``, ``sort``,
+   etc.).
+
+-  Parameter columns can be referenced in multiple fields and multiple times.
+
+-  All parameter columns have to be specified/bound when accessing the tuple
+   table. For example, the following query would be invalid, since ``?address``
+   cannot be bound.
+
+::
+
+   SELECT * WHERE { TT companyNameByAddress{ ?name ?address } }
+
+
+-  Solr parameters can only refer to parameter columns (the use of
+   ``"solr.q" "address:*{2}*"`` in the above examples will result in an error).
+
+-  Properties of parameter columns are ignored.
+
+-  Note that different values of the parameter columns of a Solr tuple table
+   will typically result in a different ordered set of records. The virtual
+   column ``row#`` added to each of the result sets will contain the index of
+   each record in the given result set. So, for example, a California-based
+   company may be assigned a different ``row#`` depending on whether we query
+   for "address:*CA*" or "address:*US*". The ``row#`` placeholder should
+   therefore be used with caution when the source table contains parameter
+   columns.
+
+Data Sources and Incremental Reasoning
+--------------------------------------
+
+RDFox never caches data retrieved from a data source: facts are fetched on
+demand in order to answer queries or evaluate rules. Due to RDFox's
+materialized reasoning, however, facts derived on the basis of data source
+facts are added to the ``all`` domain and form part of the data set for
+subsequent query or rule evaluations without further retrievals from the data
+source. Owing to RDFox's incremental approach to reasoning, such facts will
+remain present in the data store until the next full materialization. A full
+materialization can be triggered in the following ways:
+
+- using the ``remat`` command in the shell (see :numref:`remat-command`)
+
+- by making a ``PATCH`` request to the RDFox endpoint with the right path for
+  the data store (e.g. ``/datastores/my-datastore``) and including the
+  parameter ``operation=recompute-materialization`` (see
+  :numref:`APIs-managing-content`)
+
+- by calling the
+  ``tech.oxfordsemantic.jrdfox.client.DataStoreConnection.recomputeMaterialization()``
+  method in Java

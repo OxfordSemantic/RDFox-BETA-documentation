@@ -1,0 +1,305 @@
+.. _features-and-requirements:
+
+
+RDFox Features and Requirements
+===============================
+
+RDFox Features
+--------------
+
+RDFox® provides the following main functionality:
+
+- RDFox can import RDF triples, rules, and OWL 2 and SWRL axioms either
+  programmatically or from files of certain formats (see :numref:`import` for
+  details). RDF data can be validated using the SHACL constraint language.
+  Additionally, RDFox can access information from external data sources, such as
+  CSV files, relational databases, or Apache Solr (see :numref:`data-sources`).
+
+- Triples, rules and axioms can be exported into a number of different formats
+  (see :numref:`export` for details). Furthermore, the contents of the system
+  can be incrementally saved into a binary file, which can later be loaded to
+  restore the system's state.
+
+- RDFox can answer SPARQL 1.1 queries (see :numref:`querying`) and provides
+  functionality for monitoring query answering and accessing query plans.
+
+- RDFox supports materialization-based reasoning, where all triples that
+  logically follow from the facts and rules in the system are materialized as
+  new triples (see :numref:`reasoning`) . Materializations can be incrementally
+  updated, which means that reasoning does not need to be performed from
+  scratch once the information in the system is updated. Furthermore, the
+  results of reasoning can be *explained*, which means that RDFox is able to
+  return proofs for any new fact added to the store through materialization.
+
+- RDFox supports ACID transactional updates (see :numref:`transactions` for
+  further details on transactions).
+
+- Individual information elements in the system can be assigned different
+  access permissions for different users (see :numref:`access-control` for
+  further details on access control).
+
+.. _software-archive:
+
+Software Archive
+----------------------
+
+RDFox is distributed as an archive containing the following files and
+directories:
+
+- ``RDFox`` (macOS/Linux) or ``RDFox.exe`` (Windows): a stand-alone executable
+  that can be used to run RDFox on the command line.
+
+- ``lib``: a directory containing the following libraries:
+
+   - ``JRDFox.jar``: the Java API to the RDFox engine.
+
+   - ``libRDFox.dylib`` (macOS), ``libRDFox.so`` (Linux), or ``libRDFox.dll``
+     (Windows): a dynamic/shared library that implements the C and the Java
+     Native APIs of RDFox.
+
+   - ``libRDFox.lib`` (Windows only): the import library needed for linking
+     ``libRDFox.dll`` on Windows.
+
+   - ``libRDFox-static.a`` (macOS and Linux) or ``libRDFox-static.lib``
+     (Windows): a static library that implements the C API of RDFox.
+
+- ``include``: a directory containing definitions for an EXPERIMENTAL C API.
+  The definitions include C++ classes that can be used to make it easier to
+  correctly manage the resources exposed by the C API within C++ applications.
+
+- ``examples``: a directory containing demonstration programs that show how to
+  call RDFox as a library.
+
+
+   - ``C``: a directory containing a C source file demonstrating how to call
+     RDFox via the experimental C API. The directory also contains scripts
+     ``compile-shared-and-run.sh`` and ``compile-static-and-run.sh`` on macOS
+     and Linux, and scripts ``compile-shared-and-run.bat`` and
+     ``compile-static-and-run.bat`` on Windows, which can be used to build and
+     run the demo. On macOS and Linux, the scripts assumes a C-99 compliant
+     version of gcc is available on the path. On Windows, the scripts assume
+     that ``vcvars64.bat`` has been executed in the shell prior to execution.
+
+   - ``C++``: a directory containing a C++ source file demonstrating how to call
+     RDFox via the C++ wrapper for the experimental C API. The directory also
+     contains scripts ``compile-shared-and-run.sh`` and
+     ``compile-static-and-run.sh`` on macOS and Linux, and scripts
+     ``compile-shared-and-run.bat`` and ``compile-static-and-run.bat`` on
+     Windows, which can be used to build and run the demo. On macOS and Linux,
+     the script assumes a version of g++ supporting C++11 is available on the
+     path. On Windows, the script assumes that ``vcvars64.bat`` has been
+     executed in the shell prior to execution.
+
+   - ``Java``: a directory containing source code for a program demonstrating
+     how to call RDFox via the JRDFox API. The ``examples/Java/build.xml``
+     Apache Ant script can be used to compile and run the program.
+
+Interfaces
+----------------
+
+Users and developers can interact with RDFox through the following interfaces:
+
+CLI
+  RDFox comes with a built-in shell that can be used to interact with and
+  control the RDFox Server. The shell can be launched together with an RDFox
+  Server instance using the ``shell`` or ``sandbox`` modes of the executable.
+  Alternatively the ``remote`` executable mode can be used to connect to and use
+  the shell interface of a remote RDFox Server. See :numref:`rdfox-shell` for
+  details.
+
+RESTful API
+  When RDFox's endpoint is running, clients can interact with the associated
+  RDFox server via a RESTful API. For details of the RESTful API, see
+  :numref:`apis`. For details of how to configure and start the
+  endpoint, see :numref:`rdfox-endpoint`.
+
+Java API
+  RDFox can be embedded into Java applications and called via the Java API
+  described in :numref:`apis` and :numref:`javadoc`. To use JRDFox in
+  your project, simply add ``JRDFox.jar`` to your classpath, and make sure that
+  the path to the dynamic library is correctly specified when starting your
+  program using the following JVM option:
+
+  ::
+
+     -Djava.library.path=<path to the dynamic library>
+
+C API (EXPERIMENTAL)
+  RDFox can be dynamically loaded and called through a C API.
+
+GUI
+  As well as serving the REST API, the RDFox endpoint serves the RDFox Console,
+  a browser-based user interface supporting basic querying and visualization of
+  data store content. When the endpoint is running, the Console can be loaded by
+  visiting ``http[s]:<hostname>:<port>/console/`` where ``<hostname>`` and
+  ``<port>`` are the host name and port number at which the endpoint can be
+  reached.
+
+System Requirements
+---------------------
+
+Software
+~~~~~~~~
+
+Operating Systems
+^^^^^^^^^^^^^^^^^
+
+RDFox supports the following operating system versions:
+
+Windows
+  Windows 10 or higher
+
+Mac
+  macOS 10.14 or higher
+
+Linux
+   - Ubuntu 18.04 or higher
+   - Amazon Linux 2 or higher
+
+Additionally, RDFox can be run using Docker. See :numref:`docker` for
+details.
+
+.. _third-party-software:
+
+Third-party Software
+^^^^^^^^^^^^^^^^^^^^
+
+Some RDFox features depend on dynamic-link libraries (DLL) from the list of the
+third-party software packages below. In each case, the DLL or DLLs are loaded
+on-demand the first time the dependent functionality is accessed within a
+session. This means that RDFox can be deployed in the absence of these packages
+if the dependent functionality is not needed.
+
+`OpenSSL <https://www.openssl.org/>`__
+  Used to implement TLS for RDFox's HTTP client and server code, as well as for
+  persistence and session encryption. The search paths used to locate the DLLs
+  from this package when the endpoint is starting can be specified via the
+  ``RDFOX_LIBCRYPTO_PATH`` and ``RDFOX_LIBSSL_PATH`` environment variables. If
+  the environment variables are not set, the default values shown in the
+  following table are used.
+
+    .. table ::
+        :widths: 20,30,30
+
+        +----------------+------------------------------+---------------------------+
+        |    Platform    |     libcrypto search path    |   libssl search path      |
+        +================+==============================+===========================+
+        | Windows        | ``libcrypto-3-x64.dll``      | ``libssl-3-x64.dll``      |
+        +----------------+------------------------------+---------------------------+
+        | macOS          | ``libcrypto.3.dylib``        | ``libssl.3.dylib``        |
+        +----------------+------------------------------+---------------------------+
+        | Linux          | ``libcrypto.so``             | ``libssl.so``             |
+        +----------------+------------------------------+---------------------------+
+  
+  The resolved libraries must have version v3.0.0 or higher.
+
+`libpq <https://www.postgresql.org/docs/14/libpq.html>`__
+  Used to access PostgreSQL data sources. The search path used to locate
+  ``libpq`` when registering one of these data sources can be specified via the
+  ``RDFOX_LIBPQ_PATH`` environment variable. If the environment variable is not
+  set, the default value shown in the following table is used.
+
+    .. table ::
+        :widths: 20,30
+
+        +----------------+---------------------+
+        |    Platform    |  libpq search path  |
+        +================+=====================+
+        | Windows        | ``libpq.dll``       |
+        +----------------+---------------------+
+        | macOS          | ``libpq.dylib``     |
+        +----------------+---------------------+
+        | Linux          | ``libpq.so``        |
+        +----------------+---------------------+
+
+  The resolved library should be of a version that matches that of the
+  PostgreSQL server being connected to. The current release was built and
+  tested with both library and server from PostgreSQL 14, however it will also
+  work with a wider range of versions, both higher and lower. Please test you
+  configuration and contact OST support as needed.
+
+`iODBC <https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors>`__ or `unixODBC <http://www.unixodbc.org/>`__
+  Used to access external data sources via ODBC. The search path used to locate
+  the DLL that will manage drivers for accessing the ODBC source can be
+  specified via the ``RDFOX_ODBC_DRIVER_MANAGER_PATH`` environment variable. If
+  the environment variable is not set, RDFox will attempt to use the default
+  search paths shown in the following table to load unixODBC and, if that fails
+  and the platform is not Windows, iODBC.
+
+    .. table ::
+        :widths: 20,30,30
+
+        +----------------+------------------------+---------------------+
+        |    Platform    |  unixODBC search path  |  iODBC search path  |
+        +================+========================+=====================+
+        | Windows        | ``odbc32.dll``         | (not supported)     |
+        +----------------+------------------------+---------------------+
+        | macOS          | ``libodbc.dylib``      | ``libiodbc.dylib``  |
+        +----------------+------------------------+---------------------+
+        | Linux          | ``libodbc.so``         | ``libiodbc.so``     |
+        +----------------+------------------------+---------------------+
+
+  Although iODBC can be used, unixODBC is recommended. The current release was
+  built and tested with unixODBC v2.3, however it will work with a wider range
+  of versions, both higher and lower. Please test you configuration and contact
+  OST support as needed.
+
+For a list of other third-party components used within RDFox, see
+:numref:`acknowledgments`.
+
+.. _rdfox-license-key:
+
+License Key
+^^^^^^^^^^^
+
+.. Note for maintainers: the link printed by RDFox when it doesn't find a
+   license points to the following section so if you change the section title
+   or the name of this file, you must update the RDFox source code accordingly.
+
+Creating an :ref:`RDFox Server <servers>` requires a time-limited license key
+issued by Oxford Semantic Technologies. At server creation time, RDFox will
+search the following locations, in the order shown, for the license key:
+
+- the value of the ``license.content`` server parameter, if set
+
+- [**RDFox executable only**] the value of the ``RDFOX_LICENSE_CONTENT``
+  environment variable, if set
+
+- the content of the file specified via the ``license.file`` server parameter,
+  if set
+
+- [**RDFox executable only**] the content of the file specified via the
+  ``RDFOX_LICENSE_FILE`` environment variable, if set
+
+- [**RDFox executable only**] the content of the file ``RDFox.lic`` in the
+  directory containing the running executable, if the file exists
+
+- the content of the file at the default value for the ``license.file`` server
+  parameter, if the file exists
+
+If a candidate key is found in one location, the remaining locations will not be
+checked even if the candidate turns out to be invalid or expired. See
+:numref:`server-parameters` for details of how to specify server parameters such
+as ``license.content`` and ``license.file``.
+
+Hardware
+~~~~~~~~
+
+RDFox is a main-memory data store and as such its performance is heavily
+dependent on access to a suitable amount of RAM. Oxford Semantic Technologies
+recommends that users ensure that RDFox has unpaged access to 60-120 bytes of
+RAM per triple that their store will contain. This includes both explicitly
+imported triples and those materialized via reasoning.
+
+When RDFox is configured for :ref:`persistence`, data will also be saved to
+disk, ready to be loaded in subsequent sessions. The underlying file system
+must satisfy the system requirements documented in
+:numref:`persistence-options` for the chosen persistence option, and have 40-60
+bytes of disk space per triple. This includes enough space to store the data
+itself and some working free space that is needed for operations such as
+compaction and upgrade.
+
+Recovering from low-memory or low-disk-space conditions can be complex, so it
+is vital to monitor these metrics and take action before they become exhausted.
+Regular :ref:`compaction <compaction-dead-fact-removal>` of data stores can
+help minimize a server's memory and disk space usage.

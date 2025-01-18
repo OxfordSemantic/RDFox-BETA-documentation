@@ -1,0 +1,964 @@
+.. _querying:
+
+Querying
+========
+
+RDFox® supports most `SPARQL 1.1 Query Language
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/>`__ features, and it
+fully supports the `SPARQL 1.1 Update Language
+<https://www.w3.org/TR/2013/REC-sparql11-update-20130321/>`__. It also
+implements a few proprietary built-in functions that are not part of SPARQL
+1.1.
+
+In this section, we describe in detail the support in RDFox for the `SPARQL 1.1
+standard specification
+<https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/>`__, and the
+built-in functions that are specific to RDFox.
+
+Finally, we also describe the functionality implemented in RDFox for monitoring
+query execution.
+
+SPARQL 1.1 Support
+------------------
+
+The `SPARQL 1.1 specification
+<https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/>`__ provides a
+suite of languages and protocols for querying and manipulating RDF graph data.
+
+Query Language
+~~~~~~~~~~~~~~
+
+The core of the specification is the `SPARQL 1.1 Query Language
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/>`__, which specifies
+the syntax and semantics of allowed queries. The SPARQL 1.1 query language
+extends the `previous version of SPARQL
+<https://www.w3.org/TR/rdf-sparql-query/>`__ with a number of important
+features for applications, including nested `subqueries
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#subqueries>`__,
+`aggregation
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#aggregates>`__,
+`negation
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#negation>`__,
+`creating values by expressions
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#assignment>`__,
+`named graphs
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#namedGraphs>`__, and
+`property paths
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#propertypaths>`__.
+RDFox also implements the following
+`modification to the semantics of aggregate queries with empty GROUP BY clauses
+<https://afs.github.io/sparql-agg-group-empty.html>`__; this variant of the
+semantics was found critical to provide intuitive answers to queries such as
+``SELECT (COUNT(*) AS ?C) WHERE { ?X ?Y ?Z }`` and has been adopted by most, if
+not all RDF systems on the market.
+
+RDFox provides full support of the SPARQL 1.1 query language with the
+exception of the
+variant of the `BNODE function
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bnode>`__ that
+takes a single string argument and the
+nonnormative `DESCRIBE query form
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#describe>`__.
+The intended semantics of ``BNODE`` and ``DESCRIBE``
+is, in our opinion, not sufficiently specified in the standard, which is why
+those features have not yet been implemented in RDFox.
+
+Although RDFox supports SPARQL 1.1 property paths, in many situations it might be beneficial
+to use reasoning instead. This is explained further in :numref:`representing-property-paths`
+
+.. _query-answer-formats:
+
+Query Answer Formats
+~~~~~~~~~~~~~~~~~~~~
+
+RDFox supports the following formats for encoding the answers to SPARQL queries.
+
+- The `SPARQL 1.1 TSV Format
+  <http://www.w3.org/TR/sparql11-results-csv-tsv/>`__ has MIME type
+  ``text/tab-separated-values``.
+
+- The `SPARQL 1.1 CSV Format
+  <http://www.w3.org/TR/sparql11-results-csv-tsv/>`__ has MIME type
+  ``text/csv``.
+
+- The `SPARQL 1.1 XML Format <http://www.w3.org/TR/rdf-sparql-XMLres/>`__ has
+  MIME type ``application/sparql-results+xml``.
+
+- The `SPARQL 1.1 JSON Format <http://www.w3.org/TR/sparql11-results-json/>`__
+  has MIME type ``application/sparql-results+json``.
+
+- The proprietary format with MIME type ``application/x.sparql-results+turtle``
+  outputs each query answer in a single line that resembles Turtle. If the
+  query has exactly three answer variables, then query answers in this format
+  can be passed to API calls that expect Turtle data.
+
+- Proprietary formats with MIME types ``text/x.tab-separated-values-abbrev``,
+  ``text/x.csv-abbrev``, ``application/x.sparql-results+xml-abbrev``,
+  ``application/x.sparql-results+json-abbrev``, and
+  ``application/x.sparql-results+turtle-abbrev`` follow the same structure as
+  the formats mentioned above, with the difference that all IRIs are
+  abbreviated using prefixes of the data store that the query was evaluated
+  over. Hence, these formats provide a more user-friendly representation of
+  query results.
+
+- The proprietary format with MIME type ``application/x.sparql-results+null``
+  simply discards all answers. This can be useful in situations such as query
+  benchmarking, where one may want to measure the speed of query processing
+  without taking into account the often considerable overhead of serializing
+  query results and transporting them over the network.
+
+- Each format from :numref:`data-store-content-formats` for
+  triples/quads can be used as a query answer format for queries that return
+  variables ``?S``, ``?P``, ``?O``, and optionally ``?G``. In such a case, each
+  query answer is serialized as one triple/quad (where an answer is interpreted
+  as a quad whenever variable ``?G`` is bound).
+
+Update Language
+~~~~~~~~~~~~~~~
+
+RDFox fully supports the SPARQL 1.1 `update language
+<https://www.w3.org/TR/2013/REC-sparql11-update-20130321/>`__. In particular,
+this language allows users to insert triples into a store, delete triples from
+a store, load an RDF graph into a store, clear an RDF graph in a store, create
+a new RDF graph in a store, drop an RDF graph from a store, copy (move or add)
+the content of one graph to another, and perform a group of update operations
+as a single action.
+
+.. _built-in-functions:
+
+Built-In Functions
+------------------
+
+RDFox supports a wide range of built-in operators and functions that can be
+used during query answering and reasoning. Concretely, RDFox supports all
+`SPARQL 1.1 Functions and Operators
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#expressions>`__, with
+the exception of the variant of the `BNODE function
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bnode>`__ that
+takes a single string argument, whose semantics is unclear. In addition to
+that, RDFox also supports most of the `XPath and XQuery Functions and Operators
+<https://www.w3.org/TR/xpath-functions-31/>`__. Finally, RDFox also provides a
+number of proprietary functions that are useful in practice.
+
+There is a large overlap between the functions and operators defined in
+SPARQL 1.1 and XPath and XQuery. As a result most functions supported by RDFox
+can be accessed using their short names, as specified in SPARQL 1.1, as well as
+their IRI name, as specified in XPath and XQuery. RDFox also provides a short
+name for many of the XPath and XQuery functions that have no SPARQL equivalent.
+
+RDFox often provides additional overloads for the functions and operators from
+the SPARQL and the XPath and XQuery specifications, which improves usability.
+So, for example, one can extract the year of an ``xsd:gYearMonth`` value, and
+can also compare without restrictions two ``xsd:duration`` values according to
+the partial order on durations. All such extensions are documented where the
+respective functions and operators are introduced.
+
+A full list of the RDFox built-in functions and operators is given in the
+following sections. Functions will be presented with all their available names.
+If present, short names will precede the IRI names. If a function name is part
+of the SPARQL 1.1 specification or the XPath and XQuery specification, the name
+will be given as a link pointing to the respective part of the specification.
+We will assume the following prefix definitions.
+
+.. list-table:: XPath/XQuery Function Name Prefixes
+    :align: center
+    :widths: 10 40
+
+    * - ``xsd:``
+      - ``<http://www.w3.org/2001/XMLSchema#>``
+    * - ``fn:``
+      - ``<http://www.w3.org/2005/xpath-functions#>``
+    * - ``math:``
+      - ``<http://www.w3.org/2005/xpath-functions/math#>``
+
+
+All RDFox functions and operators can be used in SPARQL queries. Furthermore,
+all RDFox functions and operators can also be used in rules, with the exception
+of ``NOW``, ``RAND``, ``UUID``, and ``STRUUID``, whose values are not
+determined by their arguments.
+
+.. |space| raw:: html
+
+     &nbsp;&nbsp;&nbsp;&nbsp;
+
+Operators
+~~~~~~~~~
+
+The RDFox operators are listed in the following table and discussed in detail
+next.
+
+.. list-table:: RDFox Operators
+    :align: center
+
+    * - ``!`` |space| unary logical-not
+      - ``&&`` |space| binary logical-and
+      - ``||`` |space| binary logical-or
+    * - ``<=`` |space| binary less-equal-than
+      - ``>=`` |space| binary greater-equal-than
+      - ``=`` |space| binary equal
+    * - ``<`` |space| binary less-than
+      - ``>`` |space| binary greater-than
+      - ``!=`` |space| binary not-equal
+    * - ``+`` |space| binary add
+      - ``*`` |space| binary multiply
+      - ``+`` |space| unary plus
+    * - ``-`` |space| binary subtract
+      - ``/`` |space| binary divide
+      - ``-`` |space| unary minus
+    * - ``idiv`` |space| integer division
+      - ``mod`` |space| modulo operator
+      -
+
+
+The **Boolean operators** in RDFox are the `logical not
+<https://www.w3.org/TR/xpath-functions/#func-not>`__ ( ``!`` ), `logical and
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-logical-and>`__
+( ``&&`` ), and `logical or
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-logical-or>`__ (
+``||`` ), which behave as defined in SPARQL 1.1.
+
+The **comparison operators** in RDFox are ``<``, ``<=``, ``=``, ``!=``, ``>=``
+and ``>``. These operators have been significantly extended when compared to
+the respective operators in SPARQL 1.1 and in XPath/XQuery. When compared to
+SPARQL, the comparison operators in RDFox have additional overloads for all the
+date/time and duration datatypes. When compared to XPath/XQuery, which also
+defines such overloads, RDFox has the following differences.
+
+* Operators ``=`` and ``!=`` are can be used to compare IRIs, blank nodes, and
+  literals regardless of their type. For example, it is possible to compare an
+  IRI with a blank node, or to compare two literals of different datatypes.
+* In RDFox, ``xsd:duration`` values are compared according to the partial order
+  defined in the `XML Schema specification
+  <https://www.w3.org/TR/xmlschema-2/#duration-order>`__. In contrast, in
+  XPath/XQuery, the operators ``<, <=, =>, >`` are only defined for the
+  subtypes ``xsd:dayTimeDuration`` and ``xsd:yearMonthDuration``.
+* Similarly, in RDFox date and time values are compared according to the
+  partial order on dates and times defined in the `XML Schema
+  <https://www.w3.org/TR/xmlschema-2/#dateTime-order>`__. In contrast,
+  XPath/XQuery imposes various restrictions on the allowed comparisons.
+
+The **mathematical operators** in RDFox are the unary ``+`` and ``-``
+operators, and the binary addition ``+``, subtraction ``-``, multiplication
+``*``, division ``/``, integer division ``idiv``, and modulo ``mod`` operators.
+
+SPARQL 1.1 defines only a subset of the above operators and their overloads in
+comparison to XPath/XQuery (e.g. ``idiv`` and ``mod`` are not in SPARQL 1.1).
+RDFox extends the XPath/XQuery behavior of these operators as outlined next.
+
+* The unary ``+`` and ``-`` operators have been extended to the datatype
+  ``xsd:duration``.
+* The binary subtraction operator ``-`` has been extended to all compatible
+  date and time datatypes. The result of such operation is an ``xsd:duration``.
+* The binary addition and subtraction operators have been extended so that
+  durations can be added to and subtracted from values of any of the date and
+  time datatypes.
+
+Functions on Terms
+~~~~~~~~~~~~~~~~~~
+
+The following table lists the RDF functions on terms. Most of the functions
+behave as specified in SPARQL 1.1. One difference is the addition of the two
+Boolean functions ``isInteger`` and ``isDecimal``. The function ``isInteger``
+returns true if the argument has one of the integer datatypes, while the
+``isDecimal`` function returns true if its argument is of type ``xsd:decimal``.
+Another change concerns the functions ``IRI`` and ``URI``, which take an
+optional second argument that specify the base against which the first argument
+is resolved. If not provided, the default base is used. Furthermore, the
+``BOUND`` function has been extended to operate on arbitrary expressions. The
+function returns ``"true"^^xsd:boolean``, when the input expression can be
+successfully evaluated. In particular, when the expression is a variable, its
+evaluation succeeds when the variable is bound. Finally, function ``STREX``
+extends the SPARQL function ``STR`` with the ability to compute a string
+representation of arbitrary RDF terms.
+
+.. list-table:: Functions on terms
+    :align: center
+
+    * - `BOUND <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bound>`__
+      - `isIRI <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isIRI>`__
+      - `isURI <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isIRI>`__
+      - `isBlank <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isBlank>`__
+    * - `isLiteral <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isLiteral>`__
+      - `isNumeric <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-isNumeric>`__
+      - isInteger
+      - isDecimal
+    * - `sameTerm <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sameTerm>`__
+      - `IRI <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-iri>`__
+      - `STR <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-str>`__
+      - STREX
+    * - `URI <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-iri>`__
+      - `BNODE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-bnode>`__
+      - `STRDT <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strdt>`__
+      - `STRLANG <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strlang>`__
+    * -  `UUID <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-uuid>`__
+      - `STRUUID <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-struuid>`__
+      - `LANG <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lang>`__
+      - `DATATYPE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-datatype>`__
+
+Constructor Functions
+~~~~~~~~~~~~~~~~~~~~~
+
+RDFox has a number of constructor functions that allow users to create a value
+of a particular type. The following table lists the constructor functions
+defined in `SPARQL 1.1
+<https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#FunctionMapping>`__.
+
+.. list-table:: RDFox Constructor Functions
+    :align: center
+
+    * - xsd:anyURI
+      - xsd:boolean
+      - xsd:date
+      - xsd:dateTime
+    * - xsd:dateTimeStamp
+      - xsd:dayTimeDuration
+      - xsd:decimal
+      - xsd:double
+    * - xsd:duration
+      - xsd:float
+      - xsd:gDay
+      - xsd:gMonth
+    * - xsd:gMonthDay
+      - xsd:gYear
+      - xsd:gYearMonth
+      - xsd:integer
+    * - xsd:string
+      - xsd:time
+      - xsd:yearMonthDuration
+      -
+
+RDFox additionally provides the following constructor functions for the
+date/time datatypes. The offset parameter in all functions is optional except
+in the case of ``DATE_TIME_STAMP``.
+
+.. list-table:: RDFox Constructor Functions for Date/Time datatypes.
+    :align: center
+    :widths: 30 20
+
+    * - DURATION ( year, month, day, hours, minutes, seconds )
+      - Constructs an ``xsd:duration`` value.
+    * - YEAR_MONTH_DURATION ( year, month )
+      - Constructs an ``xsd:duration`` value.
+    * - DAY_TIME_DURATION ( day, hours, minutes, seconds )
+      - Constructs an ``xsd:duration`` value.
+    * - DATE_TIME ( year, month, day, hour, minute, second, offset )
+      - Constructs an ``xsd:dateTime`` value.
+    * - DATE_TIME_STAMP ( year, month, day, hour, minute, second, offset )
+      - Constructs an ``xsd:dateTimeStamp`` value.
+    * - TIME ( hour, minute, second, offset )
+      - Constructs an ``xsd:time`` value.
+    * - DATE ( year, month, day, offset )
+      - Constructs an ``xsd:date`` value.
+    * - G_DAY ( day, offset )
+      - Constructs an ``xsd:gDay`` value.
+    * - G_MONTH ( month, offset )
+      - Constructs an ``xsd:gMonth`` value.
+    * - G_MONTH_DAY ( month, day, offset )
+      - Constructs an ``xsd:gMonthDay`` value.
+    * - G_YEAR_MONTH ( year, month, offset )
+      - Constructs an ``xsd:gYearMonth`` value.
+    * - G_YEAR ( year, offset )
+      - Constructs an ``xsd:gYear`` value.
+
+
+IRI and String Functions
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The IRI and string functions in SPARQL 1.1 and XPath/XQuery almost fully
+overlap, and RDFox provides full support for them, with the exception of
+`fn:contains`, which only supports the variant with two arguments.
+
+.. list-table:: IRI and String Functions
+    :align: center
+
+    * - `ENCODE_FOR_URI <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-encode>`__ |space| ( `fn:encode-for-uri <https://www.w3.org/TR/xpath-functions/#func-encode-for-uri>`__ )
+      - ESCAPE_HTML_URI |space| ( `fn:escape-html-uri <https://www.w3.org/TR/xpath-functions/#func-escape-html-uri>`__ )
+      - IRI_TO_URI |space| ( `fn:iri-to-uri <https://www.w3.org/TR/xpath-functions/#func-iri-to-uri>`__ )
+    * - `CONTAINS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-contains>`__ |space| ( `fn:contains <https://www.w3.org/TR/xpath-functions/#func-contains>`__ )
+      - `STRENDS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strends>`__ |space| ( `fn:ends-with <https://www.w3.org/TR/xpath-functions/#func-ends-with>`__ )
+      - `LCASE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-lcase>`__ |space| ( `fn:lower-case <https://www.w3.org/TR/xpath-functions/#func-lower-case>`__ )
+    * - `STRSTARTS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strstarts>`__ |space| ( `fn:starts-with <https://www.w3.org/TR/xpath-functions/#func-starts-with>`__ )
+      - `STRLEN <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strlen>`__ |space| ( `fn:string-length <https://www.w3.org/TR/xpath-functions/#func-string-length>`__ )
+      - `SUBSTR <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-substr>`__ |space| ( `fn:substring <https://www.w3.org/TR/xpath-functions/#func-substring>`__ )
+    * - `STRAFTER <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strafter>`__ |space| ( `fn:substring-after <https://www.w3.org/TR/xpath-functions/#func-substring-after>`__ )
+      - `STRBEFORE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-strbefore>`__ |space| ( `fn:substring-before <https://www.w3.org/TR/xpath-functions/#func-substring-before>`__ )
+      - `UCASE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-ucase>`__ |space| ( `fn:upper-case <https://www.w3.org/TR/xpath-functions/#func-upper-case>`__ )
+    * - `CONCAT <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-concat>`__  |space| ( `fn:concat <https://www.w3.org/TR/xpath-functions/#func-concat>`__ )
+      - `langMatches <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-langMatches>`__
+      - `REGEX <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-regex>`__  |space| ( `fn:matches <https://www.w3.org/TR/xpath-functions/#func-matches>`__ )
+    * - `REPLACE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-replace>`__  |space| ( `fn:replace <https://www.w3.org/TR/xpath-functions/#func-replace>`__ )
+      -
+      -
+
+Hash Functions
+~~~~~~~~~~~~~~
+
+The RDFox hash functions are the ones specified in SPARQL 1.1 and are given in
+the following table.
+
+.. list-table:: RDFox Hash Functions
+    :align: center
+
+    * - `MD5 <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-md5>`__
+      - `SHA1 <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha1>`__
+      - `SHA256 <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha256>`__
+      - `SHA384 <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha384>`__
+      - `SHA512 <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-sha512>`__
+
+
+Mathematical Functions
+~~~~~~~~~~~~~~~~~~~~~~
+
+RDFox supports all mathematical functions from SPARQL 1.1 and most of the
+mathematical functions in XPath/XQuery. RDFox also provides additional
+functions that are useful in practice. The only nonstandard functions are
+``MAXFN`` and ``MINFN``, which take any number of arguments and return the
+maximum and the minimum value, respectively.
+
+.. list-table:: Basic Functions
+    :align: center
+
+    * - `IF <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-if>`__
+      - `COALESCE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-coalesce>`__
+    * - MINFN
+      - MAXFN
+    * - `ABS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-abs>`__ |space| ( `fn:abs <https://www.w3.org/TR/xpath-functions/#func-abs>`__ )
+      - `ROUND <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-round>`__ |space| ( `fn:round <https://www.w3.org/TR/xpath-functions/#func-round>`__ )
+    * - `CEIL <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-ceil>`__ |space| ( `fn:ceiling <https://www.w3.org/TR/xpath-functions/#func-ceiling>`__ )
+      - `FLOOR <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-floor>`__ |space| ( `fn:floor <https://www.w3.org/TR/xpath-functions/#func-floor>`__ )
+    * - `RAND <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#idp2130040>`__
+      - PI |space| ( `math:pi <https://www.w3.org/TR/xpath-functions/#func-math-pi>`__ )
+
+.. list-table:: Exponential and Power Functions
+    :widths: 40 40 15 15
+    :align: center
+
+    * - POW |space| ( `math:pow <https://www.w3.org/TR/xpath-functions/#func-math-pow>`__ )
+      - SQRT |space| ( `math:sqrt <https://www.w3.org/TR/xpath-functions/#func-math-sqrt>`__ )
+      - `CBRT <https://en.wikipedia.org/wiki/Cube_root>`__
+      - `HYPOT <https://en.wikipedia.org/wiki/Hypot>`__
+    * - LOG |space| ( `math:log <https://www.w3.org/TR/xpath-functions/#func-math-log>`__ )
+      - LOG10 |space| ( `math:log10 <https://www.w3.org/TR/xpath-functions/#func-math-log10>`__ )
+      - LOG2 |space|
+      -
+    * - EXP |space| ( `math:exp <https://www.w3.org/TR/xpath-functions/#func-math-exp>`__ )
+      - EXP10 |space| ( `math:exp10 <https://www.w3.org/TR/xpath-functions/#func-math-exp10>`__ )
+      - EXP2
+      -
+
+.. list-table:: Trigonometric Functions
+    :align: center
+
+    * - SIN |space| ( `math:sin <https://www.w3.org/TR/xpath-functions/#func-math-sin>`__ )
+      - COS |space| ( `math:cos <https://www.w3.org/TR/xpath-functions/#func-math-cos>`__ )
+    * - ASIN |space| ( `math:asin <https://www.w3.org/TR/xpath-functions/#func-math-asin>`__ )
+      - ACOS |space| ( `math:acos <https://www.w3.org/TR/xpath-functions/#func-math-acos>`__ )
+    *
+      - TAN |space| ( `math:tan <https://www.w3.org/TR/xpath-functions/#func-math-tan>`__ )
+      -
+    *
+      - ATAN |space| ( `math:atan <https://www.w3.org/TR/xpath-functions/#func-math-atan>`__ )
+      - ATAN2 |space| ( `math:atan2 <https://www.w3.org/TR/xpath-functions/#func-math-atan2>`__ )
+
+.. list-table:: Hyperbolic Functions
+    :align: center
+
+    * - SINH
+      - COSH
+      - TANH
+      - ASINH
+      - ACOSH
+      - ATANH
+
+.. list-table:: Error and Gamma Functions
+    :align: center
+
+    * - `ERF <https://en.wikipedia.org/wiki/Error_function>`__
+      - `ERFC <https://en.wikipedia.org/wiki/Error_function#Complementary_error_function>`__
+      - `GAMMA <https://en.wikipedia.org/wiki/Gamma_function>`__
+      - `LGAMMA <https://en.wikipedia.org/wiki/Gamma_function#The_log-gamma_function>`__
+
+Date and Time Functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This section describes the RDFox functions on dates, times and durations. RDFox
+supports all SPARQL 1.1 date time functions and most XPath/XQuery date time
+functions. In RDFox, many of these functions have been extended to apply to all
+date/time values.
+
+.. list-table:: RDFox Date Time Functions
+    :align: center
+    :widths: 20 100
+
+    * - `NOW <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-now>`__
+      - Returns an xsd:dateTime value representing the current moment in time.
+    * - `YEAR <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-year>`__
+      - Returns the year component of a date/time value. Extends
+        `fn:year-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-year-from-dateTime>`__ and
+        `fn:year-from-date <https://www.w3.org/TR/xpath-functions/#func-year-from-date>`__
+        to all date/time datatypes with a valid year component.
+    * - `MONTH <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-month>`__
+      - Returns the month component of a date/time value. Extends
+        `fn:month-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-month-from-dateTime>`__ and
+        `fn:month-from-date <https://www.w3.org/TR/xpath-functions/#func-month-from-date>`__
+        to data/time datatypes with a valid month component.
+    * - `DAY <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-day>`__
+      - Returns the day component of a date/time value. Extends
+        `fn:day-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-day-from-dateTime>`__ and
+        `fn:day-from-date <https://www.w3.org/TR/xpath-functions/#func-day-from-date>`__
+        to date/time datatypes with a valid day component.
+    * - YEARS
+      - Returns the number of years in a duration:
+        `fn:years-from-duration <https://www.w3.org/TR/xpath-functions/#func-years-from-duration>`__.
+    * - MONTHS
+      - Returns the number of months in a duration:
+        `fn:months-from-duration <https://www.w3.org/TR/xpath-functions/#func-months-from-duration>`__.
+    * - DAYS
+      - Returns the number of days in a duration:
+        `fn:days-from-duration <https://www.w3.org/TR/xpath-functions/#func-day-from-duration>`__.
+    * - `HOURS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-hours>`__
+      - Returns the hours component of a date/time value. Extends
+        `fn:hours-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-hours-from-dateTime>`__,
+        `fn:hours-from-time <https://www.w3.org/TR/xpath-functions/#func-hours-from-time>`__, and
+        `fn:hours-from-duration <https://www.w3.org/TR/xpath-functions/#func-hours-from-duration>`__
+        to date/time datatypes with a valid hours component.
+    * - `MINUTES <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-minutes>`__
+      - Returns the minutes component of a date/time value. Extends
+        `fn:minutes-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-minutes-from-dateTime>`__,
+        `fn:minutes-from-time <https://www.w3.org/TR/xpath-functions/#func-minutes-from-time>`__, and
+        `fn:minutes-from-duration <https://www.w3.org/TR/xpath-functions/#func-minutes-from-duration>`__
+        to date/time datatypes with a valid minutes component.
+    * - `SECONDS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-seconds>`__
+      - Returns the seconds component of a date/time value. Extends
+        `fn:seconds-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-seconds-from-dateTime>`__,
+        `fn:seconds-from-time <https://www.w3.org/TR/xpath-functions/#func-seconds-from-time>`__,
+        `fn:seconds-from-duration <https://www.w3.org/TR/xpath-functions/#func-seconds-from-duration>`__
+        to date/time datatypes with a valid seconds component.
+    * - `TIMEZONE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-timezone>`__
+      - Returns the timezone component of a date/time value. Extends
+        `fn:timezone-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-timezone-from-dateTime>`__,
+        `fn:timezone-from-date <https://www.w3.org/TR/xpath-functions/#func-timezone-from-date>`__,
+        `fn:timezone-from-time <https://www.w3.org/TR/xpath-functions/#func-timezone-from-time>`__
+        to date/time datatypes with a valid timezone component.
+    * - `TZ <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-tz>`__
+      - Returns the timezone component of a date/time value as a simple literal. Extended to date/time values with a valid timezone component.
+    * - DURATION_MONTHS
+      - Returns the number of months in the internal representation ``($months, $seconds)`` of an ``xsd:duration`` value.
+    * - DURATION_SECONDS
+      - Returns the number of seconds in the internal representation ``($months, $seconds)`` of an ``xsd:duration`` value,
+    * - TIME_ON_TIMELINE
+      - Returns the decimal number representing a date time value on the timeline. Note that this is the number of seconds elapsed since 0001-01-01T00:00:00 in accordance with the `W3C XML Schema Definition <https://www.w3.org/TR/xmlschema11-2/#vp-dt-timeOnTimeline>`__.
+    * - TO_TIMEZONE
+      - Adjusts the time zone of a date/time value. An extension of
+        `fn:adjust-dateTime-to-timezone <https://www.w3.org/TR/xpath-functions/#func-adjust-dateTime-to-timezone>`__,
+        `fn:adjust-date-to-timezone <https://www.w3.org/TR/xpath-functions/#func-adjust-date-to-timezone>`__,
+        `fn:adjust-time-to-timezone <https://www.w3.org/TR/xpath-functions/#func-adjust-time-to-timezone>`__,
+        to all date/time datatypes. The function takes two arguments: a
+        mandatory date/time value and an optional timezone value. If the
+        timezone value is provided, the function returns a date/time value in
+        the specified timezone that is equivalent to the first argument. If the
+        timezone is not provided, the function returns the local value of its
+        first argument with no timezone.
+    * - DAY_OF_THE_WEEK
+      - Returns an integer representing the day of the week for an ``xsd:date``, ``xsd:dateTime``, or ``xsd:dateTimeStamp`` value in the local time of the date. The function returns a weekday number compliant with the ISO 8601 standard: 1 represents Monday, 2 represents Tuesday, and so on, up to 7 which represents Sunday.
+
+The ``AGENT()`` Function
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+RDFox supports a proprietary built-in function for use in audit logging:
+``AGENT``. This function returns an ``xsd::string`` containing the name of the
+:ref:`agent <agents>` that owns the connection on which SPARQL evaluation is
+taking place.
+
+.. _aggregate-functions:
+
+Aggregate Functions
+-------------------
+
+Aggregate functions differ from normal functions in that they perform
+computations on sets of values rather than on individual values. In SPARQL,
+aggregate functions are applied either to the set of results of a given query
+or to a subset of results obtained using the ``GROUP_BY`` construct. RDFox
+supports the following list of aggregate functions, which includes all
+aggregate functions in SPARQL 1.1.
+
+.. list-table:: RDFox Aggregate Functions
+    :align: center
+    :widths: 40 60
+
+    * - `COUNT(V) <https://www.w3.org/TR/sparql11-query/#defn_aggCount>`__
+      - Returns the number of results in which V is defined (i.e. not ``UNDEF``).
+    * - `SUM(V) <https://www.w3.org/TR/sparql11-query/#defn_aggSum>`__
+      - Returns the sum of all values V in the set of results.
+    * - `AVG(V) <https://www.w3.org/TR/sparql11-query/#defn_aggAvg>`__
+      - Returns the average of all values V in the set of results.
+    * - MUL(V)
+      - Returns the product of all values V in the set of results.
+    * - `MIN(V) <https://www.w3.org/TR/sparql11-query/#defn_aggMin>`__
+      - Returns the smallest value V in the set of results.
+    * - COUNT_MIN(V)
+      - Returns the number of results that have the smallest value of V.
+    * - SAMPLE_ARGMIN(A, V)
+      - Returns the value of A in the first result that has the smallest value of V.
+    * - MIN_ARGMIN(A, V)
+      - Returns the smallest value of A in the results that have the smallest value of V.
+    * - MAX_ARGMIN(A, V)
+      - Returns the largest value of A in the results that have the smallest value of V.
+    * - `MAX(V) <https://www.w3.org/TR/sparql11-query/#defn_aggMax>`__
+      - Returns the largest value in the set of results.
+    * - COUNT_MAX(V)
+      - Returns the number of results that have the largest value of V.
+    * - SAMPLE_ARGMAX(A, V)
+      - Returns the value of A in the first result that has the largest value of V.
+    * - MIN_ARGMAX(A, V)
+      - Returns the smallest value of A in the results that have the largest value of V.
+    * - MAX_ARGMAX(A, V)
+      - Returns the largest value of A in the results that have the largest value of V.
+    * - `GROUP_CONCAT(V; SEPARATOR=...) <https://www.w3.org/TR/sparql11-query/#defn_aggGroupConcat>`__
+      - Returns the concatenation (in some order) of the values V in the set of results using the given separator.
+    * - `SAMPLE(V) <https://www.w3.org/TR/sparql11-query/#defn_aggSample>`__
+      - Returns the first defined value of V in the set of results, if one exists, or ``UNDEF``, otherwise.
+
+.. _querying-tuple-tables:
+
+Querying Tuple Tables
+---------------------
+
+RDFox organizes information in a data store using tuple tables, as described in
+more detail in :numref:`servers`. There are two ways of referring to tuple
+tables in queries: one uses the proprietary operator ``TT`` and the other uses
+the reserved IRI ``rdfox:TT``.
+
+**Querying Tuple Tables Using** ``TT`` **Expressions**
+
+RDFox provides a proprietary ``TT`` operator to access data stored in tuple
+tables, as shown in the following example.
+
+.. container :: example
+
+   **Example:** Assume that a binary tuple table ``EmployeeName`` is
+   mounted from an external data source (e.g., a database), and that it
+   contains pairs that relate employee IDs to their names. The following query
+   retrieves all pairs whose ID is contained in the ``:Manager`` class.
+
+   ::
+
+      SELECT ?id ?name
+      WHERE {
+          ?id rdf:type :Manager .
+          TT EmployeeName { ?id ?name }
+      }
+
+In the above example, ``TT EmployeeName { ?id ?name }`` retrieves all pairs of
+IDs and names stored in the ``EmployeeName`` tuple table. Since the tuple
+table is binary, only two terms (i.e., ``?id`` and ``?name`` ) are allowed to
+occur inside the ``TT`` expression. This is analogous to named graphs, where
+``GRAPH :G { ?X ?Y ?Z }`` accesses all triples in a named graph ``:G``. The
+difference to ``GRAPH`` expressions can be summarized as follows.
+
+- The number of terms inside ``TT`` must match with the arity (i.e., the number
+  of positions) of the tuple table.
+
+- Each ``TT`` expression represents exactly one reference to a tuple table. For
+  example, to retrieve pairs of employee IDs with the same name, one can use
+  ``TT EmployeeName { ?id1 ?name } . TT EmployeeName { ?id2 ?name }``
+  (whereas ``TT EmployeeName { ?id1 ?name .?id2 ?name }`` is syntactically
+  invalid).
+
+- Variables cannot be used in place of tuple table names. For example, ``TT ?T
+  { ?id ?name }`` is syntactically invalid.
+
+
+**Querying Tuple Tables Using** ``rdfox:TT``
+
+The use of the proprietary operator ``TT`` is a syntactic extension of the
+SPARQL language and may result in queries being rejected by third-party
+libraries. To address this, RDFox provides an additional method for accessing
+tuple tables, which stays within the syntactic rules of the SPARQL language.
+This method specifies tuple table atoms using the reserved IRI ``rdfox:TT`` and
+`RDF Collections <https://www.w3.org/TR/sparql11-query/#collections>`__, as
+shown in the following example.
+
+.. container :: example
+
+    **Example:** Consider again the tuple table ``EmployeeName``. We can
+    retrieve all pairs whose ID is contained in the ``:Manager`` class using
+    the following query.
+
+    ::
+
+        SELECT ?id ?name
+        WHERE {
+            ?id rdf:type :Manager .
+             (?id ?name) rdfox:TT "EmployeeName"
+        }
+
+    The reserved IRI ``rdfox::TT`` links the tuple table name ``EmployeeName``
+    with the tuple table arguments encoded as an `RDF Collection
+    <https://www.w3.org/TR/sparql11-query/#collections>`__ (i.e. ``(?id
+    ?name)``).  The query can also be given in its equivalent expanded form.
+
+    ::
+
+        SELECT ?id ?name
+        WHERE {
+            ?id rdf:type :Manager .
+            _:b0 rdfox:TT "EmployeeName" .
+            _:b0 rdf:first ?id ;
+                 rdf:rest _:b1.
+            _:b1 rdf:first ?name ;
+                 rdf:rest rdf:nil.
+        }
+
+In its expanded form, a tuple table atom is encoded using multiple triple
+patterns and, as a result, its position in the query body may be ambiguous. To
+avoid ambiguity, RDFox determines the position of the tuple table atom using
+the position of the triple pattern with subject ``rdfox:TT``. In the above
+example the position of the tuple table atom is determined by the position of
+the triple pattern triple ``_:b0 rdfox:TT "EmployeeName" .``
+
+The following restrictions apply to the use of ``rdfox:TT``.
+
+- The object of the triple pattern with subject ``rdfox:TT`` should be a
+  well-formed RDF collection.
+- The RDF collection that encodes the tuple table arguments should be of size
+  equal to the arity of the tuple table.
+- Variables cannot be used in place of tuple table names. For example, the use
+  of ``(?id ?name) rdfox:TT ?T`` is invalid.
+
+Distinguishing Explicit and Derived Facts in Queries
+----------------------------------------------------
+
+As described in :numref:`reasoning`, RDFox supports reasoning, by which it can
+use Datalog rules to derive additional facts from the facts explicitly given in
+the input. Sometimes, it can be useful to distinguish in the query whether a
+fact has been explicitly given in the input, or whether it has been derived by
+a rule. To facilitate this, RDFox provides a proprietary extension of the
+SPARQL 1.1 syntax. The following example demonstrates this.
+
+.. container :: example
+
+    **Example:** Assume that the following triples are loaded into the data store.
+
+    ::
+
+        :brian rdf:type :LivingThing .
+        :peter rdf:type :Person .
+
+    If the data store contains rule ``:LivingThing[?X] :- :Person[?X] .``, then
+    the following triple is going to be derived.
+
+    ::
+
+        :peter rdf:type :LivingThing .
+
+    The following query retrieves all facts of the form ``x rdf:type
+    :LivingThing``, together with a Boolean flag which is set to ``true`` if
+    the fact is explicitly given in the input.
+
+    ::
+
+        SELECT ?id ?e
+        WHERE {
+            ?id rdf:type :LivingThing EXPLICIT ?e
+        }
+
+    Our our example data, this query returns one answer where ``?id`` is mapped
+    to ``:brian`` and ``?e`` is mapped to ``true``, and another answer where
+    ``?id`` is mapped to ``:peter`` and ``?e`` is mapped to ``false``.
+
+The ``TT`` pattern provides an analogous extension. Moreover, variables bound
+by ``EXPLICIT`` can be used in the rest of the query like any other variable;
+for example, they can be used in other triple patterns to facilitate joins.
+
+.. container :: example
+
+   **Example:** The query for employees from :numref:`querying-tuple-tables`
+   can be modified as follows to compute the join between managers and their
+   names, while requiring both facts to be either explicit or derived.
+
+   ::
+
+      SELECT ?id ?name
+      WHERE {
+          ?id rdf:type :Manager EXPLICIT ?e .
+          TT EmployeeName { ?id ?name EXPLICIT ?e }
+      }
+
+.. _query-monitoring:
+
+Monitoring Query Evaluation
+---------------------------
+
+RDFox provides different ways of analyzing query evaluation. In particular,
+users can gain access to query plans generated by the RDFox query optimizer as
+well as to useful statistics about the execution of such plans.
+
+Suppose that we initialize a data store with the example :ref:`data <data_ttl>`
+from our :ref:`Getting Started <getting-started>` guide. Furthermore, consider
+the SPARQL query
+
+::
+
+    SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :forename ?n. ?p :hasParent ?z }
+
+which returns the following four answers:
+
+::
+
+   :meg "Meg" .
+   :stewie "Stewie" .
+   :chris "Chris" .
+   :meg "Meg" .
+
+Next we discuss two ways of analyzing how RDFox evaluates the above query using
+query plans and query profiling, respectively.
+
+Query Plans
+~~~~~~~~~~~
+
+Query plans provide insights into the order in which RDFox evaluates the
+different parts of the query. They are determined by the query optimizer in
+RDFox based on the shape of the query and the statistical properties of the
+data present in the store at the time of planning. To see the query plan that
+RDFox uses to evaluate a given query, one needs to set the shell variable
+``query.explain`` to ``true``, as shown next.
+
+::
+
+   set query.explain true
+
+The next time we evaluate the above query, the shell will also display the
+following query plan.
+
+::
+
+   QUERY ?p ?n                                                            QueryIterator
+       PROJECT ?n ?p                      {          -->    ?n ?p }
+           CONJUNCTION                    {          -->    ?n ?p ?z }    NestedIndexLoopJoinIterator
+               [?p, :hasParent, ?z]       {          -->    ?p ?z }       TripleTableIterator
+               [?p, rdf:type, :Person]    { ?p ?z    -->    ?p ?z }       TripleTableIterator
+               [?p, :forename, ?n]        { ?p ?z    -->    ?n ?p ?z }    TripleTableIterator
+
+The query plan is executed top-down in a depth-first-search manner and we can
+think of solution variable bindings as being generated one-at-a-time. It is
+useful to go in more detail through the execution of the plan for a given
+solution binding.
+
+When we first “visit” the ``PROJECT`` block, we haven’t obtained any variable
+bindings yet (hence the empty space left of the “–>”symbol); in
+contrast, by the time we have finished executing the subplan underneath, we
+will have obtained a binding of variables ``?n`` and ``?p`` and hence an answer
+to the query (as reflected on the right-hand side of the “–>” symbol).
+Similarly, when we first visit the ``CONJUNCTION`` block, which performs the
+join of the query, we have an empty binding and, by the time we return from it,
+we will have a binding for ``?n``, ``?p`` and ``?z``. The join is performed
+also top-down. First, we obtain a binding for ``?p`` and ``?z`` by matching the
+triple pattern ``[?p, :hasParent, ?z]``. We then consider the second triple
+pattern ``[?p, rdf:type, :Person]`` and finally the third triple pattern ``[?p,
+:forename, ?n]``, which extends the binding by providing also a value for
+variable ``?n``.
+
+Let us consider a slightly more complex query, which uses the ``OPTIONAL``
+operator in SPARQL.
+
+::
+
+    SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :hasParent ?z . OPTIONAL { ?p :forename ?n } }
+
+
+RDFox will execute the following query plan:
+
+::
+
+   QUERY ?p ?n                                                                  QueryIterator
+       PROJECT ?n ?p                          {          -->    ?p | ?n }
+           OPTIONAL                           {          -->    ?p ?z | ?n }    OptionalIterator
+               CONJUNCTION                    {          -->    ?p ?z }         NestedIndexLoopJoinIterator
+                   [?p, :hasParent, ?z]       {          -->    ?p ?z }         TripleTableIterator
+                   [?p, rdf:type, :Person]    { ?p ?z    -->    ?p ?z }         TripleTableIterator
+               FILTER true
+                   [?p, :forename, ?n]        { ?p ?z    -->    ?n ?p ?z }      TripleTableIterator
+
+The important difference to notice in this plan is the use of the " \| "
+symbol. The variables on the left-hand-side of “\|” are always bound by the
+corresponding block, whereas those indicated on the right-hand-side may or may
+not be returned.
+
+
+Query Profiling
+~~~~~~~~~~~~~~~
+
+In addition to the ordering of the plan nodes of a given query specified in a
+query plan, users can also obtain runtime information about the number of
+operations performed on each of them. This information could be useful when
+debugging potential performance issues with query evaluation.
+
+To obtain such runtime information, one needs to enable a query profiler using
+the following command.
+
+::
+
+   set query.monitor profile
+
+When evaluating our original query
+
+::
+
+    SELECT ?p ?n WHERE { ?p rdf:type :Person . ?p :forename ?n. ?p :hasParent ?z }
+
+with query profiler enabled, RDFox will print the following output.
+
+::
+
+    == QUERY EVALUATION STATISTICS ==
+
+    Statistics after 0 (s)
+    +-----------------------------------------------------------------------------------------------------------------------------------------
+    | Sample Count   Iterator Open   Iterator Advance    Plan Node                                                                            
+    +-----------------------------------------------------------------------------------------------------------------------------------------
+    |            0               0                  0    QUERY ?p ?n                                                            QueryIterator              
+    |            0               0                  0        PROJECT ?n ?p                      {          -->    ?n ?p }                                  
+    |            0               1                  4            CONJUNCTION                    {          -->    ?n ?p ?z }    NestedIndexLoopJoinIterator
+    |            0               1                  4                [?p, :hasParent, ?z]       {          -->    ?p ?z }       TripleTableIterator        
+    |            0               4                  4                [?p, rdf:type, :Person]    { ?p ?z    -->    ?p ?z }       TripleTableIterator        
+    |            0               4                  4                [?p, :forename, ?n]        { ?p ?z    -->    ?n ?p ?z }    TripleTableIterator        
+    +-----------------------------------------------------------------------------------------------------------------------------------------
+
+    =================================
+
+The output is an enriched version of the query plan with 
+sampling information of query evaluation and information about the
+number of times the iterator of each plan node was accessed, i.e. was
+``opened`` and ``advanced``. For example, the iterator for ``[?p, :hasParent,
+?z]`` was ``opened`` once (successfully), and advanced four times (three times
+successfully and once unsuccessfully), signified as ``1 / 4``. For each of the
+four successful operations on the iterator of ``[?p, :hasParent, ?z]``, the
+iterator for ``[?p, rdf:type, :Person]`` is ``opened`` once (each time
+successfully) and advanced once (each time unsuccessfully), signified as ``4 /
+4``. The statistics for the other plan nodes are determined in the same way
+with the exception of the top level plan nodes. The statistics for those plan
+nodes are unavailable, due to their special handling, but they can be inferred
+from the number of query results: the iterators of these plan nodes are opened
+once, and advanced as many times as the number of query results. In addition, 
+the output contains the column sample count, which provides indication of the 
+relative time spent for the evaluation of each plan node. The larger the number
+of samples a plan node has, the more time has been spent on its evaluation. The
+sample count column is useful for queries with non-trivial evaluation time. The
+sampling frequency of the profiler is controlled by the shell parameter 
+``query.profiler.sampling-frequency``.
+
+By default, the query profiler prints statistics only once, at the end of query
+evaluation. Alternatively, it can be configured to print statistics at a given
+frequency using the shell variable ``log-frequency``. This can be useful when
+fixing problematic queries with long evaluation times.
+
+Access Control
+--------------
+
+Like all operations, the evaluation of SPARQL requests (i.e. queries and
+updates) is subject to the rules of RDFox's access control system (see
+:numref:`access-control`). When specifying access control policies at the
+granularity of named graphs, it is important to be aware that triples in
+unreadable named graphs are silently skipped during query evaluation. For a
+more detailed explanation of this see :numref:`named-graph-access-control`.

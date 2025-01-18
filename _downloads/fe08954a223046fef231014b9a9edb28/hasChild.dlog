@@ -1,0 +1,2 @@
+@prefix : <https://rdfox.com/getting-started/> .
+[?p, :hasChild, ?c] :- [?c, :hasParent, ?p] .

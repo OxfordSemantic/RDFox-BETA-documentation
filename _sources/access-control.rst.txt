@@ -1,0 +1,1192 @@
+.. _access-control:
+
+Access Control
+==============
+
+This section introduces RDFox®'s access control system. The key concepts of the
+system are described first, followed by sections on roles, external agents, the
+role manager, and authentication. The final two sub-sections present a
+walkthrough of how to secure and RDFox server followed by some examples of
+access control policies.
+
+Access control settings may be persisted between sessions or for replication
+purposes. See :numref:`persistence` for more information.
+
+Key Concepts
+------------
+
+This section describes the key concepts of RDFox's access control system,
+beginning with primitives such as *resources* and *access types*, and moving on
+to more complex concepts such as *privileges* and *agents* and finally,
+*authorization*.
+
+.. _access-control-resources:
+
+Resources
+~~~~~~~~~
+
+A *resource* represents a component of an RDFox server to which access can be
+controlled. As described in :numref:`servers`, the set of resources within each
+server form a containment hierarchy with the server itself at the root.
+
+Every resource has a unique name relative to the server. To make it clear which
+resources are contained within other resources, the names of contained
+resources begin with the name of the resource that contains them.
+
+The following table shows the different types of resource within an RDFox
+server with the corresponding resource name format. Braces (``{}``) indicate
+list-element segments.
+
++-----------------------------------+-------------------------------------------------------------------+
+| Description                       | Resource name format                                              |
++===================================+===================================================================+
+| The server itself.                | ``|``                                                             |
++-----------------------------------+-------------------------------------------------------------------+
+| The list of requests running on   | ``|requests``                                                     |
+| the RDFox endpoint.               |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The list of data stores within a  | ``|datastores``                                                   |
+| server.                           |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| A specific data store within the  | ``|datastores|{data-store-name}``                                 |
+| server.                           |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The Datalog program loaded inside | ``|datastores|{data-store-name}|rules``                           |
+| a data store.                     |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The OWL axioms loaded inside a    | ``|datastores|{data-store-name}|axioms``                          |
+| data store.                       |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The commit procedure of a data    | ``|datastores|{data-store-name}|commitprocedure``                 |
+| store.                            |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The list of delta queries         | ``|datastores|{data-store-name}|deltaqueries``                    |
+| registered with a data store.     |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| A specific delta query registered | ``|datastores|{data-store-name}|deltaqueries|{delta-query-name}`` |
+| with a data store.                |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The list of data sources          | ``|datastores|{data-store-name}|datasources``                     |
+| registered with a data store.     |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| A specific data source registered | ``|datastores|{data-store-name}|datasources|{data-source-name}``  |
+| with a data store.                |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The list of tuple tables within a | ``|datastores|{data-store-name}|tupletables``                     |
+| data store.                       |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| A specific tuple table within a   | ``|datastores|{data-store-name}|tupletables|{tuple-table-name}``  |
+| data store.                       |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| A specific named graph within a   | ``|datastores|{data-store-name}|namedgraphs|{graph-name}``        |
+| data store.                       |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| The list of roles in the server’s | ``|roles``                                                        |
+| role database.                    |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+| A specific role in the server’s   | ``|roles|{role-name}``                                            |
+| role database.                    |                                                                   |
++-----------------------------------+-------------------------------------------------------------------+
+
+.. note::
+
+   Graph names appearing in access control resource names must be valid Turtle
+   literals. For convenience, IRIs may be specified using prefixes defined
+   within the referenced data store, or as relative IRIs against the data
+   store’s base IRI. Named graph resource names will usually be output using
+   fully-expanded IRIs in the graph name segment, regardless of how they were
+   input.
+
+.. _resource-specifiers:
+
+Resource Specifiers
+~~~~~~~~~~~~~~~~~~~
+
+Resource specifiers enable administrators to describe sets of resources
+succinctly. All valid resource names are also valid resource specifiers.
+Additionally, resource specifiers may have the following elements:
+
+-  ``*``, the list element wildcard. This may appear as the final segment of a
+   resource specifier if and only if that segment is a list-element segment, and
+   signifies that a privilege applies to all possible values in that segment as
+   determined at the time authorization is checked. For example, in a server
+   containing roles ``a``, ``b`` and ``c`` and no other roles, the resource
+   specifier ``|roles|*`` specifies exactly the resources ``|roles|a``,
+   ``|roles|b`` and ``|roles|c``. If role ``d`` is added, it too will be
+   included in the set specified by ``|roles|*``.
+-  ``>``, the recursivity indicator. A specifier beginning with ``>``
+   instead of the initial ``|`` character specifies the same resources that
+   would be specified by the non-recursive version *plus* all of their
+   subordinate resources. For example, in a server with a data store called
+   ``ds`` containing data sources ``one`` and ``two``, the resource specifier
+   ``>datastores|ds|datasources`` specifies exactly the resources
+   ``|datastores|ds|datasources``, ``|datastores|ds|datasources|one`` and
+   ``|datastores|ds|datasources|two``. It is an error to use the recursivity
+   indicator to begin the name of a resource with no subordinate resources.
+
+The list element wildcard and recursivity indicator may be combined freely
+(subject to their individual rules). For example, if we want to grant a
+privilege over every part of every data store within a server but not over the
+list of data stores itself, we can use the resource specifier
+``>datastores|*``. To also include the list of data stores, we can use
+``>datastores``.
+
+Resource specifiers have their own set of escaping rules which ensure that they
+do not impose any restrictions on list element names. The rules are as follow:
+
+- Names beginning with ``*`` must have the initial ``*`` escaped as ``**``. For
+  example the correct specifier for a role with name ``*abc`` would be
+  ``|roles|**abc``. No escaping of ``*`` characters is required at any other
+  position within a name.
+-  Names containing ``|`` must have each ``|`` escaped as ``||``. For example,
+   the correct specifier for a data store with name ``my|store`` would be
+   ``|datastores|my||store``.
+
+.. _access-types:
+
+Access Types
+~~~~~~~~~~~~
+
+An *access type* describes a particular mode of access to a resource.
+
+RDFox defines three access types; ``read``, ``write`` and ``grant``. The
+``read`` access type covers all retrieval of information from the system. The
+``write`` access type covers addition, mutation and deletion of information.
+The ``grant`` access type is used to restrict which roles can grant and revoke
+privileges over a resource to or from other roles.
+
+Multiple access types can be specified at once in a comma-separated list, e.g.,
+``read,write``. To save typing in situations where a role should have full
+control of one or more resources, RDFox accepts the access type name ``full``,
+which allows all of the above access types. Note that the ``full`` privilege
+for a resource specifier is stored separately from the ``read``, ``write`` and
+``grant`` privileges. This means that revoking ``full`` access type must be
+done explicitly, *i.e.* revoking ``read`` access from a role that has ``full``
+access has no impact on what the role can actually do.
+
+.. _privileges:
+
+Privileges
+~~~~~~~~~~
+
+In RDFox, privileges to access the system are expressed as pairs of *resource
+specifiers* and *access type* lists. The resource specifier identifies a subset
+of the server's *resources*, and the access type list specifies the ways which
+those resources may be accessed by holders of the privilege.
+
+.. _agents:
+
+Agents
+~~~~~~
+
+In the context of RDFox access control, an *agent* is a person or system that
+uses an RDFox server. RDFox's access control system enables the administrator
+of a server to control which agents can authenticate to the server and what
+level of access they have once authenticated.
+
+There are two classes of agent: *roles*, which are managed by an RDFox server
+instance, and *external agents*, which are managed by an external system (e.g.,
+Microsoft Entra™). The process of authenticating agents is described in
+sections :numref:`authentication-managers` and
+:numref:`other-authentication-pathways`.
+
+.. _roles:
+
+Roles
+^^^^^
+
+*Roles* are agents that are stored within an RDFox server. Roles can be created
+for individual users, or for groups of users. Although the concept of a role is
+common to many access control systems, this document uses the term to refer
+exclusively to RDFox roles. Roles are stored in and managed by the server's
+*role manager*, which is described in more detail in :numref:`role-manager`.
+
+Each role maintains a name that uniquely identifies a role. This name can be
+included in logs to provide a record of system usage.
+
+Each role maintains a set :ref:`privileges <privileges>` directly assigned to
+it, which can be modified by *granting* or *revoking* a privilege: the former
+adds a privilege to the set, and the latter removes a privilege from the set.
+To understand how grant and revoke operations work and how they affect what a
+role can do, assume that role ``A`` is granted a read privilege over
+``>datastores`` and consider the following.
+
+- Only explicitly granted privileges can be revoked. Thus, although role ``A``
+  can read a data store called ``myStore`` (because ``>datastores`` is a
+  recursive resource specifier that extends the read privilege too all data
+  stores), an attempt to revoke a read privilege over ``|datastores|myStore``
+  for ``A`` will report that the latter privilege does not exist. This is
+  because the set of privileges for ``A`` explicitly contains only a read
+  privilege for ``>datastores``, and not a read privilege over
+  ``|datastores|myStore``.
+
+- All privileges are *positive* in the sense that they specify what is allowed.
+  Hence, since role ``A`` has been granted a read privilege over
+  ``>datastores``, it is not possible to prevent ``A`` from reading a specific
+  data store.
+
+- The set of privileges associated with a role is a true set in the sense that
+  all duplicates are eliminated. Hence, if a read privilege over
+  ``>datastores`` is granted once more to role ``A``, the set of privileges of
+  ``A`` contains just one copy of the said privilege. Consequently, a
+  subsequent attempt to revoke the read privilege for ``>datastores`` removes
+  the privilege from the set.
+
+Each role additionally maintains a set of roles that it is a member of, which
+can be modified by *granting* or *revoking* a role. For example, after granting
+a role ``B`` to a role ``A``, role ``A`` is added as a member of role ``B``.
+The term "granting a role" reflects how this feature is often used in practice;
+for example, one can grant a role ``Administrator`` to a role ``Peter`` to make
+``Peter`` an administrator. The membership relation is transitive: if role
+``B`` is granted to role ``A``, and role ``C`` is granted to role ``B``, then
+``A`` is a member of both ``B`` and ``C``; moreover ``B`` and ``C`` are said to
+be *super roles* of ``A``.
+
+RDFox uses the set of role's *effective privileges* to authorize an access of a
+role to a protected resource (see :numref:`authorization`). In particular, the
+set of effective privileges of a role is the union of the privileges granted to
+the role or any of its super roles. For example, if role ``B`` is granted a
+read privilege for ``>datastores``, role ``A`` is granted a read and a write
+privilege for ``|datastores|myStore``, and role ``B`` is granted to role ``A``,
+then the set of effective privileges of ``A`` contains a read privilege for
+``>datastores``, a read privilege for ``|datastores|myStore``, and a write
+privilege for for ``|datastores|myStore``. One should not be confused by the
+fact that the read privilege for ``|datastores|myStore`` is redundant because
+it is subsumed by the read privilege for ``>datastores``: the set of effective
+privileges for ``A`` still consists (conceptually) of these three privileges.
+The set of effective privileges cannot be modified directly: it is always
+derived automatically from the sets of the explicitly granted privileges and
+roles in the system.
+
+When a role is created, it can optionally be associated with a password. Roles
+created with a password can authenticate in local shell sessions (i.e., using
+the RDFox executable's ``shell`` mode) and may change their passwords later on.
+In contrast, roles created without a password cannot authenticate in local
+shell sessions and cannot have a password set at any later time. If a password
+is needed for a role that doesn't have one, the role can be deleted and
+recreated with a password. The main use for password-less roles is providing a
+way to centrally store privileges for a class of user.
+
+.. _external-agents:
+
+External Agents
+^^^^^^^^^^^^^^^
+
+An external agent is any agent that does not have a corresponding role, but is
+provided by a trusted third-party system (for example Microsoft Entra™).
+External agents are typically used to provide single sign-on (SSO) facilities
+in large organizations, where creating a role in RDFox for each user would be
+inconvenient.
+
+Unlike roles, privileges cannot be granted to external agents directly;
+instead, they can acquire privileges only by inheritance from super roles. To
+facilitate this, the third-party system must associate with each external agent
+a list of roles that the agent is a member of, which determines the set of
+effective privileges of an agent in the same way as described in
+:numref:`roles`. During authentication, the third-party system must confirm the
+identity of the external agent, as well as provide the list of roles that the
+agent is a member of. This process is described in
+:numref:`effective-privileges-external-agent`.
+
+.. _authorization:
+
+Authorization
+~~~~~~~~~~~~~
+
+Before an agent attempts to execute an operation (e.g., importing data or
+running a query), RDFox will perform an *authorization* check for all resources
+that are required for the operation to succeed. In most cases cases this check
+is performed as follows.
+
+- RDFox first identifies the set of all prerequisites for the operation, where
+  each prerequisite consists of a resource and an access type. This step is
+  described in more detail in :numref:`identifying-prerequisites`.
+
+- For each prerequisite, RDFox inspects the set of agent's effective privileges
+  trying to locate at least one privilege whose resource specifier and access
+  type covers the resource and the access type of the prerequisite.
+
+- As soon as a prerequisite is identified type cannot be covered by any of the
+  privileges in the effective set, the operation is aborted, and an error
+  message is provided describing the prerequisite resource and access type in
+  question. Hence, the error message describes one, but not necessarily all
+  reasons why an operation cannot proceed.
+
+- If all resources and access types can be matched, the operation is allowed to
+  proceed.
+
+In certain cases, however, applying this general authorization protocol might
+be hard; for example, it is hard (or in many cases even impossible) to identify
+the named graphs touched by a SPARQL query without evaluating the query itself.
+RDFox thus sometimes deviates from this general pattern, as further described
+in :numref:`authorization-special-cases`.
+
+.. _identifying-prerequisites:
+
+Identifying Prerequisites
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Prerequisites for an operation are identified in the obvious way in most cases.
+For example, importing a Turtle file requires a read privilege over the data
+store (to access the data store's prefixes), as well as a write privilege over
+the ``DefaultTriples`` tuple table (to write imported triples into the data
+store). The rest of this section discusses several less obvious cases.
+
+Creating new resources (data stores, data sources, tuple tables or roles)
+requires a write privilege over the containing list resource. For example,
+creating a data store requires a write privilege over the ``/datastores``
+resources. Deleting resources requires a write privilege over both the
+containing list resource *and* the element to be deleted.
+
+Granting and revoking privileges involves two prerequisites: a ``grant`` access
+type over the resource to which access is being granted, and ``write`` access
+type over the role which will receive or, in the case of revocation, lose the
+privilege.
+
+.. container:: example
+
+   **Example: Privileges needed to grant privileges over a data store**
+
+   Granting the power to create data stores to a role named
+   ``datastore-creators`` requires privileges sufficient for the following
+   accesses:
+
+   ============================= ==============
+   Resource                      Type of access
+   ============================= ==============
+   ``|datastores``               ``grant``
+   ``|roles|datastore-creators`` ``write``
+   ============================= ==============
+
+Granting and revoking membership of one role to another role works in a similar
+way. To grant membership of a role requires two privileges: ``grant`` over the
+role being granted and ``write`` over the role which will receive or, in the
+case of revocation, lose the membership.
+
+.. container:: example
+
+   **Example: Privileges needed to grant membership of a role**
+
+   Granting role ``group`` to role ``user1``, requires privileges sufficient to
+   allow these accesses:
+
+   ================ ==============
+   Resource         Type of access
+   ================ ==============
+   ``|roles|group`` ``grant``
+   ``|roles|user1`` ``write``
+   ================ ==============
+
+.. _authorization-special-cases:
+
+Authorization Special Cases
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This section documents four special cases where authorization does not follow
+the general pattern described in :numref:`authorization`.
+
+Distinct Privileges for List and List Elements
+""""""""""""""""""""""""""""""""""""""""""""""
+
+RDFox provides several operations that retrieve lists of elements together with
+some basic elements' properties. For example, it is possible to list all data
+stores and, for each, retrieve certain basic information such as the data store
+unique ID and whether a data store is online or offline. Strictly speaking,
+such operations have the following prerequisites:
+
+- a read access over the list resource (i.e., ``|datastores`` in this example)
+  is needed to allow enumerating the elements in question, and
+
+- a read access over each element in the list (i.e., each data store in this
+  example) is needed to read the element's properties.
+
+The "all or nothing" authorization check outlined in :numref:`authorization`
+requires all prerequisites to be satisfied before the operation can proceed,
+which can be problematic; for example, listing data stores would fail as soon
+as an agent cannot read at least one data store. To support such requests while
+still obeying access control restrictions, the prerequisites over the list
+elements are treated as *optional* -- that is, the call succeeds if the agent
+as the read permission over the element list, and the element's properties are
+optionally included for each element that the agent can read.
+
+.. container:: example
+
+   Consider an RDFox server with two data stores: ``ds1`` and ``ds2``. Agent 
+   ``admin`` has read access over all resources, while agent ``client`` has
+   read access to the list of data stores and to ``ds1`` but not to ``ds2``.
+   When ``admin`` queries the list of data stores, the response will name 
+   ``ds1`` and ``ds2`` and include properties of both. When ``client`` makes
+   the same query, their response will name both data stores but will only
+   include properties of ``ds1``.
+
+.. _named-graph-access-control:
+
+Authorizing Named Graph Access
+""""""""""""""""""""""""""""""
+
+Applying the authorization check from :numref:`authorization` to the evaluation
+of SPARQL queries would require identifying the set of relevant named graphs in
+advance, but this is often very hard or even impossible without evaluating the
+query itself. Analogously, when importing a TriG file, the set of relevant
+named graphs is known only once the file has been fully processed. Thus, named
+graphs are never included into the set of prerequisites, and, instead, the
+following policies are applied.
+
+- For read access to named graphs, RDFox simply "pretends" that all named
+  graphs not readable by the agent do not exist.
+
+- For write accesses to named graphs, RDFox aborts the operation on the first
+  attempt to write to an unwritable named graph.
+
+.. note::
+
+   All operations that read or write to named graphs require privileges to
+   access the containing data store and its ``Quads`` tuple table, all of which
+   are checked as prerequisites.
+
+.. container:: example
+
+    The following SPARQL query selects all named graphs in a data store that
+    are visible to the agent evaluating the query. This example shows how
+    different agents may receive different results to the same query. ::
+    
+        SELECT DISTINCT ?G WHERE { GRAPH ?G { ?S ?P ?O } }
+
+SPARQL updates involving ``DELETE/INSERT WHERE``, ``COPY``, ``ADD``, or
+``MOVE`` statements, are separately sensitive to which graphs are readable and
+writable as illustrated in the following example.
+
+.. container:: example
+
+   The following SPARQL update copies all of the triples from graph ``:G1`` to
+   graph ``:G2``. Let's assume that graph ``:G1`` is not empty and that the
+   prefix ``:`` is defined in the data store. ::
+
+      INSERT { GRAPH :G2 { ?S ?P ?O } }
+      WHERE  { GRAPH :G1 { ?S ?P ?O } }
+   
+   Imagine we have a role with read and write privileges over the ``Quads``
+   table within the data store but no privileges over any named graphs. When
+   the role invokes the above query, no authorization error is raised even
+   though the ``INSERT`` clause specifies an unwritable graph. This is because
+   access control prevented the body of the query (the ``WHERE`` clause) from
+   matching the triple in the unreadable graph ``:G1`` so there was no attempt
+   to write a triple into the unwritable graph ``:G2``.
+
+   If we grant the role a read privilege over graph ``:G1`` and reevaluate the
+   update (on a fresh connection), an error will be produced. This time, the
+   query body was allowed to match the triple in ``:G1`` and an attempt to
+   write it to ``:G2`` was made. This resulted in the operation being
+   immediately aborted.
+
+   Finally, if we grant a write privilege over graph ``:G2`` and reevaluate
+   once more (again, on a fresh connection), no error is produced. If we were
+   to inspect graph ``:G2`` as a role with read permission over it, we would
+   find the triples from ``:G1`` there.
+
+.. _request-access-control:
+
+Authorizing Request Access
+""""""""""""""""""""""""""
+
+Requests running on the RDFox endpoint are transient (i.e., they come and go as
+they are submitted) so it is not possible to control access to each request
+individually. Instead, RDFox observes the following rules for governing access
+to requests.
+
+- Each role has full control over all requests it creates.
+
+- For requests created by other roles, each role inherits the privileges of the
+  ``|requests`` resource. Thus, a role with write access to the ``|requests``
+  resource is allowed to cancel any request running on the system.
+
+Authorizing a Role's Access to Itself
+"""""""""""""""""""""""""""""""""""""
+
+No role is allowed to grant or revoke its own privileges or memberships.
+
+.. _role-manager:
+
+Role Manager
+------------
+
+Every RDFox server has a built-in role manager that is responsible for storing
+the server's roles. The roles contained by the role manager can be modified
+using the appropriate APIs (see :numref:`APIs-managing-roles`) or shell
+commands (see the :ref:`role <role-command>`, :ref:`grant <grant-command>`, and
+:ref:`revoke <revoke-command>` commands).
+
+Role Manager Services
+~~~~~~~~~~~~~~~~~~~~~
+
+Every authentication workflow in RDFox uses one of the role manager
+services described in this section.
+
+.. _password-based-authentication:
+
+Password-Based Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A role can be authenticated by supplying the role's name and password. When
+authentication fails, no information is leaked about whether the role exists or
+not.
+
+.. _direct-role-retrieval:
+
+Direct Role Retrieval
+^^^^^^^^^^^^^^^^^^^^^
+
+Direct role retrieval is the process of retrieving a role using the role's name
+alone (i.e., without checking the role's password). This is used for cases where
+the role's identity is authenticated by a trusted third-party system. Role
+retrieval will be successful only if the following conditions are met, and will
+otherwise result in an error.
+
+1. The role being authenticated exists (that is, there is a role with the same
+   name).
+2. The role manager's ``externally-authenticatable-role`` parameter is set to a
+   role that also exists.
+3. The role being authenticated is a member of the role mentioned in condition
+   2.
+4. The role being authenticated does not have any members.
+
+.. _effective-privileges-external-agent:
+
+Determining the Effective Privileges of External Agents
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As explained in :numref:`external-agents`, external agents are not granted
+privileges directly. Rather, when authenticating an external agent, the
+third-party system conducting the authentication will provide a list of roles
+that the agent is a member of. If the following conditions are met, the role
+manager then produces the set of agent's effective privileges provided;
+otherwise, authenticating the external agent fails.
+
+1. The agent name does not match that of any of the server's roles.
+2. The role manager's ``externally-grantable-role`` parameter is set to a role
+   that exists.
+3. Every role in the list of roles specified by the third-party system
+   exists and is a member of the role mentioned in condition 2.
+
+.. _role-manager-configuration-parameters:
+
+Role Manager Configuration Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following table lists the configuration parameters for the role manager. To
+specify these parameters, pass them as :ref:`server parameters
+<server-parameters>`, prefixed with ``role-manager.``.
+
+.. table ::
+   :widths: 25,20,50
+
+   +-------------------------------------+------------------------+---------------------------------------------------------------------------------+
+   |        Option                       |          Value         |             Description                                                         |
+   +=====================================+========================+=================================================================================+
+   | ``argon2i.memory-cost``             | a non-negative integer | The amount of memory the role manager will use to generate Argon2i password     |
+   |                                     |                        | hashes in kibibytes. If not zero, this parameter must be at least 8 times the   |
+   |                                     |                        | ``argon2i.parallelism`` parameter although much larger values are usually       |
+   |                                     |                        | required for security. The authors of the Argon2i algorithm included guidance   |
+   |                                     |                        | on setting the parameters in Section 4 of                                       |
+   |                                     |                        | `rfc9106 <https://www.rfc-editor.org/rfc/rfc9106.html#name-parameter-choice>`__ |
+   |                                     |                        |                                                                                 |
+   |                                     |                        | This parameter, and the others beginning ``argon2i.``, only have an effect      |
+   |                                     |                        | during initialization of a new persistent server. At that time, if any of the   |
+   |                                     |                        | parameters is zero (the default value in all cases), RDFox will automatically   |
+   |                                     |                        | determine values for all three parameters together to attempt to achieve a      |
+   |                                     |                        | hashing time of approximately 1 second on the current hardware. Once the        |
+   |                                     |                        | parameters are determined (whether from the user's settings or by the           |
+   |                                     |                        | automatic procedure) they are saved within the server directory and used when   |
+   |                                     |                        | generating new hashes.                                                          |
+   +-------------------------------------+------------------------+---------------------------------------------------------------------------------+
+   | ``argon2i.time-cost``               | a non-negative integer | The number of iterations of the core Argon2i hashing algorithm that the role    |
+   |                                     |                        | manager will use to generate Argon2i password hashes. See the comments for the  |
+   |                                     |                        | ``argon2i.memory-cost`` parameter.                                              |
+   +-------------------------------------+------------------------+---------------------------------------------------------------------------------+
+   | ``argon2i.parallelism``             | a non-negative integer | The number of independent computational chains that the role manager will use   |
+   |                                     |                        | to generate Argon2i password hashes. See the comments for the                   |
+   |                                     |                        | ``argon2i.memory-cost`` parameter.                                              |
+   +-------------------------------------+------------------------+---------------------------------------------------------------------------------+
+   | ``externally-authenticatable-role`` | a string               | The name of a role whose members may be authenticated by a third-party system   |
+   |                                     |                        | (see conditions 2 and 3 in :numref:`direct-role-retrieval`). Setting this       |
+   |                                     |                        | parameter does not create the role automatically: this must be done separately  |
+   |                                     |                        | using a role creation API call or shell command.                                |
+   +-------------------------------------+------------------------+---------------------------------------------------------------------------------+
+   | ``externally-grantable-role``       | a string               | The name of a role whose members may be granted to external agents (see         |
+   |                                     |                        | :numref:`effective-privileges-external-agent`). Setting this parameter does     |
+   |                                     |                        | not create the role automatically: this must be done using a role creation API  |
+   |                                     |                        | call or shell command.                                                          |
+   +-------------------------------------+------------------------+---------------------------------------------------------------------------------+
+
+.. _authentication-managers:
+
+Authentication Managers
+-----------------------
+
+*Authentication* is the process of identifying the agent that is involved in
+processing a request. Authentication requests are often processed by one of the
+preconfigured authentication *authentication managers*, but
+:numref:`other-authentication-pathways` specifies several cases in which an
+authentication manager is bypassed. The :ref:`authentication-managers
+<authentication-managers-server-param>` server parameter contains a
+comma-separated list of authentication managers configured for the server.
+
+Each authentication manager provides two ways to authenticate an agent.
+
+- Each authentication manager implements an *authentication scheme* that can
+  authenticate an agent from an opaque *credentials* string.
+
+- An authentication manager can be asked to create a *session*. Doing so
+  produces a *session token* that uniquely identifies an agent. When making
+  subsequent requests, a session token must be presented to the authentication
+  manager to identify the agent involved in the request. At that point, the
+  authentication manager may decide to *refresh* a session token -- that is,
+  issue a new a session token that is to be used in subsequent requests. The
+  latter ensures that the same session token is not used for long periods of
+  time, which could be a potential security vulnerability. In addition, an
+  authentication manager can impose a validity time on session tokens -- that
+  is, reject authentication requests with tokens that are older than a
+  predefined time period.
+  
+At present, both options are available only through the RESTful API. Thus, the
+HTTP authentication schemes define authentication scheme names and the format
+of the credentials string. Moreover, session tokens in the RESTful API are
+managed as described in :numref:`REST-sessions`. The available authentication
+managers are described in the following sections.
+
+.. _role-name+password:
+
+``role-name+password`` Authentication Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``role-name+password`` authentication manager allows users to authenticate
+as a role by supplying the role's name and password. It has no support for
+authenticating external agents. To enable this role manager, include
+``role-name+password`` in the comma-separated list specified for the
+:ref:`authentication-managers <authentication-managers-server-param>` server
+parameter. When enabled, the ``role-name+password`` authentication manager will
+be responsible for verifying the authentication information received in
+requests that use the ``Basic`` HTTP authentication scheme.
+
+Configuration Parameters
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following table lists the configuration parameters for the
+``role-name+password`` authentication manager. To specify these parameters,
+pass them as :ref:`server parameters <server-parameters>`, prefixed with
+``role-name+password.``.
+
+.. table ::
+   :widths: 25,20,50
+
+   +-----------------------------+---------------------------------+----------------------------------------------------------------+
+   |            Option           |          Value                  |             Description                                        |
+   +=============================+=================================+================================================================+
+   | ``session-refresh-time``    | a duration of ``1 s`` or more   | Specifies the time after which a session token is refreshed -- |
+   |                             | specified as described in       | that is, when a request is made with a session token that is   |
+   |                             | :numref:`specifying-durations`  | older than this time, the server will issue a fresh session    |
+   |                             |                                 | token as part of authentication. The default value is 5        |
+   |                             |                                 | minutes.                                                       |
+   +-----------------------------+---------------------------------+----------------------------------------------------------------+
+   | ``session-validity-time``   | a duration of ``1 s`` or more   | Specifies the validity time of a session token -- that is, an  |
+   |                             | specified as described in       | authentication request with a session token older than this    |
+   |                             | :numref:`specifying-durations`  | time will fail. The default value is 24 hours.                 |
+   +-----------------------------+---------------------------------+----------------------------------------------------------------+
+
+.. _role-name+password-session-authentication:
+
+Session-Based Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``role-name+password`` authentication manager does not require a login
+initiation call.
+
+Login completion calls that are routed to this authentication manager must
+include the following parameters in the request body:
+
+  - ``role-name``
+  - ``password``
+
+The authentication manager will call the role manager to perform
+:ref:`password-based authentication <effective-privileges-external-agent>`.
+
+Logout calls that are routed this authentication manager perform no action
+besides unsetting the session token cookie.
+
+.. _oidc:
+
+``oidc`` Authentication Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``oidc`` (short for OpenID Connect) authentication manager allows users to
+authenticate as either a role or an external agent using OIDC tokens. To enable
+this role manager, include ``oidc`` in the comma-separated list specified for
+the :ref:`authentication-managers <authentication-managers-server-param>`
+server parameter.
+
+When enabled, the OIDC authentication manager will be responsible for verifying
+the authentication information received in requests that use the ``Bearer``
+HTTP authentication scheme.
+
+.. warning::
+
+   RDFox does not support any mechanism for checking whether the credentials it
+   receives have been revoked. This means that the holder of the credentials
+   which has a valid structure and cryptographic signature will be able to use
+   the credentials to authenticate to RDFox until the token's expiration time.
+   The same applies to any session derived from these credentials (see
+   :numref:`REST-sessions`).
+
+Configuration Parameters
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following table lists the configuration parameters for the OIDC
+authentication manager. To specify these parameters, pass them as :ref:`server
+parameters <server-parameters>`, prefixed with ``oidc.``.
+
+.. table ::
+   :widths: 30,20,50
+
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   |            Option              |          Value                 |             Description                                    |
+   +================================+================================+============================================================+
+   | ``agent-name-claim``           | a string                       | The name of the JWT claim from which the agent name will   |
+   |                                |                                | be extracted. The default value of this parameter is       |
+   |                                |                                | ``sub``.                                                   |
+   |                                |                                |                                                            |
+   |                                |                                | The values in the claim specified by this parameter may be |
+   |                                |                                | printed in HTTP request logs and returned by the ``AGENT`` |
+   |                                |                                | built-in in SPARQL requests. It is important that the      |
+   |                                |                                | value in this claim uniquely identifies the subject of the |
+   |                                |                                | token.                                                     |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   | ``client-id``                  | a string                       | The identifier for the current RDFox instance as an OpenID |
+   |                                |                                | Connect client. The ``aud`` claim from the received token  |
+   |                                |                                | must match the value set for this parameter, which has no  |
+   |                                |                                | default value and must be set explicitly.                  |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   | ``client-secret``              | a string                       | The secret issued for the current RDFox instance as an     |
+   |                                |                                | OpenID Connect client, for use when authenticating itself  |
+   |                                |                                | to the OpenID provider. This parameter has no default      |
+   |                                |                                | value and must be specified if interactive OIDC login is   |
+   |                                |                                | desired.                                                   |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   | ``delete-refresh-token-after`` | a duration, specified          | The duration of time after which a refresh token is        |
+   |                                | as described in                | deleted from disk. This value should be longer than the    |
+   |                                | :numref:`specifying-durations` | validity of the refresh token, otherwise the refresh token |
+   |                                |                                | may be deleted while it is still in use. The default value |
+   |                                |                                | is 91 days.                                                |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   | ``issuer``                     | a string                       | The identifier for the OpenID provider's issuer, which     |
+   |                                |                                | must be a case-sensitive URL using the ``https`` scheme    |
+   |                                |                                | that contains scheme, host, and optionally port number and |
+   |                                |                                | path components, and no query or fragment components.      |
+   |                                |                                | The ``iss`` claim in received tokens must match this value.|
+   |                                |                                | The value is also used to discover the OpenID provider's   |
+   |                                |                                | configuration including its public keys, authorization     |
+   |                                |                                | endpoint and token endpoint. This parameter has no default |
+   |                                |                                | and must be set explicitly.                                |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   | ``roles-claim``                | a string                       | The name of the claim from the received JWT                |
+   |                                |                                | token which will be used as the agent name. This           |
+   |                                |                                | parameter has no default and may be left unset             |
+   |                                |                                | (see comments below this table).                           |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+   | ``refresh-tokens-directory``   | a string                       | Specifies the directory to be used for persistence of      |
+   |                                |                                | refresh tokens. This value may be omitted, in which case   |
+   |                                |                                | RDFox will store the OIDC refresh tokens in the            |
+   |                                |                                | ``oidc-refresh-tokens`` subdirectory of the server         |
+   |                                |                                | directory (See also :numref:`server-directory`).           |
+   +--------------------------------+--------------------------------+------------------------------------------------------------+
+
+When authenticating a JWT, the OIDC authentication manager uses the
+availability of a roles claim to decide how to complete the authentication. If
+the ``roles-claim`` parameter is not set or if it is set but the JWT in
+question does not have a claim with the specified name, the OIDC authentication
+manager will ask the role manager to complete the authentication process using
+:ref:`direct role retrieval <direct-role-retrieval>`. If the ``roles-claim``
+parameter is set and the JWT in question does have a claim with the specified
+name, the OIDC authentication manager will attempt to compile the privileges of
+the JWT subject as an external agent, using the process described in
+:ref:`external agent privilege compilation
+<effective-privileges-external-agent>`. Note that both of these options depend
+on the configuration of the role manager.
+
+.. _oidc-session-authentication:
+
+Session-Based Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using the ``oidc`` authentication manager in session-based authentication
+requires that the ``client-secret`` parameter be set.
+
+Login initiation calls that are routed to the OIDC authentication manager are
+required to specify the ``completion-uri`` initiation parameter specifying the
+URI where the OP will redirect the client after a successful login. Such a call
+initializes the state parameter for the authorization code flow, sets a cookie
+based on this, and redirects the client to the OpenID Connect provider (OP)'s
+authorization endpoint to request a token. The OP must then redirect the client
+back to the same URI as was specified via the ``completion-uri``. The page at
+this URI must decode the code and state parameters from the URL fragment or
+query string, and use them to make a login completion call to the RDFox server,
+ensuring that the cookie set by the login initiation call is included in the
+request.
+
+Login completion calls that are routed to the OIDC authentication manager must
+include, in the request body, the ``code`` and ``state`` values received from
+the OP as well as the same ``completion-uri`` value as was used in the
+initiation call. Using this information, the OIDC authentication manager will
+then attempt to authenticate the resource owner by performing a token request
+with the OP and, if this is successful, processing the received ID token in the
+same way if it were received with the ``Authorization`` header. A refresh token
+is requested and must be present in the token response.
+
+The OIDC authentication manager securely encrypts and stores refresh tokens to
+disk as specified by the ``refresh-tokens-directory`` parameter. Logout calls
+that are routed to the OIDC authentication manager delete the refresh token from
+disk and unset the session token cookie. This model ensures that even in the
+case that an attacker gains access to a valid session token cookie, they are not
+able to refresh the session after logout. Expired refresh tokens are
+automatically deleted from disk after the time specified by the
+``delete-refresh-token-after`` parameter has elapsed.
+
+.. _other-authentication-pathways:
+
+Other Authentication Pathways
+-----------------------------
+
+The following authentication workflows do not use an authentication manager,
+instead using the role manager directly:
+
+  - Clients of the RDFox HTTP :ref:`endpoint <rdfox-endpoint>` may authenticate
+    using client TLS certificates. See :numref:`REST-client-certificates`.
+  - Authenticating to a local RDFox shell session uses :ref:`password-based
+    authentication <password-based-authentication>`.
+  - Authentication via the Java or C/C++ APIs also uses :ref:`password-based
+    authentication <password-based-authentication>`.
+
+Securing an RDFox Server
+------------------------
+
+This section gives practical information on how to set up a secure, persistent
+RDFox server. Examples are given for the RDFox executable and shell but all
+steps can also be achieved programmatically using the APIs described in
+:numref:`apis`.
+
+.. _access-control-initialization:
+
+Initialization
+~~~~~~~~~~~~~~
+
+At least one role must exist within an RDFox server's role database before that
+server can be used. When the role database is empty at startup, either because
+the server directory has not been initialized for role persistence, or because
+role persistence is disabled, RDFox will check the process's command line
+arguments and environment variables for the name and password to use for the
+first role. If either value is missing after that, the behavior depends on the
+executable mode in use. In ``init`` mode, the user is prompted to provide the
+missing values as follows:
+
+::
+
+   Enter the name of the first role: admin
+   Enter the first role password:
+   Confirm the password:
+
+
+See :numref:`rdfox-executable` for more details on how to start the RDFox
+executable.
+
+When using role persistence, RDFox will next determine the parameters for
+hashing passwords on the local hardware. This may take a minute or more but
+will only happen the first time persistence is used with a given server
+directory. A successful initialization will continue as follows:
+
+::
+
+   Initializing access control (may take a minute or more)...
+   Access control has been initialized by creating the first role with name "admin".
+
+This concludes the initialization process and the process will now exit. At
+this point, the first role holds the privilege ``full >``, giving it full
+control over the server and all its resources, including the power to configure
+access control. Next, we launch a ``shell`` mode process which will ask for
+login credentials. Once authentication is successful, the shell prompt is
+returned.
+
+::
+
+   A new server connection was opened as role 'admin' and stored with name 'sc1'.
+   >
+
+.. note::
+
+   RDFox uses `argon2i <https://en.wikipedia.org/wiki/Argon2>`__ to compute
+   hashes for storage when role persistence is enabled.
+
+Managing Roles
+~~~~~~~~~~~~~~
+
+In the shell, the :ref:`role-command` command provides several subcommands for
+managing the roles in the system. It uses the shell's active server connection
+to perform operations. To understand how the shell manages server and data store
+connections, see :numref:`connection-management-shell`.
+
+The command ``role create <role-name>`` creates a new role, prompting for the
+role’s password to be provided and confirmed. For example:
+
+::
+
+   > role create user1
+   Enter the password for the new role:
+   Confirm the password:
+   A new role was created with name "user1".
+
+In some situations, it may be necessary to create a role without a password,
+for example when the role will used solely to group other roles. This can be
+achieved by adding the ``no-password`` flag to the command:
+
+   > role create group no-password
+   A new role was created with name "group".
+
+To list the roles in the server’s role database, use ``role list``. To delete a
+role which is no longer needed, use ``role delete <role-name>``.
+
+To change a role’s password, ensure that the active server connection is
+authenticated as the role whose password is to be changed and issue the
+:ref:`password-command` command. It is not possible to change the password of a
+role that was created without a password. If this is necessary, the role must be
+deleted and recreated with a password.
+
+.. note::
+
+   Commands that require interactive password entry cannot be used in the
+   remote shell.
+
+Assigning Privileges Directly
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the shell, privileges are granted or revoked with the ``privileges``
+subcommand of the :ref:`grant-command` or :ref:`revoke-command` commands.
+Privileges must be given as a list of access types followed by a resource
+specifier. For example the following script grants ``read``, ``write`` and
+``grant`` privileges over all data stores to ``user1`` and then revokes the
+``write`` and ``grant`` privileges:
+
+::
+
+   > grant privileges read,write,grant >datastores|* to user1
+   The privileges 'read,write,grant' over the resource specifier ">datastores|*" were granted to the role "user1".
+   > revoke privileges write,grant >datastores|* from user1
+   The privileges 'write,grant' over resource specifier ">datastores|*" were revoked from the role "user1".
+
+To check that the role's privileges are now as we expect, we can use the
+``show`` subcommand of the :ref:`role-command` command which prints all of the
+specified role's privileges, memberships and members:
+
+::
+
+   > role show user1
+
+   Password hash for 'user1' is <password-hash>
+
+   'user1' has the following directly assigned privileges:
+   ==============================================
+     Resource specifier   Allowed access types
+   ----------------------------------------------
+     >datastores|*        read
+   ==============================================
+
+   'user1' is a direct member of the following roles:
+   ================
+     Memberships
+   ----------------
+   ================
+
+   The following roles are direct members of 'user1':
+   ============
+     Members
+   ------------
+   ============
+
+Discovering Privilege Requirements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Individual operations may require several privileges depending on which
+resources they access. To determine which privileges are needed for a particular
+operation, attempt the operation as a completely unprivileged role and examine
+the resulting error message to identify the first required privilege. For
+example, the error messages in the following shell session tells us that in
+order to list the roles, a role must have a ``read`` privilege over the
+``|roles`` resource.
+
+::
+
+   > srvconn open user1-connection as user1
+   Password for 'user1':
+   A new server connection was opened and stored with name 'user1-connection'.
+   > srvconn active user1-connection
+   Server connection 'user1-connection' is active.
+   > role list
+   An error occurred while executing the command:
+       The role 'user1' is not authorized to read the resource '|roles'.
+
+Next, grant the missing privilege:
+
+::
+
+   > srvconn active sc1
+   Server connection 'user1-connection' is active.
+   > grant privileges read |roles to user1
+   The privilege 'read' over the resource specifier "|roles" was granted to the role "user1".
+
+Although the privileges were successfully granted to the role, the server
+connection we opened earlier as ``user1`` will not have been modified. To
+exercise the new privileges available to ``user1``, we first close the existing
+server connection and open and activate a new one:
+
+::
+
+   > srvconn close
+   The active server connection was closed.
+   > srvconn open user1-connection as user1
+   Password for 'user1': 
+   A new server connection was opened and stored with name 'user1-connection'.
+   > srvconn active user1-connection
+   Server connection 'user1-connection' is active.
+
+Finally, retry the operation:
+
+::
+
+   > role list
+   =========
+   Name
+   ---------
+   admin
+   group
+   user1
+   =========
+
+The command is now successful. For other commands, multiple iterations of the
+above process may be needed before the command succeeds. For security reasons,
+RDFox only reveals the missing privileges for one resource at a time.
+
+.. _assigning-privileges-via-membership:
+
+Assigning Privileges via Membership
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Roles can be arranged into hierarchies using the ``role`` subcommand of the
+:ref:`grant-command` command:
+
+::
+
+   > srvconn active sc1
+   Server connection 'sc1' is active.
+   > grant role group to user1
+   Membership of the role 'group' was granted to the role 'user1'.
+
+and removed from them using the ``role`` subcommand of the :ref:`revoke-command`
+command:
+
+::
+
+   > revoke role group from user1
+   Membership of the role "group" was revoked from the role "user1" (if it was present).
+
+A role may be a member of as many other roles as is necessary however RDFox
+will prevent cycles: a role cannot be a member of itself either directly or
+indirectly. RDFox will also not allow roles with one or more members to be
+deleted.
+
+.. _securing-the-rest-endpoint:
+
+Securing the REST Endpoint
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On receipt of an anonymous REST request (one with no ``Authorization`` header
+or TLS-authenticated role name), RDFox will attempt to create a new connection
+for the request by authenticating with role name ``guest`` and password
+``guest``. To enable anonymous REST access, administrators should therefore
+create the ``guest`` role and grant it the privileges to perform any operation
+which should be available to *any* client that can reach the REST endpoint. As
+a corollary, anonymous REST access can be completely disabled by ensuring the
+absence of a role named ``guest`` from the server’s role list. Note that RDFox
+will not allow the ``guest`` role to be created with any password other than
+``guest``, nor will it allow this role’s password to be changed.
+
+Testing the Setup
+~~~~~~~~~~~~~~~~~
+
+Verifying that your access control policy is correct is an essential step in
+establishing a secure RDFox server. Oxford Semantic Technologies recommends
+comprehensive tests including both positive (checking that a given role can
+perform the operations it should be authorized to perform) and negative (check
+that a given role cannot perform the operations it should not be authorized to
+perform) tests.
+
+Persistence
+~~~~~~~~~~~
+
+When persistence (see :numref:`persistence`) is enabled, RDFox saves relevant
+parts of the server's content to the server directory. An attacker with access
+to that directory will be able to tamper with any persisted access control
+policies. For this reason, it is vital to also tightly control access to the
+server directory when role persistence is enabled.
+
+Example Access Control Policies
+-------------------------------
+
+This section contains several additional examples of access control policies.
+The scripts in this section are written assuming they are being run by a role
+with the all-powerful ``full >`` privilege as is assigned to the first server
+role.
+
+Anonymous, Read-Only REST Access
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following shell example shows how to enable anonymous (unauthenticated),
+read-only access to the entire server:
+
+::
+
+   > role create guest
+   A new role was created with name "guest".
+   > grant privileges read > to guest
+   The privilege 'read' over the resource specifier ">" was granted to the role "guest".
+   > endpoint start
+   The REST endpoint was successfully started at port number/service name 12110 with 11 threads.
+
+See :ref:`securing-the-rest-endpoint` for more details.
+
+Delegating Administration of a Data Store
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To minimize the work that must be done as the most powerful role, it may be
+desirable to create separate roles to administrate each data store. To do this,
+first create the data store and its administrator role and ensure that the role
+has full control over the data store as follows:
+
+::
+
+   > dstore create ds
+   A new data store 'ds' was created and initialized.
+   > active ds
+   Data store connection 'ds' is active.
+   > role create ds-admin
+   ...
+   A new role was created with name "ds-admin".
+   > grant privileges full >datastores|ds to ds-admin
+   The privilege 'full' over the resource specifier ">datastores|ds" was granted to the role "ds-admin".
+
+Finally, to ensure that ``ds-admin`` is able to grant and revoke privileges over
+the data store to and from other roles, we grant it write access over all roles
+as follows:
+
+::
+
+   > grant privileges read |roles to ds-admin
+   The privilege 'read' over the resource specifier "|roles" was granted to the role "ds-admin".
+   > grant privileges read,write |roles|* to ds-admin
+   The privileges 'read,write' over the resource specifier "|roles|*" were granted to the role "ds-admin".

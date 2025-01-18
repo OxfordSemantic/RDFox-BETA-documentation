@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5. Data Stores &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
+        <script defer="defer" src="_static/algolia.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="6. Tuple Tables" href="tuple-tables.html" />
+    <link rel="prev" title="4. Servers" href="servers.html" />
+    <!-- Start of HubSpot Cookie Blocking Code -->
+    <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
+    <!-- End of HubSpot Cookie Blocking Code -->
+
+     
+
+    <!-- Set up consent mode for Google Analytics -->
+    <!-- Retrieve previous consent settings if present, otherwise deny everything -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        if(localStorage.getItem('consentMode') === null) {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'denied',
+                'ads_data_redaction': true,
+            });
+        } else {
+            gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+        }
+    </script>
+    <!-- End of consent mode setup for Google Analytics -->
+
+    <!-- Listen for consent changes from HubSpot consent banner -->
+    <script>
+        var _hsp = window._hsp = window._hsp || [];
+        _hsp.push(['addPrivacyConsentListener', function(consent) {
+            const consentMode = {
+                'ad_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'analytics_storage': consent.categories.analytics ? 'granted' : 'denied',
+                'personalization_storage': consent.categories.advertisement ? 'granted' : 'denied',
+                'functionality_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'security_storage': consent.categories.functionality ? 'granted' : 'denied',
+                'ads_data_redaction': consent.categories.advertisement ? false : true,
+            };
+            gtag('consent', 'update', consentMode);
+            localStorage.setItem('consentMode', JSON.stringify(consentMode))
+
+            // Google Tag Manager
+            function addGtm(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0];
+                var j=d.createElement(s);
+                var dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            }
+            if(
+                consent.categories.analytics
+                || consent.categories.functionality
+                || consent.categories.advertisement
+            ) {
+                addGtm(window,document,'script','dataLayer','GTM-WFM2Q9D');
+            }
+            // End of Google Tag Manager code
+        }]);
+    </script>
+    <!-- End of consent listener -->
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="welcome-to-rdfox.html">1. Welcome to RDFox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features-and-requirements.html">2. RDFox Features and Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">3. Getting Started</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Organization of Data</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="servers.html">4. Servers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">5. Data Stores</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#operations-on-data-stores">5.1. Operations on Data Stores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#organization-of-data">5.2. Organization of Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#storage">5.2.1. Storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#importation-and-delete-insert-clauses">5.2.2. Importation and DELETE/INSERT Clauses</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mapping-triples-and-quads-to-rdf-datasets-for-sparql-where-ask">5.2.3. Mapping Triples and Quads to RDF Datasets for SPARQL WHERE/ASK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compaction-and-dead-fact-removal">5.2.4. Compaction and Dead Fact Removal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-data-types-for-literals">5.3. Supported Data Types for Literals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-store-configuration">5.4. Data Store Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-store-parameters">5.4.1. Data Store Parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#default-graph-name">5.4.1.1. <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#equality">5.4.1.2. <code class="docutils literal notranslate"><span class="pre">equality</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#init-resource-capacity">5.4.1.3. <code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#init-tuple-capacity">5.4.1.4. <code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-data-pool-size">5.4.1.5. <code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-resource-capacity">5.4.1.6. <code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-tuple-capacity">5.4.1.7. <code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#persistence">5.4.1.8. <code class="docutils literal notranslate"><span class="pre">persistence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quad-table-type">5.4.1.9. <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swrl-negation-as-failure">5.4.1.10. <code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#triple-table-type">5.4.1.11. <code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#type">5.4.1.12. <code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-store-properties">5.4.2. Data Store Properties</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auto-compact-after">5.4.2.1. <code class="docutils literal notranslate"><span class="pre">auto-compact-after</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auto-update-statistics-mode">5.4.2.2. <code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#base-iri">5.4.2.3. <code class="docutils literal notranslate"><span class="pre">base-iri</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#errors-in-bind">5.4.2.4. <code class="docutils literal notranslate"><span class="pre">errors-in-bind</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#invalid-literal-policy">5.4.2.5. <code class="docutils literal notranslate"><span class="pre">invalid-literal-policy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-backward-chaining-depth">5.4.2.6. <code class="docutils literal notranslate"><span class="pre">max-backward-chaining-depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-threads-used">5.4.2.7. <code class="docutils literal notranslate"><span class="pre">max-threads-used</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#property-paths-cardinality">5.4.2.8. <code class="docutils literal notranslate"><span class="pre">property-paths-cardinality</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-planning-algorithms">5.4.2.9. <code class="docutils literal notranslate"><span class="pre">query-planning-algorithms</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#remove-dead-facts">5.4.2.10. <code class="docutils literal notranslate"><span class="pre">remove-dead-facts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#query-validation">5.4.2.11. <code class="docutils literal notranslate"><span class="pre">query-validation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#user-blank-node-import-policy">5.4.2.12. <code class="docutils literal notranslate"><span class="pre">user-blank-node-import-policy</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tuple-tables.html">6. Tuple Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-sources.html">7. Data Sources</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Functionality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="import-and-export.html">8. Import and Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="querying.html">9. Querying</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reasoning.html">10. Reasoning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transactions.html">11. Transactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="access-control.html">12. Access Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence.html">13. Persistence</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Interfaces</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="connections.html">14. Connections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-shell.html">15. RDFox Shell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apis.html">16. APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadoc.html">17. Javadoc</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Operations Manual</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-executable.html">18. RDFox Executable</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdfox-endpoint.html">19. RDFox Endpoint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">20. Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="high-availability.html">21. High Availability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RDFox</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">5. </span>Data Stores</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="data-stores">
+<span id="id1"></span><h1><span class="section-number">5. </span>Data Stores<a class="headerlink" href="#data-stores" title="Permalink to this headline">¶</a></h1>
+<p>As explained in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>, a <em>data store</em> encapsulates a unit of
+logically related information. Many applications will store all of their
+related data in one data store (although some applications may use more than
+one data store). It is important to keep in mind that a query and rule can
+operate only on one data store; thus, all information that should be queried or
+reasoned within one unit should be loaded into one data store.</p>
+<p>As explained in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>, a data store serves as a container for
+other kinds of objects:</p>
+<ul class="simple">
+<li><p><em>tuple tables</em> are data store components that store facts (see
+<a class="reference internal" href="tuple-tables.html#tuple-tables"><span class="std std-numref">Section 6</span></a>);</p></li>
+<li><p><em>data sources</em> can be registered with a data store to access external,
+non-RDF data (see <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>);</p></li>
+<li><p><em>OWL axioms</em> and <em>Datalog rules</em> are used to specify rules of inference that
+are to be applied to the data loaded into the data store (see
+<a class="reference internal" href="reasoning.html#reasoning"><span class="std std-numref">Section 10</span></a>);</p></li>
+<li><p><em>statistics modules</em> summarize the data loaded into a data store in a way
+that helps query planning.</p></li>
+</ul>
+<p>The behavior of a data store can be customized using various parameters and
+properties, as explained in <a class="reference internal" href="#data-store-configuration"><span class="std std-numref">Section 5.4</span></a>.</p>
+<div class="section" id="operations-on-data-stores">
+<span id="id2"></span><h2><span class="section-number">5.1. </span>Operations on Data Stores<a class="headerlink" href="#operations-on-data-stores" title="Permalink to this headline">¶</a></h2>
+<p>The following list summarizes the operations on data stores available in the
+shell or via one of the available APIs.</p>
+<ul>
+<li><p>A data store can be <em>created</em> on a server. To create a data store, one must
+specify the data store name and zero or more <a class="reference internal" href="#data-store-parameters"><span class="std std-ref">parameters</span></a> expressed as key-value pairs.</p></li>
+<li><p>A data store can be <em>deleted</em> on the server. RDFox® allows a data store to be
+deleted only if there are no active <a class="reference internal" href="connections.html#connections"><span class="std std-ref">connections</span></a> to the
+data store.</p></li>
+<li><p>A data store can be <em>saved</em> to and subsequently <em>loaded</em> from a binary file.
+The file obtained in this way contains all data store content; thus, when a
+data store is loaded from a file, it is restored to exactly the same state as
+before saving. RDFox supports the following binary formats.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">standard</span></code> format stores the data in a way that is more resilient to
+changes in RDFox implementation. This format should be used in most cases.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">raw</span></code> format stores the data in exactly the same way as the data is
+stored in RAM. This format allows one to reconstruct the state of a data
+store exactly and is therefore useful when reporting bugs, but it is more
+likely to change between RDFox releases.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="organization-of-data">
+<span id="organization-of-rdf-data"></span><h2><span class="section-number">5.2. </span>Organization of Data<a class="headerlink" href="#organization-of-data" title="Permalink to this headline">¶</a></h2>
+<p>The following sections explain how data is organized within a data store with
+details on how the data are stored, managed, imported, and queried.</p>
+<div class="section" id="storage">
+<h3><span class="section-number">5.2.1. </span>Storage<a class="headerlink" href="#storage" title="Permalink to this headline">¶</a></h3>
+<p>By default, two in-memory tuple tables are created automatically when a data
+store is created. The first, <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code>, has arity three and is
+designed to hold triples from an <a class="reference external" href="https://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/Overview.html#dfn-rdf-dataset">RDF dataset’s</a>
+default graph. The second, <code class="docutils literal notranslate"><span class="pre">Quads</span></code>, has arity four and is designed to hold
+triples from all of the RDF dataset’s named graphs. If the <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code>
+(see <a class="reference internal" href="#default-graph-name-parameter"><span class="std std-numref">Section 5.4.1.1</span></a>) parameter is specified at data
+store creation time, the <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table is not created.</p>
+</div>
+<div class="section" id="importation-and-delete-insert-clauses">
+<h3><span class="section-number">5.2.2. </span>Importation and DELETE/INSERT Clauses<a class="headerlink" href="#importation-and-delete-insert-clauses" title="Permalink to this headline">¶</a></h3>
+<p>By default, when performing import operations or evaluating SPARQL <code class="docutils literal notranslate"><span class="pre">DELETE</span></code>
+or <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> clauses, RDFox maps default graph triples to entries in the
+<code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table and named graph triples (also known as quads) to
+entries in the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table. While named graph triples are always mapped to
+the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table, it is possible to override the default mapping for default
+graph triples so that they too are mapped to entries in the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table.
+The exact mechanisms for doing this are described next.</p>
+<p>For import operations, the default mapping for default graph triples can be
+overridden by setting the <em>target default graph</em> parameter (see
+<a class="reference internal" href="import-and-export.html#import-parameters"><span class="std std-numref">Section 8.2.1</span></a>) of the operation. In this case, default graph
+triples are written to the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table with the specified graph name. When
+the target default graph parameter is not provided for the specific operation,
+but the data store’s <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> parameter is set (see
+<a class="reference internal" href="#default-graph-name-parameter"><span class="std std-numref">Section 5.4.1.1</span></a>), the data store parameter is used as
+the graph name instead.</p>
+<p>For SPARQL <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> and <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> clauses, overriding the default graph can
+be achieved by wrapping the triple patterns in the standard syntax for named
+graphs. When this syntax is not used, any setting for the
+<code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> parameter is used as the name of the graph that should
+receive all default triples.</p>
+<p>When importing rules, default graph atoms are interpreted as references to the
+the <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table unless the target default graph parameter is set
+for the import or the <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> parameter is set for the data
+store. In the latter two cases, default graph atoms are interpreted as
+references to the named graph with the specified name.</p>
+<p>When importing OWL, all axioms are applied to the <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table
+unless the target default graph parameter is set for the import or the
+<code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> parameter is set for the data store. In the latter two
+cases, axioms are instead applied to the named graph with the specified name.</p>
+</div>
+<div class="section" id="mapping-triples-and-quads-to-rdf-datasets-for-sparql-where-ask">
+<h3><span class="section-number">5.2.3. </span>Mapping Triples and Quads to RDF Datasets for SPARQL WHERE/ASK<a class="headerlink" href="#mapping-triples-and-quads-to-rdf-datasets-for-sparql-where-ask" title="Permalink to this headline">¶</a></h3>
+<p>Before evaluating SPARQL <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> clauses or <code class="docutils literal notranslate"><span class="pre">ASK</span></code> queries, it is necessary
+to determine the RDF dataset for the query. An RDF dataset comprises exactly
+one default graph plus zero or more named graphs. The default RDF dataset for
+an RDFox data store contains the triples stored in the data store’s
+<code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table in the default graph and all named graphs stored in
+the data store’s <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table as its named graphs.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table is not present when a query begins, the default
+RDF dataset instead contains the multiset of all triples from the data store’s
+<code class="docutils literal notranslate"><span class="pre">Quads</span></code> table in the default graph and, as above, all named graphs stored in
+the data store’s <code class="docutils literal notranslate"><span class="pre">Quads</span></code> table as its named graphs.</p>
+<p>Regardless of whether the <code class="docutils literal notranslate"><span class="pre">DefaultTriples</span></code> table exists or not, the default
+behaviors described above can always be overridden using either <code class="docutils literal notranslate"><span class="pre">FROM</span></code> and
+<code class="docutils literal notranslate"><span class="pre">FROM</span> <span class="pre">NAMED</span></code> clauses in the query itself or, in the case of the SPARQL
+protocol, the <code class="docutils literal notranslate"><span class="pre">default-graph-uri</span></code> and <code class="docutils literal notranslate"><span class="pre">named-graph-uri</span></code> request parameters.</p>
+</div>
+<div class="section" id="compaction-and-dead-fact-removal">
+<span id="compaction-dead-fact-removal"></span><h3><span class="section-number">5.2.4. </span>Compaction and Dead Fact Removal<a class="headerlink" href="#compaction-and-dead-fact-removal" title="Permalink to this headline">¶</a></h3>
+<p>Facts added to any in-memory tuple table can be deleted using any of the APIs
+provided by RDFox, and all facts can be removed from a data store using a
+dedicated <em>clear</em> operation. Facts deleted in any of these two ways will not be
+taken into account during reasoning or query evaluation. However, it is
+important to bear in mind that fact deletion typically only marks the fact as
+deleted and does not reclaim any resources used to store the fact. Facts that
+have been marked for deletion are sometimes called <em>dead</em>, and all other facts
+are called <em>live</em>. If a fact is added to a data store that already contains the
+same fact marked for deletion, the fact is <em>resurrected</em> – that is, the
+deletion flag is removed and the fact becomes live. As a consequence of these
+implementation choices, an application that keeps adding and deleting batches
+of distinct facts will eventually run out of memory, even if the number of
+facts that are live at any point in time is bounded.</p>
+<p>Memory occupied by dead facts can be reclaimed by <em>compacting</em> a data store.
+Roughly speaking, this operation removes all dead facts from memory, rebuilds
+all indexes used for query evaluation, and updates all statistics used during
+query planing. This operation increments the version of the data store even
+though the data store content does not change conceptually. The memory used by
+a data store after compaction should be roughly the same as if the data was
+imported into a fresh data store. It is thus generally good practice to compact
+a data store after periods of substantial data deletion.</p>
+<p>If a data store is persistent (see <a class="reference internal" href="persistence.html#persistence"><span class="std std-numref">Section 13</span></a>), compacting it also
+saves a fresh snapshot of its entire content to disk and removes older
+snapshots and deltas to free up disk space. On startup, RDFox loads data stores
+by first loading their most recent snapshot and then replaying the changes in
+all subsequent deltas in order. Compacting regularly helps to speed up server
+restart by minimizing the number of deltas that need to be replayed after the
+most recent snapshot is loaded.</p>
+<p>Since compaction completely reorganizes the data in a data store, it can be
+performed only in exclusive mode – that is, if no readers and no writers are
+active on the data store. Moreover, compaction requires reindexing the data
+store, which can take considerable time if the data store contains a lot of
+data. Thus, in applications where the data changes frequently, it is prudent to
+schedule compaction at times of low use.</p>
+<p>For persistent data stores, compaction will also temporarily increase the disk
+usage of the volume containing the server directory by the size of the data
+store’s new snapshot, which must be safely written to disk before older
+snapshots and deltas can be removed. Because of this, operators should ensure
+that sufficient disk space is available before initiating compaction.</p>
+<p>Because compaction can be a heavy-weight operation, particularly when a new
+snapshot of the data store is saved to disk, RDFox also supports <em>dead fact
+removal</em>, which can be seen as a lighter form of compaction. Unlike compaction,
+it is applied only to tuple tables that contain more than 50% dead facts, and
+it does not save a new snapshot of the data store. Thus, while dead fact
+removal also requires exclusive access to the data store, the exclusive lock
+will typically be held for shorter periods of time and so this operation is
+less likely to disturb client operation, and there is no associated increase in
+disk usage.</p>
+<p>An operator can explicitly initiate data store compaction using any of the
+available APIs. Moreover, RDFox can be configured to perform compaction and
+dead fact removal automatically as follows.</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">auto-compact-after</span></code> data store property (see
+<a class="reference internal" href="#data-store-properties"><span class="std std-numref">Section 5.4.2</span></a>) can be used to configure a data store to be
+automatically compacted after a fixed number of committed transactions. For
+example, if the <code class="docutils literal notranslate"><span class="pre">auto-compact-after</span></code> data store property is set to <code class="docutils literal notranslate"><span class="pre">5</span></code>,
+then the data store will be compacted automatically if (a) the last
+compaction occurred at least five transactions ago and (b) no readers and no
+writers are active on the data store when the transaction is committed. If a
+reader or writer is active, compaction will be attempted when the next
+transaction is committed. This option should be used only when compaction
+overhead is unlikely to adversely affect the query and update rate of an
+RDFox instance. The default value for the <code class="docutils literal notranslate"><span class="pre">auto-compact-after</span></code> data store
+property is <code class="docutils literal notranslate"><span class="pre">never</span></code> – that is, automatic compaction is switched off by
+default.</p></li>
+<li><p>If the value of the <code class="docutils literal notranslate"><span class="pre">remove-dead-facts</span></code> data store property (see
+<a class="reference internal" href="#data-store-properties"><span class="std std-numref">Section 5.4.2</span></a>) is set to <code class="docutils literal notranslate"><span class="pre">auto</span></code>, then dead fact removal
+will be performed every time when a transaction is committed or rolled back.
+Specifically, provided that no readers and no writers are active on a data
+store at the point of commit or rollback, dead facts will be removed from
+every tuple table that contains more than 50% of dead facts. If an exclusive
+lock cannot be obtained, dead fact removal will be attempted again on the
+next commit or rollback. Dead fact removal is switched on by default as this
+should pose no problems for many applications. However, the need to acquire
+an exclusive lock can introduce an occasional slowdown in query response
+times, in which case the <code class="docutils literal notranslate"><span class="pre">remove-dead-facts</span></code> data store property should be
+set to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="supported-data-types-for-literals">
+<span id="literal-data-types"></span><h2><span class="section-number">5.3. </span>Supported Data Types for Literals<a class="headerlink" href="#supported-data-types-for-literals" title="Permalink to this headline">¶</a></h2>
+<p>As well as IRIs and blank nodes, RDFox data stores can store literal values in
+the following formats:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Datatype</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>http://www.w3.org/2000/01/rdf-schema#Literal</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#anyURI</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#string</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#boolean</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#dateTime</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#dateTimeStamp</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#time</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#date</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#gYearMonth</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#gYear</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#gMonthDay</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#gDay</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#gMonth</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#duration</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#yearMonthDuration</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#dayTimeDuration</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#double</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#float</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#decimal</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#integer</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#nonNegativeInteger</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#nonPositiveInteger</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#negativeInteger</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#positiveInteger</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#long</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#int</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#short</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#byte</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#unsignedLong</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#unsignedInt</p></td>
+</tr>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#unsignedShort</p></td>
+</tr>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#unsignedByte</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="data-store-configuration">
+<span id="id3"></span><h2><span class="section-number">5.4. </span>Data Store Configuration<a class="headerlink" href="#data-store-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The behavior of a data store can be customized using options expressed as
+key-value pairs. These options are arranged into the following two groups.</p>
+<ul class="simple">
+<li><p><em>Data store parameters</em> are options that are set when a data store is created
+and cannot be changed subsequently. They are supplied to various APIs that
+allow data store creation, and they generally govern issues such as data
+store capacity or the persistence scheme used. Data store parameters are
+described in more detail in <a class="reference internal" href="#data-store-parameters"><span class="std std-numref">Section 5.4.1</span></a>.</p></li>
+<li><p><em>Data store properties</em> are options that can change throughout the lifetime
+of a data store. RDFox provides various APIs for retrieving and changing data
+store properties; moreover, if a data store is persisted, any changes to data
+store properties are persisted too. Data store properties are described in
+more detail in <a class="reference internal" href="#data-store-properties"><span class="std std-numref">Section 5.4.2</span></a>.</p></li>
+</ul>
+<div class="section" id="data-store-parameters">
+<span id="id4"></span><h3><span class="section-number">5.4.1. </span>Data Store Parameters<a class="headerlink" href="#data-store-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Data store parameters are key-value pairs that are determined when a data store
+is created and that cannot be changed subsequently.</p>
+<div class="section" id="default-graph-name">
+<span id="default-graph-name-parameter"></span><h4><span class="section-number">5.4.1.1. </span><code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code><a class="headerlink" href="#default-graph-name" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code> option can be set to any IRI to activate RDFox’s
+alternative handling of default graph data. See
+<a class="reference internal" href="#organization-of-rdf-data"><span class="std std-numref">Section 5.2</span></a> for a full description. By default, this
+parameter is unset.</p>
+</div>
+<div class="section" id="equality">
+<span id="equality-parameter"></span><h4><span class="section-number">5.4.1.2. </span><code class="docutils literal notranslate"><span class="pre">equality</span></code><a class="headerlink" href="#equality" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">equality</span></code> option determines how RDFox deals with the semantics of
+equality, which is encoded using the <code class="docutils literal notranslate"><span class="pre">owl:sameAs</span></code> property. This option has
+the following values.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">off</span></code>: There is no special handling of equality and the <code class="docutils literal notranslate"><span class="pre">owl:sameAs</span></code>
+property is treated as just another property. This is the default if the
+<code class="docutils literal notranslate"><span class="pre">equality</span></code> option is not specified.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">noUNA</span></code>: The <code class="docutils literal notranslate"><span class="pre">owl:sameAs</span></code> property is treated as equality, and the
+<em>Unique Name Assumption</em> is not used — that is, deriving an equality
+between two IRIs does not result in a contradiction. This is the treatment of
+equality in OWL 2 DL.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UNA</span></code>: : The <code class="docutils literal notranslate"><span class="pre">owl:sameAs</span></code> property is treated as equality, but
+interpreted under UNA — that is, deriving an equality between two IRIs
+results in a contradiction, and only equalities between an IRI and a blank
+node, or between two blank nodes are allowed. Thus, if a triple of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;IRI₁,</span> <span class="pre">owl:sameAs,</span> <span class="pre">IRI₂&gt;</span></code> is derived, RDFox detects a clash and derives
+<code class="docutils literal notranslate"><span class="pre">&lt;IRI₁,</span> <span class="pre">rdf:type,</span> <span class="pre">owl:Nothing&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;IRI₂,</span> <span class="pre">rdf:type,</span> <span class="pre">owl:Nothing&gt;</span></code>.</p></li>
+</ul>
+<p>In all equality modes (i.e., all modes other than <code class="docutils literal notranslate"><span class="pre">off</span></code>), distinct RDF
+literals (e.g., strings, numbers, dates) are assumed to refer to distinct
+objects, and so deriving an equality between the distinct literals results in a
+contradiction.</p>
+<p><strong>Note</strong> RDFox will reject rules that use negation-as-failure or aggregation in
+all <code class="docutils literal notranslate"><span class="pre">equality</span></code> modes other than <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</div>
+<div class="section" id="init-resource-capacity">
+<h4><span class="section-number">5.4.1.3. </span><code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code><a class="headerlink" href="#init-resource-capacity" title="Permalink to this headline">¶</a></h4>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code> option is an integer that is used
+as a hint to the data store specifying the number of resources that the store
+will contain. This hint is used to initialize certain data structures to the
+sizes that ensure faster importation of data. The actual number of resources
+that a data store can contain is not limited by this option: RDFox will resize
+the data structures as needed if this hint is exceeded.</p>
+</div>
+<div class="section" id="init-tuple-capacity">
+<h4><span class="section-number">5.4.1.4. </span><code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code><a class="headerlink" href="#init-tuple-capacity" title="Permalink to this headline">¶</a></h4>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code> option is an integer that is used as a
+hint to the data store specifying the number of tuples that the store will
+contain. This hint is used to initialize certain data structures to the sizes
+that ensure faster importation of data. The actual number of tuples that a data
+store can contain is not limited by this option: RDFox will resize the data
+structures as needed if this hint is exceeded.</p>
+</div>
+<div class="section" id="max-data-pool-size">
+<h4><span class="section-number">5.4.1.5. </span><code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code><a class="headerlink" href="#max-data-pool-size" title="Permalink to this headline">¶</a></h4>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code> option is an integer that determines the
+maximum number of bytes that RDFox can use to store resource values (e.g., IRIs
+and strings). Specifying this option can reduce significantly the amount of
+virtual memory that RDFox uses per data store.</p>
+</div>
+<div class="section" id="max-resource-capacity">
+<h4><span class="section-number">5.4.1.6. </span><code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code><a class="headerlink" href="#max-resource-capacity" title="Permalink to this headline">¶</a></h4>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code> option is an integer that determines
+the maximum number of resources that can be stored in the data store. Specifying
+this option can reduce significantly the amount of virtual memory that RDFox
+uses per data store.</p>
+</div>
+<div class="section" id="max-tuple-capacity">
+<h4><span class="section-number">5.4.1.7. </span><code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code><a class="headerlink" href="#max-tuple-capacity" title="Permalink to this headline">¶</a></h4>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code> option is an integer that determines
+the maximum number of tuples that can be stored by the in-memory tuple tables
+of a data store. Specifying this option can reduce significantly the amount of
+virtual memory that RDFox uses per data store.</p>
+</div>
+<div class="section" id="persistence">
+<h4><span class="section-number">5.4.1.8. </span><code class="docutils literal notranslate"><span class="pre">persistence</span></code><a class="headerlink" href="#persistence" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">persistence</span></code> option controls how RDFox persists data contained in a data
+store. The option can be set to <code class="docutils literal notranslate"><span class="pre">off</span></code> to disable persistence for individual
+data stores contained within a persistent server. The option can also be set to
+the same value as the <code class="docutils literal notranslate"><span class="pre">persistence</span></code> option of the server that contains the
+data store but, as this is the default value, this is not necessary.</p>
+</div>
+<div class="section" id="quad-table-type">
+<span id="quad-table-type-option"></span><h4><span class="section-number">5.4.1.9. </span><code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code><a class="headerlink" href="#quad-table-type" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code> parameter determines the type of the <code class="docutils literal notranslate"><span class="pre">Quads</span></code>
+table, which is used to store named graph triples. Each option offers different
+indexing strategies to optimize performance based on specific use cases.</p>
+<p>The available options are:
+- <cite>quad-table-lg-fi</cite> (default)
+- <cite>quad-table-lg-pi</cite>
+- <cite>quad-table-sg-fi</cite>
+- <cite>quad-table-sg-pi</cite></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-lg</span></code> suffix indicates that the table is optimized for typical use cases
+where named graphs contain a substantial amount of facts. In contrast, the <cite>-sg</cite>
+suffix is suitable for rare cases where each graph consists of very few triples.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-fi</span></code> suffix denotes <code class="docutils literal notranslate"><span class="pre">full</span></code> indexing, providing comprehensive indexing
+for efficient read and write access. Alternatively, the <code class="docutils literal notranslate"><span class="pre">-pi</span></code> suffix denotes
+<code class="docutils literal notranslate"><span class="pre">partial</span></code> indexing, which offers a reduced set of indexes, making it more
+memory efficient.</p>
+</div>
+<div class="section" id="swrl-negation-as-failure">
+<span id="swrl-naf-option"></span><h4><span class="section-number">5.4.1.10. </span><code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code><a class="headerlink" href="#swrl-negation-as-failure" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code> option determines how RDFox treats
+<code class="docutils literal notranslate"><span class="pre">ObjectComplementOf</span></code> class expressions in SWRL rules.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">off</span></code>. SWRL rules are interpreted under the open-world assumption and SWRL
+rules featuring <code class="docutils literal notranslate"><span class="pre">ObjectComplementOf</span></code> are rejected. This is the default
+value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">on</span></code>. SWRL rules are interpreted under the closed-world assumption, as
+described in <a class="reference internal" href="reasoning.html#swrl-naf-description"><span class="std std-numref">Section 10.7.3</span></a>.</p></li>
+</ul>
+</div>
+<div class="section" id="triple-table-type">
+<span id="triple-table-type-option"></span><h4><span class="section-number">5.4.1.11. </span><code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code><a class="headerlink" href="#triple-table-type" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code> parameter determines the type of the <code class="docutils literal notranslate"><span class="pre">Triple</span></code> table.
+Each option offers different indexing strategies to optimize performance based
+on specific use cases.</p>
+<p>The available options are:
+- <cite>triple-table-fi</cite> (default)
+- <cite>triple-table-pi</cite></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-fi</span></code> suffix denotes <code class="docutils literal notranslate"><span class="pre">full</span></code> indexing, providing comprehensive indexing
+for efficient read and write access. Alternatively, the <code class="docutils literal notranslate"><span class="pre">-pi</span></code> suffix denotes
+<code class="docutils literal notranslate"><span class="pre">partial</span></code> indexing, which offers a reduced set of indexes, making it more
+memory efficient.</p>
+</div>
+<div class="section" id="type">
+<span id="data-store-type"></span><h4><span class="section-number">5.4.1.12. </span><code class="docutils literal notranslate"><span class="pre">type</span></code><a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">type</span></code> option determines the storage scheme used by the data store. The
+value determines the maximum capacity of a data store (i.e., the maximum number
+of resources and/or facts), its memory footprint, and the speed with which it
+can answer certain types of queries. The following data store types are
+currently supported:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">parallel-nn</span></code> (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parallel-nw</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parallel-ww</span></code></p></li>
+</ul>
+<p>In suffixes <code class="docutils literal notranslate"><span class="pre">nn</span></code>, <code class="docutils literal notranslate"><span class="pre">nw</span></code>, and <code class="docutils literal notranslate"><span class="pre">ww</span></code>, the first character determines whether
+the system uses 32-bit (<code class="docutils literal notranslate"><span class="pre">n</span></code> for <em>narrow</em>) or 64-bit (<code class="docutils literal notranslate"><span class="pre">w</span></code> for <em>wide</em>)
+unsigned integers for representing resource IDs, and the second character
+determines whether the system uses 32-bit (<code class="docutils literal notranslate"><span class="pre">n</span></code>) or 64-bit (<code class="docutils literal notranslate"><span class="pre">w</span></code>) unsigned
+integers for representing triple or quad IDs. Thus, an <code class="docutils literal notranslate"><span class="pre">nw</span></code> store can contain
+at most 4 × 10<sup>9</sup> resources and at most 1.8 × 10<sup>19</sup> triples.</p>
+</div>
+</div>
+<div class="section" id="data-store-properties">
+<span id="id5"></span><h3><span class="section-number">5.4.2. </span>Data Store Properties<a class="headerlink" href="#data-store-properties" title="Permalink to this headline">¶</a></h3>
+<p>Data store properties are key-value pairs that can be modified at any point
+during a data store’s lifetime using any of the provided RDFox APIs (see
+<a class="reference internal" href="apis.html#apis"><span class="std std-numref">Section 16</span></a>) or the <code class="docutils literal notranslate"><span class="pre">dsprop</span></code> shell command (see <a class="reference internal" href="rdfox-shell.html#dsprop-command"><span class="std std-numref">Section 15.2.16</span></a>).</p>
+<div class="section" id="auto-compact-after">
+<span id="id6"></span><h4><span class="section-number">5.4.2.1. </span><code class="docutils literal notranslate"><span class="pre">auto-compact-after</span></code><a class="headerlink" href="#auto-compact-after" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">auto-compact-after</span></code> data store property determines whether and how
+frequently a data store is compacted automatically. The allowed values are as
+follows.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">never</span></code>: The data store is never compacted automatically. (However,
+compaction can be requested explicitly using any of the provided APIs.). This
+is the default.</p></li>
+<li><p>an integer <code class="docutils literal notranslate"><span class="pre">n</span></code>: The data store is compacted after <code class="docutils literal notranslate"><span class="pre">n</span></code> transactions are
+successfully committed, provided that the data store has no active readers or
+writers at the point of commit.</p></li>
+</ul>
+</div>
+<div class="section" id="auto-update-statistics-mode">
+<h4><span class="section-number">5.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code><a class="headerlink" href="#auto-update-statistics-mode" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code> data store property governs how RDFox
+manages statistics about the data loaded into the system. RDFox uses these
+statistics during query planning in order to identify an efficient plan, so
+query performance may be suboptimal if the statistics are not up to date. The
+allowed values are as follows.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">off</span></code>: Statistics are never updated automatically, but they can be updated
+manually using the <code class="docutils literal notranslate"><span class="pre">stats</span> <span class="pre">update</span></code> command or via one of the available APIs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">balanced</span></code>: The cost of updating the statistics is balanced against the
+possibility of using outdated statistics. This is the default.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eager</span></code>: Statistics are updated after each operation that has the potential
+to invalidate the statistics (e.g., importing data).</p></li>
+</ul>
+</div>
+<div class="section" id="base-iri">
+<h4><span class="section-number">5.4.2.3. </span><code class="docutils literal notranslate"><span class="pre">base-iri</span></code><a class="headerlink" href="#base-iri" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">base-iri</span></code> data store property contains an IRI that is used as the base
+when importing data or evaluating queries with no explicitly set base IRI. All
+relative IRIs in such cases are resolved against the value of this property in
+order to obtain an absolute IRI. The defalt value is
+<code class="docutils literal notranslate"><span class="pre">https://rdfox.com/default-base-iri/</span></code>.</p>
+</div>
+<div class="section" id="errors-in-bind">
+<h4><span class="section-number">5.4.2.4. </span><code class="docutils literal notranslate"><span class="pre">errors-in-bind</span></code><a class="headerlink" href="#errors-in-bind" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">errors-in-bind</span></code> data store property governs how errors encountered
+during the evaluation of <code class="docutils literal notranslate"><span class="pre">BIND</span></code> expressions are handled in queries. As an
+example, consider SPARQL query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">BIND(2</span> <span class="pre">+</span> <span class="pre">&quot;a&quot;</span> <span class="pre">AS</span> <span class="pre">?X)</span> <span class="pre">.</span> <span class="pre">?Y</span>
+<span class="pre">:R</span> <span class="pre">?X</span> <span class="pre">}</span></code>; here, the expression <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">+</span> <span class="pre">&quot;a&quot;</span></code> raises an error because strings
+cannot be added to integers.</p>
+<ul class="simple">
+<li><p>If the value of <code class="docutils literal notranslate"><span class="pre">errors-in-bind</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">standard-compliant</span></code>, then
+variable <code class="docutils literal notranslate"><span class="pre">?X</span></code> is unbound after evaluating the <code class="docutils literal notranslate"><span class="pre">BIND</span></code> expression, and the
+query becomes equivalent to <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?Y</span> <span class="pre">:R</span> <span class="pre">?X</span> <span class="pre">}</span></code>. This is the
+default behavior.</p></li>
+<li><p>If the value of <code class="docutils literal notranslate"><span class="pre">errors-in-bind</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">skip</span></code>, then the attempt to
+bind <code class="docutils literal notranslate"><span class="pre">?X</span></code> to an error is skipped and the query does not return any answers.</p></li>
+</ul>
+<p>The default behavior is compliant with the SPARQL 1.1 standard, but it can be
+counterintuitive by silently accepting errors, and it can also lead to
+inefficient query plans. The value of this data store property can be
+overridden during query evaluation by passing the query parameter with the same
+name.</p>
+</div>
+<div class="section" id="invalid-literal-policy">
+<span id="invalid-literal-policy-property"></span><h4><span class="section-number">5.4.2.5. </span><code class="docutils literal notranslate"><span class="pre">invalid-literal-policy</span></code><a class="headerlink" href="#invalid-literal-policy" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">invalid-literal-policy</span></code> data store property governs how RDFox handles
+invalid literals in imported data, queries, and updates.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">error</span></code>: Invalid literals in the input are treated as errors, and so input
+containing such literals cannot be processed. This is the default.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">as-string</span></code>: During import, invalid literals are converted to string
+literals and a warning is emitted alerting the user to the fact that the
+value was converted. In queries and updates, invalid literals are converted
+to strings, but no warning is emitted.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">as-string-silent</span></code>: Invalid literals are converted to string literals in
+the import data, queries, and updates, but without emitting a warning.</p></li>
+</ul>
+</div>
+<div class="section" id="max-backward-chaining-depth">
+<h4><span class="section-number">5.4.2.6. </span><code class="docutils literal notranslate"><span class="pre">max-backward-chaining-depth</span></code><a class="headerlink" href="#max-backward-chaining-depth" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">max-backward-chaining-depth</span></code> data store property determines the
+recursion depth of the backward chaining phase in the incremental reasoning
+that RDFox uses to update the materialization. The value can be a nonnegative
+integer, or <code class="docutils literal notranslate"><span class="pre">unbounded</span></code> (the default). The value of this property should be
+changed only if so directed by Oxford Semantic Technologies support personnel.</p>
+</div>
+<div class="section" id="max-threads-used">
+<h4><span class="section-number">5.4.2.7. </span><code class="docutils literal notranslate"><span class="pre">max-threads-used</span></code><a class="headerlink" href="#max-threads-used" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">max-threads-used</span></code> data store property determines how many threads of the
+server’s thread pool this data store is allowed to use for tasks such as
+importation or reasoning. The value can be a nonnegative integer, or
+<code class="docutils literal notranslate"><span class="pre">all-available</span></code>; the latter is the default and it states that a data store
+can use as many threads of the server’s thread pool as are currently available.
+Note that this doesn’t affect the number of REST requests served concurrently
+(see <code class="docutils literal notranslate"><span class="pre">num-http-workers</span></code> in <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p>
+</div>
+<div class="section" id="property-paths-cardinality">
+<h4><span class="section-number">5.4.2.8. </span><code class="docutils literal notranslate"><span class="pre">property-paths-cardinality</span></code><a class="headerlink" href="#property-paths-cardinality" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">property-paths-cardinality</span></code> data store property governs the evaluation
+of property paths in queries. As an example, consider SPARQL query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span>
+<span class="pre">?Y</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R/:S</span> <span class="pre">?Y</span> <span class="pre">}</span></code>.</p>
+<ul class="simple">
+<li><p>If the value of <code class="docutils literal notranslate"><span class="pre">property-paths-cardinality</span></code> is equal to
+<code class="docutils literal notranslate"><span class="pre">standard-compliant</span></code>, then the query is equivalent to <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">WHERE</span>
+<span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Z</span> <span class="pre">.</span> <span class="pre">?Z</span> <span class="pre">:S</span> <span class="pre">?Y</span> <span class="pre">}</span></code> — that is, the query can return the same pair of
+values for <code class="docutils literal notranslate"><span class="pre">?X</span></code> and <code class="docutils literal notranslate"><span class="pre">?Y</span></code> more than once. This is the default.</p></li>
+<li><p>If the value of <code class="docutils literal notranslate"><span class="pre">property-paths-cardinality</span></code> is equal to <code class="docutils literal notranslate"><span class="pre">distinct</span></code>, then
+the query is equivalent to <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">DISTINCT</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Z</span> <span class="pre">.</span> <span class="pre">?Z</span> <span class="pre">:S</span>
+<span class="pre">?Y</span> <span class="pre">}</span></code> — that is, the query can return a pair of values for <code class="docutils literal notranslate"><span class="pre">?X</span></code> and
+<code class="docutils literal notranslate"><span class="pre">?Y</span></code> at most once.</p></li>
+</ul>
+<p>Elimination of duplicate values is required by the standard whenever a property
+path contains <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">+</span></code>, or <code class="docutils literal notranslate"><span class="pre">?</span></code>. Thus, the <code class="docutils literal notranslate"><span class="pre">distinct</span></code> value for the
+<code class="docutils literal notranslate"><span class="pre">property-paths-cardinality</span></code> data store property presents a more uniform and
+consistent semantics for SPARQL 1.1 property paths; moreover, complex property
+paths can often be evaluated more efficiently with the <code class="docutils literal notranslate"><span class="pre">distinct</span></code> option. The
+value of this data store property can be overridden during query evaluation by
+passing the query parameter with the same name.</p>
+</div>
+<div class="section" id="query-planning-algorithms">
+<h4><span class="section-number">5.4.2.9. </span><code class="docutils literal notranslate"><span class="pre">query-planning-algorithms</span></code><a class="headerlink" href="#query-planning-algorithms" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">query-planning-algorithms</span></code> data store property governs which algorithms
+are used to plan a query. The value of this property should be changed only if
+so directed by Oxford Semantic Technologies support personnel. The value of
+this data store property can be overridden during query evaluation by passing
+the query parameter with the same name.</p>
+</div>
+<div class="section" id="remove-dead-facts">
+<h4><span class="section-number">5.4.2.10. </span><code class="docutils literal notranslate"><span class="pre">remove-dead-facts</span></code><a class="headerlink" href="#remove-dead-facts" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">remove-dead-facts</span></code> data store property specifies whether <a class="reference internal" href="#compaction-dead-fact-removal"><span class="std std-ref">dead fact
+removal</span></a> is applied automatically after a
+transaction is committed or rolled back. The allowed values are <code class="docutils literal notranslate"><span class="pre">auto</span></code> (the
+default), and <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</div>
+<div class="section" id="query-validation">
+<h4><span class="section-number">5.4.2.11. </span><code class="docutils literal notranslate"><span class="pre">query-validation</span></code><a class="headerlink" href="#query-validation" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">query-validation</span></code> data store property specifies whether RDFox should
+reject queries that conform to the SPARQL 1.1 standard in a strict sense, but
+exhibit a pattern that was often found to represent a user error. The value
+<code class="docutils literal notranslate"><span class="pre">standard-compliant</span></code> instructs RDFox to closely follow the SPARQL 1.1
+specification, whereas the value <code class="docutils literal notranslate"><span class="pre">strict</span></code> instructs RDFox to perform further
+checks, some of which are listed below. The default value is <code class="docutils literal notranslate"><span class="pre">strict</span></code>. The
+value of this data store property can be overridden during query evaluation by
+passing the query parameter with the same name.</p>
+<p>The following list presents some of the types of queries that RDFox will reject
+in <code class="docutils literal notranslate"><span class="pre">strict</span></code> mode, all of which represent common mistakes.</p>
+<ul class="simple">
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">BIND(?X</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">AS</span> <span class="pre">?Y)</span> <span class="pre">.</span> <span class="pre">?Z</span> <span class="pre">:R</span> <span class="pre">?X</span> <span class="pre">}</span></code> will be rejected
+because, as per the SPARQL 1.1 standard, <code class="docutils literal notranslate"><span class="pre">BIND(?X</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">AS</span> <span class="pre">?Y)</span></code> must be
+evaluated before triple pattern <code class="docutils literal notranslate"><span class="pre">?Z</span> <span class="pre">:R</span> <span class="pre">?X</span></code>, and so variable <code class="docutils literal notranslate"><span class="pre">?X</span></code> is
+necessarily unbound when <code class="docutils literal notranslate"><span class="pre">BIND</span></code> is evaluated. Such a query should usually
+be written as <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?Z</span> <span class="pre">:R</span> <span class="pre">?X</span> <span class="pre">.</span> <span class="pre">BIND(?X</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">AS</span> <span class="pre">?Y)</span> <span class="pre">}</span></code>.</p></li>
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y</span> <span class="pre">.</span> <span class="pre">FILTER(?Z</span> <span class="pre">&gt;</span> <span class="pre">2)</span> <span class="pre">}</span></code> will be rejected
+because variable <code class="docutils literal notranslate"><span class="pre">?Z</span></code> occurs in <code class="docutils literal notranslate"><span class="pre">FILTER(?Z</span> <span class="pre">&gt;</span> <span class="pre">2)</span></code>, but not in <code class="docutils literal notranslate"><span class="pre">?X</span> <span class="pre">:R</span>
+<span class="pre">?Y</span></code>. Variable <code class="docutils literal notranslate"><span class="pre">?Z</span></code> is thus necessarily unbound. Such queries usually
+contain a typo: this query was likely meant to be <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y</span>
+<span class="pre">.</span> <span class="pre">FILTER(?X</span> <span class="pre">&gt;</span> <span class="pre">2)</span> <span class="pre">}</span></code>.</p></li>
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y</span> <span class="pre">.</span> <span class="pre">OPTIONAL</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:S</span> <span class="pre">?Y</span> <span class="pre">.</span> <span class="pre">FILTER(?Z</span> <span class="pre">&gt;</span> <span class="pre">2)</span> <span class="pre">}</span></code>
+will be rejected because variable <code class="docutils literal notranslate"><span class="pre">?Z</span></code> in <code class="docutils literal notranslate"><span class="pre">FILTER(?Z</span> <span class="pre">&gt;</span> <span class="pre">2)</span></code> occurs in
+neither <code class="docutils literal notranslate"><span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y</span></code> nor <code class="docutils literal notranslate"><span class="pre">?X</span> <span class="pre">:S</span> <span class="pre">?Y</span></code>, and so the variable is necessarily
+unbound. Such queries usually contain a typo just as in the previous item.</p></li>
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">GRAPH</span> <span class="pre">:G</span> <span class="pre">{</span> <span class="pre">?S</span> <span class="pre">?P</span> <span class="pre">?O</span> <span class="pre">}</span> <span class="pre">}</span></code> will be rejected if either
+the dataset does not include the named graph <code class="docutils literal notranslate"><span class="pre">:G</span></code>, or the user does not
+have permissions to read the named graph <code class="docutils literal notranslate"><span class="pre">:G</span></code>. SPARQL 1.1 requires such
+queries to be evaluated as if named graph <code class="docutils literal notranslate"><span class="pre">:G</span></code> were empty; however, this
+does not support detecting errors (e.g., if <code class="docutils literal notranslate"><span class="pre">:G</span></code> was mistyped in the query).</p></li>
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?S</span> <span class="pre">?P</span> <span class="pre">?O</span> <span class="pre">}</span> <span class="pre">ORDER</span> <span class="pre">BY</span> <span class="pre">?Z</span></code> will be rejected because
+variable <code class="docutils literal notranslate"><span class="pre">?Z</span></code> is used in <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code>, but is not bound in the main part of
+the query.</p></li>
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span> <span class="pre">?Y</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y</span> <span class="pre">}</span> <span class="pre">GROUP</span> <span class="pre">BY</span> <span class="pre">?X</span></code> will be rejected
+because the query uses <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code>, but variable <code class="docutils literal notranslate"><span class="pre">?Y</span></code> occurs neither in
+<code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code> nor in an aggregation function. SPARQL 1.1 standard stipulates
+that the value of <code class="docutils literal notranslate"><span class="pre">?Y</span></code> should be sampled in such cases — that is the
+query should be evaluated as if it was written as <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span> <span class="pre">(SAMPLE(?Y1)</span> <span class="pre">AS</span>
+<span class="pre">?Y)</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y1</span> <span class="pre">}</span> <span class="pre">GROUP</span> <span class="pre">BY</span> <span class="pre">?X</span></code>. However, such implicit, significant
+rewriting of the query often tends to hide a typo or an omission of <code class="docutils literal notranslate"><span class="pre">?Y</span></code>
+from <code class="docutils literal notranslate"><span class="pre">GROUP</span> <span class="pre">BY</span></code>.</p></li>
+<li><p>Query <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">?X</span> <span class="pre">?Z</span> <span class="pre">WHERE</span> <span class="pre">{</span> <span class="pre">?X</span> <span class="pre">:R</span> <span class="pre">?Y</span> <span class="pre">}</span></code> will be rejected because variable
+<code class="docutils literal notranslate"><span class="pre">?Z</span></code> is selected, but not bound in the query. Variable <code class="docutils literal notranslate"><span class="pre">?Z</span></code> is thus
+necessarily unbound, which usually indicates a typo.</p></li>
+</ul>
+</div>
+<div class="section" id="user-blank-node-import-policy">
+<h4><span class="section-number">5.4.2.12. </span><code class="docutils literal notranslate"><span class="pre">user-blank-node-import-policy</span></code><a class="headerlink" href="#user-blank-node-import-policy" title="Permalink to this headline">¶</a></h4>
+<p>If the <code class="docutils literal notranslate"><span class="pre">user-blank-node-import-policy</span></code> data store property is set to
+<code class="docutils literal notranslate"><span class="pre">rename-apart</span></code>, then user-defined blank nodes imported from distinct files
+are renamed apart during the importation process; hence, importing data
+<em>merges</em> blank nodes according to the RDF specification. There is no way to
+control the process of renaming blank nodes, which can be problematic in some
+applications. Because of that, the default value of this option is
+<code class="docutils literal notranslate"><span class="pre">keep-unchanged</span></code>, which ensures that the data is imported ‘as is’. Regardless
+of the state of this option, autogenerated blank nodes (i.e., blank nodes
+obtained by expanding <code class="docutils literal notranslate"><span class="pre">[]</span></code> or <code class="docutils literal notranslate"><span class="pre">(...)</span></code> in Turtle files) are always renamed
+apart.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="servers.html" class="btn btn-neutral float-left" title="4. Servers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tuple-tables.html" class="btn btn-neutral float-right" title="6. Tuple Tables" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+  </div>
+
+  
+     
+
+    <!-- consent banner, edit cookies button and HS cookies -->
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6485449.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+    <!-- Cookies settings button -->
+    <!-- Start of HubSpot code snippet -->
+    <button type="button" id="hs_show_banner_button"
+    style="background-color: #fff; border: 1px solid #2980b9;
+        border-radius: 3px; padding: 5px 8px; text-decoration: none; color: #2980b9;
+        font-family: inherit; font-size: 80%; font-weight: normal; line-height: inherit;
+        text-align: left; text-shadow: none;"
+    onClick="(function(){
+            var _hsp = window._hsp = window._hsp || [];
+            _hsp.push(['showBanner']);
+        })()"
+    >
+    Cookie Settings
+    </button>
+    <style>
+        @media all and (min-width:1160px){
+            .hs-cookie-notification-position-bottom {width: 80%!important;}
+        }
+    </style>
+    <!-- End of HubSpot code snippet -->
+    <!-- consent banner, edit cookies button and HS cookies -->
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

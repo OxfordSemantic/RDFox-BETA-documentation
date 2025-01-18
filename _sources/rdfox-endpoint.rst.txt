@@ -1,0 +1,305 @@
+.. _rdfox-endpoint:
+
+RDFox Endpoint
+==============
+
+The RDFox® Endpoint provides REST access to the process's RDFox server (see
+:numref:`servers`) and also serves the HTML, JavaScript and other static
+assets for the  RDFox Console. For a description of the RDFox REST API, see
+:numref:`apis`.
+
+Starting and Stopping the Endpoint
+----------------------------------
+
+The endpoint can be started in the following ways:
+
+-  By launching the RDFox process in ``daemon`` mode (see
+   :numref:`rdfox-executable`).
+
+-  By issuing ``endpoint start`` within the RDFox shell (see
+   :numref:`endpoint-command`). When started in this manner, the endpoint
+   accesses the same `RDFox server <servers>`__ as the shell, so the effects of
+   any commands that affect the state of the server (e.g., ``dstore create``)
+   will be immediately visible on the endpoint.
+
+Starting the endpoint requires that at least one authentication mechanism is
+configured. In practice this requires that the :ref:`authentication manager
+<authentication-managers>` server parameter is not empty, or the
+``request-client-certificates`` endpoint parameter is set to ``true``.
+
+The endpoint can be stopped in the shell by issuing ``endpoint stop``. Processes
+running in ``daemon`` mode (where there is no active instance of the shell) can
+be stopped by sending them a ``SIGINT`` (for example with Ctrl-C) or ``SIGTERM``
+signal.
+
+.. _endpoint-parameters:
+
+Endpoint Parameters
+-------------------
+
+The configuration of the endpoint is determined by the parameters below.
+
+- ``port`` determines the port at which the endpoint is started. The port can
+  be specified as a verbatim port number or as a `TCP service name
+  <https://www.iana.org/assignments/service-names-port-numbers/service-names-por
+  t-numbers.xhtml>`__. The default is ``12110``. For legacy reasons, the port
+  can also be specified using ``service-name``; moreover, if both options are
+  present, then ``port`` takes precedence.
+
+- ``num-http-workers`` determines the number of threads that the endpoint will
+  use to process RESTful requests. The default value is one less than the
+  number of logical processors of the machine on which RDFox is run.
+
+- ``channel-timeout`` determines the length of time that the endpoint will wait
+  for I/O while servicing HTTP(S) requests. That is, if the endpoint tries to
+  read from or write to the TCP connection, the respective I/O will wait for
+  for the specified duration before giving up. This option ensures endpoint
+  resilience in the face of slow or buggy HTTP(S) clients. See
+  :numref:`specifying-durations` for the accepted values for this parameter.
+  The ``unlimited`` setting may be used but should be reserved for those cases
+  where there are valid reasons for I/O operations to take a long time and
+  clients are known to be correct. The default value is ``60 s``.
+
+- ``max-idle-connections`` determines the maximum number of connections to the
+  server that can be idle at any point in time. Once this limit is exceeded,
+  RDFox endpoint will close all idle connections (even those that have been
+  idle for less than ``connection-keep-alive-time``) in order to free resources
+  and thus provide uninterrupted service to users. For this option to be
+  effective, it should be set to some value lower than the maximum number of
+  file descriptors for the RDFox process. On Window, the default value for this
+  parameter is 1024. On Linux and macOS, the default value is set to 90% of the
+  maximum number of file descriptors for the server process.
+
+- ``connection-keep-alive-time`` determines the maximum time that an HTTP
+  connection will be kept open between requests. That is, if a client opens a
+  TCP connection to the endpoint and makes a request, the server will wait for
+  the specified amount of time to receive another request on this connection;
+  if no request is issued in the specified time, the server will close the
+  connection. See :numref:`specifying-durations` for the accepted values for
+  this parameter. The ``unlimited`` setting may not be used. The value of ``0``
+  means that the server should close the TCP connection after every request.
+  The default value is ``90 s``.
+
+- ``listening-backlog`` determines the `TCP listening backlog
+  <https://www.linuxjournal.com/files/linuxjournal.com/linuxjournal/articles/023/2333/2333s2.html>`__
+  for the socket accepting the connection. The default value is 10.
+
+- ``receive-buffer`` and ``send-buffer`` determine the sizes in bytes of the
+  receive and send buffers for the sockets servicing the requests. The default
+  values are zero, which means that the system will determine the buffer sizes
+  depending on the properties of the connection. For more information, please
+  refer to the `SO_RCVBUF and SO_SNDBUF
+  <http://man7.org/linux/man-pages/man7/socket.7.html>`__ socket options.
+
+- ``lock-timeout`` specifies the maximum time the endpoint will wait to obtain
+  a lock on a data store. If the lock cannot be obtained within the specified
+  time, the endpoint will return HTTP status ``423 - Locked``. See
+  :numref:`specifying-durations` for the accepted values for this parameter
+  which include the value ``unlimited``. The default value for this parameter
+  is ``2 s``.
+
+- ``object-keep-alive-time`` specifies the time for which the endpoint will
+  keep cached cursors, connections or shells between requests. During its
+  operation, the endpoint retains certain objects between requests either for
+  performance reasons (e.g., the endpoint may cache cursors of partially
+  evaluated queries) or to ensure its operation (e.g., the endpoint will
+  maintain named server and data store connections). In order to prevent these
+  objects from accumulating indefinitely, the endpoint will delete each object
+  after it has not been used for the specified amount of time. See
+  :numref:`specifying-durations` for the accepted values for this parameter.
+  The ``unlimited`` setting may not be used. The default value for this
+  parameter is ``60 s``.
+
+- ``access-control-allow-origin`` configures the RDFox endpoint for
+  *Cross-Origin Resource Sharing* (CORS). When this option is set, RDFox will
+  include, in response to CORS requests, all the headers necessary to allow
+  cross-origin usage of the REST API by the specified origin or origins. The
+  value ``*`` can be set to allow use of the REST API by *any* origin.
+  Otherwise the value should be a space-delimited list of origins such as
+  ``"https://example.org http://localhost:8080"`` to allow requests from just
+  those origins. When this option is unset (the default), RDFox will not add
+  any CORS headers to its responses.
+
+- ``protocol`` determines which network layer protocol the endpoint will use.
+
+   - ``IPv4`` means the endpoint will use Internet Protocol version 4.
+
+   - ``IPv6`` means the endpoint will use Internet Protocol version 6.
+
+   - ``IPv6-v4`` means the endpoint will use Internet Protocol version 6 if
+     possible or Internet Protocol version 4 if not. This is the default value.
+
+- The following parameters determine the TLS configuration for the endpoint.
+
+   - ``channel`` determines the connection type that the endpoint should use.
+
+      - ``unsecure`` disables TLS, meaning that the endpoint will listen for
+        HTTP connections (only). This is the default value.
+
+      - ``ssl`` means the endpoint will listen for HTTPS connections (only).
+        This option requires the `OpenSSL <https://www.openssl.org/>`__
+        package. See :numref:`third-party-software` for more detail.
+
+   - ``credentials`` specifies the server certificate and private key, and the
+     intermediate certificates as a verbatim string in PEM format. The string
+     must contain the server’s private key, the server’s certificate, and zero
+     or more intermediate certificates. For example, this file could look as
+     follows:
+
+      ::
+
+         -----BEGIN RSA PRIVATE KEY-----
+         ... server key ...
+         -----END RSA PRIVATE KEY-----
+         -----BEGIN CERTIFICATE-----
+         ... server certificate ...
+         -----END CERTIFICATE-----
+         -----BEGIN CERTIFICATE-----
+         ... 1st intermediate certificate ...
+         -----END CERTIFICATE-----
+         -----BEGIN CERTIFICATE-----
+         ... 2st intermediate certificate ...
+         -----END CERTIFICATE-----
+
+   - ``credentials-file`` specifies the name of the file that contains
+     the credentials. The file content must have the same format as the
+     ``credentials`` parameter.
+
+   - ``credentials-passphrase`` provides the passphrase that can be used to
+     decrypt the credentials in case they are encrypted. This parameter is
+     optional.
+
+   - ``min-secure-protocol`` determines the minimum protocol version that the
+     server should use. The allowed values are ``ssl3``, ``tls1``, ``tls11``,
+     ``tls12``, and ``tls13``. The default value is ``tls12``.
+
+   - ``request-client-certificates`` specifies whether the server should
+     request client certificates during TLS handshakes. See
+     :numref:`REST-client-certificates` for more information.
+
+   - ``trusted-root-certificate`` specifies a Certificate Authority (CA)
+     certificate that should be trusted, in PEM format. This will be used in
+     addition to the default trust anchors for the loaded OpenSSL library. See
+     :numref:`REST-client-certificates` for more information.
+
+   - ``trusted-root-certificate-file`` specifies the name of a file that
+     contains the trusted root certificate. The file content must have the same
+     format as the ``trusted-root-certificate`` parameter.
+
+- The following parameters determine the configuration for HTTP request logging
+  (see also :numref:`request-logging`).
+
+   - ``request-logger`` determines how each serviced HTTP request is logged.
+     All logging goes to standard output.
+
+      - ``none`` disables request logging. This is the default value.
+
+      - ``clf`` enables request logging using the `Common Log Format
+        <https://www.w3.org/Daemon/User/Config/Logging.html#common-logfile-format>`__.
+
+      - ``elf`` enables request logging using the `Extended Log Format
+        <https://www.w3.org/TR/WD-logfile.html>`__. The exact content of each
+        log entry is determined by the ``elf-logger-fields`` parameter. Each
+        log entry is limited to 10 KiB. Where an entry would exceed this limit,
+        the elided fields are indicated with ``...``.
+
+   - ``request-logger.destination`` determines where the request log is
+     written.
+
+      - ``stdout`` means the request log is written to standard output. This is
+        the default value.
+
+      - ``directory`` means the request log is written to a file within the
+        directory identified by the ``request-logger.directory`` parameter. The
+        file name is determined automatically.
+
+   - ``request-logger.directory`` determines the directory to which the request
+     log is written. This parameter has no effect unless
+     ``request-logger.destination`` is set to ``directory``. If this parameter
+     is unset but the RDFox server associated with the endpoint is configured
+     to use a server directory, the logs will be written within the
+     ``request-logs`` subdirectory of the server directory. If a directory is
+     required by other settings but no directory is available, the endpoint
+     will fail to start.
+
+   - ``elf-logger-fields`` determines which fields are logged by the extended
+     log format logger. This parameter has no effect unless ``request-logger``
+     is set to ``elf``. The value for this parameter must be a space-delimited
+     list of the following field identifiers: ``date``, ``time``,
+     ``time-taken``, ``c-ip``, ``c-port``, ``cs({HEADER})``, ``cs-bytes``,
+     ``cs-method``, ``cs-uri``, ``cs-uri-query``, ``cs-uri-stem``,
+     ``sc({HEADER})``, ``sc-bytes``, ``sc-status``, ``x-agent-name``,
+     ``x-protocol-error``. The identifier ``x-agent-name`` specifies the agent
+     name with which the request was made. The identifier ``x-protocol-error``
+     specifies the textual description of any exception raised due to a
+     protocol error while handling an attempted request. All other identifiers
+     have the meanings defined in the `draft specification
+     <https://www.w3.org/TR/WD-logfile.html>`__. The default value for this
+     parameter is ``date time cs-method cs-uri-stem sc-status sc-bytes
+     time-taken``.
+
+- The following parameters determine the configuration for time limits on the
+  evaluation of SPARQL queries.
+
+  - ``query-time-limit`` determines the maximum time that a request for query
+    evaluation can take; if a query request is not completed in that time,
+    query evaluation will be stopped. See :numref:`specifying-durations` for
+    the accepted values for this parameter. The ``unlimited`` setting may be
+    used. The default value is ``30 s``.
+    
+  - ``allow-query-time-limit-override`` is a Boolean value specifying whether a
+    query request can override the time limit on query evaluation. If this
+    option is set to ``true`` or ``yes``, then each query evaluation request
+    can use the ``Query-Time-Limit`` header to specify the query time limit to
+    be used for the current request. The value of the ``Query-Time-Limit``
+    header follows the same syntax as the ``query-time-limit`` endpoint
+    parameter. The default value is ``false``.
+
+.. _specifying-endpoint-parameters:
+
+Specifying Endpoint Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the RDFox endpoint is started for a server that is configured to use a
+server directory, it will inspect that directory for a file named
+``endpoint.params`` and, if the file is found, attempt to load endpoint
+parameters from it. The format of the file matches that for the server
+parameters file described in :numref:`server-parameters-file`.
+
+When launching the endpoint from the RDFox shell, parameters may additionally
+be set using shell variables. In this case, the parameter names should be
+prefixed with ``endpoint.``. For example, to launch an endpoint listening on
+port 8080, the user would issue ``set endpoint.port 8080`` before starting the
+endpoint with ``endpoint start``. Parameters specified in this way take
+precedence over those loaded from the endpoint parameters file.
+
+When launching ``daemon`` processes, parameters may additionally be specified
+by including them in the command line before the ``daemon`` mode specifier. In
+this case, the parameter names should be prefixed with a single dash (``-``).
+For example, to set the ``port`` parameter, the user might issue the following
+command:
+
+::
+
+   RDFox -port 8080 daemon
+
+Again, parameters specified in this way take precedence over those loaded from
+the endpoint parameters file.
+
+Changing Endpoint Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To change the configuration of the endpoint, the endpoint must be stopped and
+restarted with the updated set of parameters. When the endpoint was started
+from an RDFox shell, this can be achieved by first updating the endpoint
+parameters file and/or relevant shell variables, and then issuing ``endpoint
+stop`` followed by ``endpoint start``. When the endpoint was started in
+``daemon`` mode, this can be achieved by editing the endpoint parameters file
+and then sending ``SIGHUP`` to the process. Endpoint parameters that were
+specified on the command line take precedence over those loaded from the
+endpoint parameters file and cannot, therefore be changed in this way. Note
+also that this mechanism is not available on Windows systems which lack support
+for signals.
+
+In all cases, stopping the endpoint will result in all clients being
+disconnected.
