@@ -229,8 +229,9 @@ dead fact removal automatically as follows.
 Supported Data Types for Literals
 ---------------------------------
 
-As well as IRIs and blank nodes, RDFox data stores can store literal values in
-the following formats:
+As well as IRIs and blank nodes, RDFox data stores can store literal values of
+the following datatypes, all of which comply fully with the `XML Schema
+Datatypes 1.1 specification <https://www.w3.org/TR/xmlschema11-2/>`__.
 
 +----------------------------------------------------------+
 | Datatype                                                 |
@@ -293,14 +294,18 @@ the following formats:
 +----------------------------------------------------------+
 | \http://www.w3.org/2001/XMLSchema#byte                   |
 +----------------------------------------------------------+
-| \http://www.w3.org/2001/XMLSchema#unsignedLong           |
-+----------------------------------------------------------+
 | \http://www.w3.org/2001/XMLSchema#unsignedInt            |
 +----------------------------------------------------------+
 | \http://www.w3.org/2001/XMLSchema#unsignedShort          |
 +----------------------------------------------------------+
 | \http://www.w3.org/2001/XMLSchema#unsignedByte           |
 +----------------------------------------------------------+
+
+In addition, RDFox partially supports the
+`http://www.w3.org/2001/XMLSchema#unsignedLong` datatype: only the values
+between zero and 9223372036854775807 are supported. This partial implementation
+thus allows RDFox to import some, but not all datasets containing literals of
+this datatype.
 
 .. _data-store-configuration:
 
@@ -372,16 +377,6 @@ contradiction.
 
 **Note** RDFox will reject rules that use negation-as-failure or aggregation in
 all ``equality`` modes other than ``off``.
-
-``init-resource-capacity``
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The value of the ``init-resource-capacity`` option is an integer that is used
-as a hint to the data store specifying the number of resources that the store
-will contain. This hint is used to initialize certain data structures to the
-sizes that ensure faster importation of data. The actual number of resources
-that a data store can contain is not limited by this option: RDFox will resize
-the data structures as needed if this hint is exceeded.
 
 ``init-tuple-capacity``
 ^^^^^^^^^^^^^^^^^^^^^^^

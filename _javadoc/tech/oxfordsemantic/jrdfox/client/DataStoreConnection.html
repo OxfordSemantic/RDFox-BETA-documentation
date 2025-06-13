@@ -391,7 +391,7 @@ java.lang.String&nbsp;dataSourceTableName)</code></th>
 </tr>
 <tr class="altColor" id="i30">
 <td class="colFirst"><code><a href="DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#describeDeltaQuery(java.lang.String)">describeDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;tupleTableName)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#describeDeltaQuery(java.lang.String)">describeDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName)</code></th>
 <td class="colLast">
 <div class="block">Returns information about the delta query with the given name.</div>
 </td>
@@ -546,7 +546,7 @@ long&nbsp;dataStoreVersion,
 </td>
 </tr>
 <tr class="altColor" id="i48">
-<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colFirst"><code><a href="CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCommitProcedure()">getCommitProcedure</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the data store's commit procedure.</div>
@@ -861,24 +861,24 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;dataSourcePar
 </tr>
 <tr class="rowColor" id="i87">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,int,int,int)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 java.lang.String&nbsp;queryText,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</code></th>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</code></th>
 <td class="colLast">
 <div class="block">Registers a delta query with a data store.</div>
 </td>
 </tr>
 <tr class="altColor" id="i88">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 <a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</code></th>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</code></th>
 <td class="colLast">
 <div class="block">Registers a delta query with a data store.</div>
 </td>
@@ -1731,8 +1731,8 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;statisticsPar
 <li class="blockList">
 <section class="detail">
 <h3><a id="getCommitProcedure()">getCommitProcedure</a></h3>
-<div class="memberSignature"><span class="returnType">java.lang.String</span>&nbsp;<span class="memberName">getCommitProcedure</span>()
-                             throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="memberSignature"><span class="returnType"><a href="CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></span>&nbsp;<span class="memberName">getCommitProcedure</span>()
+                                throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
 <div class="block">Returns the data store's commit procedure.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1811,12 +1811,12 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;statisticsPar
 <li class="blockList">
 <section class="detail">
 <h3><a id="describeDeltaQuery(java.lang.String)">describeDeltaQuery</a></h3>
-<div class="memberSignature"><span class="returnType"><a href="DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a></span>&nbsp;<span class="memberName">describeDeltaQuery</span>&#8203;(<span class="arguments">java.lang.String&nbsp;tupleTableName)</span>
+<div class="memberSignature"><span class="returnType"><a href="DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a></span>&nbsp;<span class="memberName">describeDeltaQuery</span>&#8203;(<span class="arguments">java.lang.String&nbsp;deltaQueryName)</span>
                            throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
 <div class="block">Returns information about the delta query with the given name.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>tupleTableName</code> - the name of the delta query whose information is to be returned</dd>
+<dd><code>deltaQueryName</code> - the name of the delta query whose information is to be returned</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>information about the delta query</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -1826,13 +1826,13 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;statisticsPar
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,int,int,int)">registerDeltaQuery</a></h3>
+<h3><a id="registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,long,long,long)">registerDeltaQuery</a></h3>
 <div class="memberSignature"><span class="returnType">void</span>&nbsp;<span class="memberName">registerDeltaQuery</span>&#8203;(<span class="arguments">java.lang.String&nbsp;deltaQueryName,
 java.lang.String&nbsp;queryText,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</span>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
 <div class="block">Registers a delta query with a data store.</div>
 <dl>
@@ -1840,9 +1840,9 @@ int&nbsp;additionsMaxSize)</span>
 <dd><code>deltaQueryName</code> - the name of the delta query to be created</dd>
 <dd><code>queryText</code> - the string representation of the query</dd>
 <dd><code>formatName</code> - the format that the query results should be stored and returned in</dd>
-<dd><code>snapshotsMaxSize</code> - the maximum number of triples that a snapshot delta query answer can contain. A value of 0 indicates no values are stored, while a value of int.MAX_VALUE implies storage of all values.</dd>
-<dd><code>deletionsMaxSize</code> - the maximum number of triples that a deletion delta query answer can contain. A value of 0 indicates no values are stored, while a value of int.MAX_VALUE implies storage of all values.</dd>
-<dd><code>additionsMaxSize</code> - the maximum number of triples that a addition delta query answer can contain. A value of 0 indicates no values are stored, while a value of int.MAX_VALUE implies storage of all values.</dd>
+<dd><code>snapshotsMaxSize</code> - the maximum number of answers that a snapshot delta query answer can contain (0 means no answers are stored, and <code>Long.MAX_VALUE</code> means no limit)</dd>
+<dd><code>deletionsMaxSize</code> - the maximum number of answers that a deletion delta query answer can contain (0 means no answers  are stored, and <code>Long.MAX_VALUE</code> means no limit)</dd>
+<dd><code>additionsMaxSize</code> - the maximum number of answers that a addition delta query answer can contain (0 means no answers are stored, and <code>Long.MAX_VALUE</code> means no limit)</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
 </dl>
@@ -1850,13 +1850,13 @@ int&nbsp;additionsMaxSize)</span>
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int)">registerDeltaQuery</a></h3>
+<h3><a id="registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long)">registerDeltaQuery</a></h3>
 <div class="memberSignature"><span class="returnType">void</span>&nbsp;<span class="memberName">registerDeltaQuery</span>&#8203;(<span class="arguments">java.lang.String&nbsp;deltaQueryName,
 <a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</span>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
 <div class="block">Registers a delta query with a data store.</div>
 <dl>
@@ -1864,9 +1864,9 @@ int&nbsp;additionsMaxSize)</span>
 <dd><code>deltaQueryName</code> - the name of the delta query to be created</dd>
 <dd><code>query</code> - the query object</dd>
 <dd><code>formatName</code> - the format that the query results should be stored and returned in</dd>
-<dd><code>snapshotsMaxSize</code> - the maximum number of triples that a snapshot delta query answer can contain. A value of 0 indicates no values are stored, while a value of int.MAX_VALUE implies storage of all values.</dd>
-<dd><code>deletionsMaxSize</code> - the maximum number of triples that a deletion delta query answer can contain. A value of 0 indicates no values are stored, while a value of int.MAX_VALUE implies storage of all values.</dd>
-<dd><code>additionsMaxSize</code> - the maximum number of triples that a addition delta query answer can contain. A value of 0 indicates no values are stored, while a value of int.MAX_VALUE implies storage of all values.</dd>
+<dd><code>snapshotsMaxSize</code> - the maximum number of answers that a snapshot delta query answer can contain (0 means no answers are stored, and <code>Long.MAX_VALUE</code> means no limit)</dd>
+<dd><code>deletionsMaxSize</code> - the maximum number of answers that a deletion delta query answer can contain (0 means no answers  are stored, and <code>Long.MAX_VALUE</code> means no limit)</dd>
+<dd><code>additionsMaxSize</code> - the maximum number of answers that a addition delta query answer can contain (0 means no answers are stored, and <code>Long.MAX_VALUE</code> means no limit)</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
 </dl>

@@ -116,6 +116,6 @@ Operations Manual
   RDFox.
 
 Information
-  Sections :numref:`{number} <release-notes>` and :numref:`{number}
-  <acknowledgments>` contain release notes and software license acknowledgments
-  for RDFox respectively.
+  Sections :ref:`release-notes`, :ref:`security-advisories`, and
+  :ref:`acknowledgments` contain release notes, security advisories, and
+  software license acknowledgments for RDFox respectively.

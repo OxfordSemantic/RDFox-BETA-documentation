@@ -341,11 +341,13 @@ deltaquery
 deltaqueryanswer
 ~~~~~~~~~~~~~~~~
 
+**Syntax:**
+
 ::
 
     deltaqueryanswer {list {name <name> | from <version> | to <version> | type <answer-type> }... | show <name> <version> <answer-type> | delete {name <name> | from <version> | to <version> | type <answer-type> }...}
 
-**Description** Manages the delta query answers.
+**Description:** Manages the delta query answers.
 
 - Option ``list`` prints the delta query answers matching the specified
   criteria. The parameter ``name`` restricts the query name of the returned
@@ -990,6 +992,8 @@ maxmemory
 
 **Description:** This command sets the maximum memory that the server is
 allowed to use, or prints the current memory usage if no number is specified.
+Both the argument and the command's output are in bytes (unlike the
+``max-memory`` server parameter, whose value is in megabytes).
 
 .. _password-command:
 

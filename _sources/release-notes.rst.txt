@@ -20,7 +20,68 @@ the normal channels.
 Releases
 --------
 
-Release 7.3 (TBD)
+Release 7.4 (????????????????)
+  - Added a data source type ``lucene`` for integrating with Apache Lucene
+    (RD-2270). See :numref:`registering-lucene-data-sources` for details.
+  - Added a data source type ``SQLite`` for integrating with SQLite (RD-2181).
+    See :numref:`registering-sqlite-data-sources` for details.
+  - The dictionary that stores the resources in a data store has been optimized
+    to reduce memory usage (RD-1984). Moreover, XSDDateTime and XSDDuration
+    resources are now stored in a more compact format (RD-1974).
+  - The RDFox Console has been redesigned to improve usability (RD-1683).
+  - The C and C++ APIs are no longer EXPERIMENTAL (RD-2214).
+  - The endpoint has been modified to ensure that it remains responsive even
+    when the server is under heavy load (RD-2205).
+  - The code for querying a data source as part of a SPARQL query has been
+    rewritten to improve performance by batching calls to the external source
+    (RD-1416).
+  - Added a new server parameter ``persistence.snapshot-restore-mode``
+    controlling how new snapshots are restored by an instance using
+    ``file-sequence`` persistence (RD-2301). See documentation of this
+    parameter within :numref:`server-parameters` for details.
+  - Replaced the SPARQL ``ORDER BY`` implementation to provide consistent
+    performance across all Operating Systems (RD-2167).
+  - RDFox server directory files are now stored in a subdirectory named
+    ``current`` and include human-readable file headers (RD-2275 & RD-2276).
+    This addresses a previous issue where version upgrades could result in files
+    being created outside the server directory.
+  - The data store parameter ``init-resource-capacity`` was removed.
+  - The ``init`` mode now requires a ``channel`` endpoint parameter to be
+    explicitly supplied.
+  - Fixed a bug in the ``ODBC`` data source, where if the ODBC driver
+    miss-reported the width of a column, data within that column could be
+    improperly truncated during transmission (RD-2339).
+  - Fixed a bug where extreme XSDDuration values could overflow during
+    parsing, causing the stored duration to be incorrect (RD-2344).
+
+Release 7.3d (3rd April 2025)
+  - Fixed a bug in the ``SKOLEM`` built-in tuple table that produced
+    identifiers containing the contents of an uninitialized memory buffer for
+    some input IRIs (RD-2210). This issue could be exploited by an attacker to
+    capture whatever data was in the same piece of memory when it was
+    allocated. See the security advisory :ref:`security-advisories-rd-2210` for
+    more details.
+
+Release 7.3c (12th March 2025)
+  - Fixed a buffer overrun in the implementation of the API for initializing a
+    new session.
+  - Fixed a crash when using the APIs for session-based authentication when
+    OpenSSL is not available (RD-2148).
+  - Fixed a bug in the restoration of data stores containing delta queries
+    and/or commit procedures which could result in inconsistencies between
+    replicas in a HA setup.
+  - Fixed a bug that could lead to a crash when compacting data stores with
+    multiple populated tables where at least one resource is not referenced in
+    all tables (RD-2198).
+  - Fixed a bug that could lead to incorrect answers for queries with
+    expressions that use N-ary addition or multiplication of temporary values
+    (RD-2186).
+
+Release 7.3a (5th February 2025)
+  - Fixed a bug that led to errors when querying a data store containing
+    ``xsd:boolean`` values after compaction (RD-2143).
+
+Release 7.3 (3rd February 2025)
   - The RDFox Console has a new login experience with support for both
     password-based and OpenID Connect authentication (RD-1620). See
     :numref:`authentication-managers` for details of how to configure
@@ -49,14 +110,19 @@ Release 7.3 (TBD)
   - The ``server-directory`` server parameter can now be set to the empty
     string to explicitly specify that no server directory should be used. This
     is useful for launching in-memory daemon processes.
+  - The RDFox Console's SPARQL page now supports downloading result sets of
+    arbitrary size (RD-1961). Downloading, very large result sets may require
+    an increase in the value configured for the ``query-time-limit`` endpoint
+    parameter (see :numref:`endpoint-parameters`).
+  - The endpoint parameter ``credentials-passphrase`` can now be set via the
+    ``RDFOX_ENDPOINT_CREDENTIALS_PASSPHRASE`` environment variable (RD-2131).
+  - ETag values returned by the endpoint now include the content type of the
+    response, if it has one. This improves cache control by browsers. See
+    :numref:`REST-detecting-updates`.
   - Non-printable characters and UNICODE surrogates can no longer be used in
     names (e.g. data store names, role names, etc.) (RD-1954, RD-1964). As part
     of this change, RDFox now also validates that the UTF-8 encoding of such
     names is valid.
-  - The Console's download feature now supports downloading result sets of
-    arbitrary size (RD-1961). Downloading, very large result sets may require
-    an increase in the value configured for the ``query-time-limit`` endpoint
-    parameter (see :numref:`endpoint-parameters`).
   - Fixed an issue where RDFox shell variables could be expanded to multiple
     arguments/tokens within a single command (RD-1951).
   - Fixed an issue where RDFox could spuriously report an out of memory error
@@ -74,8 +140,11 @@ Release 7.3 (TBD)
     strings longer than 15000 characters), could cause a hang (RD-2100).
   - Fixed an issue with the persistence of data stores loaded from one of the 
     two binary formats. (RD-2115).
+  - Fixed an issue where RDFox over-reported memory usage. If the optional
+    `-max-memory` server parameter is set to a small value, this could cause the
+    server to incorrectly reach the memory limit (RD-2122).
 
-Release 7.2c (8th January 2024)
+Release 7.2c (8th January 2025)
   - Fixed a crash affecting some queries with ``FILTER`` expressions inside
     ``OPTIONAL`` (RD-2094).
   - Fixed an issue where a rolling back a transaction in which a delta query

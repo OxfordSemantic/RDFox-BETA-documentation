@@ -106,14 +106,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </td>
 </tr>
 <tr class="rowColor">
-<th class="colFirst" scope="row"><a href="CursorAdvanceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorAdvanceException</a></th>
-<td class="colLast">
-<div class="block">This exception is thrown when <code>Cursor.advance()</code> is called
- and the cursor was not opened earlier, or the data store has changed
- since <code>Cursor.open()</code> was called.</div>
-</td>
-</tr>
-<tr class="altColor">
 <th class="colFirst" scope="row"><a href="CursorNoLongerUsableException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorNoLongerUsableException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when a method of <code>Cursor</code> is
@@ -121,16 +113,22 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  cursor from being used any more.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="DeltaQueryCompilationException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">DeltaQueryCompilationException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during rule compilation occurs.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="DuplicateResourceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">DuplicateResourceException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when a client tries to create a resource that already exists.</div>
+</td>
+</tr>
+<tr class="altColor">
+<th class="colFirst" scope="row"><a href="InvalidCursorStateException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">InvalidCursorStateException</a></th>
+<td class="colLast">
+<div class="block">This exception is thrown when a cursor function is called and the cursor is an invalid state.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -160,6 +158,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </td>
 </tr>
 <tr class="rowColor">
+<th class="colFirst" scope="row"><a href="MemoryExhaustedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">MemoryExhaustedException</a></th>
+<td class="colLast">
+<div class="block">This exception is thrown when RDFox runs out of memory.</div>
+</td>
+</tr>
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="OperationInterruptedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">OperationInterruptedException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an operation on a <a href="../client/ServerConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client"><code>ServerConnection</code></a>
@@ -167,37 +171,37 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  <code>interrupt()</code> method.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="ParsingException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ParsingException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during parsing occurs.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="QueryCompilationException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">QueryCompilationException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during query compilation occurs.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="ResourceInUseException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ResourceInUseException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an operation attempts to modify a resource that is currently used elsewhere.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="RuleCompilationException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">RuleCompilationException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during rule compilation occurs.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="SystemCallException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">SystemCallException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when a system call throws an exception.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="UnknownResourceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">UnknownResourceException</a></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an operation attempts to access a resource that does not exist.</div>

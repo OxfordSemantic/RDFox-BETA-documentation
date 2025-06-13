@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="23. Release Notes" href="release-notes.html" />
+    <link rel="next" title="Release Notes" href="release-notes.html" />
     <link rel="prev" title="21. High Availability" href="high-availability.html" />
     <!-- Start of HubSpot Cookie Blocking Code -->
     <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
@@ -161,8 +161,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -424,7 +425,8 @@ command:</p>
 <span class="w">           </span>-e<span class="w"> </span>RDFOX_ROLE<span class="w"> </span><span class="se">\</span>
 <span class="w">           </span>-e<span class="w"> </span>RDFOX_PASSWORD<span class="w"> </span><span class="se">\</span>
 <span class="w">           </span>oxfordsemantic/rdfox<span class="w"> </span><span class="se">\</span>
-<span class="w">               </span>-persistence<span class="w"> </span>off<span class="w"> </span>daemon
+<span class="w">               </span>-persistence<span class="w"> </span>off<span class="w"> </span><span class="se">\</span>
+<span class="w">               </span>-server-directory<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>daemon
 </pre></div>
 </div>
 <p>The RDFox server started by the above command will contain no data stores
@@ -441,7 +443,8 @@ launched using the following command:</p>
 <span class="w">           </span>-e<span class="w"> </span>RDFOX_ROLE<span class="w"> </span><span class="se">\</span>
 <span class="w">           </span>-e<span class="w"> </span>RDFOX_PASSWORD<span class="w"> </span><span class="se">\</span>
 <span class="w">           </span>oxfordsemantic/rdfox<span class="w"> </span><span class="se">\</span>
-<span class="w">               </span>-persistence<span class="w"> </span>off<span class="w"> </span>daemon<span class="w"> </span>.<span class="w"> </span>start
+<span class="w">               </span>-persistence<span class="w"> </span>off<span class="w"> </span><span class="se">\</span>
+<span class="w">               </span>-server-directory<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>daemon<span class="w"> </span>.<span class="w"> </span>start
 </pre></div>
 </div>
 </div>
@@ -451,7 +454,7 @@ launched using the following command:</p>
 <p>Many container orchestration systems require a health check endpoint to
 determine whether a container is healthy. The RDFox endpoint has a dedicated API
 for this purpose at path <code class="docutils literal notranslate"><span class="pre">/health</span></code>. <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests to this path will always
-return <code class="docutils literal notranslate"><span class="pre">204</span> <span class="pre">-</span> <span class="pre">No</span> <span class="pre">Content</span></code>. See also <a class="reference internal" href="apis.html#rest-endpoint-health"><span class="std std-numref">Section 16.19</span></a>.</p>
+return <code class="docutils literal notranslate"><span class="pre">204</span> <span class="pre">-</span> <span class="pre">No</span> <span class="pre">Content</span></code>. See also <a class="reference internal" href="apis.html#rest-endpoint-health"><span class="std std-numref">Section 16.20</span></a>.</p>
 </div>
 </div>
 
@@ -460,13 +463,13 @@ return <code class="docutils literal notranslate"><span class="pre">204</span> <
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="high-availability.html" class="btn btn-neutral float-left" title="21. High Availability" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="release-notes.html" class="btn btn-neutral float-right" title="23. Release Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="release-notes.html" class="btn btn-neutral float-right" title="Release Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

@@ -19,7 +19,7 @@
 <script type="text/javascript" src="../../../../script-dir/jquery-ui.js"></script>
 </head>
 <body class="class-declaration">
-<script type="text/javascript">var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6};
+<script type="text/javascript">var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -187,34 +187,48 @@ extends java.lang.AutoCloseable</pre>
 </td>
 </tr>
 <tr class="rowColor" id="i9">
+<td class="colFirst"><code>int</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIndexOfCurrentAnswerInWindow()">getIndexOfCurrentAnswerInWindow</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns the index of the current answer in the current window.</div>
+</td>
+</tr>
+<tr class="altColor" id="i10">
+<td class="colFirst"><code>int</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNumberOfAnswersInWindow()">getNumberOfAnswersInWindow</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns the number of answers in the current window.</div>
+</td>
+</tr>
+<tr class="rowColor" id="i11">
 <td class="colFirst"><code><a href="../logic/expression/Resource.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">Resource</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getResource(int)">getResource</a></span>&#8203;(int&nbsp;argumentIndex)</code></th>
 <td class="colLast">
 <div class="block">Returns the resource by for the given index in the current answer row.</div>
 </td>
 </tr>
-<tr class="altColor" id="i10">
+<tr class="altColor" id="i12">
 <td class="colFirst"><code><a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getResourceValue(int)">getResourceValue</a></span>&#8203;(int&nbsp;argumentIndex)</code></th>
 <td class="colLast">
 <div class="block">Returns the resource bound to the given index in the current answer row.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i11">
+<tr class="rowColor" id="i13">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#open()">open</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Opens the cursor and positions it to the first tuple.</div>
 </td>
 </tr>
-<tr class="altColor" id="i12">
+<tr class="altColor" id="i14">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#open(long)">open</a></span>&#8203;(long&nbsp;skipToOffset)</code></th>
 <td class="colLast">
 <div class="block">Opens the cursor and positions it to the tuple with the given offset.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i13">
+<tr class="rowColor" id="i15">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stop()">stop</a></span>()</code></th>
 <td class="colLast">
@@ -410,6 +424,34 @@ extends java.lang.AutoCloseable</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the multiplicity of the current tuple</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="getNumberOfAnswersInWindow()">getNumberOfAnswersInWindow</a></h3>
+<div class="memberSignature"><span class="returnType">int</span>&nbsp;<span class="memberName">getNumberOfAnswersInWindow</span>()
+                        throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Returns the number of answers in the current window.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the number of answers in the current window</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="getIndexOfCurrentAnswerInWindow()">getIndexOfCurrentAnswerInWindow</a></h3>
+<div class="memberSignature"><span class="returnType">int</span>&nbsp;<span class="memberName">getIndexOfCurrentAnswerInWindow</span>()
+                             throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Returns the index of the current answer in the current window.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the index of the current answer in the current window</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
 </dl>

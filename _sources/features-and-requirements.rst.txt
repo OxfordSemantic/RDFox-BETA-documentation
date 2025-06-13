@@ -63,9 +63,8 @@ directories:
    - ``libRDFox-static.a`` (macOS and Linux) or ``libRDFox-static.lib``
      (Windows): a static library that implements the C API of RDFox.
 
-- ``include``: a directory containing definitions for an EXPERIMENTAL C API.
-  The definitions include C++ classes that can be used to make it easier to
-  correctly manage the resources exposed by the C API within C++ applications.
+- ``include``: a directory containing include files providing access to the C
+  and C++ APIs.
 
 - ``examples``: a directory containing demonstration programs that show how to
   call RDFox as a library.
@@ -76,23 +75,22 @@ directories:
      ``compile-shared-and-run.sh`` and ``compile-static-and-run.sh`` on macOS
      and Linux, and scripts ``compile-shared-and-run.bat`` and
      ``compile-static-and-run.bat`` on Windows, which can be used to build and
-     run the demo. On macOS and Linux, the scripts assumes a C-99 compliant
+     run the demo. On macOS and Linux, the scripts assumes a C17 compliant
      version of gcc is available on the path. On Windows, the scripts assume
      that ``vcvars64.bat`` has been executed in the shell prior to execution.
 
-   - ``C++``: a directory containing a C++ source file demonstrating how to call
-     RDFox via the C++ wrapper for the experimental C API. The directory also
-     contains scripts ``compile-shared-and-run.sh`` and
-     ``compile-static-and-run.sh`` on macOS and Linux, and scripts
-     ``compile-shared-and-run.bat`` and ``compile-static-and-run.bat`` on
-     Windows, which can be used to build and run the demo. On macOS and Linux,
-     the script assumes a version of g++ supporting C++11 is available on the
-     path. On Windows, the script assumes that ``vcvars64.bat`` has been
-     executed in the shell prior to execution.
+   - ``C++``: a directory containing a C++ source file demonstrating how to use
+     RDFox via the C++ API. The directory also contains scripts
+     ``compile-shared-and-run.sh`` and ``compile-static-and-run.sh`` on macOS
+     and Linux, and scripts ``compile-shared-and-run.bat`` and
+     ``compile-static-and-run.bat`` on Windows, which can be used to build and
+     run the demo. On macOS and Linux, the script assumes a version of g++
+     supporting C++11 is available on the path. On Windows, the script assumes
+     that ``vcvars64.bat`` has been executed in the shell prior to execution.
 
    - ``Java``: a directory containing source code for a program demonstrating
-     how to call RDFox via the JRDFox API. The ``examples/Java/build.xml``
-     Apache Ant script can be used to compile and run the program.
+     how to call RDFox via the Java API. The ``examples/Java/build.xml`` Apache
+     Ant script can be used to compile and run the program.
 
 Interfaces
 ----------------
@@ -215,7 +213,7 @@ if the dependent functionality is not needed.
   The resolved library should be of a version that matches that of the
   PostgreSQL server being connected to. The current release was built and
   tested with both library and server from PostgreSQL 14, however it will also
-  work with a wider range of versions, both higher and lower. Please test you
+  work with a wider range of versions, both higher and lower. Please test your
   configuration and contact OST support as needed.
 
 `iODBC <https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors>`__ or `unixODBC <http://www.unixodbc.org/>`__
@@ -241,11 +239,87 @@ if the dependent functionality is not needed.
 
   Although iODBC can be used, unixODBC is recommended. The current release was
   built and tested with unixODBC v2.3, however it will work with a wider range
-  of versions, both higher and lower. Please test you configuration and contact
+  of versions, both higher and lower. Please test your configuration and contact
   OST support as needed.
 
+`libsqlite3 <https://www.sqlite.org/>`__
+  Used to access SQLite data sources. The search path used to locate the
+  SQLite library can be specified via the ``RDFOX_LIBSQLITE_PATH`` environment
+  variable. If the environment variable is not set, RDFox will attempt to use
+  the default search paths shown in the following table.
+
+    .. table ::
+        :widths: 20,30
+
+        +----------------+------------------------+
+        |    Platform    | libsqlite3 search path |
+        +================+========================+
+        | Windows        | ``libsqlite3.dll``     |
+        +----------------+------------------------+
+        | macOS          | ``libsqlite3.dylib``   |
+        +----------------+------------------------+
+        | Linux          | ``libsqlite3.so``      |
+        +----------------+------------------------+
+
+  The resolved library should be of a version that matches that of the SQLite
+  file being connected to. The current release was built and tested with
+  SQLite v3.49.1, however it will also work with a wider range of versions,
+  both higher and lower. Please test your configuration and contact OST support
+  as needed.
+
+`Lucene <https://lucene.apache.org/>`__
+  Used to access Lucene data sources. The search path used to locate the
+  Lucene libraries when registering a Lucene data source can be specified via
+  the server parameter ``jvm.options`` or the environment variable 
+  ``RDFOX_JVM_OPTIONS``. The JVM options should include ``-Djava.class.path``
+  of the required Lucene libraries. The separator between the classpath is 
+  ``:`` (On Windows, ``;``). Any other JVM options can be specified as needed 
+  using the ``|`` separator.
+  If a Lucene data source is used with JRDFox, the required Lucene libraries
+  must be included in the classpath of the JVM running JRDFox.
+  The required JVM option and Lucene libraries are shown in the following table.
+
+  .. table ::
+        :widths: 25,40
+
+        +-----------------------+----------------------------------------+
+        |      JVM Option       | Lucene library search path             |
+        +=======================+========================================+
+        | ``-Djava.class.path`` | ``lucene-core-<version>.jar``          |
+        +-----------------------+----------------------------------------+
+        | ``-Djava.class.path`` | ``lucene-queryparser-<version>.jar``   |
+        +-----------------------+----------------------------------------+
+
+  The resolved libraries must have version v9.6.0 or higher.
+
+`libjvm <https://docs.oracle.com/en/java/index.html>`__
+  Used to access Lucene data sources with RDFox executable. The search path 
+  used to locate the JVM library can be specified via the ``RDFOX_LIBJVM_PATH``
+  environment variable. 
+  This is required to embed the Java Virtual Machine (JVM) within RDFox. 
+  If the environment variable is not set, RDFox will 
+  attempt to use the default search paths shown in the following table.
+
+    .. table ::
+        :widths: 20,30
+
+        +----------------+------------------------+
+        |    Platform    | libjvm search path     |
+        +================+========================+
+        | Windows        | ``jvm.dll``            |
+        +----------------+------------------------+
+        | macOS          | ``libjvm.dylib``       |
+        +----------------+------------------------+
+        | Linux          | ``libjvm.so``          |
+        +----------------+------------------------+
+
+  The resolved library should match the version of the Java Runtime 
+  Environment (JRE) in use. This release was built and tested with 
+  Java 17, but it is also compatible with Java 11 or higher. 
+  Please test your configuration and contact OST support if needed.
+
 For a list of other third-party components used within RDFox, see
-:numref:`acknowledgments`.
+:ref:`acknowledgments`.
 
 .. _rdfox-license-key:
 
@@ -285,11 +359,59 @@ as ``license.content`` and ``license.file``.
 Hardware
 ~~~~~~~~
 
+This section describes the hardware requirements for running RDFox.
+
+Memory
+^^^^^^
+
 RDFox is a main-memory data store and as such its performance is heavily
-dependent on access to a suitable amount of RAM. Oxford Semantic Technologies
-recommends that users ensure that RDFox has unpaged access to 60-120 bytes of
-RAM per triple that their store will contain. This includes both explicitly
-imported triples and those materialized via reasoning.
+dependent on access to a suitable amount of memory. The amount of memory
+required for a given application can be broken down into the following two
+components.
+
+  - **Fact storage cost** is the amount of memory required to store the facts
+    (triples or quads) including both those imported explicitly and those added
+    by materialization. This component depends on the number of facts and other
+    characteristics of the data set such as how many unique resources it
+    contains and the size of those resources.
+  - **Operating memory cost** is the amount of memory required for operations
+    such as querying, reasoning, compaction, and assorted other activities.
+    This component is proportional to the fact storage cost but the exact
+    proportion varies considerably with the characteristics of the
+    workload.
+
+Fact storage costs typically vary between 45 and 85 bytes per fact. One
+should provision an additional 10-100% of this for operating memory costs. The
+following workload characteristics will usually increase the operating memory
+costs:
+
+  - high numbers of queries evaluated concurrently with updates,
+  - queries that return large result sets with the ``ORDER BY`` or ``DISTINCT``
+    keywords, and
+  - using large and/or complicated sets of Datalog rules.
+
+A special case with high operating memory costs is that of HA replicas with the
+``highly-available`` setting for the ``persistence.snapshot-restore-mode``
+server parameter (see :numref:`server-parameters`). These should reserve
+at least 100% of the fact storage cost as additional memory, as this is
+required to restore the data store from a snapshot.
+
+While the above figures can be useful to estimate the memory requirements, an
+application should always be tested thoroughly to determine the actual memory
+requirements.
+
+In general, it is recommended to ensure that the complete memory requirements
+of an application are met without relying on memory paging because RDFox's
+performance will degrade significantly if the OS swaps the RDFox process's
+memory pages in and out of disk. It can, however, be useful to enable a
+suitably sized swap file to avoid RDFox processes being killed by the operating
+system during compaction if memory requirements increase suddenly but
+temporarily. This is relevant for all servers that perform compaction, as well
+as HA replicas that restore the new snapshots and which use with the
+``highly-available`` setting for the ``persistence.snapshot-restore-mode``.
+
+Disk Space
+^^^^^^^^^^
 
 When RDFox is configured for :ref:`persistence`, data will also be saved to
 disk, ready to be loaded in subsequent sessions. The underlying file system

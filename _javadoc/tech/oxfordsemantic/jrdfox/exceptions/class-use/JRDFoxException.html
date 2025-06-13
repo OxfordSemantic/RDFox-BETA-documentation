@@ -473,7 +473,7 @@ java.lang.String&nbsp;dataSourceTableName)</code></th>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../client/DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#describeDeltaQuery(java.lang.String)">describeDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;tupleTableName)</code></th>
+<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#describeDeltaQuery(java.lang.String)">describeDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName)</code></th>
 <td class="colLast">
 <div class="block">Returns information about the delta query with the given name.</div>
 </td>
@@ -656,7 +656,7 @@ long&nbsp;dataStoreVersion,
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colFirst"><code><a href="../../client/CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#getCommitProcedure()">getCommitProcedure</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the data store's commit procedure.</div>
@@ -752,31 +752,45 @@ int&nbsp;numberOfRows)</code></th>
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>int</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">Cursor.</span><code><span class="memberNameLink"><a href="../../client/Cursor.html#getIndexOfCurrentAnswerInWindow()">getIndexOfCurrentAnswerInWindow</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns the index of the current answer in the current window.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#getLastSnapshotDataStoreVersion()">getLastSnapshotDataStoreVersion</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the data store version of the most recent snapshot.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#getLockTimeout()">getLockTimeout</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the time in milliseconds that the system will wait for when it needs to acquire a lock on a data store.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>long[]</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">ServerConnection.</span><code><span class="memberNameLink"><a href="../../client/ServerConnection.html#getMemoryUse()">getMemoryUse</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the current memory use of RDFox.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#getName()">getName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the name of the data store inside the server.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>int</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">Cursor.</span><code><span class="memberNameLink"><a href="../../client/Cursor.html#getNumberOfAnswersInWindow()">getNumberOfAnswersInWindow</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns the number of answers in the current window.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -1244,24 +1258,24 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;dataSourcePar
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,int,int,int)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
+<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 java.lang.String&nbsp;queryText,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</code></th>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</code></th>
 <td class="colLast">
 <div class="block">Registers a delta query with a data store.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
+<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 <a href="../../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</code></th>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</code></th>
 <td class="colLast">
 <div class="block">Registers a delta query with a data store.</div>
 </td>
@@ -1425,17 +1439,31 @@ java.lang.String&nbsp;prefixIRI)</code></th>
 </td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">RDFoxServer.</span><code><span class="memberNameLink"><a href="../../client/RDFoxServer.html#startEndpoint(java.util.Map)">startEndpoint</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;endpointParameters)</code></th>
+<td class="colLast">
+<div class="block">Starts the endpoint using the supplied parameters.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">Cursor.</span><code><span class="memberNameLink"><a href="../../client/Cursor.html#stop()">stop</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Stops this iterator by releasing all resources that the cursor might hold.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">RDFoxServer.</span><code><span class="memberNameLink"><a href="../../client/RDFoxServer.html#stop()">stop</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Stops the server, or does nothing if the server is not running.</div>
+<div class="block">Stops the server and the endpoint (in case the latter is currently running), or does nothing if the server is not running.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static void</code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">RDFoxServer.</span><code><span class="memberNameLink"><a href="../../client/RDFoxServer.html#stopEndpoint()">stopEndpoint</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Stops the endpoint if the endpoint is currently running, or does nothing.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -1532,15 +1560,6 @@ java.io.OutputStream&nbsp;outputStream)</code></th>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../CursorAdvanceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorAdvanceException</a></span></code></th>
-<td class="colLast">
-<div class="block">This exception is thrown when <code>Cursor.advance()</code> is called
- and the cursor was not opened earlier, or the data store has changed
- since <code>Cursor.open()</code> was called.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../CursorNoLongerUsableException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorNoLongerUsableException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when a method of <code>Cursor</code> is
@@ -1548,18 +1567,25 @@ java.io.OutputStream&nbsp;outputStream)</code></th>
  cursor from being used any more.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../DeltaQueryCompilationException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">DeltaQueryCompilationException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during rule compilation occurs.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../DuplicateResourceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">DuplicateResourceException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when a client tries to create a resource that already exists.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../InvalidCursorStateException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">InvalidCursorStateException</a></span></code></th>
+<td class="colLast">
+<div class="block">This exception is thrown when a cursor function is called and the cursor is an invalid state.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -1587,6 +1613,13 @@ java.io.OutputStream&nbsp;outputStream)</code></th>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../MemoryExhaustedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">MemoryExhaustedException</a></span></code></th>
+<td class="colLast">
+<div class="block">This exception is thrown when RDFox runs out of memory.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../OperationInterruptedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">OperationInterruptedException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an operation on a <a href="../../client/ServerConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client"><code>ServerConnection</code></a>
@@ -1594,42 +1627,42 @@ java.io.OutputStream&nbsp;outputStream)</code></th>
  <code>interrupt()</code> method.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../ParsingException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ParsingException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during parsing occurs.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../QueryCompilationException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">QueryCompilationException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during query compilation occurs.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../ResourceInUseException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ResourceInUseException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an operation attempts to modify a resource that is currently used elsewhere.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../RuleCompilationException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">RuleCompilationException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when an error during rule compilation occurs.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../SystemCallException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">SystemCallException</a></span></code></th>
 <td class="colLast">
 <div class="block">This exception is thrown when a system call throws an exception.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>class&nbsp;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../UnknownResourceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">UnknownResourceException</a></span></code></th>
 <td class="colLast">

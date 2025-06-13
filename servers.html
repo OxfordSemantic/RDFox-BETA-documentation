@@ -168,8 +168,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -281,7 +282,7 @@ given in <a class="reference internal" href="tuple-tables.html#in-memory-tuple-t
 <li><p><em>Built-in tuple tables</em> contain facts that can be useful in various
 applications of RDFox, and they are described in more detail in
 <a class="reference internal" href="tuple-tables.html#built-in-tuple-tables"><span class="std std-numref">Section 6.5</span></a>.</p></li>
-<li><p><em>Data source tuple tables</em> provide a ‘virtual view’ over data in non-RDF data
+<li><p><em>Data source tuple tables</em> provide a “virtual view” over data in non-RDF data
 sources, such as CSV files, relational databases, or an Apache Solr index.
 Importing external data is explained in detail in <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>.</p></li>
 </ul>
@@ -293,13 +294,38 @@ in <a class="reference internal" href="tuple-tables.html#fact-domains"><span cla
 </div>
 <div class="section" id="data-sources">
 <h3><span class="section-number">4.1.2. </span>Data Sources<a class="headerlink" href="#data-sources" title="Permalink to this headline">¶</a></h3>
-<p>To support accessing data in formats other than RDFox, one or more data sources
-can be registered with a data store. Registering a data source requires
-specifying a number of parameters that govern how the data is accessed. Each
-data source is identified by a name that is unique for the data store. The
-access to the actual data is provided by data source tuple tables, which are
-created by referencing previously registered data sources. The process of
-accessing external data sources is described in more detail in
+<p>To support accessing data in external repositories, RDFox provides the concept
+of <em>data sources</em>. A data source models one external repository such as a CSV
+file or a relational database. To access the data, a data source must first be
+registered with a data store using any of the APIs supported by RDFox. When a
+data source is registered, a unique name for the data source must be specified
+to allow further reference to the data source; moreover, parameters in form of
+key-value pairs can be specified to determine how exactly the data is to be
+accessed.</p>
+<p>A data source provides a view over the “raw” data by means of <em>data source
+tables</em>. For example, a data source backed by a CSV file will provide one data
+source table that shows the raw data in the file, and a data source backed by a
+relational database will provide a data source table for each relation in the
+database. Data in a data source table may not be in a format that is amenable
+to processing using RDFox. For example, the data may be of invalid type, it may
+be structured in a way that matches the RDF graph (e.g., a database might
+contain employees’ first and last names as separate fields, whereas the RDF
+graph might expect them to be concatenated into a single string), and it may
+use identifiers that do not correspond to the identifies used in the RDF graph
+stored in RDFox. Because of this, a data source table provides just a “preview”
+of the data in the data source, and various RDFox APIs provide only the ability
+to sample a data source table.</p>
+<p>To access the data in a data source, data source tables need to be mapped into
+<em>data source tuple tables</em>. A data source tuple table is conceptually just
+another type of tuple table and so it can be used in queries and rules just
+like any other tuple table. When a data source tuple table is registered with a
+data store, users typically provide parameters specifying how the data in a
+data source table is transformed into a format that integrates well with the
+RDF graph. For example, the parameters can specify how to bridge the gap
+between the datatypes in the data source and the ones expected by the graph.
+Furthermore, parameters can also be used to specify how to transform the source
+data into identifiers (e.g., IRIs) that occur in the graph.</p>
+<p>The process of accessing external data sources is described in more detail in
 <a class="reference internal" href="data-sources.html#data-sources"><span class="std std-numref">Section 7</span></a>.</p>
 </div>
 <div class="section" id="owl-axioms">
@@ -558,7 +584,23 @@ supplied via the
 environment variable.
 By default, this parameter is unset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">license.content</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">jvm.options</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies the JVM options for Lucene data
+sources. If this parameter is set, the server
+will use it to launch a Java Virtual Machine
+within the current process using the provided
+options. For Lucene data sources, appropriate
+JVM options including the classpath for Lucene
+libraries must be specified.
+See <a class="reference internal" href="data-sources.html#registering-lucene-data-sources"><span class="std std-numref">Section 7.1.3</span></a>
+for more information.
+This parameter may alternatively be
+supplied via the <code class="docutils literal notranslate"><span class="pre">RDFOX_JVM_OPTIONS</span></code>
+environment variable.
+By default, this parameter is unset.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">license.content</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>Specifies the license content verbatim.
 This parameter is not set by default.
@@ -566,7 +608,7 @@ See <a class="reference internal" href="features-and-requirements.html#rdfox-lic
 the precedence of license-related
 options.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">license.file</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">license.file</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>Specifies the path to the license key
 file to use. The default value is
@@ -577,14 +619,14 @@ See <a class="reference internal" href="features-and-requirements.html#rdfox-lic
 the precedence of license-related
 options.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max-memory</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max-memory</span></code></p></td>
 <td><p>an integer</p></td>
 <td><p>Specifies the initial value for the
-maximum of memory (in MB) that the RDFox
+maximum of memory in MB that the RDFox
 instance should use. The default is 0.9
 times the installed memory.</p></td>
 </tr>
-<tr class="row-even"><td><blockquote>
+<tr class="row-odd"><td><blockquote>
 <div></div></blockquote>
 <p id="num-threads-server-param"><code class="docutils literal notranslate"><span class="pre">num-threads</span></code></p>
 </td>
@@ -595,7 +637,7 @@ as reasoning and importation. The default
 is the number of logical processors
 available on the machine.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>, or
 <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
 <td><p>If the value is <code class="docutils literal notranslate"><span class="pre">file</span></code> or
@@ -606,7 +648,7 @@ directory using the matching persistence
 option. See <a class="reference internal" href="persistence.html#persistence-options"><span class="std std-numref">Section 13.2.1</span></a>
 for an explanation of the available options.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.disk-sector-size</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.disk-sector-size</span></code></p></td>
 <td><p>an integer</p></td>
 <td><p>The physical sector size of the disk
 containing the server directory in bytes.
@@ -616,7 +658,7 @@ This parameter is used when the
 for read/write transactions in data
 stores. The default value is <code class="docutils literal notranslate"><span class="pre">4096</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>The name of the encryption algorithm to use
 to encrypt and decrypt all persisted data.
@@ -630,7 +672,7 @@ but this is only used if the
 <code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code> parameter
 is set.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>A base64-encoded encryption key. If this
 parameter is set, the server will use it
@@ -645,7 +687,7 @@ supplied via the
 environment variable.
 By default, this parameter is unset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code></p></td>
 <td><p>a duration of <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">ms</span></code> or more
 specified as described in
 <a class="reference internal" href="#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>.</p></td>
@@ -658,7 +700,7 @@ ignored unless <code class="docutils literal notranslate"><span class="pre">file
 persistence is in use. See also
 <a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code></p></td>
 <td><p>a hostname and UDP
 port number separated
 separated by a plus
@@ -671,6 +713,34 @@ in use. If this parameter is not set,
 the instance will neither listen for nor
 send notifications. See also
 <a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.snapshot-restore-mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">adaptive</span></code>,
+<code class="docutils literal notranslate"><span class="pre">highly-available</span></code> or
+<code class="docutils literal notranslate"><span class="pre">memory-efficient</span></code></p></td>
+<td><p>Determines how new snapshots are restored when
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence is used.</p>
+<p>Value <code class="docutils literal notranslate"><span class="pre">highly-available</span></code> ensures that the
+data store is locked for the shortest possible
+time by first loading the new snapshot into
+fresh memory before acquiring an exclusive lock,
+updating internal references to point to the
+new copy, releasing the lock and then deleting
+the old copy. In the worst case, this will
+temporarily double the memory allocated with the
+data store being restored.</p>
+<p>Value <code class="docutils literal notranslate"><span class="pre">memory-efficient</span></code> ensures that
+snapshots are restored without requiring
+substantial additional memory by first acquiring
+an exclusive lock immediately, clearing the
+existing data store (freeing memory) and
+repopulating it from the new snapshot file.</p>
+<p>Value <code class="docutils literal notranslate"><span class="pre">adaptive</span></code> attempts to follow the
+strategy described for the <code class="docutils literal notranslate"><span class="pre">highly-available</span></code>
+option but falls back to the
+<code class="docutils literal notranslate"><span class="pre">memory-efficient</span></code> strategy if allocation
+fails. This is the default option.</p>
+</td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.memory-cost</span></code></p></td>
 <td><p>a non-negative integer</p></td>
@@ -742,7 +812,7 @@ is set.</p></td>
 parameter is set, the server will use it
 to encrypt and decrypt session tokens issued
 from or received by the session-based APIs
-described in <a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.2.1.1.2</span></a>. The
+described in <a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.3.1.1.2</span></a>. The
 encryption algorithm is specified by the
 <code class="docutils literal notranslate"><span class="pre">session.encryption.algorithm</span></code> parameter.
 This parameter may alternatively be
@@ -810,7 +880,7 @@ parameter names.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

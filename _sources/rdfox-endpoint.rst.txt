@@ -47,8 +47,21 @@ The configuration of the endpoint is determined by the parameters below.
   present, then ``port`` takes precedence.
 
 - ``num-http-workers`` determines the number of threads that the endpoint will
-  use to process RESTful requests. The default value is one less than the
-  number of logical processors of the machine on which RDFox is run.
+  use to process RESTful requests. The default value is the larger of 8 and the
+  number of logical processors on the machine. For settings of 2 or more, the
+  system will limit the number of threads servicing long-running requests so
+  that at least one thread remains available for observing and controlling the
+  system. This includes the following:
+  
+    - checking the endpoint health (``GET /health``),
+    - fetching information about the server (``GET /``),
+    - listing requests (``GET /requests``),
+    - cancelling requests (``DELETE /requests/{id}``),
+    - serving the console (``GET /console``),
+    - various other operations.
+
+  When servicing a new request would exceed the limit, the client will receive
+  status code ``429 - Too Many Requests``.
 
 - ``channel-timeout`` determines the length of time that the endpoint will wait
   for I/O while servicing HTTP(S) requests. That is, if the endpoint tries to
@@ -167,7 +180,8 @@ The configuration of the endpoint is determined by the parameters below.
 
    - ``credentials-passphrase`` provides the passphrase that can be used to
      decrypt the credentials in case they are encrypted. This parameter is
-     optional.
+     optional. It can alternatively be set via the
+     ``RDFOX_ENDPOINT_CREDENTIALS_PASSPHRASE`` environment variable.
 
    - ``min-secure-protocol`` determines the minimum protocol version that the
      server should use. The allowed values are ``ssl3``, ``tls1``, ``tls11``,

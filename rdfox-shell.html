@@ -210,8 +210,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -505,10 +506,11 @@ changed, deltas (additions or deletions) are generated.</p></li>
 </div>
 <div class="section" id="deltaqueryanswer">
 <span id="deltaqueryanswer-command"></span><h3><span class="section-number">15.2.13. </span>deltaqueryanswer<a class="headerlink" href="#deltaqueryanswer" title="Permalink to this headline">¶</a></h3>
+<p><strong>Syntax:</strong></p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>deltaqueryanswer {list {name &lt;name&gt; | from &lt;version&gt; | to &lt;version&gt; | type &lt;answer-type&gt; }... | show &lt;name&gt; &lt;version&gt; &lt;answer-type&gt; | delete {name &lt;name&gt; | from &lt;version&gt; | to &lt;version&gt; | type &lt;answer-type&gt; }...}
 </pre></div>
 </div>
-<p><strong>Description</strong> Manages the delta query answers.</p>
+<p><strong>Description:</strong> Manages the delta query answers.</p>
 <ul class="simple">
 <li><p>Option <code class="docutils literal notranslate"><span class="pre">list</span></code> prints the delta query answers matching the specified
 criteria. The parameter <code class="docutils literal notranslate"><span class="pre">name</span></code> restricts the query name of the returned
@@ -1041,7 +1043,9 @@ commit
 </pre></div>
 </div>
 <p><strong>Description:</strong> This command sets the maximum memory that the server is
-allowed to use, or prints the current memory usage if no number is specified.</p>
+allowed to use, or prints the current memory usage if no number is specified.
+Both the argument and the command’s output are in bytes (unlike the
+<code class="docutils literal notranslate"><span class="pre">max-memory</span></code> server parameter, whose value is in megabytes).</p>
 </div>
 <div class="section" id="password">
 <span id="password-command"></span><h3><span class="section-number">15.2.32. </span>password<a class="headerlink" href="#password" title="Permalink to this headline">¶</a></h3>
@@ -1179,7 +1183,7 @@ If the <code class="docutils literal notranslate"><span class="pre">no-password<
 password. If neither of those options is used then the user is prompted to
 enter a new password for the role. A password hash of an existing role can
 obtained by listing role information using the <code class="docutils literal notranslate"><span class="pre">role</span> <span class="pre">show</span></code> shell command
-or programmatically as described in <a class="reference internal" href="apis.html#apis-list-role-information"><span class="std std-numref">Section 16.18.4</span></a>.</p></li>
+or programmatically as described in <a class="reference internal" href="apis.html#apis-list-role-information"><span class="std std-numref">Section 16.19.4</span></a>.</p></li>
 <li><p>Option <code class="docutils literal notranslate"><span class="pre">delete</span></code> deletes the role with name <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code>. This option will
 prompt for confirmation unless <code class="docutils literal notranslate"><span class="pre">force</span></code> is specified.</p></li>
 </ul>
@@ -1718,7 +1722,7 @@ following command.</p>
 error raised by RDFox when the above command is re-executed will not cause
 execution to stop. If at a later date, the number of resources that the data
 store needs to accommodate grows beyond the capacity of a <code class="docutils literal notranslate"><span class="pre">parallel-nn</span></code>
-store (see <a class="reference internal" href="data-stores.html#data-store-type"><span class="std std-numref">Section 5.4.1.12</span></a>), the above line may be replaced with
+store (see <a class="reference internal" href="data-stores.html#data-store-type"><span class="std std-numref">Section 5.4.1.11</span></a>), the above line may be replaced with
 the following.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dstore create recipes type parallel-wn
 </pre></div>
@@ -1745,7 +1749,7 @@ situations such as these, additional manual intervention will be needed.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

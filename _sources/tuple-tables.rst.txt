@@ -264,8 +264,8 @@ argument of ``SKOLEM``.
 
 Atoms involving the ``SKOLEM`` built-in tuple table must satisfy certain
 *binding restrictions* in rules and queries. Essentially, it must be possible
-to evaluate a query/rule so that, once an ``SKOLEM`` atom is reached,
-either the value of the last argument, or the values of all all but the last
+to evaluate a query/rule so that, once a ``SKOLEM`` atom is reached,
+either the value of the last argument, or the values of all but the last
 argument must be known. This is explained using the following example.
 
 .. container:: example

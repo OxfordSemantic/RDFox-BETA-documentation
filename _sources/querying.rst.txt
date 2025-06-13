@@ -25,6 +25,8 @@ The `SPARQL 1.1 specification
 <https://www.w3.org/TR/2013/REC-sparql11-overview-20130321/>`__ provides a
 suite of languages and protocols for querying and manipulating RDF graph data.
 
+.. _query-language:
+
 Query Language
 ~~~~~~~~~~~~~~
 
@@ -63,8 +65,36 @@ The intended semantics of ``BNODE`` and ``DESCRIBE``
 is, in our opinion, not sufficiently specified in the standard, which is why
 those features have not yet been implemented in RDFox.
 
-Although RDFox supports SPARQL 1.1 property paths, in many situations it might be beneficial
-to use reasoning instead. This is explained further in :numref:`representing-property-paths`
+Although RDFox supports SPARQL 1.1 property paths, in many situations it might
+be beneficial to use reasoning instead. This is explained further in
+:numref:`representing-property-paths`
+
+RDFox unifies the notions of ``ASK`` and ``SELECT`` queries so that both types
+of query can be treated uniformly. RDFox achieves this in two steps.
+
+* RDFox allows the ``SELECT`` clause to contain no variables; since the
+  selection list is empty, such a query can return zero or more empty
+  substitutions (i.e., substitutions not defining any variables). For example,
+  unlike in the SPARQL 1.1 standard, query ``SELECT WHERE { ?X :name ?Y }`` is
+  syntactically valid. For each triple of the form ``<a, :name, b>``, this
+  query returns one empty substitution; moreover, if there are no triples of
+  the form ``<a, :name, b>``, this query returns no substitutions.
+  Consequently, note that the empty answer (i.e., the answer containing no
+  substitutions) and the nonempty answer containing one empty substitution
+  indicate different states of the RDF graph. Since such queries are not
+  supported by the SPARQL 1.1 standard, RDFox is compliant with the standard on
+  all queries that are valid as per the standard.
+
+* RDFox treats a query of the form ``ASK WHERE { ... }`` as a syntactic
+  abbreviation for a query of the form ``SELECT DISTINCT WHERE { ... }``. The
+  latter query can either return no substitutions (which is tantamount to the
+  ``ASK`` query returning ``false``), or return one empty substitution (which
+  is tantamount to the ``ASK`` query returning ``true``). The answers of such
+  queries (regardless of whether the query was written using ``ASK`` or
+  ``SELECT DISTINCT``) are written into the respective query answer formats by
+  following the rules for ``ASK`` queries. For example, the result containing
+  one empty substitution is written in the ``application/sparql-results+json``
+  format as ``{ "head" : { }, "boolean" : true }``.
 
 .. _query-answer-formats:
 
@@ -75,11 +105,22 @@ RDFox supports the following formats for encoding the answers to SPARQL queries.
 
 - The `SPARQL 1.1 TSV Format
   <http://www.w3.org/TR/sparql11-results-csv-tsv/>`__ has MIME type
-  ``text/tab-separated-values``.
+  ``text/tab-separated-values``. The standard does not specify how to encode
+  the answers of ``ASK`` queries in this format. As explained in
+  :numref:`query-language`, a query of the form ``ASK WHERE { ... }`` is
+  treated in RDFox as an abbreviation for ``SELECT DISTINCT WHERE { ... }``,
+  and such queries return either no substitutions or a single empty
+  substitution. RDFox will encode the answers of such queries onto the TSV
+  format in a natural way: an answer containing no substitution will contain
+  one empty header line, and an answer containing one empty substitution will
+  contain one empty header line followed by one empty line reflecting the empty
+  substitution. The header line is empty in both cases because the query
+  selects no variables.
 
 - The `SPARQL 1.1 CSV Format
   <http://www.w3.org/TR/sparql11-results-csv-tsv/>`__ has MIME type
-  ``text/csv``.
+  ``text/csv``. The answers to ``ASK`` and ``SELECT DISTINCT`` queries are
+  encoded as in the TSV format.
 
 - The `SPARQL 1.1 XML Format <http://www.w3.org/TR/rdf-sparql-XMLres/>`__ has
   MIME type ``application/sparql-results+xml``.

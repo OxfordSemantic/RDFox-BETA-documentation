@@ -3,16 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Security Advisories &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
       <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
-    
-      
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -20,19 +14,14 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
-        <script src="_static/sphinx_tabs/tabs.js"></script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"></script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.46.2/dist/instantsearch.production.min.js"></script>
         <script defer="defer" src="_static/algolia.js"></script>
     <script src="_static/js/theme.js"></script>
-      <script src="_static/language_data.js"></script>
-      <script>
-        window.rdfoxDocsCurrentVersion = "7.3";
-      </script>
-    
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Acknowledgments" href="acknowledgments.html" />
+    <link rel="prev" title="Release Notes" href="release-notes.html" />
     <!-- Start of HubSpot Cookie Blocking Code -->
     <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
     <!-- End of HubSpot Cookie Blocking Code -->
@@ -112,7 +101,7 @@
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -157,9 +146,18 @@
 <li class="toctree-l1"><a class="reference internal" href="docker.html">22. RDFox Docker Images</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Security Advisories</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rd-2210-2-3-low">RD-2210 - 2.3 (Low)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mitigations">Mitigations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#affected-versions">Affected Versions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resolution">Resolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cvss-score">CVSS Score</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
@@ -177,7 +175,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Search</li>
+      <li class="breadcrumb-item active">Security Advisories</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -186,33 +184,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="security-advisories">
+<span id="id1"></span><h1>Security Advisories<a class="headerlink" href="#security-advisories" title="Permalink to this headline">¶</a></h1>
+<p>This section documents security advisories for RDFox.</p>
+<div class="section" id="rd-2210-2-3-low">
+<span id="security-advisories-rd-2210"></span><h2>RD-2210 - 2.3 (Low)<a class="headerlink" href="#rd-2210-2-3-low" title="Permalink to this headline">¶</a></h2>
+<p>A logic error in the SKOLEM built-in tuple table could allow a remotely
+authenticated attacker to capture the content of memory allocated for
+construction of a SKOLEM blank node identifier into the identifier itself. This
+corrupts the system and, if the identifiers are formatted in query responses,
+may lead to unauthorized disclosure of information depending on what data was
+previously stored in the allocated memory.</p>
+<p>To exploit this issue, one or more IRIs whose length excluding the final
+segment is a multiple of 3 must be stored in the data store. An attacker with
+write privileges could establish this condition and could also add the
+incorrect identifiers back into the dictionary to be harvested at a later date
+using rules or SPARQL updates. Once the necessary IRIs or any faulty SKOLEM
+identifiers are present in the dictionary, an attacker with read privileges
+could read them by querying.</p>
+<div class="section" id="mitigations">
+<h3>Mitigations<a class="headerlink" href="#mitigations" title="Permalink to this headline">¶</a></h3>
+<p>There are no advised mitigations for this issue. Please see the resolution
+section below.</p>
+</div>
+<div class="section" id="affected-versions">
+<h3>Affected Versions<a class="headerlink" href="#affected-versions" title="Permalink to this headline">¶</a></h3>
+<p>This issue affects versions v7.3, v7.3a, and v7.3c.</p>
+</div>
+<div class="section" id="resolution">
+<h3>Resolution<a class="headerlink" href="#resolution" title="Permalink to this headline">¶</a></h3>
+<p>This issue is fixed in v7.3d and later versions. Users of one of the affected
+versions are advised to upgrade to a fixed version as soon as possible to
+prevent new exploitation of this issue. After upgrading, they should also
+follow the <a class="reference external" href="https://rdfox-distribution.s3.eu-west-2.amazonaws.com/release/v7.3d/RDFox-v7.3d-upgrade-instructions.pdf">v7.3d upgrade instructions</a>
+to ensure that their system is free of any incorrect SKOLEM identifiers created
+by this issue.</p>
+</div>
+<div class="section" id="cvss-score">
+<h3>CVSS Score<a class="headerlink" href="#cvss-score" title="Permalink to this headline">¶</a></h3>
+<p>CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N. – 2.3 (Low)</p>
+</div>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
-
-  
-    <script>
-      warningNode = document.createElement("p")
-      warningText = document.createTextNode("Warning: The following results are based on version '7.3' of the documentation")
-      warningNode.appendChild(warningText)
-      searchResults = document.getElementById("search-results")
-      searchResults.parentNode.insertBefore(warningNode, searchResults)
-    </script>
-  
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="release-notes.html" class="btn btn-neutral float-left" title="Release Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acknowledgments.html" class="btn btn-neutral float-right" title="Acknowledgments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
@@ -259,11 +280,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  
-     
-  
-
+  </script> 
 
 </body>
 </html>

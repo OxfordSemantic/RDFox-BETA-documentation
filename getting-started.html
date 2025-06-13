@@ -187,8 +187,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -221,13 +222,12 @@ time. It is organised into one section of common setup steps, followed by three
 equivalent sections demonstrating how to access RDFox’s querying and reasoning
 functionality through different interfaces (GUI, CLI and REST API), and finally
 a section of suggestions for how to learn more.</p>
-<p>If you are looking to get started with the Java, or the experimental C or C++
-APIs to RDFox, see instead the appropriate demo program included with each RDFox
-release.</p>
+<p>If you are looking to get started with the Java, or the C or C++ APIs to RDFox,
+see instead the appropriate demo program included with each RDFox release.</p>
 <div class="section" id="setup">
 <span id="id2"></span><h2><span class="section-number">3.1. </span>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
 <p>Before you begin, make sure that you have downloaded the latest RDFox release
-for your system from <a class="reference external" href="https://www.rdfox.com/downloads">www.rdfox.com/downloads</a> and unzipped it. This will produce a new
+for your system from <a class="reference external" href="https://oxfordsemantic.tech/download">oxfordsemantic.tech/download</a> and unzipped it. This will produce a new
 directory containing the RDFox executable (named <code class="docutils literal notranslate"><span class="pre">RDFox</span></code> on Linux and macOS,
 and <code class="docutils literal notranslate"><span class="pre">RDFox.exe</span></code> on Windows) and some other files. The following instructions
 refer to this directory as <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code>.</p>
@@ -235,7 +235,7 @@ refer to this directory as <code class="docutils literal notranslate"><span clas
 valid license key. The quickest way to do this is to add a copy of your license
 key file directly to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> (see <a class="reference internal" href="features-and-requirements.html#rdfox-license-key"><span class="std std-numref">Section 2.4.1.3</span></a>
 for other ways). If you do not have a license key file, you can request one at
-<a class="reference external" href="https://www.rdfox.com/tryrdfoxforfree">https://www.rdfox.com/tryrdfoxforfree</a>.</p>
+<a class="reference external" href="https://oxfordsemantic.tech/free-trial">oxfordsemantic.tech/free-trial</a>.</p>
 <p>The following small RDF graph in <a class="reference external" href="https://www.w3.org/TR/turtle/">Turtle</a>
 format will be used in the instructions below.</p>
 <div class="highlight-turtle notranslate" id="data-ttl"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
@@ -425,7 +425,7 @@ is captured in the Datalog file <a class="reference internal" href="#has-child-d
 downloaded to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code> earlier. Import it by clicking on the
 <a class="reference internal" href="_images/add-content-header-image.png"><img alt="AddContentHeader" src="_images/add-content-header-image.png" style="height: 25px;" /></a> button in the header. In the “Add content” dialog that opens,
 click <a class="reference internal" href="_images/choose-file-image.png"><img alt="ChooseFile" src="_images/choose-file-image.png" style="height: 25px;" /></a>, navigate to <code class="docutils literal notranslate"><span class="pre">&lt;working_directory&gt;</span></code>, select <code class="docutils literal notranslate"><span class="pre">hasChild.dlog</span></code>,
-click to confirm and then click <a class="reference internal" href="_images/add-content-image.png"><img alt="AddContent" src="_images/add-content-image.png" style="height: 25px;" /></a>.</p>
+click to confirm and then click <a class="reference internal" href="_images/add-content-image.png"><img alt="AddContent" src="_images/add-content-image.png" style="height: 25px;" /></a> and <a class="reference internal" href="_images/upload-completed-image.png"><img alt="OK" src="_images/upload-completed-image.png" style="height: 25px;" /></a>.</p>
 <p>Importing this file will cause RDFox to run its reasoning algorithms, adding the
 triples that result from applying the loaded rules to the loaded facts to the
 data store as additional facts. Facts loaded explicitly from data are referred
@@ -459,9 +459,8 @@ appears.</p>
 <div class="section" id="exploring-a-data-store">
 <h3><span class="section-number">3.2.7. </span>Exploring a Data Store<a class="headerlink" href="#exploring-a-data-store" title="Permalink to this headline">¶</a></h3>
 <p>In addition to the SPARQL runner, the web console provides a way to explore the
-facts in a data store visually. Click the <a class="reference internal" href="_images/explore-image.png"><img alt="Explore" src="_images/explore-image.png" style="height: 25px;" /></a> icon to the right of
-<code class="docutils literal notranslate"><span class="pre">:peter</span></code> where it appears in the results table to switch to begin an
-exploration.</p>
+facts in a data store visually. Click the <a class="reference internal" href="_images/explore-image.png"><img alt="Explore" src="_images/explore-image.png" style="height: 25px;" /></a> icon to the left of
+<code class="docutils literal notranslate"><span class="pre">:peter</span></code> where it appears in the results table to begin an exploration.</p>
 <p>Initially, a single purple rectangle is displayed representing the node
 <code class="docutils literal notranslate"><span class="pre">:peter</span></code>. The dot icon in the upper right of the purple <code class="docutils literal notranslate"><span class="pre">peter</span></code> node
 indicates that there are links present in the data store that are not being
@@ -1046,7 +1045,7 @@ Java, see <a class="reference internal" href="apis.html#apis"><span class="std s
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

@@ -161,12 +161,12 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;compilationPa
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../../../client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
+<th class="colSecond" scope="row"><span class="typeNameLabel">DataStoreConnection.</span><code><span class="memberNameLink"><a href="../../../../client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 <a href="../Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize)</code></th>
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize)</code></th>
 <td class="colLast">
 <div class="block">Registers a delta query with a data store.</div>
 </td>
@@ -185,13 +185,13 @@ int&nbsp;additionsMaxSize)</code></th>
 </thead>
 <tbody>
 <tr class="altColor">
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../../client/DeltaQueryInfo.html#%3Cinit%3E(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int,long,long,long)">DeltaQueryInfo</a></span>&#8203;(java.lang.String&nbsp;name,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../../client/DeltaQueryInfo.html#%3Cinit%3E(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long,long,long,long)">DeltaQueryInfo</a></span>&#8203;(java.lang.String&nbsp;name,
 java.lang.String&nbsp;uniqueID,
 <a href="../Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize,
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize,
 long&nbsp;lastDataStoreVersionWithSnapshot,
 long&nbsp;lastDataStoreVersionWithDeletion,
 long&nbsp;lastDataStoreVersionWithAddition)</code></th>

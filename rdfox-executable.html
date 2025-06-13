@@ -157,8 +157,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -281,8 +282,9 @@ is:</p>
 </div>
 <p>If the <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> parameter is not specified in the command, the
 default value for the OS user account is used (see above). If the
-<code class="docutils literal notranslate"><span class="pre">persistence</span></code> parameter is not specified, or it is specified with value
-<code class="docutils literal notranslate"><span class="pre">off</span></code> the process will return an error.</p>
+<code class="docutils literal notranslate"><span class="pre">persistence</span></code> server parameter is not specified, or it is specified with
+value <code class="docutils literal notranslate"><span class="pre">off</span></code> the process will return an error. If the <code class="docutils literal notranslate"><span class="pre">channel</span></code> endpoint
+parameter is not specified, the process will return an error.</p>
 <p>A role and password are required by this mode in order to create the first
 server role. If either are absent from both the command arguments and
 environment variables, and the <code class="docutils literal notranslate"><span class="pre">-temp-role</span></code> option is not specified, RDFox
@@ -504,7 +506,7 @@ both variables remain unset, RDFox will prompt for the missing information.</p>
 <p>When invoked from the remote shell, commands will operate in exactly the same
 way as if they were invoked from the local shell (<code class="docutils literal notranslate"><span class="pre">shell</span></code> and <code class="docutils literal notranslate"><span class="pre">sandbox</span></code>
 modes) save for the exceptions documented in
-<a class="reference internal" href="apis.html#rest-remote-shell-limitations"><span class="std std-numref">Section 16.20.1.1</span></a>. Interruptible operations may be
+<a class="reference internal" href="apis.html#rest-remote-shell-limitations"><span class="std std-numref">Section 16.21.1.1</span></a>. Interruptible operations may be
 interrupted with Ctrl-C just as in local shells.</p>
 <p>File paths embedded within commands are always interpreted with respect to the
 server’s file system. The remote shell client does not provide any way of using
@@ -574,7 +576,7 @@ reload the service. To uninstall the service, run:</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

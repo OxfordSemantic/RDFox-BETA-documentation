@@ -376,6 +376,12 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataStorePart.html#COMMIT_PROCEDURE">COMMIT_PROCEDURE</a></span> - Static variable in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataStorePart.html" title="class in tech.oxfordsemantic.jrdfox.client">DataStorePart</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client"><span class="typeNameLink">CommitProcedureInfo</span></a> - Class in <a href="tech/oxfordsemantic/jrdfox/client/package-summary.html">tech.oxfordsemantic.jrdfox.client</a></dt>
+<dd>
+<div class="block">Encapsulates information about a commit procedure.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html#%3Cinit%3E(tech.oxfordsemantic.jrdfox.logic.sparql.statement.DeleteInsertUpdate%5B%5D)">CommitProcedureInfo(DeleteInsertUpdate[])</a></span> - Constructor for class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html#commitTransaction()">commitTransaction()</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client">DataStoreConnection</a></dt>
 <dd>
 <div class="block">Commits the transaction associated with this connection.</div>
@@ -634,18 +640,6 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Provides access to the results of a query.</div>
 </dd>
-<dt><a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions"><span class="typeNameLink">CursorAdvanceException</span></a> - Exception in <a href="tech/oxfordsemantic/jrdfox/exceptions/package-summary.html">tech.oxfordsemantic.jrdfox.exceptions</a></dt>
-<dd>
-<div class="block">This exception is thrown when <code>Cursor.advance()</code> is called
- and the cursor was not opened earlier, or the data store has changed
- since <code>Cursor.open()</code> was called.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html#%3Cinit%3E()">CursorAdvanceException()</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorAdvanceException</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html#%3Cinit%3E(java.lang.String)">CursorAdvanceException(String)</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorAdvanceException</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html#%3Cinit%3E(java.lang.String,java.lang.Throwable)">CursorAdvanceException(String, Throwable)</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/CursorAdvanceException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">CursorAdvanceException</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="tech/oxfordsemantic/jrdfox/exceptions/CursorNoLongerUsableException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions"><span class="typeNameLink">CursorNoLongerUsableException</span></a> - Exception in <a href="tech/oxfordsemantic/jrdfox/exceptions/package-summary.html">tech.oxfordsemantic.jrdfox.exceptions</a></dt>
 <dd>
 <div class="block">This exception is thrown when a method of <code>Cursor</code> is
@@ -808,7 +802,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Encapsulates information about a delta query.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DeltaQueryInfo.html#%3Cinit%3E(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int,long,long,long)">DeltaQueryInfo(String, String, Query, String, int, int, int, long, long, long)</a></span> - Constructor for class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a></dt>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DeltaQueryInfo.html#%3Cinit%3E(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long,long,long,long)">DeltaQueryInfo(String, String, Query, String, long, long, long, long, long, long)</a></span> - Constructor for class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/datalog/TupleTableName.html#DEPENDENCY_GRAPH">DEPENDENCY_GRAPH</a></span> - Static variable in class tech.oxfordsemantic.jrdfox.logic.datalog.<a href="tech/oxfordsemantic/jrdfox/logic/datalog/TupleTableName.html" title="class in tech.oxfordsemantic.jrdfox.logic.datalog">TupleTableName</a></dt>
 <dd>&nbsp;</dd>
@@ -927,6 +921,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/expression/FunctionCall.html#equal(tech.oxfordsemantic.jrdfox.logic.expression.Expression,tech.oxfordsemantic.jrdfox.logic.expression.Expression)">equal(Expression, Expression)</a></span> - Static method in class tech.oxfordsemantic.jrdfox.logic.expression.<a href="tech/oxfordsemantic/jrdfox/logic/expression/FunctionCall.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">FunctionCall</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/expression/FunctionCall.html#EQUAL">EQUAL</a></span> - Static variable in class tech.oxfordsemantic.jrdfox.logic.expression.<a href="tech/oxfordsemantic/jrdfox/logic/expression/FunctionCall.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">FunctionCall</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html#equals(java.lang.Object)">equals(Object)</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataSourceInfo.html#equals(java.lang.Object)">equals(Object)</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataSourceInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DataSourceInfo</a></dt>
 <dd>&nbsp;</dd>
@@ -1269,6 +1265,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns <code>true</code> if the import was aborted before processing all input(s) fully.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/Cursor.html#getIndexOfCurrentAnswerInWindow()">getIndexOfCurrentAnswerInWindow()</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/Cursor.html" title="interface in tech.oxfordsemantic.jrdfox.client">Cursor</a></dt>
+<dd>
+<div class="block">Returns the index of the current answer in the current window.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/sparql/statement/DeleteInsertUpdate.html#getInsertTemplate()">getInsertTemplate()</a></span> - Method in class tech.oxfordsemantic.jrdfox.logic.sparql.statement.<a href="tech/oxfordsemantic/jrdfox/logic/sparql/statement/DeleteInsertUpdate.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">DeleteInsertUpdate</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/Datatype.html#getIRI()">getIRI()</a></span> - Method in enum tech.oxfordsemantic.jrdfox.logic.<a href="tech/oxfordsemantic/jrdfox/logic/Datatype.html" title="enum in tech.oxfordsemantic.jrdfox.logic">Datatype</a></dt>
@@ -1363,6 +1363,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/sparql/path/NegativePath.html#getNegatedPaths()">getNegatedPaths()</a></span> - Method in class tech.oxfordsemantic.jrdfox.logic.sparql.path.<a href="tech/oxfordsemantic/jrdfox/logic/sparql/path/NegativePath.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.path">NegativePath</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/Cursor.html#getNumberOfAnswersInWindow()">getNumberOfAnswersInWindow()</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/Cursor.html" title="interface in tech.oxfordsemantic.jrdfox.client">Cursor</a></dt>
+<dd>
+<div class="block">Returns the number of answers in the current window.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/StatementResult.html#getNumberOfAttemptedDeletions()">getNumberOfAttemptedDeletions()</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/StatementResult.html" title="class in tech.oxfordsemantic.jrdfox.client">StatementResult</a></dt>
 <dd>
 <div class="block">Returns the number of tuples the statement tried to delete.</div>
@@ -1576,6 +1580,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns a boolean indicating whether the statement type supports a query body.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html#getSteps()">getSteps()</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></dt>
+<dd>
+<div class="block">Returns the steps of the commit procedure.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/ComponentInfo.html#getSubComponent(int)">getSubComponent(int)</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/ComponentInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">ComponentInfo</a></dt>
 <dd>
 <div class="block">Returns information about sub-component.</div>
@@ -1679,6 +1687,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Returns true if the rule contains aggregation in the body.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html#hashCode()">hashCode()</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/CommitProcedureInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">CommitProcedureInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataSourceInfo.html#hashCode()">hashCode()</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataSourceInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DataSourceInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataSourceTableInfo.html#hashCode()">hashCode()</a></span> - Method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataSourceTableInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DataSourceTableInfo</a></dt>
@@ -1831,6 +1841,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/Datatype.html#INVALID_DATATYPE">INVALID_DATATYPE</a></span> - tech.oxfordsemantic.jrdfox.logic.<a href="tech/oxfordsemantic/jrdfox/logic/Datatype.html" title="enum in tech.oxfordsemantic.jrdfox.logic">Datatype</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/Prefixes.DeclareResult.html#INVALID_PREFIX_NAME">INVALID_PREFIX_NAME</a></span> - tech.oxfordsemantic.jrdfox.<a href="tech/oxfordsemantic/jrdfox/Prefixes.DeclareResult.html" title="enum in tech.oxfordsemantic.jrdfox">Prefixes.DeclareResult</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions"><span class="typeNameLink">InvalidCursorStateException</span></a> - Exception in <a href="tech/oxfordsemantic/jrdfox/exceptions/package-summary.html">tech.oxfordsemantic.jrdfox.exceptions</a></dt>
+<dd>
+<div class="block">This exception is thrown when a cursor function is called and the cursor is an invalid state.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html#%3Cinit%3E()">InvalidCursorStateException()</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">InvalidCursorStateException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html#%3Cinit%3E(java.lang.String)">InvalidCursorStateException(String)</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">InvalidCursorStateException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html#%3Cinit%3E(java.lang.String,java.lang.Throwable)">InvalidCursorStateException(String, Throwable)</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/InvalidCursorStateException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">InvalidCursorStateException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="tech/oxfordsemantic/jrdfox/logic/sparql/path/InversePath.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.path"><span class="typeNameLink">InversePath</span></a> - Class in <a href="tech/oxfordsemantic/jrdfox/logic/sparql/path/package-summary.html">tech.oxfordsemantic.jrdfox.logic.sparql.path</a></dt>
 <dd>&nbsp;</dd>
@@ -2049,6 +2069,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Type marker for a tuple table that stores facts in memory.</div>
 </dd>
+<dt><a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions"><span class="typeNameLink">MemoryExhaustedException</span></a> - Exception in <a href="tech/oxfordsemantic/jrdfox/exceptions/package-summary.html">tech.oxfordsemantic.jrdfox.exceptions</a></dt>
+<dd>
+<div class="block">This exception is thrown when RDFox runs out of memory.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html#%3Cinit%3E()">MemoryExhaustedException()</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">MemoryExhaustedException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html#%3Cinit%3E(java.lang.String)">MemoryExhaustedException(String)</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">MemoryExhaustedException</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html#%3Cinit%3E(java.lang.String,java.lang.Throwable)">MemoryExhaustedException(String, Throwable)</a></span> - Constructor for exception tech.oxfordsemantic.jrdfox.exceptions.<a href="tech/oxfordsemantic/jrdfox/exceptions/MemoryExhaustedException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">MemoryExhaustedException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="tech/oxfordsemantic/jrdfox/logic/sparql/pattern/MinusPattern.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.pattern"><span class="typeNameLink">MinusPattern</span></a> - Class in <a href="tech/oxfordsemantic/jrdfox/logic/sparql/pattern/package-summary.html">tech.oxfordsemantic.jrdfox.logic.sparql.pattern</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/expression/FunctionCall.html#MOD">MOD</a></span> - Static variable in class tech.oxfordsemantic.jrdfox.logic.expression.<a href="tech/oxfordsemantic/jrdfox/logic/expression/FunctionCall.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">FunctionCall</a></dt>
@@ -2388,11 +2418,11 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Registers a data source with a data store.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,int,int,int)">registerDeltaQuery(String, String, String, int, int, int)</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client">DataStoreConnection</a></dt>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,long,long,long)">registerDeltaQuery(String, String, String, long, long, long)</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client">DataStoreConnection</a></dt>
 <dd>
 <div class="block">Registers a delta query with a data store.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int)">registerDeltaQuery(String, Query, String, int, int, int)</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client">DataStoreConnection</a></dt>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long)">registerDeltaQuery(String, Query, String, long, long, long)</a></span> - Method in interface tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/DataStoreConnection.html" title="interface in tech.oxfordsemantic.jrdfox.client">DataStoreConnection</a></dt>
 <dd>
 <div class="block">Registers a delta query with a data store.</div>
 </dd>
@@ -2607,6 +2637,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dd>
 <div class="block">Starts the server using the supplied parameters and returns the number of data stores in the server (or -1 is the server is already running).</div>
 </dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#startEndpoint(java.util.Map)">startEndpoint(Map&lt;String, String&gt;)</a></span> - Static method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/RDFoxServer.html" title="class in tech.oxfordsemantic.jrdfox.client">RDFoxServer</a></dt>
+<dd>
+<div class="block">Starts the endpoint using the supplied parameters.</div>
+</dd>
 <dt><a href="tech/oxfordsemantic/jrdfox/logic/sparql/statement/Statement.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement"><span class="typeNameLink">Statement</span></a> - Class in <a href="tech/oxfordsemantic/jrdfox/logic/sparql/statement/package-summary.html">tech.oxfordsemantic.jrdfox.logic.sparql.statement</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/logic/sparql/statement/Statement.html#%3Cinit%3E()">Statement()</a></span> - Constructor for class tech.oxfordsemantic.jrdfox.logic.sparql.statement.<a href="tech/oxfordsemantic/jrdfox/logic/sparql/statement/Statement.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Statement</a></dt>
@@ -2629,7 +2663,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#stop()">stop()</a></span> - Static method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/RDFoxServer.html" title="class in tech.oxfordsemantic.jrdfox.client">RDFoxServer</a></dt>
 <dd>
-<div class="block">Stops the server, or does nothing if the server is not running.</div>
+<div class="block">Stops the server and the endpoint (in case the latter is currently running), or does nothing if the server is not running.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/ImportNotificationMonitor.NotificationAction.html#STOP_IMPORT_NO_EXCEPTION">STOP_IMPORT_NO_EXCEPTION</a></span> - tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/ImportNotificationMonitor.NotificationAction.html" title="enum in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor.NotificationAction</a></dt>
 <dd>
@@ -2638,6 +2672,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/ImportNotificationMonitor.NotificationAction.html#STOP_IMPORT_WITH_EXCEPTION">STOP_IMPORT_WITH_EXCEPTION</a></span> - tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/ImportNotificationMonitor.NotificationAction.html" title="enum in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor.NotificationAction</a></dt>
 <dd>
 <div class="block">Importation should be stopped and an exception describing the current notification should be thrown.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="tech/oxfordsemantic/jrdfox/client/RDFoxServer.html#stopEndpoint()">stopEndpoint()</a></span> - Static method in class tech.oxfordsemantic.jrdfox.client.<a href="tech/oxfordsemantic/jrdfox/client/RDFoxServer.html" title="class in tech.oxfordsemantic.jrdfox.client">RDFoxServer</a></dt>
+<dd>
+<div class="block">Stops the endpoint if the endpoint is currently running, or does nothing.</div>
 </dd>
 <dt><a href="tech/oxfordsemantic/jrdfox/logic/sparql/pattern/SubselectPattern.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.pattern"><span class="typeNameLink">SubselectPattern</span></a> - Class in <a href="tech/oxfordsemantic/jrdfox/logic/sparql/pattern/package-summary.html">tech.oxfordsemantic.jrdfox.logic.sparql.pattern</a></dt>
 <dd>&nbsp;</dd>

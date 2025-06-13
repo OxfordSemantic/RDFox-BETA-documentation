@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>23. Release Notes &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Release Notes &mdash; RDFox  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/ost_theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/dev-favicon.ico"/>
@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="24. Acknowledgments" href="acknowledgments.html" />
+    <link rel="next" title="Security Advisories" href="security-advisories.html" />
     <link rel="prev" title="22. RDFox Docker Images" href="docker.html" />
     <!-- Start of HubSpot Cookie Blocking Code -->
     <script type="application/javascript" id="hs-cookie-banner-scan" data-hs-allowed="true" src="https://js.hs-banner.com/cookie-scanning/6485449/4b9c57c39524d7b4a85dd163da87b1d54dc9b0e11f55359272e78d1092aa8d77.js"></script>
@@ -147,12 +147,13 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">23. Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#experimental-features">23.1. Experimental features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#releases">23.2. Releases</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Release Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#experimental-features">Experimental features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#releases">Releases</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -169,7 +170,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active"><span class="section-number">23. </span>Release Notes</li>
+      <li class="breadcrumb-item active">Release Notes</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -179,9 +180,9 @@
            <div itemprop="articleBody">
              
   <div class="section" id="release-notes">
-<span id="id1"></span><h1><span class="section-number">23. </span>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="experimental-features">
-<h2><span class="section-number">23.1. </span>Experimental features<a class="headerlink" href="#experimental-features" title="Permalink to this headline">¶</a></h2>
+<h2>Experimental features<a class="headerlink" href="#experimental-features" title="Permalink to this headline">¶</a></h2>
 <p>From time to time, RDFox® releases may include experimental features not
 intended for use in production. In these cases, the affected APIs will
 clearly be labeled “EXPERIMENTAL” meaning that they may change or
@@ -193,9 +194,74 @@ whether experimental or not, we would be grateful to hear it via any of
 the normal channels.</p>
 </div>
 <div class="section" id="releases">
-<h2><span class="section-number">23.2. </span>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
+<h2>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>Release 7.3 (TBD)</dt><dd><ul class="simple">
+<dt>Release 7.4 (????????????????)</dt><dd><ul class="simple">
+<li><p>Added a data source type <code class="docutils literal notranslate"><span class="pre">lucene</span></code> for integrating with Apache Lucene
+(RD-2270). See <a class="reference internal" href="data-sources.html#registering-lucene-data-sources"><span class="std std-numref">Section 7.1.3</span></a> for details.</p></li>
+<li><p>Added a data source type <code class="docutils literal notranslate"><span class="pre">SQLite</span></code> for integrating with SQLite (RD-2181).
+See <a class="reference internal" href="data-sources.html#registering-sqlite-data-sources"><span class="std std-numref">Section 7.1.4.2</span></a> for details.</p></li>
+<li><p>The dictionary that stores the resources in a data store has been optimized
+to reduce memory usage (RD-1984). Moreover, XSDDateTime and XSDDuration
+resources are now stored in a more compact format (RD-1974).</p></li>
+<li><p>The RDFox Console has been redesigned to improve usability (RD-1683).</p></li>
+<li><p>The C and C++ APIs are no longer EXPERIMENTAL (RD-2214).</p></li>
+<li><p>The endpoint has been modified to ensure that it remains responsive even
+when the server is under heavy load (RD-2205).</p></li>
+<li><p>The code for querying a data source as part of a SPARQL query has been
+rewritten to improve performance by batching calls to the external source
+(RD-1416).</p></li>
+<li><p>Added a new server parameter <code class="docutils literal notranslate"><span class="pre">persistence.snapshot-restore-mode</span></code>
+controlling how new snapshots are restored by an instance using
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence (RD-2301). See documentation of this
+parameter within <a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a> for details.</p></li>
+<li><p>Replaced the SPARQL <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> implementation to provide consistent
+performance across all Operating Systems (RD-2167).</p></li>
+<li><p>RDFox server directory files are now stored in a subdirectory named
+<code class="docutils literal notranslate"><span class="pre">current</span></code> and include human-readable file headers (RD-2275 &amp; RD-2276).
+This addresses a previous issue where version upgrades could result in files
+being created outside the server directory.</p></li>
+<li><p>The data store parameter <code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code> was removed.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">init</span></code> mode now requires a <code class="docutils literal notranslate"><span class="pre">channel</span></code> endpoint parameter to be
+explicitly supplied.</p></li>
+<li><p>Fixed a bug in the <code class="docutils literal notranslate"><span class="pre">ODBC</span></code> data source, where if the ODBC driver
+miss-reported the width of a column, data within that column could be
+improperly truncated during transmission (RD-2339).</p></li>
+<li><p>Fixed a bug where extreme XSDDuration values could overflow during
+parsing, causing the stored duration to be incorrect (RD-2344).</p></li>
+</ul>
+</dd>
+<dt>Release 7.3d (3rd April 2025)</dt><dd><ul class="simple">
+<li><p>Fixed a bug in the <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> built-in tuple table that produced
+identifiers containing the contents of an uninitialized memory buffer for
+some input IRIs (RD-2210). This issue could be exploited by an attacker to
+capture whatever data was in the same piece of memory when it was
+allocated. See the security advisory <a class="reference internal" href="security-advisories.html#security-advisories-rd-2210"><span class="std std-ref">RD-2210 - 2.3 (Low)</span></a> for
+more details.</p></li>
+</ul>
+</dd>
+<dt>Release 7.3c (12th March 2025)</dt><dd><ul class="simple">
+<li><p>Fixed a buffer overrun in the implementation of the API for initializing a
+new session.</p></li>
+<li><p>Fixed a crash when using the APIs for session-based authentication when
+OpenSSL is not available (RD-2148).</p></li>
+<li><p>Fixed a bug in the restoration of data stores containing delta queries
+and/or commit procedures which could result in inconsistencies between
+replicas in a HA setup.</p></li>
+<li><p>Fixed a bug that could lead to a crash when compacting data stores with
+multiple populated tables where at least one resource is not referenced in
+all tables (RD-2198).</p></li>
+<li><p>Fixed a bug that could lead to incorrect answers for queries with
+expressions that use N-ary addition or multiplication of temporary values
+(RD-2186).</p></li>
+</ul>
+</dd>
+<dt>Release 7.3a (5th February 2025)</dt><dd><ul class="simple">
+<li><p>Fixed a bug that led to errors when querying a data store containing
+<code class="docutils literal notranslate"><span class="pre">xsd:boolean</span></code> values after compaction (RD-2143).</p></li>
+</ul>
+</dd>
+<dt>Release 7.3 (3rd February 2025)</dt><dd><ul class="simple">
 <li><p>The RDFox Console has a new login experience with support for both
 password-based and OpenID Connect authentication (RD-1620). See
 <a class="reference internal" href="access-control.html#authentication-managers"><span class="std std-numref">Section 12.3</span></a> for details of how to configure
@@ -213,25 +279,30 @@ indexes and thus consume less memory than their full indexing counterparts
 <code class="docutils literal notranslate"><span class="pre">quad-table-sg</span></code> table types have been renamed to <code class="docutils literal notranslate"><span class="pre">triple-table-fi</span></code>,
 <code class="docutils literal notranslate"><span class="pre">quad-table-lg-fi</span></code> and <code class="docutils literal notranslate"><span class="pre">quad-table-sg-fi</span></code> respectively.</p></li>
 <li><p>Added an API call and shell command to check the integrity of the server
-(RD-1962). See <a class="reference internal" href="apis.html#apis-checking-server-integrity"><span class="std std-numref">Section 16.3.3</span></a> and
+(RD-1962). See <a class="reference internal" href="apis.html#apis-checking-server-integrity"><span class="std std-numref">Section 16.4.3</span></a> and
 <a class="reference internal" href="rdfox-shell.html#checkintegrity-command"><span class="std std-numref">Section 15.2.5</span></a>.</p></li>
 <li><p>Added API support for session-based authentication (RD-1811). See
-<a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.2.1.1.2</span></a>.</p></li>
+<a class="reference internal" href="apis.html#rest-sessions"><span class="std std-numref">Section 16.3.1.1.2</span></a>.</p></li>
 <li><p>Added support for authenticating external agents with client certificates
-(RD-2026). See <a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a>.</p></li>
+(RD-2026). See <a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.3.1.1.3</span></a>.</p></li>
 <li><p>Added new <code class="docutils literal notranslate"><span class="pre">DAY_OF_THE_WEEK()</span></code> function returning the weekday
 number (RD-2063). See <a class="reference internal" href="querying.html#built-in-functions"><span class="std std-numref">Section 9.2</span></a>.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">server-directory</span></code> server parameter can now be set to the empty
 string to explicitly specify that no server directory should be used. This
 is useful for launching in-memory daemon processes.</p></li>
+<li><p>The RDFox Console’s SPARQL page now supports downloading result sets of
+arbitrary size (RD-1961). Downloading, very large result sets may require
+an increase in the value configured for the <code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> endpoint
+parameter (see <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p></li>
+<li><p>The endpoint parameter <code class="docutils literal notranslate"><span class="pre">credentials-passphrase</span></code> can now be set via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_ENDPOINT_CREDENTIALS_PASSPHRASE</span></code> environment variable (RD-2131).</p></li>
+<li><p>ETag values returned by the endpoint now include the content type of the
+response, if it has one. This improves cache control by browsers. See
+<a class="reference internal" href="apis.html#rest-detecting-updates"><span class="std std-numref">Section 16.18.1.2</span></a>.</p></li>
 <li><p>Non-printable characters and UNICODE surrogates can no longer be used in
 names (e.g. data store names, role names, etc.) (RD-1954, RD-1964). As part
 of this change, RDFox now also validates that the UTF-8 encoding of such
 names is valid.</p></li>
-<li><p>The Console’s download feature now supports downloading result sets of
-arbitrary size (RD-1961). Downloading, very large result sets may require
-an increase in the value configured for the <code class="docutils literal notranslate"><span class="pre">query-time-limit</span></code> endpoint
-parameter (see <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p></li>
 <li><p>Fixed an issue where RDFox shell variables could be expanded to multiple
 arguments/tokens within a single command (RD-1951).</p></li>
 <li><p>Fixed an issue where RDFox could spuriously report an out of memory error
@@ -249,9 +320,12 @@ zero (RD-2099).</p></li>
 strings longer than 15000 characters), could cause a hang (RD-2100).</p></li>
 <li><p>Fixed an issue with the persistence of data stores loaded from one of the
 two binary formats. (RD-2115).</p></li>
+<li><p>Fixed an issue where RDFox over-reported memory usage. If the optional
+<cite>-max-memory</cite> server parameter is set to a small value, this could cause the
+server to incorrectly reach the memory limit (RD-2122).</p></li>
 </ul>
 </dd>
-<dt>Release 7.2c (8th January 2024)</dt><dd><ul class="simple">
+<dt>Release 7.2c (8th January 2025)</dt><dd><ul class="simple">
 <li><p>Fixed a crash affecting some queries with <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> expressions inside
 <code class="docutils literal notranslate"><span class="pre">OPTIONAL</span></code> (RD-2094).</p></li>
 <li><p>Fixed an issue where a rolling back a transaction in which a delta query
@@ -312,7 +386,7 @@ RDFox version, before attempting the upgrade.</p></li>
 <li><p>Compaction now automatically recovers disk space in all cases (RD-1844).
 The <code class="docutils literal notranslate"><span class="pre">delete-redundant-files</span></code> parameter of the operation has been removed.</p></li>
 <li><p>Roles can now be created without passwords (RD-1815). See
-<a class="reference internal" href="apis.html#apis-managing-roles"><span class="std std-numref">Section 16.18</span></a> for details of the APIs for creating roles
+<a class="reference internal" href="apis.html#apis-managing-roles"><span class="std std-numref">Section 16.19</span></a> for details of the APIs for creating roles
 and <a class="reference internal" href="rdfox-shell.html#role-command"><span class="std std-numref">Section 15.2.39</span></a> for how to create roles in the RDFox shell.</p></li>
 <li><p>Improved the automatic management of database connections in PostgreSQL
 and ODBC data sources (RD-1873).</p></li>
@@ -480,7 +554,7 @@ shell client in <a class="reference internal" href="rdfox-executable.html#remote
 <li><p>Data stores with persistence enabled can now be brought offline in order to
 free up memory, and brought back online when they are needed again
 (RD-1650). See <a class="reference internal" href="rdfox-shell.html#dstore-command"><span class="std std-numref">Section 15.2.17</span></a> for details of how to do this in
-the shell and <a class="reference internal" href="apis.html#apis-bringing-a-data-store-offline-online"><span class="std std-numref">Section 16.4.5</span></a> for how
+the shell and <a class="reference internal" href="apis.html#apis-bringing-a-data-store-offline-online"><span class="std std-numref">Section 16.5.5</span></a> for how
 to do it programmatically. The newly-introduced server parameter
 <code class="docutils literal notranslate"><span class="pre">all-data-stores-online-on-startup</span></code> can be set to <code class="docutils literal notranslate"><span class="pre">false</span></code> to start the
 server with all data stores initially offline.</p></li>
@@ -492,11 +566,11 @@ persistence. See <a class="reference internal" href="rdfox-executable.html#rdfox
 all modes of the RDFox executable.</p></li>
 <li><p>The RDFox Update Protocol now supports selective replacement of data store
 content (e.g., replacing just the rules in one RESTful API call); see
-<a class="reference internal" href="apis.html#rdfox-update-protocol-put"><span class="std std-numref">Section 16.9.2.6</span></a>.</p></li>
+<a class="reference internal" href="apis.html#rdfox-update-protocol-put"><span class="std std-numref">Section 16.10.2.6</span></a>.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">/content</span></code> key now implements the <a class="reference external" href="http://www.w3.org/TR/sparql11-http-rdf-update/">SPARQL 1.1 Graph Store HTTP
 Protocol</a> fully, as well
 as a proprietary RDFox Update Protocol (see
-<a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.9</span></a>).</p></li>
+<a class="reference internal" href="apis.html#apis-managing-content"><span class="std std-numref">Section 16.10</span></a>).</p></li>
 <li><p>RDFox now supports automatic compaction and automatic dead fact removal to
 help reclaim memory and minimise restart times after facts are deleted from
 a data store (see <a class="reference internal" href="data-stores.html#compaction-dead-fact-removal"><span class="std std-numref">Section 5.2.4</span></a>).</p></li>
@@ -519,7 +593,7 @@ work with data stores that have a value for the parameter (RD-1595).</p></li>
 compacting, etc., are now invoked by sending <code class="docutils literal notranslate"><span class="pre">POST</span></code> requests to path
 <code class="docutils literal notranslate"><span class="pre">/datastores/&lt;DSTRNAME&gt;/operations</span></code> rather than to
 <code class="docutils literal notranslate"><span class="pre">/datastore/&lt;DSTRNAME&gt;</span></code>. See
-<a class="reference internal" href="apis.html#rest-invoking-data-store-operations"><span class="std std-numref">Section 16.4.8</span></a> for the complete list of
+<a class="reference internal" href="apis.html#rest-invoking-data-store-operations"><span class="std std-numref">Section 16.5.8</span></a> for the complete list of
 operations available using the new path (RD-1640).</p></li>
 <li><p>The server parameters <code class="docutils literal notranslate"><span class="pre">persist-roles</span></code> and <code class="docutils literal notranslate"><span class="pre">persist-ds</span></code>, which formerly
 controlled persistence of roles and data stores respectively, have been
@@ -746,7 +820,7 @@ referring to triples in named graphs. See <a class="reference internal" href="re
 <li><p>Each data store is now associated with a base IRI and a set of prefixes
 that are assumed to be implicitly present in all API calls. All RDFox APIs
 have been extended to support management of this information (see
-<a class="reference internal" href="apis.html#apis-data-store-prefixes"><span class="std std-numref">Section 16.6</span></a>). New data stores are populated with a
+<a class="reference internal" href="apis.html#apis-data-store-prefixes"><span class="std std-numref">Section 16.7</span></a>). New data stores are populated with a
 set of default prefixes and the default base IRI
 <code class="docutils literal notranslate"><span class="pre">https://rdfox.com/default-base-iri/</span></code>. RDFox shell instances no longer
 maintain a base IRI nor a set of prefixes and the <code class="docutils literal notranslate"><span class="pre">base</span></code>, <code class="docutils literal notranslate"><span class="pre">prefix</span></code> and
@@ -1375,13 +1449,13 @@ unconditional case mappings as defined by the Unicode Standard 11.0 (RD-8)</p></
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="docker.html" class="btn btn-neutral float-left" title="22. RDFox Docker Images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="acknowledgments.html" class="btn btn-neutral float-right" title="24. Acknowledgments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="security-advisories.html" class="btn btn-neutral float-right" title="Security Advisories" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

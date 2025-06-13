@@ -119,8 +119,9 @@ is:
 
 If the ``server-directory`` parameter is not specified in the command, the
 default value for the OS user account is used (see above). If the
-``persistence`` parameter is not specified, or it is specified with value
-``off`` the process will return an error.
+``persistence`` server parameter is not specified, or it is specified with
+value ``off`` the process will return an error. If the ``channel`` endpoint 
+parameter is not specified, the process will return an error.
 
 A role and password are required by this mode in order to create the first
 server role. If either are absent from both the command arguments and

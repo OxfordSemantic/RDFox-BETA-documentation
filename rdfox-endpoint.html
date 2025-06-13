@@ -155,8 +155,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -217,8 +218,24 @@ be specified as a verbatim port number or as a <a class="reference external" hre
 can also be specified using <code class="docutils literal notranslate"><span class="pre">service-name</span></code>; moreover, if both options are
 present, then <code class="docutils literal notranslate"><span class="pre">port</span></code> takes precedence.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">num-http-workers</span></code> determines the number of threads that the endpoint will
-use to process RESTful requests. The default value is one less than the
-number of logical processors of the machine on which RDFox is run.</p></li>
+use to process RESTful requests. The default value is the larger of 8 and the
+number of logical processors on the machine. For settings of 2 or more, the
+system will limit the number of threads servicing long-running requests so
+that at least one thread remains available for observing and controlling the
+system. This includes the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>checking the endpoint health (<code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/health</span></code>),</p></li>
+<li><p>fetching information about the server (<code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/</span></code>),</p></li>
+<li><p>listing requests (<code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/requests</span></code>),</p></li>
+<li><p>cancelling requests (<code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/requests/{id}</span></code>),</p></li>
+<li><p>serving the console (<code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/console</span></code>),</p></li>
+<li><p>various other operations.</p></li>
+</ul>
+</div></blockquote>
+<p>When servicing a new request would exceed the limit, the client will receive
+status code <code class="docutils literal notranslate"><span class="pre">429</span> <span class="pre">-</span> <span class="pre">Too</span> <span class="pre">Many</span> <span class="pre">Requests</span></code>.</p>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">channel-timeout</span></code> determines the length of time that the endpoint will wait
 for I/O while servicing HTTP(S) requests. That is, if the endpoint tries to
 read from or write to the TCP connection, the respective I/O will wait for
@@ -330,17 +347,18 @@ the credentials. The file content must have the same format as the
 <code class="docutils literal notranslate"><span class="pre">credentials</span></code> parameter.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">credentials-passphrase</span></code> provides the passphrase that can be used to
 decrypt the credentials in case they are encrypted. This parameter is
-optional.</p></li>
+optional. It can alternatively be set via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_ENDPOINT_CREDENTIALS_PASSPHRASE</span></code> environment variable.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">min-secure-protocol</span></code> determines the minimum protocol version that the
 server should use. The allowed values are <code class="docutils literal notranslate"><span class="pre">ssl3</span></code>, <code class="docutils literal notranslate"><span class="pre">tls1</span></code>, <code class="docutils literal notranslate"><span class="pre">tls11</span></code>,
 <code class="docutils literal notranslate"><span class="pre">tls12</span></code>, and <code class="docutils literal notranslate"><span class="pre">tls13</span></code>. The default value is <code class="docutils literal notranslate"><span class="pre">tls12</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">request-client-certificates</span></code> specifies whether the server should
 request client certificates during TLS handshakes. See
-<a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a> for more information.</p></li>
+<a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.3.1.1.3</span></a> for more information.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">trusted-root-certificate</span></code> specifies a Certificate Authority (CA)
 certificate that should be trusted, in PEM format. This will be used in
 addition to the default trust anchors for the loaded OpenSSL library. See
-<a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.2.1.1.3</span></a> for more information.</p></li>
+<a class="reference internal" href="apis.html#rest-client-certificates"><span class="std std-numref">Section 16.3.1.1.3</span></a> for more information.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">trusted-root-certificate-file</span></code> specifies the name of a file that
 contains the trusted root certificate. The file content must have the same
 format as the <code class="docutils literal notranslate"><span class="pre">trusted-root-certificate</span></code> parameter.</p></li>
@@ -473,7 +491,7 @@ disconnected.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

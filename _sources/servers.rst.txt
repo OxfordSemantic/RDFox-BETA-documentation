@@ -104,7 +104,7 @@ different kinds of data containers.
   applications of RDFox, and they are described in more detail in
   :numref:`built-in-tuple-tables`.
 
-- *Data source tuple tables* provide a 'virtual view' over data in non-RDF data
+- *Data source tuple tables* provide a "virtual view" over data in non-RDF data
   sources, such as CSV files, relational databases, or an Apache Solr index.
   Importing external data is explained in detail in :numref:`data-sources`.
 
@@ -117,13 +117,41 @@ in :numref:`fact-domains`.
 Data Sources
 ~~~~~~~~~~~~
 
-To support accessing data in formats other than RDFox, one or more data sources
-can be registered with a data store. Registering a data source requires
-specifying a number of parameters that govern how the data is accessed. Each
-data source is identified by a name that is unique for the data store. The
-access to the actual data is provided by data source tuple tables, which are
-created by referencing previously registered data sources. The process of
-accessing external data sources is described in more detail in
+To support accessing data in external repositories, RDFox provides the concept
+of *data sources*. A data source models one external repository such as a CSV
+file or a relational database. To access the data, a data source must first be
+registered with a data store using any of the APIs supported by RDFox. When a
+data source is registered, a unique name for the data source must be specified
+to allow further reference to the data source; moreover, parameters in form of
+key-value pairs can be specified to determine how exactly the data is to be
+accessed.
+
+A data source provides a view over the "raw" data by means of *data source
+tables*. For example, a data source backed by a CSV file will provide one data
+source table that shows the raw data in the file, and a data source backed by a
+relational database will provide a data source table for each relation in the
+database. Data in a data source table may not be in a format that is amenable
+to processing using RDFox. For example, the data may be of invalid type, it may
+be structured in a way that matches the RDF graph (e.g., a database might
+contain employees' first and last names as separate fields, whereas the RDF
+graph might expect them to be concatenated into a single string), and it may
+use identifiers that do not correspond to the identifies used in the RDF graph
+stored in RDFox. Because of this, a data source table provides just a "preview"
+of the data in the data source, and various RDFox APIs provide only the ability
+to sample a data source table.
+
+To access the data in a data source, data source tables need to be mapped into
+*data source tuple tables*. A data source tuple table is conceptually just
+another type of tuple table and so it can be used in queries and rules just
+like any other tuple table. When a data source tuple table is registered with a
+data store, users typically provide parameters specifying how the data in a
+data source table is transformed into a format that integrates well with the
+RDF graph. For example, the parameters can specify how to bridge the gap
+between the datatypes in the data source and the ones expected by the graph.
+Furthermore, parameters can also be used to specify how to transform the source
+data into identifiers (e.g., IRIs) that occur in the graph.
+
+The process of accessing external data sources is described in more detail in
 :numref:`data-sources`.
 
 .. _axioms:
@@ -363,6 +391,20 @@ that control the behavior of authentication managers, which are documented in
    |                                                  |                                 | environment variable.                           |
    |                                                  |                                 | By default, this parameter is unset.            |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``jvm.options``                                  | a string                        | Specifies the JVM options for Lucene data       |
+   |                                                  |                                 | sources. If this parameter is set, the server   |
+   |                                                  |                                 | will use it to launch a Java Virtual Machine    |
+   |                                                  |                                 | within the current process using the provided   |
+   |                                                  |                                 | options. For Lucene data sources, appropriate   |
+   |                                                  |                                 | JVM options including the classpath for Lucene  |
+   |                                                  |                                 | libraries must be specified.                    |
+   |                                                  |                                 | See :numref:`registering-lucene-data-sources`   |
+   |                                                  |                                 | for more information.                           |
+   |                                                  |                                 | This parameter may alternatively be             |
+   |                                                  |                                 | supplied via the ``RDFOX_JVM_OPTIONS``          |
+   |                                                  |                                 | environment variable.                           |
+   |                                                  |                                 | By default, this parameter is unset.            |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
    | ``license.content``                              | a string                        | Specifies the license content verbatim.         |
    |                                                  |                                 | This parameter is not set by default.           |
    |                                                  |                                 | See :numref:`rdfox-license-key` for             |
@@ -379,7 +421,7 @@ that control the behavior of authentication managers, which are documented in
    |                                                  |                                 | options.                                        |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
    | ``max-memory``                                   | an integer                      | Specifies the initial value for the             |
-   |                                                  |                                 | maximum of memory (in MB) that the RDFox        |
+   |                                                  |                                 | maximum of memory in MB that the RDFox          |
    |                                                  |                                 | instance should use. The default is 0.9         |
    |                                                  |                                 | times the installed memory.                     |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
@@ -449,6 +491,32 @@ that control the behavior of authentication managers, which are documented in
    |                                                  |                                 | the instance will neither listen for nor        |
    |                                                  |                                 | send notifications. See also                    |
    |                                                  |                                 | :numref:`replication-performance`.              |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``persistence.snapshot-restore-mode``            | ``adaptive``,                   | Determines how new snapshots are restored when  |
+   |                                                  | ``highly-available`` or         | ``file-sequence`` persistence is used.          |
+   |                                                  | ``memory-efficient``            |                                                 |
+   |                                                  |                                 | Value ``highly-available`` ensures that the     |
+   |                                                  |                                 | data store is locked for the shortest possible  |
+   |                                                  |                                 | time by first loading the new snapshot into     |
+   |                                                  |                                 | fresh memory before acquiring an exclusive lock,|
+   |                                                  |                                 | updating internal references to point to the    |
+   |                                                  |                                 | new copy, releasing the lock and then deleting  |
+   |                                                  |                                 | the old copy. In the worst case, this will      |
+   |                                                  |                                 | temporarily double the memory allocated with the|
+   |                                                  |                                 | data store being restored.                      |
+   |                                                  |                                 |                                                 |
+   |                                                  |                                 | Value ``memory-efficient`` ensures that         |
+   |                                                  |                                 | snapshots are restored without requiring        |
+   |                                                  |                                 | substantial additional memory by first acquiring|
+   |                                                  |                                 | an exclusive lock immediately, clearing the     |
+   |                                                  |                                 | existing data store (freeing memory) and        |
+   |                                                  |                                 | repopulating it from the new snapshot file.     |
+   |                                                  |                                 |                                                 |
+   |                                                  |                                 | Value ``adaptive`` attempts to follow the       |
+   |                                                  |                                 | strategy described for the ``highly-available`` |
+   |                                                  |                                 | option but falls back to the                    |
+   |                                                  |                                 | ``memory-efficient`` strategy if allocation     |
+   |                                                  |                                 | fails. This is the default option.              |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
    | ``role-manager.argon2i.memory-cost``             | a non-negative integer          | See                                             |
    |                                                  |                                 | :numref:`role-manager-configuration-parameters` |

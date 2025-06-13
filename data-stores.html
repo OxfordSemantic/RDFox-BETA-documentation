@@ -131,16 +131,15 @@
 <li class="toctree-l3"><a class="reference internal" href="#data-store-parameters">5.4.1. Data Store Parameters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#default-graph-name">5.4.1.1. <code class="docutils literal notranslate"><span class="pre">default-graph-name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#equality">5.4.1.2. <code class="docutils literal notranslate"><span class="pre">equality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#init-resource-capacity">5.4.1.3. <code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#init-tuple-capacity">5.4.1.4. <code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#max-data-pool-size">5.4.1.5. <code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#max-resource-capacity">5.4.1.6. <code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#max-tuple-capacity">5.4.1.7. <code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#persistence">5.4.1.8. <code class="docutils literal notranslate"><span class="pre">persistence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#quad-table-type">5.4.1.9. <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#swrl-negation-as-failure">5.4.1.10. <code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#triple-table-type">5.4.1.11. <code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#type">5.4.1.12. <code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#init-tuple-capacity">5.4.1.3. <code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-data-pool-size">5.4.1.4. <code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-resource-capacity">5.4.1.5. <code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#max-tuple-capacity">5.4.1.6. <code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#persistence">5.4.1.7. <code class="docutils literal notranslate"><span class="pre">persistence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quad-table-type">5.4.1.8. <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swrl-negation-as-failure">5.4.1.9. <code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#triple-table-type">5.4.1.10. <code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#type">5.4.1.11. <code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#data-store-properties">5.4.2. Data Store Properties</a><ul>
@@ -191,8 +190,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="release-notes.html">23. Release Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">24. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-advisories.html">Security Advisories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 </ul>
 
         </div>
@@ -415,8 +415,9 @@ set to <code class="docutils literal notranslate"><span class="pre">off</span></
 </div>
 <div class="section" id="supported-data-types-for-literals">
 <span id="literal-data-types"></span><h2><span class="section-number">5.3. </span>Supported Data Types for Literals<a class="headerlink" href="#supported-data-types-for-literals" title="Permalink to this headline">¶</a></h2>
-<p>As well as IRIs and blank nodes, RDFox data stores can store literal values in
-the following formats:</p>
+<p>As well as IRIs and blank nodes, RDFox data stores can store literal values of
+the following datatypes, all of which comply fully with the <a class="reference external" href="https://www.w3.org/TR/xmlschema11-2/">XML Schema
+Datatypes 1.1 specification</a>.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 100%" />
@@ -484,16 +485,19 @@ the following formats:</p>
 </tr>
 <tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#byte</p></td>
 </tr>
-<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#unsignedLong</p></td>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#unsignedInt</p></td>
 </tr>
-<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#unsignedInt</p></td>
+<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#unsignedShort</p></td>
 </tr>
-<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#unsignedShort</p></td>
-</tr>
-<tr class="row-even"><td><p>http://www.w3.org/2001/XMLSchema#unsignedByte</p></td>
+<tr class="row-odd"><td><p>http://www.w3.org/2001/XMLSchema#unsignedByte</p></td>
 </tr>
 </tbody>
 </table>
+<p>In addition, RDFox partially supports the
+<cite>http://www.w3.org/2001/XMLSchema#unsignedLong</cite> datatype: only the values
+between zero and 9223372036854775807 are supported. This partial implementation
+thus allows RDFox to import some, but not all datasets containing literals of
+this datatype.</p>
 </div>
 <div class="section" id="data-store-configuration">
 <span id="id3"></span><h2><span class="section-number">5.4. </span>Data Store Configuration<a class="headerlink" href="#data-store-configuration" title="Permalink to this headline">¶</a></h2>
@@ -549,17 +553,8 @@ contradiction.</p>
 <p><strong>Note</strong> RDFox will reject rules that use negation-as-failure or aggregation in
 all <code class="docutils literal notranslate"><span class="pre">equality</span></code> modes other than <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
 </div>
-<div class="section" id="init-resource-capacity">
-<h4><span class="section-number">5.4.1.3. </span><code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code><a class="headerlink" href="#init-resource-capacity" title="Permalink to this headline">¶</a></h4>
-<p>The value of the <code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code> option is an integer that is used
-as a hint to the data store specifying the number of resources that the store
-will contain. This hint is used to initialize certain data structures to the
-sizes that ensure faster importation of data. The actual number of resources
-that a data store can contain is not limited by this option: RDFox will resize
-the data structures as needed if this hint is exceeded.</p>
-</div>
 <div class="section" id="init-tuple-capacity">
-<h4><span class="section-number">5.4.1.4. </span><code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code><a class="headerlink" href="#init-tuple-capacity" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">5.4.1.3. </span><code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code><a class="headerlink" href="#init-tuple-capacity" title="Permalink to this headline">¶</a></h4>
 <p>The value of the <code class="docutils literal notranslate"><span class="pre">init-tuple-capacity</span></code> option is an integer that is used as a
 hint to the data store specifying the number of tuples that the store will
 contain. This hint is used to initialize certain data structures to the sizes
@@ -568,28 +563,28 @@ store can contain is not limited by this option: RDFox will resize the data
 structures as needed if this hint is exceeded.</p>
 </div>
 <div class="section" id="max-data-pool-size">
-<h4><span class="section-number">5.4.1.5. </span><code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code><a class="headerlink" href="#max-data-pool-size" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">5.4.1.4. </span><code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code><a class="headerlink" href="#max-data-pool-size" title="Permalink to this headline">¶</a></h4>
 <p>The value of the <code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code> option is an integer that determines the
 maximum number of bytes that RDFox can use to store resource values (e.g., IRIs
 and strings). Specifying this option can reduce significantly the amount of
 virtual memory that RDFox uses per data store.</p>
 </div>
 <div class="section" id="max-resource-capacity">
-<h4><span class="section-number">5.4.1.6. </span><code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code><a class="headerlink" href="#max-resource-capacity" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">5.4.1.5. </span><code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code><a class="headerlink" href="#max-resource-capacity" title="Permalink to this headline">¶</a></h4>
 <p>The value of the <code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code> option is an integer that determines
 the maximum number of resources that can be stored in the data store. Specifying
 this option can reduce significantly the amount of virtual memory that RDFox
 uses per data store.</p>
 </div>
 <div class="section" id="max-tuple-capacity">
-<h4><span class="section-number">5.4.1.7. </span><code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code><a class="headerlink" href="#max-tuple-capacity" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">5.4.1.6. </span><code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code><a class="headerlink" href="#max-tuple-capacity" title="Permalink to this headline">¶</a></h4>
 <p>The value of the <code class="docutils literal notranslate"><span class="pre">max-tuple-capacity</span></code> option is an integer that determines
 the maximum number of tuples that can be stored by the in-memory tuple tables
 of a data store. Specifying this option can reduce significantly the amount of
 virtual memory that RDFox uses per data store.</p>
 </div>
 <div class="section" id="persistence">
-<h4><span class="section-number">5.4.1.8. </span><code class="docutils literal notranslate"><span class="pre">persistence</span></code><a class="headerlink" href="#persistence" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">5.4.1.7. </span><code class="docutils literal notranslate"><span class="pre">persistence</span></code><a class="headerlink" href="#persistence" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">persistence</span></code> option controls how RDFox persists data contained in a data
 store. The option can be set to <code class="docutils literal notranslate"><span class="pre">off</span></code> to disable persistence for individual
 data stores contained within a persistent server. The option can also be set to
@@ -597,7 +592,7 @@ the same value as the <code class="docutils literal notranslate"><span class="pr
 data store but, as this is the default value, this is not necessary.</p>
 </div>
 <div class="section" id="quad-table-type">
-<span id="quad-table-type-option"></span><h4><span class="section-number">5.4.1.9. </span><code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code><a class="headerlink" href="#quad-table-type" title="Permalink to this headline">¶</a></h4>
+<span id="quad-table-type-option"></span><h4><span class="section-number">5.4.1.8. </span><code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code><a class="headerlink" href="#quad-table-type" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">quad-table-type</span></code> parameter determines the type of the <code class="docutils literal notranslate"><span class="pre">Quads</span></code>
 table, which is used to store named graph triples. Each option offers different
 indexing strategies to optimize performance based on specific use cases.</p>
@@ -615,7 +610,7 @@ for efficient read and write access. Alternatively, the <code class="docutils li
 memory efficient.</p>
 </div>
 <div class="section" id="swrl-negation-as-failure">
-<span id="swrl-naf-option"></span><h4><span class="section-number">5.4.1.10. </span><code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code><a class="headerlink" href="#swrl-negation-as-failure" title="Permalink to this headline">¶</a></h4>
+<span id="swrl-naf-option"></span><h4><span class="section-number">5.4.1.9. </span><code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code><a class="headerlink" href="#swrl-negation-as-failure" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">swrl-negation-as-failure</span></code> option determines how RDFox treats
 <code class="docutils literal notranslate"><span class="pre">ObjectComplementOf</span></code> class expressions in SWRL rules.</p>
 <ul class="simple">
@@ -627,7 +622,7 @@ described in <a class="reference internal" href="reasoning.html#swrl-naf-descrip
 </ul>
 </div>
 <div class="section" id="triple-table-type">
-<span id="triple-table-type-option"></span><h4><span class="section-number">5.4.1.11. </span><code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code><a class="headerlink" href="#triple-table-type" title="Permalink to this headline">¶</a></h4>
+<span id="triple-table-type-option"></span><h4><span class="section-number">5.4.1.10. </span><code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code><a class="headerlink" href="#triple-table-type" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">triple-table-type</span></code> parameter determines the type of the <code class="docutils literal notranslate"><span class="pre">Triple</span></code> table.
 Each option offers different indexing strategies to optimize performance based
 on specific use cases.</p>
@@ -640,7 +635,7 @@ for efficient read and write access. Alternatively, the <code class="docutils li
 memory efficient.</p>
 </div>
 <div class="section" id="type">
-<span id="data-store-type"></span><h4><span class="section-number">5.4.1.12. </span><code class="docutils literal notranslate"><span class="pre">type</span></code><a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h4>
+<span id="data-store-type"></span><h4><span class="section-number">5.4.1.11. </span><code class="docutils literal notranslate"><span class="pre">type</span></code><a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">type</span></code> option determines the storage scheme used by the data store. The
 value determines the maximum capacity of a data store (i.e., the maximum number
 of resources and/or facts), its memory footprint, and the speed with which it
@@ -870,7 +865,7 @@ apart.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Oxford Semantic Technologies Ltd.</p>
+    <p>&#169; Copyright 2025, Oxford Semantic Technologies Ltd.</p>
   </div>
 
   

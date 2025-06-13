@@ -1,0 +1,56 @@
+.. _security-advisories:
+
+Security Advisories
+===================
+
+This section documents security advisories for RDFox.
+
+.. _security-advisories-rd-2210:
+
+RD-2210 - 2.3 (Low)
+-------------------
+
+A logic error in the SKOLEM built-in tuple table could allow a remotely
+authenticated attacker to capture the content of memory allocated for
+construction of a SKOLEM blank node identifier into the identifier itself. This
+corrupts the system and, if the identifiers are formatted in query responses,
+may lead to unauthorized disclosure of information depending on what data was
+previously stored in the allocated memory.
+
+To exploit this issue, one or more IRIs whose length excluding the final
+segment is a multiple of 3 must be stored in the data store. An attacker with
+write privileges could establish this condition and could also add the
+incorrect identifiers back into the dictionary to be harvested at a later date
+using rules or SPARQL updates. Once the necessary IRIs or any faulty SKOLEM
+identifiers are present in the dictionary, an attacker with read privileges
+could read them by querying.
+
+Mitigations
+~~~~~~~~~~~
+
+There are no advised mitigations for this issue. Please see the resolution
+section below.
+
+Affected Versions
+~~~~~~~~~~~~~~~~~
+
+This issue affects versions v7.3, v7.3a, and v7.3c.
+
+.. The bug was identified as having been introduced in RDFox commit 9d0f1255e44af27bc81d3741611b2fa883760f20 - see comments in Jira.
+
+Resolution
+~~~~~~~~~~
+
+This issue is fixed in v7.3d and later versions. Users of one of the affected
+versions are advised to upgrade to a fixed version as soon as possible to
+prevent new exploitation of this issue. After upgrading, they should also
+follow the `v7.3d upgrade instructions
+<https://rdfox-distribution.s3.eu-west-2.amazonaws.com/release/v7.3d/RDFox-v7.3d-upgrade-instructions.pdf>`_
+to ensure that their system is free of any incorrect SKOLEM identifiers created
+by this issue.
+
+CVSS Score
+~~~~~~~~~~
+
+CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N. -- 2.3 (Low)
+

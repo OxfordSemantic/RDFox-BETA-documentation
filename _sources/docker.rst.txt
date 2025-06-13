@@ -301,7 +301,8 @@ absolute path to a valid, in-date RDFox license key file.
                  -e RDFOX_ROLE \
                  -e RDFOX_PASSWORD \
                  oxfordsemantic/rdfox \
-                     -persistence off daemon
+                     -persistence off \
+                     -server-directory "" daemon
 
    The RDFox server started by the above command will contain no data stores
    initially. These can be created and populated via the REST API however, in
@@ -320,7 +321,8 @@ absolute path to a valid, in-date RDFox license key file.
                  -e RDFOX_ROLE \
                  -e RDFOX_PASSWORD \
                  oxfordsemantic/rdfox \
-                     -persistence off daemon . start
+                     -persistence off \
+                     -server-directory "" daemon . start
 
 
 Checking the Health of RDFox Containers

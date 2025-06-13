@@ -4,20 +4,20 @@ APIs
 ====
 
 Programmatic control of RDFox® can be gained remotely via a RESTful API exposed
-through an HTTP endpoint or in-memory via Java.
+through an HTTP endpoint or in-memory via the Java, C, and C++ APIs.
 
 This section describes the functionality provided in both APIs for managing the
 different information elements of the system. This section should be understood
-as a reference for the JAVA and REST APIs in RDFox, and it requires
-understanding of the structure of RDFox as described in :numref:`servers`.
+as a reference for all APIs in RDFox, and it requires understanding of the
+structure of RDFox as described in :numref:`servers`.
 
 .. _APIs-java-basics:
 
 Basics of the Java API
 ----------------------
 
-The Java API is available within Java processes that have JRDFox.jar loaded
-(see :numref:`software-archive`).
+To use the Java API, a Java process must load the ``JRDFox.jar`` library (see
+:numref:`software-archive`).
 
 Starting and Stopping the Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,6 +148,211 @@ before a transaction is committed, incremental reasoning is run only once.
 It is generally good practice to add all rules before the facts, or to add
 rules and facts in an arbitrary order but grouped in a single transaction. This
 will usually increase the performance of the first reasoning operation.
+
+The ``logic`` package
+~~~~~~~~~~~~~~~~~~~~~
+
+Datalog rules and SPARQL queries can be represented in the Java API using their
+textual representation. For example, a SPARQL query can be evaluated in the
+Java API by passing the query text to the
+
+.. code:: java
+
+   DataStoreConnection dsConn = RDFoxServer.newDataStoreConnection(...);
+   OutputStream outputStream = ...;
+   dsConn.evaluateStatement("SELECT ?X ?Y WHERE { ?X :hasParent ?Y }", Collections.emptyMap(), outputStream, "text/tab-separated-values");
+
+However, when rule/queries are produced programmatically, such an approach can
+be cumbersome: the syntactic structure of Datalog and SPARQL is complex and
+formatting rules are nontrivial, which makes using a string-based interface
+nontrivial. To help client applications produce correctly structured rules and
+queries, the Java API provides the ``logic`` package, which consists of classes
+that allow client applications to represent rules and queries structurally
+(i.e., using objects). For example, instead of providing a query string, the
+above query can be represented using an instance of the
+``tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query`` object, which can
+then be passed to the ``evaluateStatement()`` method.
+
+.. code:: java
+
+   Variable X = Variable.create("X");
+   Variable Y = Variable.create("Y");
+   IRI hasParent = IRI.create("http://example.com/hasParent");
+   QueryBody queryBody = QueryBody.createMutable();
+   queryBody.setWherePattern(
+       ConjunctionPattern.create(
+           TriplePattern.create(X, hasParent, Y)
+       )
+   );
+   Query query = SelectQuery.create(false, false,
+       new SelectQuery.SelectionPair[] {
+           new SelectQuery.SelectionPair(X, X),
+           new SelectQuery.SelectionPair(Y, Y),
+       }, queryBody
+   );
+   DataStoreConnection dsConn = RDFoxServer.newDataStoreConnection(...);
+   OutputStream outputStream = ...;
+   dsConn.evaluateStatement(query, Collections.emptyMap(), outputStream, "text/tab-separated-values");
+
+Although seemingly more verbose, the main benefit of such an approach is that
+users do not need to worry about how to correctly serialize a query into a
+string, which can eliminate common mistakes such as abbreviating or serializing
+IRIs incorrectly.
+
+Basics of the C and C++ APIs
+----------------------------
+
+To use the C/C++ APIs, a process must either load the RDFox dynamic library or
+be linked with the static library (see :numref:`software-archive`). Definitions
+for both APIs are provided in the ``/include/CRDFox/CRDFox.h`` file, which
+should be included into each C or C++ compilation unit that uses the C/C++ API.
+
+The C/C++ APIs are organized around the same concepts as the Java API: a server
+is started in the same way as in the Java API, and is accessed through server
+and data store connections that provide the same sets of operations. The main
+difference is that the C/C++ APIs do not provide an equivalent of the ``logic``
+package of the Java API. In contrast, Datalog rules and SPARQL queries are
+always represented as strings in the C/C++ APIs.
+
+Because the C/C++ APIs closely follow the Java API, the rest of this document
+provides examples only for the Java API. Equivalent code for the C/C++ APIs can
+be obtained as a straightforward adaptation of the Java code.
+
+C API
+~~~~~
+
+The C API consists of functions with signatures of the form
+``<class-name>_<function-name>()``, where ``<class-name>`` and
+``<function-name>`` reflect the name of the API class and the function,
+respectively. All class names are prefixed with the letter ``C`` in the C/C++
+APIs. For example, a function that evaluates a query on a data store connection
+is called ``CDataStoreConnection_evaluateQuery``. The object on which the
+function is to be invoked is passed as the first argument to each API function.
+
+In the Java API, any errors encountered in a call to an API function are
+reported using exceptions. Since C does not provide exceptions, all functions
+of the C API that can fail return a Boolean value indicating whether the
+function call resulted in an exception. If the return value is ``true``,
+information about the exception that was thrown can be retrieved using the
+``CRDFoxServer_getLastException()`` function, which returns information about
+the last exception thrown on the current thread. The result of this function
+remains the same until another exception is thrown on the same thread. Since
+the result of most functions is a failure indicator, any return values are
+passed as output parameters at the end of the argument list. Thus, calls to the
+C API usually follow the structure described below.
+
+.. code:: C
+
+   CDataStoreConnection* dataStoreConnection;
+   if (CRDFoxServer_newDataStoreConnection("MyDataStore", "guest", "guest", &dataStoreConnection)) {
+       // Failure: read information about the exception.
+       const char* what;
+       size_t whatLength;
+       bool isRDFoxException;
+       const char* exceptionName;
+       size_t exceptionNameLength;
+       const char* message;
+       size_t messageLength;
+       CRDFoxServer_getLastException(&what, &whatLength, &isRDFoxException, &exceptionName, &exceptionNameLength, &message, &messageLength);
+       // Process exception information.
+       ...
+   }
+   else {
+       // Success: dataStoreConnection can be used.
+       ...
+   }
+
+Functions that cannot fail return the result value directly (instead of
+returning a Boolean value). For example, the following function returns a
+pointer to a static parameters object.
+
+.. code:: C
+
+   const CParameters* emptyParameters = CParameters_getEmptyParameters();
+
+Since C does not provide automatic garbage collection, objects created via the
+C API needed to be explicitly deleted using the appropriate ``*_destroy()``
+function. For example, the following code fragment creates, uses, and destroys
+a ``CParameters`` object.
+
+.. code:: C
+
+   CParameters* parameters;
+   if (CParameters_newEmptyParameters(&parameters)) {
+       // Handle error...
+   }
+   else {
+       // Use parameters
+       if (CParameters_setString(parameters, "key", "value")) {
+           ...
+       }
+       CParameters_destroy(parameters);
+   }
+
+To distinguish objects that need to be destroyed from those that do not, most C
+API functions that create objects return non-const object pointers. For
+example, the ``CParameters_newEmptyParameters()`` function returns a non-const
+pointer ``CParameters*``, indicating that the object is owned by the caller and
+so the caller should free the object when the object is no longer needed. In
+contrast, objects that should not be freed by the caller are returned as const
+pointers and so they cannot be passed to the corresponding ``*_destroy()``
+function. For example, the following code will not compile.
+
+.. code:: C
+
+   const CParameters* emptyParameters = CParameters_getEmptyParameters();
+   CParameters_destroy(emptyParameters); // <-- Will not compile!
+
+The C API relies on a minimal ABI that should be standard for any given
+platform, and so it should be possible to use the C API on any compiler for the
+target platform.
+
+C++ API
+~~~~~~~
+
+The C++ language has no standard ABI (i.e., a set of rules that determine how
+objects are laid out in memory). Because of that, even though RDFox is written
+in C++, it is not possible to simply expose the internal C++ interface as that
+interface would be usable only if the client application is compiled with
+exactly the same version of the compiler as the one used to compile RDFox. This
+would impose significant limitations on how RDFox is distributed and used in
+client applications.
+
+The C++ API of RDFox overcomes this problem by using the so-called hourglass
+design pattern by providing helper classes that simplify resource management,
+calling API functions, and error checking. For example, to simplify the
+management of data store connections, the ``CRDFox.h`` file provides the
+``CDataStoreConnection`` helper class, as well as the
+``CDataStoreConnectionPtr`` unique pointer that implements the RAII pattern for
+life cycle management. Using these helpers, a data store connection can be
+created and used in C++ as follows.
+
+.. code:: C
+
+   try {
+       CDataStoreConnectionPtr dataStoreConnection = CRDFoxServer::newDataStoreConnection("MyDataStore", "guest", "guest");
+       dataStoreConnection->evaluateStatement("SELECT ?X ?Y WHERE { ?X :hasName ?Y }", ...);
+   }
+   catch (const CRDFoxException& e) {
+       std::cout << e.getExceptionName() ": " << e.what() << std::endl;
+   }
+
+The ``CRDFoxServer::newDataStoreConnection()`` helper function calls
+``CRDFoxServer_newDataStoreConnection()`` and returns a unique pointer to the
+newly created connection. Since ``CDataStoreConnectionPtr`` is a suitably
+instantiated instance of ``std::unique_ptr``, the connection is freed
+automatically when the ``dataStoreConnection`` variable goes out of scope.
+Furthermore, if calling ``CRDFoxServer_newDataStoreConnection()`` fails, the
+``CRDFoxServer::newDataStoreConnection()`` function throws an instance of
+``CRDFoxException``, which encapsulates all relevant information about the
+exception.
+
+The code of all helper classes is included in full in the ``CRDFox.h`` file and
+so these classes are compiled using the client's compiler. Furthermore, all
+helper classes funnel all calls to RDFox through the C API whose ABI is stable.
+In this way, the C++ API considerably simplifies the use of RDFox, but without
+the downside of tying together the ABIs of the client code and of the RDFox
+itself.
 
 Basics of the RESTful API
 -------------------------
@@ -611,11 +816,13 @@ In some cases, it is useful for client applications to know which agent is
 currently authenticated and how. This can be determined by sending a ``GET``
 request to path ``/authentication/self``. If no agent is authenticated on the
 connection, a ``401 Unauthorized`` response is returned. Otherwise, the
-response is written as the output of a SPARQL query that binds the variable
-``?agent-name`` to the name of the agent, variable ``?agent-type`` to the type
-of the agent (either ``role`` or ``external-agent``), and variable
-``?authentication-route`` to the authentication mechanism that was used (one of
-``authorization-header``, ``session-cookie``, ``tls-certificate``, ``guest``).
+response is written as the output of a SPARQL query that encodes the result as
+a series property--value pairs bound as variables ``?Property`` and ``?Value``.
+Property ``agent-name`` specifies the agent's name, property ``agent-type``
+describes the type of the agent (either ``role`` or ``external-agent``), and
+property ``authentication-route`` describes the authentication mechanism that
+was used (one of ``authorization-header``, ``session-cookie``,
+``tls-certificate``, or ``guest``).
 
 **Request**
 
@@ -642,17 +849,21 @@ of the agent (either ``role`` or ``external-agent``), and variable
 As HTTP is a stateless protocol, the authentication status returned by the
 above API call is only correct for the request itself. It is therefore
 essential that any client presenting a "logged in" state to an end user based
-on the information returned by the above API, ensures that calls it makes to
-the other APIs documented on this page are sent with the same authentication
+on the information returned by the above API ensures that calls it makes to the
+other APIs documented on this page are sent with the same authentication
 information.
 
 Suppressing the WWW-Authenticate response header
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In accordance with `rfc7235 <https://datatracker.ietf.org/doc/html/rfc7235>`__, RDFox includes a 
-``WWW-Authenticate`` header, detailing available authentication options, in any ``401 (Unauthorized)``
-response. A REST client may prevent RDFox including this header in such a response by including
-the header ``RDFox-Suppress-Basic-WWW-Authenticate: true`` in the request. 
+In accordance with `rfc7235 <https://datatracker.ietf.org/doc/html/rfc7235>`__,
+RDFox includes a ``WWW-Authenticate`` header, detailing available
+authentication options, in any ``401 (Unauthorized)`` response. A REST client
+may prevent RDFox the inclusion of the `Basic` scheme in this response header
+by adding the ``RDFox-Suppress-Basic-WWW-Authenticate: true`` to the request
+headers. This is useful for avoiding browser login prompts which are triggered
+by the presences of the ``Basic`` scheme in a ``WWW-Authenticate`` header
+returned with a ``401``.
 
 
 .. _APIs-treating-get-results-as-answers-to-sparql-queries:
@@ -1044,7 +1255,9 @@ is written as the output of a SPARQL query that binds the variable
 and variable ``?Mutable`` to ``true`` if the value of the property can be
 changed and to ``false`` otherwise. The names of all properties specified at
 the time the server was created are prefixed with ``parameters.`` so that they
-can be identified in the output.
+can be identified in the output. The value of the ``max-memory`` property is
+specified in bytes (unlike the ``max-memory`` server parameter, whose value is
+in megabytes).
 
 **Request**
 
@@ -1183,7 +1396,7 @@ and variable ``?Parameters`` is bound to a string containing the data store para
    Content-Type: text/csv; charset=UTF-8
 
    Name,UniqueID,Persistent,Online,Parameters
-   DataStore1,01234567890123456789,false,true,init-resource-capacity=16384&max-data-pool-size=10000000&max-resource-capacity=1000000&max-tuple-capacity=1000000&type=parallel-nn
+   DataStore1,01234567890123456789,false,true,max-data-pool-size=10000000&max-resource-capacity=1000000&max-tuple-capacity=1000000&type=parallel-nn
    DataStore2,98765432109876543210,false,true,type=parallel-nn
    DataStore3,,,,
 
@@ -1223,11 +1436,10 @@ parameters (see :numref:`data-store-parameters`) are prefixed with
    unique-id,01234567890123456789
    persistent,false
    online,true
-   parameters.init-resource-capacity,16384,false
-   parameters.max-data-pool-size,10000000,false
-   parameters.max-resource-capacity,1000000,false
-   parameters.max-tuple-capacity,1000000,false
-   parameters.type,parallel-nn,false
+   parameters.max-data-pool-size,10000000
+   parameters.max-resource-capacity,1000000
+   parameters.max-tuple-capacity,1000000
+   parameters.type,parallel-nn
 
 **Java API**
 
@@ -1462,7 +1674,6 @@ contains the ID of the parent component.
    ... etc ...
    2,Component name,Data store parameters
    2,Parent component ID,1
-   2,init-resource-capacity,16384
    2,max-data-pool-size,10000000
    2,max-resource-capacity,1000000
    2,max-tuple-capacity,1000000
@@ -1474,7 +1685,7 @@ In the above example, diagnostic information is requested for data store
 data store. Properties such as ``Name``, ``Unique ID``, and so on provide
 information about the data store. Component with ID ``2`` is a subcomponent of
 the data store. It provides information about the data store parameters, such
-as ``init-resource-capacity``, ``max-data-pool-size``, and so on.
+as ``max-resource-capacity``, ``max-data-pool-size``, and so on.
 
 **Java API**
 
@@ -2341,7 +2552,8 @@ format (MIME type ``text/turtle``) retrieves all triples from the default
 graph, whereas a request to output the content using the Datalog format (MIME
 type ``application/x.datalog``) retrieves all rules and no triples. Parameters
 that customize the export operation can be specified in the query string of the
-request URI.
+request URI. When the ``Accept`` header is absent, the default format is
+``text/turtle``.
 
 When retrieving facts in the ``application/n-triples``, ``text/turtle``,
 ``application/n-quads``, or ``application/trig`` formats, the only supported
@@ -4310,10 +4522,15 @@ incremented.
 Jointly, a data store unique ID and a data store version identify a particular
 state of a data store. That is, if these values are the same between two API
 calls, then we know that the data store has not been updated. The converse does
-not hold necessarily: even if an update request fails, the version may be
-incremented before the failure is detected. Nevertheless, differing unique ID
-and/or versions between two API calls indicate with a high degree of
-probability that the data store has been updated.
+not necessarily hold: although RDFox implements several checks to help avoid
+unnecessarily incrementing the data store version when committing a read/write
+transaction, these checks don't cover all scenarios so it is possible for the
+version number to change even though there is no change to the logical content
+of the store. In addition, :ref:`compacting <compaction-dead-fact-removal>` a
+data store always produces a new version without changing the logical content.
+Nevertheless, differing unique IDs and/or versions between two API calls
+indicate, with a high degree of probability, that the data store has been
+updated.
 
 Java API
 ^^^^^^^^
@@ -4321,14 +4538,14 @@ Java API
 The ``DataStoreConnection`` class in Java API provides a ``getUniqueID()`` and
 ``getDataStoreVersion()`` methods that allow users to retrieve the unique ID
 and the data store version, respectively. Moreover, the
-``getLastTransactionDataStoreVersion()`` method returns the version of the data
-store at the point the last transaction was successfully evaluated on this
-connection (or ``0`` if no transaction has been evaluated on this connection).
-Thus, by recording the unique ID and the data store version and comparing them
-with the values in subsequent requests, an application can detect that a data
-store has been updated. Note that the unique ID of a data store never changes
-during the lifetime of a data store. Moreover, each data store connection is
-associated with just one data store, and so a unique ID can never change on one
+``getDataStoreVersionAfterLastOperation()`` method returns the version of the
+data store at the end of the last operation performed on the connection (or
+``0`` if no operation has been performed on the connection). Thus, by recording
+the unique ID and the data store version and comparing them with the values in
+subsequent requests, an application can detect that a data store has been
+updated. Note that the unique ID of a data store never changes during the
+lifetime of a data store. Moreover, each data store connection is associated
+with just one data store, and so a unique ID can never change on one
 connection.
 
 .. _REST-detecting-updates:
@@ -4336,12 +4553,23 @@ connection.
 RESTful API
 ^^^^^^^^^^^
 
-The RESTful API exposes these pieces of information as ETags, which are strings
-of the form ``"uniqueID-version"``. For HTTP requests operating on a data store
-or any of its parts, the response will contain a header of the form ``ETag:
-"uniqueID-version"`` indicating the version of the data store upon request's
-completion. The following example illustrates this on the example of data
-importation.
+The RESTful API uses the standard ``ETag`` response header to allow clients to
+detect updates. For most requests operating on a data store or any of its
+parts, the data store's unique ID and version are included in the ETag value
+that is returned in the response. The client can then parse the component
+values back from the ETag and in that way track the unique ID and highest known
+version of the store. ETags are not returned for requests on an explicit
+connection that has an open read/write transaction, because such requests may
+sample data that belongs neither to the current data store version nor the
+next.
+
+ETag values produced by the endpoint will follow one of two formats. If the
+response includes a ``Content-Type`` header, the ETag value will be of the form
+``"uniqueID-version-contentType"``, where ``uniqueID``, ``version``, and
+``contentType`` have their obvious meanings. Otherwise the value will be of the
+form ``"uniqueID-version"``.
+
+The following example illustrates this on the example of data importation.
 
 **Request**
 
@@ -4349,6 +4577,7 @@ importation.
 
    POST /datastores/myStore/content HTTP/1.1
    Host: localhost
+   Accept: text/csv
 
    [The facts/rules to be added in a format supported by RDFox]
 
@@ -4357,15 +4586,19 @@ importation.
 .. code:: http
 
    HTTP/1.1 200 OK
-   ETag: "01234567890123456789-2"
+   ETag: "10125879972600259594-2-text/csv"
+   Content-Type: text/csv; charset=UTF-8
 
    [Response body as usual]
 
-In HTTP, an ETag is considered specific to each resource. In RDFox, however,
-the same ETag is generated for all resources of a particular data store. Thus,
-in the above example, ETag ``"01234567890123456789-2"`` applies not only to
-resource ``/datastores/myStore/content``, but also to ``/datastores/myStore``
-and every resource underneath (such as, say,
+In HTTP, an ETag is considered specific to a representation of a resource. In
+RDFox, however, the ETags of all resources of a particular data store at a
+particular version will share a common prefix: that part containing the unique
+ID and version of the data store. Thus, in the above example, the part of the
+ETag up to but excluding the second hyphen, namely
+``"01234567890123456789-2"``, applies not only to resource
+``/datastores/myStore/content``, but also to every other resource whose path
+begins ``/datastores/myStore/`` (e.g. ``/datastores/myStore/info`` or
 ``/datastores/myStore/content/tupletables``). In other words, importing the
 data into the data store using ``/datastores/myStore/content`` changes the
 ETags of all parts of the data store.
@@ -4387,17 +4620,6 @@ as possible. Specifically, most requests are processed as follows.
   sent in the error response. The rationale behind this is that the request
   matches to well-defined RDFox operations, and so knowing the current data
   store version might actually be used to recover from failure.
-
-Since RDFox forms ETags by combining the data store's unique ID and version
-number, neither of which change during the lifetime of a read/write transaction,
-returning ETags while such a transaction remains open would lead to the same
-ETag value being returned for consecutive requests even if the response body
-were different. Such behavior would violate the basic principles of ETags. To
-avoid this, RDFox does not send ETags in response to requests that use a data
-store connection with an open read/write transaction. The exception to this rule
-is when the request has closed the transaction either by committing it or
-rolling it back. See :numref:`REST-transactions` for details of how transactions
-are managed in the RESTful API.
 
 Conditional Requests
 ~~~~~~~~~~~~~~~~~~~~
@@ -4461,9 +4683,10 @@ RESTful API
 In the RESTful API, conditional requests are supported using standard HTTP
 ``If-Match`` and ``If-None-Match`` headers. Specifically, if a request contains
 an ``If-Match`` header with a particular ETag, the request will succeed only if
-the version of the data store matches the ETag when the request is executed.
-This is illustrated by the following example, where the request (presumably)
-fails because of a version mismatch.
+the unique ID and version of the data store and, optionally, the content type
+of the response match the ETag when the request is executed. This is
+illustrated by the following example, where the request fails because of a
+version mismatch.
 
 **Request**
 
@@ -4471,7 +4694,7 @@ fails because of a version mismatch.
 
    POST /datastores/myStore/content HTTP/1.1
    Host: localhost
-   If-Match: "01234567890123456789-2"
+   If-Match: "01234567890123456789-2-text/turtle"
 
    [The facts/rules to be added in a format supported by RDFox]
 
@@ -4480,11 +4703,11 @@ fails because of a version mismatch.
 .. code:: http
 
    HTTP/1.1 412 Precondition Failed
-   ETag: "01234567890123456789-5"
+   ETag: "01234567890123456789-5-text/turtle"
    Content-Type: text/plain; charset=UTF-8
    Content-Length: XX
 
-   DataStoreVersionDoesNotMatchException: Data store version is 5, which is different from the expected version 2.
+   The data store does not match any of the ETags in the 'If-Match' request header.
 
 Note that the response in the above example contains the current ETag of the
 data store. Thus, an application can try to use this ETag in any subsequent
@@ -4499,32 +4722,34 @@ illustrated by the following request.
 
 .. code:: http
 
-   GET /datastores/myStore/sparql?query=SELECT+%3FX+%3FY+%3FZ+WHERE+{+%3FX+%3FY+%3FZ+} HTTP/1.1
+   GET /datastores/myStore/sparql?query=SELECT%20%3FX%20%3FY%20%3FZ%20WHERE%20{%20%3FX%20%3FY%20%3FZ%20} HTTP/1.1
    Host: localhost
    Accept: text/csv; charset=UTF-8
-   If-None-Match: "01234567890123456789-5"
+   If-None-Match: "01234567890123456789-5-text/csv"
 
 **Response**
 
 .. code:: http
 
    HTTP/1.1 304 Not Modified
-   ETag: "01234567890123456789-5"
-   Content-Type: text/plain; charset=UTF-8
-   Content-Length: XX
-
-   DataStoreVersionMatchesException: Data store version is equal to 5.
+   ETag: "01234567890123456789-5-text/csv"
 
 Conditional requests in RDFox differ from HTTP in the following minor ways.
 
 - ETags are opaque values in HTTP that must match exactly. RDFox, however,
   allows for partial matches. In particular, the value of ``If-Match`` and
-  ``If-None-Match`` headers can have the form ``"uniqueID-version"`` where
-  ``uniqueID`` and ``version`` can either be specific values or the wildcard
-  character ``*``. Thus, ``"01234567890123456789-*"`` matches any data store
-  whose unique ID is ``01234567890123456789``, regardless of the current data
-  store version. Analogously, ``"*-5"`` matches any data store whose version is
-  ``5``, and ``"*-*"`` matches any data store.
+  ``If-None-Match`` headers can have the form
+  ``"uniqueID-version-contentType"`` or ``"uniqueID-version"`` where
+  ``uniqueID``, ``version``, and ``contentType`` can either be specific values
+  or the wildcard character ``*``. Thus, ``"01234567890123456789-*-*"`` matches
+  any data store whose unique ID is ``01234567890123456789``, regardless of the
+  current data store version or response content type. Analogously, ``"*-5-*"``
+  matches any data store whose version is ``5`` regardless of content type, and
+  ``"*-*-*"`` matches any combination of data store, version, and content type.
+  Note that the first ETag format, that omits content type information, can be
+  used anywhere, even if the response will have a ``Content-Type`` header, and
+  will be treated as if ``*`` were specified in the third position of the ETag.
+
 
 - HTTP allows one to specify more than one ETag in the ``If-Match`` or
   ``If-None-Match`` headers. However, RDFox will reject such requests: the

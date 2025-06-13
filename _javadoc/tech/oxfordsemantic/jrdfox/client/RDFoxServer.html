@@ -19,7 +19,7 @@
 <script type="text/javascript" src="../../../../script-dir/jquery-ui.js"></script>
 </head>
 <body class="class-declaration">
-<script type="text/javascript">var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9};
+<script type="text/javascript">var data = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -246,13 +246,27 @@ java.lang.String&nbsp;password)</code></th>
 </td>
 </tr>
 <tr class="rowColor" id="i9">
-<td class="colFirst"><code>static void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stop()">stop</a></span>()</code></th>
+<td class="colFirst"><code>static boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#startEndpoint(java.util.Map)">startEndpoint</a></span>&#8203;(java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;endpointParameters)</code></th>
 <td class="colLast">
-<div class="block">Stops the server, or does nothing if the server is not running.</div>
+<div class="block">Starts the endpoint using the supplied parameters.</div>
 </td>
 </tr>
 <tr class="altColor" id="i10">
+<td class="colFirst"><code>static void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stop()">stop</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Stops the server and the endpoint (in case the latter is currently running), or does nothing if the server is not running.</div>
+</td>
+</tr>
+<tr class="rowColor" id="i11">
+<td class="colFirst"><code>static void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#stopEndpoint()">stopEndpoint</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Stops the endpoint if the endpoint is currently running, or does nothing.</div>
+</td>
+</tr>
+<tr class="altColor" id="i12">
 <td class="colFirst"><code>static void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#upgrade(java.lang.String,java.lang.String,java.io.OutputStream)">upgrade</a></span>&#8203;(java.lang.String&nbsp;serverDirectoryPath,
 java.lang.String&nbsp;persistenceEncryptionKey,
@@ -469,7 +483,35 @@ java.lang.String&nbsp;password)</span>
 <h3><a id="stop()">stop</a></h3>
 <div class="memberSignature"><span class="modifiers">public static</span>&nbsp;<span class="returnType">void</span>&nbsp;<span class="memberName">stop</span>()
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Stops the server, or does nothing if the server is not running.</div>
+<div class="block">Stops the server and the endpoint (in case the latter is currently running), or does nothing if the server is not running.</div>
+<dl>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if there is an error</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="startEndpoint(java.util.Map)">startEndpoint</a></h3>
+<div class="memberSignature"><span class="modifiers">public static</span>&nbsp;<span class="returnType">boolean</span>&nbsp;<span class="memberName">startEndpoint</span>&#8203;(<span class="arguments">java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;endpointParameters)</span>
+                             throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Starts the endpoint using the supplied parameters. The server must be started beforehand for this operation to succeed.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>endpointParameters</code> - the parameters of the endpoint (see <a href="https://docs.oxfordsemantic.tech/rdfox-endpoint.html#endpoint-parameters">Endpoint Parameters</a>)</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd><code>true</code> if the endpoint was started</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if there is an error</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="stopEndpoint()">stopEndpoint</a></h3>
+<div class="memberSignature"><span class="modifiers">public static</span>&nbsp;<span class="returnType">void</span>&nbsp;<span class="memberName">stopEndpoint</span>()
+                         throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Stops the endpoint if the endpoint is currently running, or does nothing.</div>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if there is an error</dd>

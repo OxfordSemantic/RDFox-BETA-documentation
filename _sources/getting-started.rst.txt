@@ -9,9 +9,8 @@ equivalent sections demonstrating how to access RDFox's querying and reasoning
 functionality through different interfaces (GUI, CLI and REST API), and finally
 a section of suggestions for how to learn more. 
 
-If you are looking to get started with the Java, or the experimental C or C++
-APIs to RDFox, see instead the appropriate demo program included with each RDFox
-release.
+If you are looking to get started with the Java, or the C or C++ APIs to RDFox,
+see instead the appropriate demo program included with each RDFox release.
 
 .. _setup:
 
@@ -19,8 +18,8 @@ Setup
 -----
 
 Before you begin, make sure that you have downloaded the latest RDFox release
-for your system from `www.rdfox.com/downloads
-<https://www.rdfox.com/downloads>`__ and unzipped it. This will produce a new
+for your system from `oxfordsemantic.tech/download
+<https://oxfordsemantic.tech/download>`__ and unzipped it. This will produce a new
 directory containing the RDFox executable (named ``RDFox`` on Linux and macOS,
 and ``RDFox.exe`` on Windows) and some other files. The following instructions
 refer to this directory as ``<working_directory>``.
@@ -29,8 +28,8 @@ You will also need to ensure that RDFox can find a
 valid license key. The quickest way to do this is to add a copy of your license
 key file directly to ``<working_directory>`` (see :numref:`rdfox-license-key`
 for other ways). If you do not have a license key file, you can request one at
-`https://www.rdfox.com/tryrdfoxforfree
-<https://www.rdfox.com/tryrdfoxforfree>`__.
+`oxfordsemantic.tech/free-trial
+<https://oxfordsemantic.tech/free-trial>`__.
 
 The following small RDF graph in `Turtle <https://www.w3.org/TR/turtle/>`__
 format will be used in the instructions below.
@@ -219,7 +218,7 @@ is captured in the Datalog file :ref:`hasChild.dlog <has_child_dlog>` that you
 downloaded to ``<working_directory>`` earlier. Import it by clicking on the
 |AddContentHeader| button in the header. In the "Add content" dialog that opens,
 click |ChooseFile|, navigate to ``<working_directory>``, select ``hasChild.dlog``,
-click to confirm and then click |AddContent|.
+click to confirm and then click |AddContent| and |OK|.
 
 Importing this file will cause RDFox to run its reasoning algorithms, adding the
 triples that result from applying the loaded rules to the loaded facts to the
@@ -270,9 +269,8 @@ Exploring a Data Store
    :height: 25
 
 In addition to the SPARQL runner, the web console provides a way to explore the
-facts in a data store visually. Click the |Explore| icon to the right of
-``:peter`` where it appears in the results table to switch to begin an
-exploration.
+facts in a data store visually. Click the |Explore| icon to the left of
+``:peter`` where it appears in the results table to begin an exploration.
 
 Initially, a single purple rectangle is displayed representing the node
 ``:peter``. The dot icon in the upper right of the purple ``peter`` node

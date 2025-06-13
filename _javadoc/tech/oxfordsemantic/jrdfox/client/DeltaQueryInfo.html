@@ -120,13 +120,13 @@ extends java.lang.Object</pre>
 </thead>
 <tbody>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int,long,long,long)">DeltaQueryInfo</a></span>&#8203;(java.lang.String&nbsp;name,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long,long,long,long)">DeltaQueryInfo</a></span>&#8203;(java.lang.String&nbsp;name,
 java.lang.String&nbsp;uniqueID,
 <a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize,
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize,
 long&nbsp;lastDataStoreVersionWithSnapshot,
 long&nbsp;lastDataStoreVersionWithDeletion,
 long&nbsp;lastDataStoreVersionWithAddition)</code></th>
@@ -161,14 +161,14 @@ long&nbsp;lastDataStoreVersionWithAddition)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor" id="i1">
-<td class="colFirst"><code>int</code></td>
+<td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAdditionsMaxSize()">getAdditionsMaxSize</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the additions max size of a delta query.</div>
 </td>
 </tr>
 <tr class="altColor" id="i2">
-<td class="colFirst"><code>int</code></td>
+<td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDeletionsMaxSize()">getDeletionsMaxSize</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the deletions max size of a delta query.</div>
@@ -217,7 +217,7 @@ long&nbsp;lastDataStoreVersionWithAddition)</code></th>
 </td>
 </tr>
 <tr class="rowColor" id="i9">
-<td class="colFirst"><code>int</code></td>
+<td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSnapshotsMaxSize()">getSnapshotsMaxSize</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the snapshots max size of a delta query.</div>
@@ -259,14 +259,14 @@ long&nbsp;lastDataStoreVersionWithAddition)</code></th>
 <ul class="blockList">
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,int,int,int,long,long,long)">DeltaQueryInfo</a></h3>
+<h3><a id="&lt;init&gt;(java.lang.String,java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long,long,long,long)">DeltaQueryInfo</a></h3>
 <div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">DeltaQueryInfo</span>&#8203;(<span class="arguments">java.lang.String&nbsp;name,
 java.lang.String&nbsp;uniqueID,
 <a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.lang.String&nbsp;formatName,
-int&nbsp;snapshotsMaxSize,
-int&nbsp;deletionsMaxSize,
-int&nbsp;additionsMaxSize,
+long&nbsp;snapshotsMaxSize,
+long&nbsp;deletionsMaxSize,
+long&nbsp;additionsMaxSize,
 long&nbsp;lastDataStoreVersionWithSnapshot,
 long&nbsp;lastDataStoreVersionWithDeletion,
 long&nbsp;lastDataStoreVersionWithAddition)</span></div>
@@ -329,7 +329,7 @@ long&nbsp;lastDataStoreVersionWithAddition)</span></div>
 <li class="blockList">
 <section class="detail">
 <h3><a id="getSnapshotsMaxSize()">getSnapshotsMaxSize</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">int</span>&nbsp;<span class="memberName">getSnapshotsMaxSize</span>()</div>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">long</span>&nbsp;<span class="memberName">getSnapshotsMaxSize</span>()</div>
 <div class="block">Returns the snapshots max size of a delta query. A value of 0 indicates
  that no snapshot values should be recorded. A value of int.MAX_VALUE
  indicates that all snapshot values should be recorded (i.e. there is no
@@ -343,7 +343,7 @@ long&nbsp;lastDataStoreVersionWithAddition)</span></div>
 <li class="blockList">
 <section class="detail">
 <h3><a id="getDeletionsMaxSize()">getDeletionsMaxSize</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">int</span>&nbsp;<span class="memberName">getDeletionsMaxSize</span>()</div>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">long</span>&nbsp;<span class="memberName">getDeletionsMaxSize</span>()</div>
 <div class="block">Returns the deletions max size of a delta query. A value of 0 indicates
  that no deleted values should be recorded. A value of int.MAX_VALUE
  indicates that all deletions should be recorded (i.e. there is no maximum
@@ -357,7 +357,7 @@ long&nbsp;lastDataStoreVersionWithAddition)</span></div>
 <li class="blockList">
 <section class="detail">
 <h3><a id="getAdditionsMaxSize()">getAdditionsMaxSize</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">int</span>&nbsp;<span class="memberName">getAdditionsMaxSize</span>()</div>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">long</span>&nbsp;<span class="memberName">getAdditionsMaxSize</span>()</div>
 <div class="block">Returns the additions max size of a delta query. A value of 0 indicates
  that no added values should be recorded. A value of int.MAX_VALUE
  indicates that all additions should be recorded (i.e. there is no maximum

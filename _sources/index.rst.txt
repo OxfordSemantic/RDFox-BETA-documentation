@@ -55,9 +55,9 @@ Table of Contents
    docker
 
 .. toctree::
-   :numbered:
    :maxdepth: 1
    :caption: Information
    
    release-notes
+   security-advisories
    acknowledgments

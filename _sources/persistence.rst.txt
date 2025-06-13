@@ -100,23 +100,22 @@ an earlier version so that it can be used with the current version. Upgrade is
 possible for at least the immediately preceding persistence version and
 possibly from versions before that.
 
-The upgrade procedure uses two auxiliary directories, the *new* and *saved*
-directories, both of which are within the same folder as the existing server
-directory. First, the upgraded server directory is created as the new
-directory. This step works by creating, within the new directory, modified
-copies of any files in the existing server directory that need to be changed to
-conform to the new persistence format, and then hard-linking or copying any
-files that do not need to be modified to give a complete, upgraded directory.
-Next, the existing server directory is moved to the saved directory path and
-then the new server directory is moved to the original server directory path.
-Finally, the saved directory is deleted. This process ensures that the server
-directory is always in a recoverable state, even if the upgrade process is
-interrupted.
+RDFox stores all persisted content in the *current* subdirectory of the server
+directory. When performing an upgrade, RDFox creates a *new* subdirectory within
+the server directory and populates it with updated copies of any files from
+*current* that require changes to match the new persistence format. Files that
+do not need modification are hard-linked or copied into *new* to create a
+complete, upgraded version. Once the *new* subdirectory is ready, RDFox moves
+the existing *current* subdirectory to *saved*, then moves *new* to *current*.
+Finally, the *saved* subdirectory is deleted. This approach ensures that all
+upgrade operations are performed entirely within the server directory, and that
+the server directory is always in a recoverable state, even if the upgrade
+process is interrupted.
 
 .. warning::
 
    While the above procedure has been designed for safety, operators should
-   always take a back of the server directory immediately before upgrade as a
+   always take a backup of the server directory immediately before upgrade as a
    precaution. In the event that you are unable to start the RDFox server after
    the upgrade using either the old or new version, restore the backup, return
    to using the old version, and contact Oxford Semantic Technologies for
@@ -127,13 +126,6 @@ operator must satisfy in order to successfully perform an upgrade:
 
   - No RDFox server, or other process, can be using the directory to be
     upgraded during any part of the upgrade process.
-  - The server directory must be on the same volume as its parent directory so
-    that the auxiliary directory paths will be on the same volume as the
-    existing directory. This is necessary to ensure that the two move
-    operations succeed.
-  - The process performing the upgrade must be able to write to the parent
-    directory of the server directory in order to create the new directory and
-    move the existing and new directories.
   - There should be enough disk space on the volume to hold a complete copy of
     the server directory. This is a worst-case requirement as hard-linking of
     files that do not need to change may substantially reduce the additional
