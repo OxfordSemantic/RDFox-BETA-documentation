@@ -121,17 +121,20 @@ extends tech.oxfordsemantic.jrdfox.formats.internal.AbstractParser</pre>
 </thead>
 <tbody>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(tech.oxfordsemantic.jrdfox.Prefixes,java.io.InputStream)">SPARQLParser</a></span>&#8203;(<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes,java.io.InputStream)">SPARQLParser</a></span>&#8203;(java.lang.String&nbsp;baseIRI,
+<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
 java.io.InputStream&nbsp;inputStream)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(tech.oxfordsemantic.jrdfox.Prefixes,java.io.Reader)">SPARQLParser</a></span>&#8203;(<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes,java.io.Reader)">SPARQLParser</a></span>&#8203;(java.lang.String&nbsp;baseIRI,
+<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
 java.io.Reader&nbsp;reader)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(tech.oxfordsemantic.jrdfox.Prefixes,tech.oxfordsemantic.jrdfox.formats.internal.InputSource)">SPARQLParser</a></span>&#8203;(<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes,tech.oxfordsemantic.jrdfox.formats.internal.InputSource)">SPARQLParser</a></span>&#8203;(java.lang.String&nbsp;baseIRI,
+<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
 tech.oxfordsemantic.jrdfox.formats.internal.InputSource&nbsp;inputSource)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -207,8 +210,9 @@ tech.oxfordsemantic.jrdfox.formats.internal.InputSource&nbsp;inputSource)</code>
 <ul class="blockList">
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(tech.oxfordsemantic.jrdfox.Prefixes,tech.oxfordsemantic.jrdfox.formats.internal.InputSource)">SPARQLParser</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">SPARQLParser</span>&#8203;(<span class="arguments"><a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
+<h3><a id="&lt;init&gt;(java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes,tech.oxfordsemantic.jrdfox.formats.internal.InputSource)">SPARQLParser</a></h3>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">SPARQLParser</span>&#8203;(<span class="arguments">java.lang.String&nbsp;baseIRI,
+<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
 tech.oxfordsemantic.jrdfox.formats.internal.InputSource&nbsp;inputSource)</span>
              throws <span class="exceptions">java.io.IOException,
 <a href="../exceptions/ParsingException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ParsingException</a></span></div>
@@ -221,8 +225,9 @@ tech.oxfordsemantic.jrdfox.formats.internal.InputSource&nbsp;inputSource)</span>
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(tech.oxfordsemantic.jrdfox.Prefixes,java.io.InputStream)">SPARQLParser</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">SPARQLParser</span>&#8203;(<span class="arguments"><a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
+<h3><a id="&lt;init&gt;(java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes,java.io.InputStream)">SPARQLParser</a></h3>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">SPARQLParser</span>&#8203;(<span class="arguments">java.lang.String&nbsp;baseIRI,
+<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
 java.io.InputStream&nbsp;inputStream)</span>
              throws <span class="exceptions">java.io.IOException,
 <a href="../exceptions/ParsingException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ParsingException</a></span></div>
@@ -235,8 +240,9 @@ java.io.InputStream&nbsp;inputStream)</span>
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(tech.oxfordsemantic.jrdfox.Prefixes,java.io.Reader)">SPARQLParser</a></h3>
-<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">SPARQLParser</span>&#8203;(<span class="arguments"><a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
+<h3><a id="&lt;init&gt;(java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes,java.io.Reader)">SPARQLParser</a></h3>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">SPARQLParser</span>&#8203;(<span class="arguments">java.lang.String&nbsp;baseIRI,
+<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes,
 java.io.Reader&nbsp;reader)</span>
              throws <span class="exceptions">java.io.IOException,
 <a href="../exceptions/ParsingException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ParsingException</a></span></div>

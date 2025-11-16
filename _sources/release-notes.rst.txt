@@ -20,7 +20,93 @@ the normal channels.
 Releases
 --------
 
-Release 7.4 (????????????????)
+Release 7.5 (TBC)
+  - Federated queries are now supported in accordance with the `SPARQL 1.1
+    Federated Query <https://www.w3.org/TR/sparql11-federated-query/>`__
+    specification.
+  - The existing ``GET /`` and ``GET /datastores/<DataStoreName>/info`` REST
+    APIs, which provide information about the whole server or a particular data
+    store respectively, now support the `OpenMetrics 1.0
+    <https://github.com/prometheus/OpenMetrics>`__ response format, enabling
+    monitoring of RDFox servers using Prometheus or compatible systems
+    (RD-2377). To improve the clarity and consistency of metrics for the newly
+    supported format, the properties returned by these APIs (and by the
+    ``serverinfo extended`` shell command and the equivalent JRDFox and C/C++
+    APIs) have been renamed and their meanings documented (see
+    :numref:`querying-component-information`). Java APIs have additionally been
+    updated to include enum types, allowing for further client side
+    calculation/aggregation using these values.
+  - Added a new server parameter ``http-remotes`` to enable integration with
+    external HTTP(S) endpoints that require authentication. See
+    :numref:`http-remotes` for details (RD-2374).
+  - Added an EXPERIMENTAL built-in function, ``SEMSIM``, for semantic
+    similarity search over text embeddings (RD-2437). See
+    :numref:`iri-and-string-functions` for details.
+  - Changes to HTTP request logging (RD-2431 and RD-2421):
+
+    - Enhanced the endpoint's extended logging format (ELF) to optionally record
+      request start events, configurable via the new
+      ``elf-logger-recorded-events`` server parameter.
+    - Added new elf-logger fields: ``x-timestamp`` (the timestamp at log creation)
+      and ``x-request-state`` (the request state at time of logging, e.g.,
+      "request_start", "request_finish", "request_error").
+    - Updated the default value of the ``elf-logger-fields`` parameter from
+      ``date time cs-method cs-uri-stem sc-status sc-bytes time-taken`` to
+      ``x-timestamp c-ip cs-method cs-uri-stem cs(RDFox-Request-ID) sc-status
+      sc-bytes time-taken x-protocol-error`` .
+    - Introduced a new request logging format, ``elf-json``, which records
+      logs in JSON. The fields and events logged by this logger are configured
+      with the same parameters (``elf-logger-fields`` and
+      ``elf-logger-recorded-events``) as the existing ``elf`` format.
+    - See documentation for these changes in :numref:`endpoint-parameters`.
+
+  - One can now extract and merge statistics for individual queries, enabling
+    troubleshooting of query plans without access to user data (RD-2405).
+  - Added an endpoint parameter, ``localhost-only`` to specify whether RDFox
+    should listen on all network interfaces or only on the loopback interface
+    (RD-2406). See :numref:`endpoint-parameters` for details.
+  - Deletions and additions in a transaction now cancel out precisely during
+    reasoning (RD-1985).
+  - All APIs now support a way to determine whether an update should be handled
+    using incremental or "from scratch" reasoning (RD-1987).
+  - The functionality of the ``<DSCONN>/transaction`` REST API key was merged
+    into ``<DSCONN>``; moreover, the ``/transaction`` key was deprecated and
+    will be removed in future (RD-2353).
+  - The existing ``allowed-schemes-on-load`` server parameter has been renamed
+    to ``allowed-url-schemes-on-import``. This parameter is used to control
+    which schemes are allowed when importing data from external sources
+    (RD-2374).
+  - Fixed an issue where numeric (Integer, Decimal and Double) values equal to
+    the lower numeric limit (e.g. Integer -2^63) were wrongly reported as outside
+    the supported range (RD-2388).
+  - Fixed an issue where JRDFox Rule object creation may introduce additional
+    expression nesting, leading to unexpected results when listing or deleting
+    rules (RD-2388).
+
+Release 7.4b (11th September 2025)
+  - Stopped the endpoint from responding with ``429 - Too Many Requests`` when
+    the number of potentially long-running requests exceeds the number of
+    threads available for this class of request (RD-2415 & RD-2430). Instead,
+    potentially long-running requests are now queued. This behavior is similar
+    to pre-v7.4 versions of RDFox, with the difference that requests to
+    `/health`, `/requests` and `/console` are still processed with higher
+    priority.
+
+Release 7.4a (6th August 2025)
+  - Fixed a bug in the implementation of RDFox's proprietary SPARQL extensions
+    for accessing tuple tables that made it possible to bypass named graph
+    access control for read operations (RD-2389). See the security advisory
+    :ref:`security-advisories-rd-2389` for more details.
+  - Fixed a bug in the implementation of the ``SKOLEM`` built-in tuple table
+    that prevented some valid SKOLEM identifiers from being decoded correctly
+    (RD-2390). Users should rematerialize any data store that contains a rule
+    with one or more SKOLEM atoms after upgrading to a fixed version. This can
+    be achieved with the `remat` shell command or an equivalent API call.
+  - Fixed a bug in the implementation of the ``SQLite`` data source tuple table,
+    where parameter columns with the ``iri`` datatype were not handled correctly
+    (RD-2397).
+
+Release 7.4 (4th July 2025)
   - Added a data source type ``lucene`` for integrating with Apache Lucene
     (RD-2270). See :numref:`registering-lucene-data-sources` for details.
   - Added a data source type ``SQLite`` for integrating with SQLite (RD-2181).
@@ -41,13 +127,19 @@ Release 7.4 (????????????????)
     parameter within :numref:`server-parameters` for details.
   - Replaced the SPARQL ``ORDER BY`` implementation to provide consistent
     performance across all Operating Systems (RD-2167).
-  - RDFox server directory files are now stored in a subdirectory named
-    ``current`` and include human-readable file headers (RD-2275 & RD-2276).
-    This addresses a previous issue where version upgrades could result in files
+  - RDFox server directory files are now stored in a versioned subdirectory
+    (RD-2348) and include human-readable file headers (RD-2275 & RD-2276). This
+    addresses a previous issue where version upgrades could result in files
     being created outside the server directory.
   - The data store parameter ``init-resource-capacity`` was removed.
   - The ``init`` mode now requires a ``channel`` endpoint parameter to be
     explicitly supplied.
+  - The implementation of Solr data sources has been updated to handle larger
+    queries (RD-1915). This change introduces a persistence incompatibility
+    that is not handled by RDFox's persistence upgrade functionality. If you
+    have a persistent server with Solr data sources registered, you will need
+    to deregister them and then compact the data store before upgrading to this
+    version.
   - Fixed a bug in the ``ODBC`` data source, where if the ODBC driver
     miss-reported the width of a column, data within that column could be
     improperly truncated during transmission (RD-2339).
@@ -97,7 +189,7 @@ Release 7.3 (3rd February 2025)
     indexes and thus consume less memory than their full indexing counterparts
     (RD-1968). The existing ``triple-table``, ``quad-table-lg`` and
     ``quad-table-sg`` table types have been renamed to ``triple-table-fi``,
-    ``quad-table-lg-fi`` and ``quad-table-sg-fi`` respectively. 
+    ``quad-table-lg-fi`` and ``quad-table-sg-fi`` respectively.
   - Added an API call and shell command to check the integrity of the server
     (RD-1962). See :numref:`APIs-checking-server-integrity` and
     :numref:`checkintegrity-command`.
@@ -133,12 +225,12 @@ Release 7.3 (3rd February 2025)
   - Fixed an apparent hang when certain operations were performed on a data
     store whose ``max-threads-used`` property was set to a value greater than
     the number of server threads (RD-2079).
-  - Fixed a hang when casting some ``xsd:float`` and ``xsd:double`` values to 
-    ``xsd:decimal``. It only affects non-zero values that should be rounded to 
+  - Fixed a hang when casting some ``xsd:float`` and ``xsd:double`` values to
+    ``xsd:decimal``. It only affects non-zero values that should be rounded to
     zero (RD-2099).
   - Fixed an issue in JRDFox where exceptionally large individual results (e.g.
     strings longer than 15000 characters), could cause a hang (RD-2100).
-  - Fixed an issue with the persistence of data stores loaded from one of the 
+  - Fixed an issue with the persistence of data stores loaded from one of the
     two binary formats. (RD-2115).
   - Fixed an issue where RDFox over-reported memory usage. If the optional
     `-max-memory` server parameter is set to a small value, this could cause the

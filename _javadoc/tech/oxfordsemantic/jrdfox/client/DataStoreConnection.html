@@ -19,7 +19,7 @@
 <script type="text/javascript" src="../../../../script-dir/jquery-ui.js"></script>
 </head>
 <body class="class-declaration">
-<script type="text/javascript">var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6,"i37":6,"i38":6,"i39":6,"i40":6,"i41":6,"i42":6,"i43":6,"i44":6,"i45":6,"i46":6,"i47":6,"i48":6,"i49":6,"i50":6,"i51":6,"i52":6,"i53":6,"i54":6,"i55":6,"i56":6,"i57":6,"i58":6,"i59":6,"i60":6,"i61":6,"i62":6,"i63":6,"i64":6,"i65":6,"i66":6,"i67":6,"i68":6,"i69":6,"i70":6,"i71":6,"i72":6,"i73":6,"i74":6,"i75":6,"i76":6,"i77":6,"i78":6,"i79":6,"i80":6,"i81":6,"i82":6,"i83":6,"i84":6,"i85":6,"i86":6,"i87":6,"i88":6,"i89":6,"i90":6,"i91":6,"i92":6,"i93":6,"i94":6,"i95":6,"i96":6,"i97":6,"i98":6,"i99":6,"i100":6,"i101":6,"i102":6,"i103":6};
+<script type="text/javascript">var data = {"i0":6,"i1":6,"i2":6,"i3":6,"i4":6,"i5":6,"i6":6,"i7":6,"i8":6,"i9":6,"i10":6,"i11":6,"i12":6,"i13":6,"i14":6,"i15":6,"i16":6,"i17":6,"i18":6,"i19":6,"i20":6,"i21":6,"i22":6,"i23":6,"i24":6,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6,"i32":6,"i33":6,"i34":6,"i35":6,"i36":6,"i37":6,"i38":6,"i39":6,"i40":6,"i41":6,"i42":6,"i43":6,"i44":6,"i45":6,"i46":6,"i47":6,"i48":6,"i49":6,"i50":6,"i51":6,"i52":6,"i53":6,"i54":6,"i55":6,"i56":6,"i57":6,"i58":6,"i59":6,"i60":6,"i61":6,"i62":6,"i63":6,"i64":6,"i65":6,"i66":6,"i67":6,"i68":6,"i69":6,"i70":6,"i71":6,"i72":6,"i73":6,"i74":6,"i75":6,"i76":6,"i77":6,"i78":6,"i79":6,"i80":6,"i81":6,"i82":6,"i83":6,"i84":6,"i85":6,"i86":6,"i87":6,"i88":6,"i89":6,"i90":6,"i91":6,"i92":6,"i93":6,"i94":6,"i95":6,"i96":6,"i97":6,"i98":6,"i99":6,"i100":6,"i101":6,"i102":6,"i103":6,"i104":6,"i105":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -255,7 +255,7 @@ java.lang.String&nbsp;dataSourceTableName)</code></th>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCursor(java.lang.String,java.util.Map)">createCursor</a></span>&#8203;(java.lang.String&nbsp;queryText,
 java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;compilationParameters)</code></th>
 <td class="colLast">
-<div class="block">Creates a cursor over the results of the given query with the default fetch window size of 100.</div>
+<div class="block">Creates a cursor over the results of the given query with the default fetch window size of one.</div>
 </td>
 </tr>
 <tr class="altColor" id="i14">
@@ -272,7 +272,7 @@ int&nbsp;fetchWindowSize)</code></th>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createCursor(tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.util.Map)">createCursor</a></span>&#8203;(<a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;compilationParameters)</code></th>
 <td class="colLast">
-<div class="block">Creates a cursor over the results of the given query with the default fetch window size of 100.</div>
+<div class="block">Creates a cursor over the results of the given query with the default fetch window size of one.</div>
 </td>
 </tr>
 <tr class="altColor" id="i16">
@@ -591,6 +591,13 @@ int&nbsp;numberOfRows)</code></th>
 </td>
 </tr>
 <tr class="altColor" id="i54">
+<td class="colFirst"><code><a href="ReasoningAlgorithm.html" title="enum in tech.oxfordsemantic.jrdfox.client">ReasoningAlgorithm</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDataStoreReasoningAlgorithm()">getDataStoreReasoningAlgorithm</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns the reasoning that the data store would use to process updates.</div>
+</td>
+</tr>
+<tr class="rowColor" id="i55">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDataStoreVersion()">getDataStoreVersion</a></span>()</code></th>
 <td class="colLast">
@@ -598,63 +605,70 @@ int&nbsp;numberOfRows)</code></th>
  data store version is returned.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i55">
+<tr class="altColor" id="i56">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getDataStoreVersionAfterLastOperation()">getDataStoreVersionAfterLastOperation</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the version that the data store had after the last operation on this connection.</div>
 </td>
 </tr>
-<tr class="altColor" id="i56">
+<tr class="rowColor" id="i57">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getIncrementalReasoningAllowed()">getIncrementalReasoningAllowed</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Returns <code>true</code> if updates on this data store connection are allowed to be processed using incremental reasoning.</div>
+</td>
+</tr>
+<tr class="altColor" id="i58">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLastSnapshotDataStoreVersion()">getLastSnapshotDataStoreVersion</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the data store version of the most recent snapshot.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i57">
+<tr class="rowColor" id="i59">
 <td class="colFirst"><code>long</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getLockTimeout()">getLockTimeout</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the time in milliseconds that the system will wait for when it needs to acquire a lock on a data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i58">
+<tr class="altColor" id="i60">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getName()">getName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the name of the data store inside the server.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i59">
+<tr class="rowColor" id="i61">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getParameters()">getParameters</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the parameters that the data store was created with.</div>
 </td>
 </tr>
-<tr class="altColor" id="i60">
+<tr class="altColor" id="i62">
 <td class="colFirst"><code><a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getPrefixes()">getPrefixes</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the prefixes of the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i61">
+<tr class="rowColor" id="i63">
 <td class="colFirst"><code><a href="TransactionState.html" title="enum in tech.oxfordsemantic.jrdfox.client">TransactionState</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTransactionState()">getTransactionState</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the state of the transaction associated with this connection.</div>
 </td>
 </tr>
-<tr class="altColor" id="i62">
+<tr class="altColor" id="i64">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUniqueID()">getUniqueID</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns a string that uniquely identifies the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i63">
+<tr class="rowColor" id="i65">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importAxiomsFromTriples(tech.oxfordsemantic.jrdfox.client.ResourceValue,boolean,tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType)">importAxiomsFromTriples</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;sourceGraph,
 boolean&nbsp;translateAssertions,
@@ -664,7 +678,7 @@ boolean&nbsp;translateAssertions,
 <div class="block">Parses the given source graph into OWL axioms, and imports the axioms into the destination graph.</div>
 </td>
 </tr>
-<tr class="altColor" id="i64">
+<tr class="altColor" id="i66">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importAxiomsFromTriples(tech.oxfordsemantic.jrdfox.client.ResourceValue,boolean,tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType,tech.oxfordsemantic.jrdfox.client.ImportNotificationMonitor)">importAxiomsFromTriples</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;sourceGraph,
 boolean&nbsp;translateAssertions,
@@ -675,34 +689,34 @@ boolean&nbsp;translateAssertions,
 <div class="block">Parses the given source graph into OWL axioms, and imports the axioms into the destination graph.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i65">
+<tr class="rowColor" id="i67">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType,java.io.File)">importData</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;defaultGraph,
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.io.File&nbsp;file)</code></th>
 <td class="colLast">
-<div class="block">Imports the data from the given file into the current data store.</div>
+<div class="block">Imports the data from the given file into the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i66">
+<tr class="altColor" id="i68">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType,java.io.InputStream)">importData</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;defaultGraph,
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.io.InputStream&nbsp;inputStream)</code></th>
 <td class="colLast">
-<div class="block">Imports the data from the given input stream into the current data store.</div>
+<div class="block">Imports the data from the given input stream into the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i67">
+<tr class="rowColor" id="i69">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType,java.lang.String)">importData</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;defaultGraph,
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.lang.String&nbsp;content)</code></th>
 <td class="colLast">
-<div class="block">Imports the data from the given string into the current data store.</div>
+<div class="block">Imports the data from the given string into the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i68">
+<tr class="altColor" id="i70">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType,java.util.Collection,java.lang.String,tech.oxfordsemantic.jrdfox.client.ImportNotificationMonitor)">importData</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;defaultGraph,
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
@@ -710,10 +724,10 @@ java.util.Collection&lt;<a href="InputSourceFactory.html" title="class in tech.o
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</code></th>
 <td class="colLast">
-<div class="block">Imports the data described by the given input source factories into the current data store.</div>
+<div class="block">Imports the data described by the given input source factories into the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i69">
+<tr class="rowColor" id="i71">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.ResourceValue,tech.oxfordsemantic.jrdfox.client.UpdateType,tech.oxfordsemantic.jrdfox.client.InputSourceFactory,java.lang.String,tech.oxfordsemantic.jrdfox.client.ImportNotificationMonitor)">importData</a></span>&#8203;(<a href="ResourceValue.html" title="interface in tech.oxfordsemantic.jrdfox.client">ResourceValue</a>&nbsp;defaultGraph,
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
@@ -721,83 +735,83 @@ java.lang.String&nbsp;formatName,
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</code></th>
 <td class="colLast">
-<div class="block">Imports the data described by the given input source factory into the current data store
+<div class="block">Imports the data described by the given input source factory into the data store
  Triples in the default graph will be put into the named graph specified using the <code>defaultGraph</code> parameter.</div>
-</td>
-</tr>
-<tr class="altColor" id="i70">
-<td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.io.File)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
-java.io.File&nbsp;file)</code></th>
-<td class="colLast">
-<div class="block">Imports the data from the given file into the current data store.</div>
-</td>
-</tr>
-<tr class="rowColor" id="i71">
-<td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.io.InputStream)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
-java.io.InputStream&nbsp;inputStream)</code></th>
-<td class="colLast">
-<div class="block">Imports the data from the given input stream into the current data store.</div>
 </td>
 </tr>
 <tr class="altColor" id="i72">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.lang.String)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
-java.lang.String&nbsp;content)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.io.File)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
+java.io.File&nbsp;file)</code></th>
 <td class="colLast">
-<div class="block">Imports the data from the given string into the current data store.</div>
+<div class="block">Imports the data from the given file into the data store.</div>
 </td>
 </tr>
 <tr class="rowColor" id="i73">
+<td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.io.InputStream)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
+java.io.InputStream&nbsp;inputStream)</code></th>
+<td class="colLast">
+<div class="block">Imports the data from the given input stream into the data store.</div>
+</td>
+</tr>
+<tr class="altColor" id="i74">
+<td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.lang.String)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
+java.lang.String&nbsp;content)</code></th>
+<td class="colLast">
+<div class="block">Imports the data from the given string into the data store.</div>
+</td>
+</tr>
+<tr class="rowColor" id="i75">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,java.util.Collection,java.lang.String,tech.oxfordsemantic.jrdfox.client.ImportNotificationMonitor)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.util.Collection&lt;<a href="InputSourceFactory.html" title="class in tech.oxfordsemantic.jrdfox.client">InputSourceFactory</a>&gt;&nbsp;inputSourceFactories,
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</code></th>
 <td class="colLast">
-<div class="block">Imports the data described by the given input source factories into the current data store.</div>
+<div class="block">Imports the data described by the given input source factories into the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i74">
+<tr class="altColor" id="i76">
 <td class="colFirst"><code><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#importData(tech.oxfordsemantic.jrdfox.client.UpdateType,tech.oxfordsemantic.jrdfox.client.InputSourceFactory,java.lang.String,tech.oxfordsemantic.jrdfox.client.ImportNotificationMonitor)">importData</a></span>&#8203;(<a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 <a href="InputSourceFactory.html" title="class in tech.oxfordsemantic.jrdfox.client">InputSourceFactory</a>&nbsp;inputSourceFactory,
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</code></th>
 <td class="colLast">
-<div class="block">Imports the data described by the given input source factory into the current data store.</div>
+<div class="block">Imports the data described by the given input source factory into the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i75">
+<tr class="rowColor" id="i77">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#interrupt()">interrupt</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Tries to interrupt an operation that is running in parallel on this connection.</div>
 </td>
 </tr>
-<tr class="altColor" id="i76">
+<tr class="altColor" id="i78">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isPersistent()">isPersistent</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns <code>true</code> if the data store is persistent.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i77">
+<tr class="rowColor" id="i79">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.util.Optional&lt;<a href="DataSourceInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DataSourceInfo</a>&gt;&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listDataSources()">listDataSources</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the list of data sources currently present in the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i78">
+<tr class="altColor" id="i80">
 <td class="colFirst"><code>java.util.List&lt;<a href="DataSourceTableInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DataSourceTableInfo</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listDataSourceTables(java.lang.String)">listDataSourceTables</a></span>&#8203;(java.lang.String&nbsp;dataSourceName)</code></th>
 <td class="colLast">
 <div class="block">Returns information about the data source tables of the specified data source in the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i79">
+<tr class="rowColor" id="i81">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.util.Optional&lt;<a href="DeltaQueryInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryInfo</a>&gt;&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listDeltaQueries()">listDeltaQueries</a></span>()</code></th>
 <td class="colLast">
@@ -805,7 +819,7 @@ java.lang.String&nbsp;formatName,
  data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i80">
+<tr class="altColor" id="i82">
 <td class="colFirst"><code>java.util.List&lt;<a href="DeltaQueryAnswerInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">DeltaQueryAnswerInfo</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listDeltaQueryAnswers(java.util.Optional,java.util.Optional,java.util.Optional,java.util.Optional)">listDeltaQueryAnswers</a></span>&#8203;(java.util.Optional&lt;java.lang.String&gt;&nbsp;deltaQueryName,
 java.util.Optional&lt;java.lang.Long&gt;&nbsp;fromDataStoreVersion,
@@ -815,35 +829,35 @@ java.util.Optional&lt;<a href="DeltaQueryAnswerType.html" title="enum in tech.ox
 <div class="block">Lists the delta query answers that match the specified delta query name, the data store version range, and delta query answer type.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i81">
+<tr class="rowColor" id="i83">
 <td class="colFirst"><code>java.util.List&lt;<a href="RuleInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">RuleInfo</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listRules()">listRules</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the information about the rules currently loaded into the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i82">
+<tr class="altColor" id="i84">
 <td class="colFirst"><code>java.util.List&lt;<a href="StatisticsInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">StatisticsInfo</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listStatistics()">listStatistics</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns information about all statistics currently managed by the data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i83">
+<tr class="rowColor" id="i85">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,&#8203;java.util.Optional&lt;<a href="TupleTableInfo.html" title="class in tech.oxfordsemantic.jrdfox.client">TupleTableInfo</a>&gt;&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listTupleTables()">listTupleTables</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Returns the list of tuple tables currently present in the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i84">
+<tr class="altColor" id="i86">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#recompile()">recompile</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Recompiles the rules and commit procedure using the currently available statistics.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i85">
+<tr class="rowColor" id="i87">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#recomputeMaterialization()">recomputeMaterialization</a></span>()</code></th>
 <td class="colLast">
@@ -851,7 +865,7 @@ java.util.Optional&lt;<a href="DeltaQueryAnswerType.html" title="enum in tech.ox
  had just been freshly imported.</div>
 </td>
 </tr>
-<tr class="altColor" id="i86">
+<tr class="altColor" id="i88">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDataSource(java.lang.String,java.util.Map)">registerDataSource</a></span>&#8203;(java.lang.String&nbsp;dataSourceName,
 java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;dataSourceParameters)</code></th>
@@ -859,7 +873,7 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;dataSourcePar
 <div class="block">Registers a data source with a data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i87">
+<tr class="rowColor" id="i89">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDeltaQuery(java.lang.String,java.lang.String,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 java.lang.String&nbsp;queryText,
@@ -871,7 +885,7 @@ long&nbsp;additionsMaxSize)</code></th>
 <div class="block">Registers a delta query with a data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i88">
+<tr class="altColor" id="i90">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerDeltaQuery(java.lang.String,tech.oxfordsemantic.jrdfox.logic.sparql.statement.Query,java.lang.String,long,long,long)">registerDeltaQuery</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 <a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
@@ -883,43 +897,35 @@ long&nbsp;additionsMaxSize)</code></th>
 <div class="block">Registers a delta query with a data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i89">
-<td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#requiresIncrementalReasoning()">requiresIncrementalReasoning</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Returns <code>true</code> if the next data store update must be performed using incremental reasoning
- (rather than standard using the standard datalog materialization "from scratch" algorithm).</div>
-</td>
-</tr>
-<tr class="altColor" id="i90">
+<tr class="rowColor" id="i91">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rollbackTransaction()">rollbackTransaction</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Rolls back the transaction associated with this connection.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i91">
+<tr class="altColor" id="i92">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCommitProcedure(java.lang.String)">setCommitProcedure</a></span>&#8203;(java.lang.String&nbsp;commitProcedure)</code></th>
 <td class="colLast">
 <div class="block">Sets the data store's commit procedure.</div>
 </td>
 </tr>
-<tr class="altColor" id="i92">
+<tr class="rowColor" id="i93">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCommitProcedure(java.util.List)">setCommitProcedure</a></span>&#8203;(java.util.List&lt;<a href="../logic/sparql/statement/Update.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Update</a>&gt;&nbsp;steps)</code></th>
 <td class="colLast">
 <div class="block">Sets the data store's commit procedure.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i93">
+<tr class="altColor" id="i94">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDataStoreOperationStartMonitor(tech.oxfordsemantic.jrdfox.client.DataStoreOperationStartMonitor)">setDataStoreOperationStartMonitor</a></span>&#8203;(<a href="DataStoreOperationStartMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">DataStoreOperationStartMonitor</a>&nbsp;dataStoreOperationStartMonitor)</code></th>
 <td class="colLast">
 <div class="block">Sets a callback interface that will be called whenever an operation starts on this data store connection.</div>
 </td>
 </tr>
-<tr class="altColor" id="i94">
+<tr class="rowColor" id="i95">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDataStoreProperty(java.lang.String,java.lang.String)">setDataStoreProperty</a></span>&#8203;(java.lang.String&nbsp;propertyName,
 java.lang.String&nbsp;propertyValue)</code></th>
@@ -927,7 +933,7 @@ java.lang.String&nbsp;propertyValue)</code></th>
 <div class="block">Sets the specified property of the data store to the given value.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i95">
+<tr class="altColor" id="i96">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDeltaQueryEvaluationMode(java.lang.String,tech.oxfordsemantic.jrdfox.client.DeltaQueryEvaluationMode)">setDeltaQueryEvaluationMode</a></span>&#8203;(java.lang.String&nbsp;deltaQueryName,
 <a href="DeltaQueryEvaluationMode.html" title="enum in tech.oxfordsemantic.jrdfox.client">DeltaQueryEvaluationMode</a>&nbsp;deltaQueryEvaluationMode)</code></th>
@@ -935,14 +941,21 @@ java.lang.String&nbsp;propertyValue)</code></th>
 <div class="block">Deregisters the delta query with the specified name from the data store.</div>
 </td>
 </tr>
-<tr class="altColor" id="i96">
+<tr class="rowColor" id="i97">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setIncrementalReasoningAllowed(boolean)">setIncrementalReasoningAllowed</a></span>&#8203;(boolean&nbsp;incrementalReasoningAllowed)</code></th>
+<td class="colLast">
+<div class="block">Determines whether it is allowed to process updates initiated on this data store connection using incremental reasoning.</div>
+</td>
+</tr>
+<tr class="altColor" id="i98">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLockTimeout(long)">setLockTimeout</a></span>&#8203;(long&nbsp;timeout)</code></th>
 <td class="colLast">
 <div class="block">Sets the time in milliseconds that the system will wait for when it needs to acquire a lock on a data store.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i97">
+<tr class="rowColor" id="i99">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setPrefix(java.lang.String,java.lang.String)">setPrefix</a></span>&#8203;(java.lang.String&nbsp;prefixName,
 java.lang.String&nbsp;prefixIRI)</code></th>
@@ -950,14 +963,14 @@ java.lang.String&nbsp;prefixIRI)</code></th>
 <div class="block">Sets the given prefix name to the given prefix IRI in the collection of the data store prefixes.</div>
 </td>
 </tr>
-<tr class="altColor" id="i98">
+<tr class="altColor" id="i100">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setPrefixes(tech.oxfordsemantic.jrdfox.Prefixes)">setPrefixes</a></span>&#8203;(<a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes)</code></th>
 <td class="colLast">
 <div class="block">Replaces all mappings of the prefix names to IRIs maintained by the data store to the collection given in the argument.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i99">
+<tr class="rowColor" id="i101">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#transactionRequiresRollback()">transactionRequiresRollback</a></span>()</code></th>
 <td class="colLast">
@@ -965,28 +978,28 @@ java.lang.String&nbsp;prefixIRI)</code></th>
  cannot be committed).</div>
 </td>
 </tr>
-<tr class="altColor" id="i100">
+<tr class="altColor" id="i102">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#unsetPrefix(java.lang.String)">unsetPrefix</a></span>&#8203;(java.lang.String&nbsp;prefixName)</code></th>
 <td class="colLast">
 <div class="block">Removes the mapping of the given prefix name in the collection of the data store prefixes.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i101">
+<tr class="rowColor" id="i103">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateMaterialization()">updateMaterialization</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Updates the materialization so that all and only the consequences of the explicitly stated facts and the rules are derived.</div>
 </td>
 </tr>
-<tr class="altColor" id="i102">
+<tr class="altColor" id="i104">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateStatistics()">updateStatistics</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Updates all statistics that the data store uses to plan queries and rules.</div>
 </td>
 </tr>
-<tr class="rowColor" id="i103">
+<tr class="rowColor" id="i105">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#updateStatistics(java.lang.String)">updateStatistics</a></span>&#8203;(java.lang.String&nbsp;statisticsName)</code></th>
 <td class="colLast">
@@ -2145,7 +2158,7 @@ java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;parameters)</
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data described by the given input source factory into the current data store.</div>
+<div class="block">Imports the data described by the given input source factory into the data store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>updateType</code> - specifies whether the imported data should be added or removed from the data store</dd>
@@ -2167,7 +2180,7 @@ java.util.Collection&lt;<a href="InputSourceFactory.html" title="class in tech.o
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data described by the given input source factories into the current data store.
+<div class="block">Imports the data described by the given input source factories into the data store.
  If this server is configured to use more than one thread, then sources are parsed and imported in parallel.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2188,7 +2201,7 @@ java.lang.String&nbsp;formatName,
 <div class="memberSignature"><span class="returnType"><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></span>&nbsp;<span class="memberName">importData</span>&#8203;(<span class="arguments"><a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.io.File&nbsp;file)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data from the given file into the current data store.</div>
+<div class="block">Imports the data from the given file into the data store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>updateType</code> - specifies whether the imported data should be added or removed from the data store</dd>
@@ -2206,7 +2219,7 @@ java.io.File&nbsp;file)</span>
 <div class="memberSignature"><span class="returnType"><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></span>&nbsp;<span class="memberName">importData</span>&#8203;(<span class="arguments"><a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.lang.String&nbsp;content)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data from the given string into the current data store.</div>
+<div class="block">Imports the data from the given string into the data store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>updateType</code> - specifies whether the imported data should be added or removed from the data store</dd>
@@ -2224,7 +2237,7 @@ java.lang.String&nbsp;content)</span>
 <div class="memberSignature"><span class="returnType"><a href="ImportResult.html" title="class in tech.oxfordsemantic.jrdfox.client">ImportResult</a></span>&nbsp;<span class="memberName">importData</span>&#8203;(<span class="arguments"><a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.io.InputStream&nbsp;inputStream)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data from the given input stream into the current data store.</div>
+<div class="block">Imports the data from the given input stream into the data store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>updateType</code> - specifies whether the imported data should be added or removed from the data store</dd>
@@ -2245,7 +2258,7 @@ java.io.InputStream&nbsp;inputStream)</span>
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data described by the given input source factory into the current data store
+<div class="block">Imports the data described by the given input source factory into the data store
  Triples in the default graph will be put into the named graph specified using the <code>defaultGraph</code> parameter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2270,7 +2283,7 @@ java.util.Collection&lt;<a href="InputSourceFactory.html" title="class in tech.o
 java.lang.String&nbsp;formatName,
 <a href="ImportNotificationMonitor.html" title="interface in tech.oxfordsemantic.jrdfox.client">ImportNotificationMonitor</a>&nbsp;importNotificationMonitor)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data described by the given input source factories into the current data store.
+<div class="block">Imports the data described by the given input source factories into the data store.
  Triples in the default graph will be put into the named graph specified using the <code>defaultGraph</code> parameter.
  If this server is configured to use more than one thread, then sources are parsed and imported in parallel.</div>
 <dl>
@@ -2294,7 +2307,7 @@ java.lang.String&nbsp;formatName,
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.io.File&nbsp;file)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data from the given file into the current data store.
+<div class="block">Imports the data from the given file into the data store.
  Triples in the default graph will be put into the named graph specified using the <code>defaultGraph</code> parameter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2315,7 +2328,7 @@ java.io.File&nbsp;file)</span>
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.lang.String&nbsp;content)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data from the given string into the current data store.
+<div class="block">Imports the data from the given string into the data store.
  Triples in the default graph will be put into the named graph specified using the <code>defaultGraph</code> parameter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2336,7 +2349,7 @@ java.lang.String&nbsp;content)</span>
 <a href="UpdateType.html" title="enum in tech.oxfordsemantic.jrdfox.client">UpdateType</a>&nbsp;updateType,
 java.io.InputStream&nbsp;inputStream)</span>
                  throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Imports the data from the given input stream into the current data store.
+<div class="block">Imports the data from the given input stream into the data store.
  Triples in the default graph will be put into the named graph specified using the <code>defaultGraph</code> parameter.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2490,14 +2503,46 @@ boolean&nbsp;translateAssertions,
 </li>
 <li class="blockList">
 <section class="detail">
-<h3><a id="requiresIncrementalReasoning()">requiresIncrementalReasoning</a></h3>
-<div class="memberSignature"><span class="returnType">boolean</span>&nbsp;<span class="memberName">requiresIncrementalReasoning</span>()
-                              throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Returns <code>true</code> if the next data store update must be performed using incremental reasoning
- (rather than standard using the standard datalog materialization "from scratch" algorithm).</div>
+<h3><a id="getIncrementalReasoningAllowed()">getIncrementalReasoningAllowed</a></h3>
+<div class="memberSignature"><span class="returnType">boolean</span>&nbsp;<span class="memberName">getIncrementalReasoningAllowed</span>()
+                                throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Returns <code>true</code> if updates on this data store connection are allowed to be processed using incremental reasoning.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd><code>true</code> if the next data store update must be performed using incremental reasoning</dd>
+<dd><code>true</code> if updates on this data store connection are allowed to be processed using incremental reasoning</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="setIncrementalReasoningAllowed(boolean)">setIncrementalReasoningAllowed</a></h3>
+<div class="memberSignature"><span class="returnType">void</span>&nbsp;<span class="memberName">setIncrementalReasoningAllowed</span>&#8203;(<span class="arguments">boolean&nbsp;incrementalReasoningAllowed)</span>
+                             throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Determines whether it is allowed to process updates initiated on this data store connection using incremental reasoning.
+ When this option is set to <code>false</code>, all updates are processed by recomputing the materialization "from scratch",
+ even if the current state of the data store allows for incremental reasoning.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>incrementalReasoningAllowed</code> - <code>true</code> if incremental reasoning is allowed for the updates initiated on this data store connection</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
+</dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="getDataStoreReasoningAlgorithm()">getDataStoreReasoningAlgorithm</a></h3>
+<div class="memberSignature"><span class="returnType"><a href="ReasoningAlgorithm.html" title="enum in tech.oxfordsemantic.jrdfox.client">ReasoningAlgorithm</a></span>&nbsp;<span class="memberName">getDataStoreReasoningAlgorithm</span>()
+                                           throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
+<div class="block">Returns the reasoning that the data store would use to process updates. The returned value is determined only based on
+ the current data store state -- that is, it does not take into account whether incremental reasoning is allowed on this
+ data store connection. Thus, even if <a href="#getIncrementalReasoningAllowed()"><code>getIncrementalReasoningAllowed()</code></a> returns <code>false</code>, this function
+ can still return <code>ReasoningAlgorithm.INCREMENTAL</code>.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the reasoning algorithm that the data store would use to process updates</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></code> - thrown if an error is encountered</dd>
 </dl>
@@ -2605,7 +2650,7 @@ int&nbsp;fetchWindowSize)</span>
 <div class="memberSignature"><span class="returnType"><a href="Cursor.html" title="interface in tech.oxfordsemantic.jrdfox.client">Cursor</a></span>&nbsp;<span class="memberName">createCursor</span>&#8203;(<span class="arguments">java.lang.String&nbsp;queryText,
 java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;compilationParameters)</span>
              throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Creates a cursor over the results of the given query with the default fetch window size of 100.</div>
+<div class="block">Creates a cursor over the results of the given query with the default fetch window size of one.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>queryText</code> - the query to be evaluated</dd>
@@ -2646,7 +2691,7 @@ int&nbsp;fetchWindowSize)</span>
 <div class="memberSignature"><span class="returnType"><a href="Cursor.html" title="interface in tech.oxfordsemantic.jrdfox.client">Cursor</a></span>&nbsp;<span class="memberName">createCursor</span>&#8203;(<span class="arguments"><a href="../logic/sparql/statement/Query.html" title="class in tech.oxfordsemantic.jrdfox.logic.sparql.statement">Query</a>&nbsp;query,
 java.util.Map&lt;java.lang.String,&#8203;java.lang.String&gt;&nbsp;compilationParameters)</span>
              throws <span class="exceptions"><a href="../exceptions/JRDFoxException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">JRDFoxException</a></span></div>
-<div class="block">Creates a cursor over the results of the given query with the default fetch window size of 100.</div>
+<div class="block">Creates a cursor over the results of the given query with the default fetch window size of one.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>query</code> - the query to be evaluated</dd>

@@ -274,6 +274,8 @@ Ant script can be used to compile and run the program.</p></li>
 </ul>
 </div></blockquote>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">models</span></code>: a directory containing default text embedding models for use with
+RDFox’s semantic search capabilities.</p></li>
 </ul>
 </div>
 <div class="section" id="interfaces">
@@ -341,11 +343,11 @@ on-demand the first time the dependent functionality is accessed within a
 session. This means that RDFox can be deployed in the absence of these packages
 if the dependent functionality is not needed.</p>
 <dl>
-<dt><a class="reference external" href="https://www.openssl.org/">OpenSSL</a></dt><dd><p>Used to implement TLS for RDFox’s HTTP client and server code, as well as for
-persistence and session encryption. The search paths used to locate the DLLs
-from this package when the endpoint is starting can be specified via the
-<code class="docutils literal notranslate"><span class="pre">RDFOX_LIBCRYPTO_PATH</span></code> and <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBSSL_PATH</span></code> environment variables. If
-the environment variables are not set, the default values shown in the
+<dt><a class="reference external" href="https://www.openssl.org/">OpenSSL</a></dt><dd><p>RDFox requires OpenSSL to implement HTTPS and to encrypt data at rest,
+including persisted data and session tokens. The search paths used to locate
+the DLLs from this package when the endpoint is starting can be specified via
+the <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBCRYPTO_PATH</span></code> and <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBSSL_PATH</span></code> environment variables.
+If the environment variables are not set, the default values shown in the
 following table are used.</p>
 <blockquote>
 <div><table class="colwidths-given docutils align-default">
@@ -378,10 +380,11 @@ following table are used.</p>
 </div></blockquote>
 <p>The resolved libraries must have version v3.0.0 or higher.</p>
 </dd>
-<dt><a class="reference external" href="https://www.postgresql.org/docs/14/libpq.html">libpq</a></dt><dd><p>Used to access PostgreSQL data sources. The search path used to locate
-<code class="docutils literal notranslate"><span class="pre">libpq</span></code> when registering one of these data sources can be specified via the
-<code class="docutils literal notranslate"><span class="pre">RDFOX_LIBPQ_PATH</span></code> environment variable. If the environment variable is not
-set, the default value shown in the following table is used.</p>
+<dt><a class="reference external" href="https://www.postgresql.org/docs/14/libpq.html">libpq</a></dt><dd><p>RDFox uses libpq to implement <cite>PostgreSQL</cite> data sources. The search path used
+to locate <code class="docutils literal notranslate"><span class="pre">libpq</span></code> when registering one of these data sources can be
+specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBPQ_PATH</span></code> environment variable. If the
+environment variable is not set, the default value shown in the following
+table is used.</p>
 <blockquote>
 <div><table class="colwidths-given docutils align-default">
 <colgroup>
@@ -412,12 +415,12 @@ tested with both library and server from PostgreSQL 14, however it will also
 work with a wider range of versions, both higher and lower. Please test your
 configuration and contact OST support as needed.</p>
 </dd>
-<dt><a class="reference external" href="https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors">iODBC</a> or <a class="reference external" href="http://www.unixodbc.org/">unixODBC</a></dt><dd><p>Used to access external data sources via ODBC. The search path used to locate
-the DLL that will manage drivers for accessing the ODBC source can be
-specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_ODBC_DRIVER_MANAGER_PATH</span></code> environment variable. If
-the environment variable is not set, RDFox will attempt to use the default
-search paths shown in the following table to load unixODBC and, if that fails
-and the platform is not Windows, iODBC.</p>
+<dt><a class="reference external" href="https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors">iODBC</a> or <a class="reference external" href="http://www.unixodbc.org/">unixODBC</a></dt><dd><p>RDFox uses either iODBC or unixODBC to implement <cite>ODBC</cite> data sources. The
+search path used to locate the DLL that will manage drivers for accessing the
+ODBC source can be specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_ODBC_DRIVER_MANAGER_PATH</span></code>
+environment variable. If the environment variable is not set, RDFox will
+attempt to use the default search paths shown in the following table to load
+unixODBC and, if that fails and the platform is not Windows, iODBC.</p>
 <blockquote>
 <div><table class="colwidths-given docutils align-default">
 <colgroup>
@@ -452,10 +455,11 @@ built and tested with unixODBC v2.3, however it will work with a wider range
 of versions, both higher and lower. Please test your configuration and contact
 OST support as needed.</p>
 </dd>
-<dt><a class="reference external" href="https://www.sqlite.org/">libsqlite3</a></dt><dd><p>Used to access SQLite data sources. The search path used to locate the
-SQLite library can be specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBSQLITE_PATH</span></code> environment
-variable. If the environment variable is not set, RDFox will attempt to use
-the default search paths shown in the following table.</p>
+<dt><a class="reference external" href="https://www.sqlite.org/">libsqlite3</a></dt><dd><p>RDFox uses libsqlite3 to implement <cite>SQLite</cite> data sources. The search path
+used to locate the SQLite library can be specified via the
+<code class="docutils literal notranslate"><span class="pre">RDFOX_LIBSQLITE_PATH</span></code> environment variable. If the environment variable is
+not set, RDFox will attempt to use the default search paths shown in the
+following table.</p>
 <blockquote>
 <div><table class="colwidths-given docutils align-default">
 <colgroup>
@@ -486,43 +490,49 @@ SQLite v3.49.1, however it will also work with a wider range of versions,
 both higher and lower. Please test your configuration and contact OST support
 as needed.</p>
 </dd>
-<dt><a class="reference external" href="https://lucene.apache.org/">Lucene</a></dt><dd><p>Used to access Lucene data sources. The search path used to locate the
-Lucene libraries when registering a Lucene data source can be specified via
-the server parameter <code class="docutils literal notranslate"><span class="pre">jvm.options</span></code> or the environment variable
-<code class="docutils literal notranslate"><span class="pre">RDFOX_JVM_OPTIONS</span></code>. The JVM options should include <code class="docutils literal notranslate"><span class="pre">-Djava.class.path</span></code>
-of the required Lucene libraries. The separator between the classpath is
-<code class="docutils literal notranslate"><span class="pre">:</span></code> (On Windows, <code class="docutils literal notranslate"><span class="pre">;</span></code>). Any other JVM options can be specified as needed
-using the <code class="docutils literal notranslate"><span class="pre">|</span></code> separator.
-If a Lucene data source is used with JRDFox, the required Lucene libraries
-must be included in the classpath of the JVM running JRDFox.
-The required JVM option and Lucene libraries are shown in the following table.</p>
+<dt><a class="reference external" href="https://lucene.apache.org/">Lucene</a></dt><dd><p>RDFox uses Lucene to implement <cite>lucene</cite> data sources. The search path used to
+locate the Lucene libraries when registering a Lucene data source can be
+specified via the server parameter <code class="docutils literal notranslate"><span class="pre">jvm.options</span></code> or the environment
+variable <code class="docutils literal notranslate"><span class="pre">RDFOX_JVM_OPTIONS</span></code>. The JVM options should include
+<code class="docutils literal notranslate"><span class="pre">-Djava.class.path</span></code> of the required Lucene libraries. The separator between
+the classpath is <code class="docutils literal notranslate"><span class="pre">:</span></code> (On Windows, <code class="docutils literal notranslate"><span class="pre">;</span></code>). Any other JVM options can be
+specified as needed using the <code class="docutils literal notranslate"><span class="pre">|</span></code> separator. If a Lucene data source is
+used with JRDFox, the required Lucene libraries must be included in the
+classpath of the JVM running JRDFox. The required Lucene libraries for
+<code class="docutils literal notranslate"><span class="pre">-Djava.class.path</span></code> are shown in the following table with explanations of
+their purpose.</p>
 <table class="colwidths-given docutils align-default">
 <colgroup>
-<col style="width: 38%" />
-<col style="width: 62%" />
+<col style="width: 43%" />
+<col style="width: 57%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>JVM Option</p></th>
-<th class="head"><p>Lucene library search path</p></th>
+<tr class="row-odd"><th class="head"><p>Lucene library search path</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-Djava.class.path</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">lucene-core-&lt;version&gt;.jar</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lucene-core-&lt;version&gt;.jar</span></code></p></td>
+<td><p>(<cite>Required</cite>) Lucene core library.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-Djava.class.path</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">lucene-queryparser-&lt;version&gt;.jar</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lucene-queryparser-&lt;version&gt;.jar</span></code></p></td>
+<td><p>(<cite>Required</cite>) Query parsers and parsing framework.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lucene-backward-codecs-&lt;version&gt;.jar</span></code></p></td>
+<td><p>(<cite>Optional</cite>) This library can be used to access
+Lucene indexes created with older major versions of
+Lucene.</p></td>
 </tr>
 </tbody>
 </table>
 <p>The resolved libraries must have version v9.6.0 or higher.</p>
 </dd>
-<dt><a class="reference external" href="https://docs.oracle.com/en/java/index.html">libjvm</a></dt><dd><p>Used to access Lucene data sources with RDFox executable. The search path
-used to locate the JVM library can be specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBJVM_PATH</span></code>
-environment variable.
-This is required to embed the Java Virtual Machine (JVM) within RDFox.
-If the environment variable is not set, RDFox will
-attempt to use the default search paths shown in the following table.</p>
+<dt><a class="reference external" href="https://docs.oracle.com/en/java/index.html">libjvm</a></dt><dd><p>RDFox uses libjvm to implement <cite>lucene</cite> data sources when the RDFox server
+was not created from the Java API. The search path used to locate the JVM
+library can be specified via the <code class="docutils literal notranslate"><span class="pre">RDFOX_LIBJVM_PATH</span></code> environment variable.
+This is required to embed the Java Virtual Machine (JVM) within RDFox. If the
+environment variable is not set, RDFox will attempt to use the default search
+paths shown in the following table.</p>
 <blockquote>
 <div><table class="colwidths-given docutils align-default">
 <colgroup>

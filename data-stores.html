@@ -674,15 +674,17 @@ writers at the point of commit.</p></li>
 </ul>
 </div>
 <div class="section" id="auto-update-statistics-mode">
-<h4><span class="section-number">5.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code><a class="headerlink" href="#auto-update-statistics-mode" title="Permalink to this headline">¶</a></h4>
+<span id="id7"></span><h4><span class="section-number">5.4.2.2. </span><code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code><a class="headerlink" href="#auto-update-statistics-mode" title="Permalink to this headline">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code> data store property governs how RDFox
 manages statistics about the data loaded into the system. RDFox uses these
 statistics during query planning in order to identify an efficient plan, so
 query performance may be suboptimal if the statistics are not up to date. The
 allowed values are as follows.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">off</span></code>: Statistics are never updated automatically, but they can be updated
-manually using the <code class="docutils literal notranslate"><span class="pre">stats</span> <span class="pre">update</span></code> command or via one of the available APIs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">off</span></code>: Statistics are updated automatically only when strictly required,
+for example after an automatic or manual compaction of the data store. They
+can still be updated manually using the <code class="docutils literal notranslate"><span class="pre">stats</span> <span class="pre">update</span></code> command or through
+one of the available APIs.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">balanced</span></code>: The cost of updating the statistics is balanced against the
 possibility of using outdated statistics. This is the default.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">eager</span></code>: Statistics are updated after each operation that has the potential

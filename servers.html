@@ -134,6 +134,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#server-parameters">4.3. Server Parameters</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#the-server-parameters-file">4.3.1. The Server Parameters File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#specifying-durations">4.3.2. Specifying Durations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#http-remotes">4.3.3. HTTP Remotes</a></li>
 </ul>
 </li>
 </ul>
@@ -495,9 +496,9 @@ at startup, otherwise all data stores
 begin in the offline state. The default
 value is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">allowed-url-schemes-on-import</span></code></p></td>
 <td><p>a string containing a space-
-separated list of URI schemes</p></td>
+separated list of URL schemes</p></td>
 <td><p>Specifies a space-separated list of
 schemes that are allowed to be used
 in the SPARQL 1.1 <code class="docutils literal notranslate"><span class="pre">LOAD</span></code> update
@@ -554,7 +555,9 @@ e.g. <code class="docutils literal notranslate"><span class="pre">oidc.&lt;param
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">delta-queries.answers-directory</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>The directory in which the delta query
-answers will be stored.</p></td>
+answers will be stored. If ommitted, RDFox
+stores the delta query answers with the data
+store content in the server directory.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">delta-queries.encryption.algorithm</span></code></p></td>
 <td><p>a string</p></td>
@@ -584,7 +587,17 @@ supplied via the
 environment variable.
 By default, this parameter is unset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">jvm.options</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">http-remotes</span></code></p></td>
+<td><p>a string</p></td>
+<td><p>Specifies a JSON object as a string mapping
+HTTP(S) endpoints to connection settings.
+See <a class="reference internal" href="#http-remotes"><span class="std std-numref">Section 4.3.3</span></a> for more
+information. This parameter may alternatively
+be supplied via the <code class="docutils literal notranslate"><span class="pre">RDFOX_HTTP_REMOTES</span></code>
+environment variable.
+By default, this parameter is unset.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">jvm.options</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>Specifies the JVM options for Lucene data
 sources. If this parameter is set, the server
@@ -600,7 +613,7 @@ supplied via the <code class="docutils literal notranslate"><span class="pre">RD
 environment variable.
 By default, this parameter is unset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">license.content</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">license.content</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>Specifies the license content verbatim.
 This parameter is not set by default.
@@ -608,7 +621,7 @@ See <a class="reference internal" href="features-and-requirements.html#rdfox-lic
 the precedence of license-related
 options.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">license.file</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">license.file</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>Specifies the path to the license key
 file to use. The default value is
@@ -619,14 +632,14 @@ See <a class="reference internal" href="features-and-requirements.html#rdfox-lic
 the precedence of license-related
 options.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max-memory</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max-memory</span></code></p></td>
 <td><p>an integer</p></td>
 <td><p>Specifies the initial value for the
 maximum of memory in MB that the RDFox
 instance should use. The default is 0.9
 times the installed memory.</p></td>
 </tr>
-<tr class="row-odd"><td><blockquote>
+<tr class="row-even"><td><blockquote>
 <div></div></blockquote>
 <p id="num-threads-server-param"><code class="docutils literal notranslate"><span class="pre">num-threads</span></code></p>
 </td>
@@ -637,7 +650,7 @@ as reasoning and importation. The default
 is the number of logical processors
 available on the machine.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>, or
 <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
 <td><p>If the value is <code class="docutils literal notranslate"><span class="pre">file</span></code> or
@@ -648,7 +661,7 @@ directory using the matching persistence
 option. See <a class="reference internal" href="persistence.html#persistence-options"><span class="std std-numref">Section 13.2.1</span></a>
 for an explanation of the available options.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.disk-sector-size</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.disk-sector-size</span></code></p></td>
 <td><p>an integer</p></td>
 <td><p>The physical sector size of the disk
 containing the server directory in bytes.
@@ -658,7 +671,7 @@ This parameter is used when the
 for read/write transactions in data
 stores. The default value is <code class="docutils literal notranslate"><span class="pre">4096</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.algorithm</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>The name of the encryption algorithm to use
 to encrypt and decrypt all persisted data.
@@ -672,7 +685,7 @@ but this is only used if the
 <code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code> parameter
 is set.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.encryption.key</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>A base64-encoded encryption key. If this
 parameter is set, the server will use it
@@ -687,7 +700,7 @@ supplied via the
 environment variable.
 By default, this parameter is unset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.file-system-poll-interval</span></code></p></td>
 <td><p>a duration of <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">ms</span></code> or more
 specified as described in
 <a class="reference internal" href="#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>.</p></td>
@@ -700,7 +713,7 @@ ignored unless <code class="docutils literal notranslate"><span class="pre">file
 persistence is in use. See also
 <a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.notifications-address</span></code></p></td>
 <td><p>a hostname and UDP
 port number separated
 separated by a plus
@@ -714,7 +727,7 @@ the instance will neither listen for nor
 send notifications. See also
 <a class="reference internal" href="persistence.html#replication-performance"><span class="std std-numref">Section 13.2.1.2.2</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.snapshot-restore-mode</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">persistence.snapshot-restore-mode</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">adaptive</span></code>,
 <code class="docutils literal notranslate"><span class="pre">highly-available</span></code> or
 <code class="docutils literal notranslate"><span class="pre">memory-efficient</span></code></p></td>
@@ -742,32 +755,32 @@ option but falls back to the
 fails. This is the default option.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.memory-cost</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.memory-cost</span></code></p></td>
 <td><p>a non-negative integer</p></td>
 <td><p>See
 <a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.time-cost</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.time-cost</span></code></p></td>
 <td><p>a non-negative integer</p></td>
 <td><p>See
 <a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.parallelism</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.argon2i.parallelism</span></code></p></td>
 <td><p>a non-negative integer</p></td>
 <td><p>See
 <a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.externally-authenticatable-role</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.externally-authenticatable-role</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>See
 <a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.externally-grantable-role</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">role-manager.externally-grantable-role</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>See
 <a class="reference internal" href="access-control.html#role-manager-configuration-parameters"><span class="std std-numref">Section 12.2.2</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>Specifies the directory to which RDFox
 should restrict any file system access
@@ -781,7 +794,7 @@ RDFox process. Sandboxing of file access
 can be disabled by setting this option
 to the empty string.</p></td>
 </tr>
-<tr class="row-odd"><td><p id="server-directory-server-param"><code class="docutils literal notranslate"><span class="pre">server-directory</span></code></p>
+<tr class="row-even"><td><p id="server-directory-server-param"><code class="docutils literal notranslate"><span class="pre">server-directory</span></code></p>
 </td>
 <td><p>a string</p></td>
 <td><p>Specifies the directory to be used for
@@ -792,7 +805,7 @@ the empty string, RDFox will be unable to use
 persistence. See also
 <a class="reference internal" href="persistence.html#server-directory"><span class="std std-numref">Section 13.1</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">session.encryption.algorithm</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">session.encryption.algorithm</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>The name of the encryption algorithm to use
 to encrypt and decrypt all session data. The
@@ -806,7 +819,7 @@ but this is only used if the
 <code class="docutils literal notranslate"><span class="pre">session.encryption.key</span></code> parameter
 is set.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">session.encryption.key</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">session.encryption.key</span></code></p></td>
 <td><p>a string</p></td>
 <td><p>A base64-encoded encryption key. If this
 parameter is set, the server will use it
@@ -848,7 +861,7 @@ newlines as <code class="docutils literal notranslate"><span class="pre">\n</spa
 persistence              file
 
 # Enable loading of file: and https: URLs only
-allowed-schemes-on-load  &quot;file https&quot;
+allowed-url-schemes-on-import  &quot;file https&quot;
 
 # Restrict importing, exporting and reading of shell scripts to the ``/data`` directory
 sandbox-directory        /data
@@ -865,6 +878,180 @@ optional unit specifier. The accepted unit specifiers are <code class="docutils 
 default), <code class="docutils literal notranslate"><span class="pre">h</span></code>, and <code class="docutils literal notranslate"><span class="pre">d</span></code>. To specify an infinite waiting time the value can be
 set to the string <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> although this is not accepted for all duration
 parameter names.</p>
+</div>
+<div class="section" id="http-remotes">
+<span id="id7"></span><h3><span class="section-number">4.3.3. </span>HTTP Remotes<a class="headerlink" href="#http-remotes" title="Permalink to this headline">¶</a></h3>
+<p>RDFox supports integration with external HTTP(S) endpoints for importing data
+and answering federated queries. These endpoints are configured using the
+<code class="docutils literal notranslate"><span class="pre">http-remotes</span></code> server parameter, which accepts a JSON object that specifies
+the cononection settings of each remote and has the following structure.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>{
+  &lt;REMOTE_ID&gt;: {
+    &quot;baseURL&quot;: &lt;BASE_URL&gt;,
+    &quot;auth&quot;: {
+      &quot;type&quot;: &lt;TYPE&gt;,
+      &quot;username&quot;: &lt;USERNAME&gt;,
+      &quot;password&quot;: &lt;PASSWORD&gt;,
+      &quot;passwordVariable&quot;: &lt;PASSWORD_VARIABLE&gt;,
+      &quot;clientId&quot;: &lt;CLIENT_ID&gt;,
+      &quot;clientSecret&quot;: &lt;CLIENT_SECRET&gt;,
+      &quot;clientSecretVariable&quot;: &lt;CLIENT_SECRET_VARIABLE&gt;,
+      &quot;tokenEndpoint&quot;: &lt;TOKEN_ENDPOINT&gt;,
+      &quot;tokenDefaultLifetime&quot;: &lt;TOKEN_DEFAULT_LIFETIME&gt;,
+      &quot;scope&quot;: &lt;SCOPE&gt;
+    },
+    &quot;federationBatchSize&quot;: &lt;FEDERATION_BATCH_SIZE&gt;
+  },
+}
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code>: (<cite>Required</cite>) A string key representing a valid URL prefix for
+the remote server. The supported schemes are <code class="docutils literal notranslate"><span class="pre">http</span></code> and <code class="docutils literal notranslate"><span class="pre">https</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">baseURL</span></code> isn’t specified, RDFox uses this directly for network access. The
+value associated with this key is the <code class="docutils literal notranslate"><span class="pre">Remote</span> <span class="pre">Configuration</span></code>, described
+below. When processing a target URL, RDFox first checks whether it begins with a
+<code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code>; if so, the corresponding configuration is applied. If multiple
+<code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> values match, RDFox uses the first one that appears in the JSON
+object. Recursive references across different
+configurations are not supported.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Remote</span> <span class="pre">Configuration</span></code>: (<cite>Required</cite>) An object value specifying how RDFox
+should connect to the endpoint. The elements are:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;BASE_URL&gt;</span></code>: (<cite>Optional</cite>) A string value representing a URL. If
+provided, RDFox uses this as the base URL when resolving request targets
+whose URLs begin with the corresponding <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code>. Before resolution,
+the <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> prefix is removed from the query or request URL, and
+the remaining path (the URI reference) is resolved against <code class="docutils literal notranslate"><span class="pre">&lt;BASE_URL&gt;</span></code>
+according to <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc3986#section-5">RFC3986</a>.
+This is path resolution rather than direct replacement, and a trailing
+<code class="docutils literal notranslate"><span class="pre">/</span></code> determines whether the final segment is interpreted as a directory or
+a file when resolving relative paths.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auth</span></code>: (<cite>Optional</cite>) An object specifying authentication details:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;TYPE&gt;</span></code>: (<cite>Required</cite>) A string value representing the authentication
+method. Only <code class="docutils literal notranslate"><span class="pre">basic</span></code> and <code class="docutils literal notranslate"><span class="pre">oauth</span></code> are supported. <code class="docutils literal notranslate"><span class="pre">basic</span></code> refers to
+<a class="reference external" href="https://www.rfc-editor.org/rfc/rfc7617">HTTP Basic Authentication</a>,
+while <code class="docutils literal notranslate"><span class="pre">oauth</span></code> refers to <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4">OAuth 2.0 Client Credentials Flow</a>. Exactly one
+of these values must be specified.</p></li>
+</ul>
+<p>For <code class="docutils literal notranslate"><span class="pre">basic</span></code> authentication, the following fields are supported:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;USERNAME&gt;</span></code>: (<cite>Required</cite>) A string value representing the username for
+authentication.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;PASSWORD&gt;</span></code> (<cite>Optional</cite>): A string value representing the password for
+authentication.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;PASSWORD_VARIABLE&gt;</span></code> (<cite>Optional</cite>): A string value representing the
+name of the environment variable containing the password.</p></li>
+</ul>
+<p>At least one of <code class="docutils literal notranslate"><span class="pre">password</span></code> or <code class="docutils literal notranslate"><span class="pre">passwordVariable</span></code> must be provided. If
+both are specified, the value of <code class="docutils literal notranslate"><span class="pre">password</span></code> takes precedence.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">oauth</span></code> authentication, the following fields are supported:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;CLIENT_ID&gt;</span></code>: (<cite>Required</cite>) A string value representing the OAuth
+client identifier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;CLIENT_SECRET&gt;</span></code>: (<cite>Optional</cite>) A string value representing the OAuth
+client secret.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;CLIENT_SECRET_VARIABLE&gt;</span></code>: (<cite>Optional</cite>) A string value representing
+the name of the environment variable containing the OAuth client secret.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;TOKEN_ENDPOINT&gt;</span></code>: (<cite>Required</cite>) A string value representing the URL of
+the OAuth token endpoint. This must be an <code class="docutils literal notranslate"><span class="pre">https</span></code> URL.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;TOKEN_DEFAULT_LIFETIME&gt;</span></code>: (<cite>Optional</cite>) Specifies the default lifetime
+of OAuth tokens in seconds if the OAuth token endpoint does not provide one.
+The default value is <code class="docutils literal notranslate"><span class="pre">3600</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;SCOPE&gt;</span></code>: (<cite>Optional</cite>) A string value representing the OAuth scope.</p></li>
+</ul>
+<p>At least one of <code class="docutils literal notranslate"><span class="pre">clientSecret</span></code> or <code class="docutils literal notranslate"><span class="pre">clientSecretVariable</span></code> must be
+provided. If both are specified, the value of <code class="docutils literal notranslate"><span class="pre">clientSecret</span></code> takes
+precedence.</p>
+<p>OAuth tokens obtained from the token endpoint are reused by RDFox until they are
+within one minute of their expiration time. The expiration time is determined by
+the <code class="docutils literal notranslate"><span class="pre">expires_in</span></code> property in the token endpoint’s response. If this property is
+not provided, RDFox falls back to the <code class="docutils literal notranslate"><span class="pre">tokenDefaultLifetime</span></code> setting in the HTTP
+remote configuration, if available. If neither is specified, a default lifetime
+of 3600 seconds is used. When RDFox detects that a previously acquired token
+has expired during communication with the HTTP remote server, it automatically
+requests a new token from the authorization server. For more details, refer to
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.4">RFC 6749, Section 4.1.4</a> .</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;FEDERATION_BATCH_SIZE&gt;</span></code>: (<cite>Optional</cite>) An integer value representing the
+maximum number of substitutions that RDFox will include in a single SPARQL
+query sent to the remote endpoint during federated query processing. The
+default value is <code class="docutils literal notranslate"><span class="pre">1024</span></code>. Larger values may improve performance when the
+network latency is high, but may increase the size of the remote query.
+A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching, causing RDFox to send each substitution
+in a separate query.</p></li>
+</ul>
+</li>
+</ul>
+<p>Consider the following example HTTP remotes configuration:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>{
+  &quot;http://service.com/guest/&quot;: {
+    &quot;baseURL&quot;: &quot;https://host.com:8080/guest/data/&quot;,
+    &quot;auth&quot;: {
+      &quot;type&quot;: &quot;basic&quot;,
+      &quot;username&quot;: &quot;guest&quot;,
+      &quot;password&quot;: &quot;password&quot;
+    }
+  },
+  &quot;https://host.com:8081/admin/data&quot;: {
+    &quot;auth&quot;: {
+      &quot;type&quot;: &quot;basic&quot;,
+      &quot;username&quot;: &quot;admin&quot;,
+      &quot;passwordVariable&quot;: &quot;ADMIN_PASSWORD&quot;
+    }
+  },
+  &quot;http://host.com:8081/guest/data&quot;: {
+    &quot;auth&quot;: {
+      &quot;type&quot;: &quot;oauth&quot;,
+      &quot;clientId&quot;: &quot;client_id&quot;,
+      &quot;clientSecret&quot;: &quot;client_secret&quot;,
+      &quot;tokenEndpoint&quot;: &quot;https://idp.com/oauth2/v2.0/token&quot;,
+      &quot;scope&quot;: &quot;repo user&quot;
+    }
+  }
+}
+</pre></div>
+</div>
+<p>The first endpoint, with <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> set to <code class="docutils literal notranslate"><span class="pre">http://service.com/guest/</span></code>,
+uses basic authentication with a username and password, and specifies a
+<code class="docutils literal notranslate"><span class="pre">baseURL</span></code> for data operations. For instance, if a user issues the command
+<code class="docutils literal notranslate"><span class="pre">LOAD</span> <span class="pre">&lt;http://service.com/guest/input.ttl&gt;</span></code>, RDFox will actually perform the
+operation as <code class="docutils literal notranslate"><span class="pre">LOAD</span> <span class="pre">&lt;https://host.com:8080/guest/data/input.ttl&gt;</span></code> because the
+<code class="docutils literal notranslate"><span class="pre">baseURL</span></code> is specified and the path after the endpoint is appended to the
+base URL. The point to note is that if neither <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> nor the
+<code class="docutils literal notranslate"><span class="pre">baseURL</span></code> ends with a <code class="docutils literal notranslate"><span class="pre">/</span></code>, then any additional path specified in a query
+will be placed directly after the host and port of the given <code class="docutils literal notranslate"><span class="pre">baseURL</span></code>. For
+example, if <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> is <code class="docutils literal notranslate"><span class="pre">http://service.com/guest</span></code> and <code class="docutils literal notranslate"><span class="pre">baseURL</span></code> is
+<code class="docutils literal notranslate"><span class="pre">https://host.com:8080/guest/data</span></code>, then <code class="docutils literal notranslate"><span class="pre">LOAD</span> <span class="pre">&lt;http://service.com/guest/input.ttl&gt;</span></code>
+will actually be executed as <code class="docutils literal notranslate"><span class="pre">LOAD</span> <span class="pre">&lt;https://host.com:8080/input.ttl&gt;</span></code>. This
+behaviour follows the logic of resolving URL paths; see
+<a class="reference external" href="https://www.rfc-editor.org/rfc/rfc3986#section-5">RFC3986</a> for reference.</p>
+<p>The second endpoint, with <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> set to
+<code class="docutils literal notranslate"><span class="pre">https://host.com:8081/admin/data</span></code>, uses basic authentication with a
+username, and retrieves the password from the <code class="docutils literal notranslate"><span class="pre">ADMIN_PASSWORD</span></code> environment
+variable. No <code class="docutils literal notranslate"><span class="pre">baseURL</span></code> is specified, so <code class="docutils literal notranslate"><span class="pre">Endpoint</span> <span class="pre">URL</span></code> is used directly for
+network access.</p>
+<p>The third endpoint, with <code class="docutils literal notranslate"><span class="pre">&lt;REMOTE_ID&gt;</span></code> set to
+<code class="docutils literal notranslate"><span class="pre">http://host.com:8081/guest/data</span></code>, uses OAuth with a client identifier and
+secret, and specifies the token endpoint and scope for obtaining access tokens
+from the identity provider.</p>
+<p>This server parameter can also be defined through an environment variable,
+<code class="docutils literal notranslate"><span class="pre">RDFOX_HTTP_REMOTES</span></code>, as shown in the following example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>export RDFOX_HTTP_REMOTES=&quot;{               \
+  &quot;https://host.com:8081/admin/data&quot;: {    \
+    &quot;auth&quot;: {                              \
+      &quot;type&quot;: &quot;basic&quot;,                     \
+      &quot;username&quot;: &quot;admin&quot;,                 \
+      &quot;passwordVariable&quot;: &quot;ADMIN_PASSWORD&quot; \
+    }                                      \
+  }                                        \
+}&quot;
+export ADMIN_PASSWORD=&quot;secret&quot;
+</pre></div>
+</div>
+<p>If both the <code class="docutils literal notranslate"><span class="pre">http-remotes</span></code> server parameter and the <code class="docutils literal notranslate"><span class="pre">RDFOX_HTTP_REMOTES</span></code>
+environment variable are set, only the server parameter is used.</p>
 </div>
 </div>
 </div>

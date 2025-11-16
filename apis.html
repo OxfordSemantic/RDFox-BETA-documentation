@@ -160,7 +160,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#connection-expiry">16.3.5.2. Connection Expiry</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#management-of-restful-requests">16.3.6. Management of RESTful Requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#choosing-between-incremental-and-from-scratch-reasoning">16.3.6. Choosing Between Incremental and “From Scratch” Reasoning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#management-of-restful-requests">16.3.7. Management of RESTful Requests</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#managing-servers">16.4. Managing Servers</a><ul>
@@ -176,7 +177,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#deleting-a-data-store">16.5.4. Deleting a Data Store</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bringing-a-data-store-offline-online">16.5.5. Bringing a Data Store Offline/Online</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#querying-data-store-state">16.5.6. Querying Data Store State</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#querying-diagnostic-information">16.5.7. Querying Diagnostic Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#querying-component-information">16.5.7. Querying Component Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#invoking-data-store-operations">16.5.8. Invoking Data Store Operations</a></li>
 </ul>
 </li>
@@ -279,8 +280,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#conditional-requests">16.18.2. Conditional Requests</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id4">16.18.2.1. Java API</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5">16.18.2.2. RESTful API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">16.18.2.1. Java API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">16.18.2.2. RESTful API</a></li>
 </ul>
 </li>
 </ul>
@@ -411,7 +412,7 @@ to create the first role.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The server is now ready to accept connections.</p>
+<p>The server is now ready to process requests.</p>
 <p>When RDFox is no longer needed by the application, the server can be stopped
 which will remove all data stores from memory. Stopping the server will fail
 while any connections to it or one of its data stores remain open.</p>
@@ -475,6 +476,24 @@ before a transaction is committed, incremental reasoning is run only once.</p>
 <p>It is generally good practice to add all rules before the facts, or to add
 rules and facts in an arbitrary order but grouped in a single transaction. This
 will usually increase the performance of the first reasoning operation.</p>
+<p>Each data store connection has a property controlling whether incremental
+reasoning is allowed for updates performed via that connection. This property
+is by default set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, but it can be set to <code class="docutils literal notranslate"><span class="pre">false</span></code> using the
+<code class="docutils literal notranslate"><span class="pre">DataStoreConnection.setIncrementalReasoningAllowed()</span></code> method. When the
+property value is <code class="docutils literal notranslate"><span class="pre">true</span></code>, updates made via that connection will be processed
+using incremental reasoning whenever possible. In contrast, if the property
+value is <code class="docutils literal notranslate"><span class="pre">false</span></code>, then updates will always be processed by throwing away all
+consequences computed previously and performing all reasoning “from scratch”.
+Incremental reasoning is usually more efficient, particularly for small,
+localized updates. However, when a data store changes significantly, “from
+scratch” reasoning may be more efficient. This is illustrated by the following
+example.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">DataStoreConnection</span><span class="w"> </span><span class="n">dsConn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RDFoxServer</span><span class="p">.</span><span class="na">newDataStoreConnection</span><span class="p">(</span><span class="n">dataStoreName</span><span class="p">,</span><span class="w"> </span><span class="n">roleName</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="p">);</span>
+<span class="n">dsConn</span><span class="p">.</span><span class="na">setIncrementalReasoningAllowed</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+<span class="n">dsConn</span><span class="p">.</span><span class="na">importData</span><span class="p">(...);</span><span class="w">     </span><span class="c1">// &lt;-- Performs &quot;from scratch&quot; reasoning.</span>
+<span class="n">dsConn</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="the-logic-package">
 <h3><span class="section-number">16.1.3. </span>The <code class="docutils literal notranslate"><span class="pre">logic</span></code> package<a class="headerlink" href="#the-logic-package" title="Permalink to this headline">¶</a></h3>
@@ -683,7 +702,6 @@ stop the endpoint.</p>
                 /&lt;DSCONN&gt;           : management of a data store connection (GET/PATCH/DELETE)
                     /cursors        : management of transaction cursors (GET/POST)
                         /&lt;CURSID&gt;   : management of a cursor (GET/PATCH/DELETE)
-                    /transaction    : management of the connection transaction (GET/PATCH)
             /content                : data store content (GET/PATCH/PUT/POST/DELETE)
             /datasources            : listing available data sources (GET)
                 /&lt;DSRCNAME&gt;         : management of a data source (GET/POST/DELETE)
@@ -850,9 +868,9 @@ format. The table below links to the relevant documentation section for each
 authentication scheme.</p>
 <table class="colwidths-given docutils align-center">
 <colgroup>
-<col style="width: 7%" />
-<col style="width: 21%" />
-<col style="width: 73%" />
+<col style="width: 25%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Authentication Manager</p></th>
@@ -1004,7 +1022,7 @@ the <code class="docutils literal notranslate"><span class="pre">session.encrypt
 parameters. If no key is specified by the above parameters, a key is randomly
 generated and used for the server session. This means that session tokens are
 invalidated when the server is restarted and users will be forced to log in
-again. This option requires</p>
+again.</p>
 </div>
 <div class="section" id="authentication-with-client-certificates">
 <span id="rest-client-certificates"></span><h5><span class="section-number">16.3.1.1.3. </span>Authentication with Client Certificates<a class="headerlink" href="#authentication-with-client-certificates" title="Permalink to this headline">¶</a></h5>
@@ -1246,7 +1264,12 @@ with the connection.</p>
 <span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/csv; charset=UTF-8</span>
 
 Property,Value,Mutable
-role-name,guest,false
+agent-name,guest,false
+lock-timeout,2000,false
+data-store-version-after-last-operation,0,false
+transaction-state,none,false
+transaction-requires-rollback,false,false
+incremental-reasoning-allowed,true,true
 </pre></div>
 </div>
 <p>A connection can be deleted using a <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> request.</p>
@@ -1324,8 +1347,38 @@ valid for at least that much time (but it may actually remain valid slightly
 longer).</p>
 </div>
 </div>
+<div class="section" id="choosing-between-incremental-and-from-scratch-reasoning">
+<h3><span class="section-number">16.3.6. </span>Choosing Between Incremental and “From Scratch” Reasoning<a class="headerlink" href="#choosing-between-incremental-and-from-scratch-reasoning" title="Permalink to this headline">¶</a></h3>
+<p>As in all other APIs, each connection used in the RESTful API has a property
+that determines whether an update performed on the connection can be performed
+incrementally, or whether reasoning must be performed “from scratch”. This
+property can be set on each explicitly managed connection just like in all
+other APIs. To simplify setting this property on implicitly managed
+connections, all RESTful API calls that use a data store connection (managed
+either explicitly or implicitly) accept an optional
+<code class="docutils literal notranslate"><span class="pre">incremental-reasoning-allowed</span></code> request parameter, with the allowed values
+<code class="docutils literal notranslate"><span class="pre">true</span></code> and <code class="docutils literal notranslate"><span class="pre">false</span></code>. Whenever this parameter is set, the property of the
+data store connection handling the request is set to the specified value, and
+it is reset after the request finishes. (Resetting this property on implicitly
+managed connections is not necessary since such connections are discarded after
+each request; however, for explicitly managed connections, this ensures that
+the connection is not altered permanently by the request.)</p>
+<p>For example, the following request adds triples to a data store and requests
+that any reasoning be performed “from scratch”.</p>
+<p><strong>Request</strong></p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">POST</span> <span class="nn">/datastores/myStore/content?incremental-reasoning-allowed=false</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
+
+[Triples of the default graph serialized according to the Turtle 1.1 specification]
+</pre></div>
+</div>
+<p><strong>Response</strong></p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="management-of-restful-requests">
-<h3><span class="section-number">16.3.6. </span>Management of RESTful Requests<a class="headerlink" href="#management-of-restful-requests" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">16.3.7. </span>Management of RESTful Requests<a class="headerlink" href="#management-of-restful-requests" title="Permalink to this headline">¶</a></h3>
 <p>Most requests running on the RESTful endpoint are assigned a request ID for the
 duration of the request’s execution. This ID can be used to inspect and cancel
 the request. The ID is assigned in one of the following two ways.</p>
@@ -1701,42 +1754,229 @@ requires-incremental-reasoning,true
 </pre></div>
 </div>
 </div>
-<div class="section" id="querying-diagnostic-information">
-<h3><span class="section-number">16.5.7. </span>Querying Diagnostic Information<a class="headerlink" href="#querying-diagnostic-information" title="Permalink to this headline">¶</a></h3>
-<p>RDFox can report extensive diagnostic information about its internal
-components, which is often useful during performance tuning and debugging.
-Please note that this call is intended for diagnostic purposes only. The
-information provided is determined by RDFox internals and is likely to change
-in future versions of RDFox. Thus, applications should not rely on this
-information being stable. Retrieval of diagnostic information cannot be
-performed as part of an explicit transaction.</p>
-<p>Diagnostic information can be retrieved at the level of the server (by querying
-the <code class="docutils literal notranslate"><span class="pre">/</span></code> key) or for a specific data store (by querying the <code class="docutils literal notranslate"><span class="pre">/info</span></code> subkey
-of the respective data store). In either case, the <code class="docutils literal notranslate"><span class="pre">component-info</span></code> request
-parameter can be specified with values <code class="docutils literal notranslate"><span class="pre">short</span></code> or <code class="docutils literal notranslate"><span class="pre">extended</span></code> to determine
-whether a shortened or an extended report should be returned. The result is
-organized in a tree of hierarchical components. The component at the root of
-this tree represents either the server or a data store (depending on which
-component the information was requested for), and contains a number of
-subcomponents that represent various parts of the root component. For example,
-the information returned for a data store contains a subcomponent for each
-tuple table, a subcomponent for each registered data source, and so on. The
-information returned for the server contains the information for all of the
-server’s data stores. The state of each component in the tree is described
-using a list of property/value pairs, where values can be strings or numeric
-values.</p>
-<p>To output this complex data structure, the RESTful API converts the component
-tree into a list as follows. Each component in the tree is assigned an integer
-component ID using depth-first traversal (with root being assigned ID one).
-Then, the tree is serialized as a result of a query containing three variables.
-In each result to the query, variable <code class="docutils literal notranslate"><span class="pre">?ComponentID</span></code> contains the ID of the
-component, variable <code class="docutils literal notranslate"><span class="pre">?Property</span></code> contains the name of the property describing
-the component with the ID stored in <code class="docutils literal notranslate"><span class="pre">?ComponentID</span></code>, and variable <code class="docutils literal notranslate"><span class="pre">?Value</span></code>
-represents the property value. For each component, the result contains a row
-with <code class="docutils literal notranslate"><span class="pre">?Property=&quot;Component</span> <span class="pre">name&quot;</span></code> and where <code class="docutils literal notranslate"><span class="pre">?Value</span></code> contains the name of
-the component. Finally, for each component other than the root, the result
-contains a row with <code class="docutils literal notranslate"><span class="pre">?Property=&quot;Parent</span> <span class="pre">component</span> <span class="pre">ID&quot;</span></code> and where <code class="docutils literal notranslate"><span class="pre">?Value</span></code>
-contains the ID of the parent component.</p>
+<div class="section" id="querying-component-information">
+<span id="id3"></span><h3><span class="section-number">16.5.7. </span>Querying Component Information<a class="headerlink" href="#querying-component-information" title="Permalink to this headline">¶</a></h3>
+<p>RDFox can report detailed information about its internal components, which is
+useful for instance monitoring, performance tuning, and debugging.</p>
+<p>Component information can be retrieved either for the whole server or for an
+individual data store. The data is organized hierarchically: the root component
+represents the server or a specific data store, and contains subcomponents for
+various internal parts. For example, the server includes subcomponents for all
+its data stores, and each data store includes subcomponents for each tuple table
+and registered data source.</p>
+<p>The state of each component is described by a list of properties. Each property
+is identified by a pair: a metric and a unique name. The Metric indicates the
+type of measurement being reported e.g. <code class="docutils literal notranslate"><span class="pre">MEMORY_CONSUMED_IN_BYTES</span></code>. The unique
+name is a string that allows the property to be further specified. For example,
+the DeltaQueryManager component reports three properties for the
+<code class="docutils literal notranslate"><span class="pre">DELTA_QUERY_ANSWERS_TOTAL</span></code> metric: “Number of snapshot answers”, “Number of
+deletion answers”, and “Number of addition answers”.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Component information cannot be retrieved as part of an explicit transaction.</p>
+</div>
+<p><strong>Reported Metrics</strong></p>
+<p>The following table shows the different metrics that are reported by RDFox.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MEMORY_CONSUMED_IN_BYTES</span></code></p></td>
+<td><p>The memory (RAM) consumption of each component of RDFox
+measured in bytes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HASH_TABLE_BUCKETS_TOTAL</span></code></p></td>
+<td><p>The number of hash table buckets.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">HASH_TABLE_BUCKETS_USED</span></code></p></td>
+<td><p>The number of hash table buckets that are currently used.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HASH_TABLE_LOAD_FACTOR</span></code></p></td>
+<td><p>The load factor of the hash table.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SERVER_VERSION</span></code></p></td>
+<td><p>The version of the RDFox server.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DATA_STORE_VERSION</span></code></p></td>
+<td><p>The version of the Data store.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LAST_SNAPSHOT_DATA_STORE_VERSION</span></code></p></td>
+<td><p>The data store version of the most recent data store
+snapshot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">END_RESOURCE_ID</span></code></p></td>
+<td><p>The maximum valid resource ID usable in the data store.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">END_TUPLE_INDEX</span></code></p></td>
+<td><p>The maximum valid tuple index usable in the data store.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EXPLICIT_FACTS_TOTAL</span></code></p></td>
+<td><p>The number of explicit facts.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FACTS_TOTAL</span></code></p></td>
+<td><p>The number of all facts (both explicit and implicit).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TUPLE_LIST_ENTRIES_TOTAL</span></code></p></td>
+<td><p>The number of entries in the tuple tables.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ROLE_MANAGER_COMPONENT_VERSION</span></code></p></td>
+<td><p>The version of the role manager component.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ROLES_TOTAL</span></code></p></td>
+<td><p>The number of roles in the role manager.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DICTIONARY_COMPONENT_VERSION</span></code></p></td>
+<td><p>The version of the dictionary component.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">RESOURCE_IDS_TOTAL</span></code></p></td>
+<td><p>The number of unique resources stored in the dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DELTA_QUERIES_TOTAL</span></code></p></td>
+<td><p>The number of delta queries registered.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DELTA_QUERY_ANSWERS_TOTAL</span></code></p></td>
+<td><p>The number of answers returned by delta queries.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PATTERN_INDEXES_TOTAL</span></code></p></td>
+<td><p>The number of pattern indexes in the data store.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PATTERN_INDEX_MAXIMUM_SIZE</span></code></p></td>
+<td><p>The maximum size of any single pattern index in the data
+store.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">REASONING_STRATA_TOTAL</span></code></p></td>
+<td><p>The number of reasoning strata in the data store.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MAXIMUM_MEMORY_USE_IN_BYTES</span></code></p></td>
+<td><p>The maximum limit of memory (RAM) RDFox is permitted to use
+measured in bytes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TOTAL_MEMORY_USE_IN_BYTES</span></code></p></td>
+<td><p>The total memory (RAM) use of RDFox measured in bytes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PERSISTENCE_NUMBER_OF_VERSIONS_RESTORED</span></code></p></td>
+<td><p>The number of versions restored from <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>
+persistence (including both those loaded at startup and
+subsequently). Not reported for other types of persistence.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PERSISTENCE_NUMBER_OF_VERSIONS_RESTORED_DURING_RUNTIME</span></code></p></td>
+<td><p>The number of versions restored from <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>
+persistence during runtime. Not reported for other types of
+persistence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AVERAGE_REPLICATION_LAG_IN_SECONDS</span></code></p></td>
+<td><p>The average replication lag in seconds. Reported only when
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence is enabled and this instance
+has restored one or more versions during runtime.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LONGEST_REPLICATION_LAG_IN_SECONDS</span></code></p></td>
+<td><p>The longest replication lag in seconds. Reported only when
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence is enabled and this instance
+has restored one or more versions during runtime.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LONGEST_REPLICATION_LAG_SERVER_VERSION</span></code></p></td>
+<td><p>The server version corresponding to the longest replication
+lag. Reported only when <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence is
+enabled and this instance has restored one or more versions
+during runtime.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LONGEST_REPLICATION_LAG_DATA_STORE_VERSION</span></code></p></td>
+<td><p>The data store version corresponding to the longest
+replication lag. Reported only when <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>
+persistence is enabled and this instance has restored one or
+more versions during runtime.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LAST_REPLICATION_LAG_IN_SECONDS</span></code></p></td>
+<td><p>The last replication lag in seconds. Reported only when
+<code class="docutils literal notranslate"><span class="pre">file-sequence</span></code> persistence is enabled and this instance
+has restored one or more versions during runtime.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INSTANCES_TO_NOTIFY_TOTAL</span></code></p></td>
+<td><p>The total number of RDFox instances in the HA cluster which
+must be notified. Reported only when <code class="docutils literal notranslate"><span class="pre">file-sequence</span></code>
+persistence is enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IDENTIFIER</span></code></p></td>
+<td><p>Identifiers for the component (e.g. “Component name”
+(Required), “Tuple table type”, “Data source type”, etc.)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">UNCATEGORIZED</span></code></p></td>
+<td><p>Additional information not naturally representable to
+monitoring systems. This includes information such as
+aggregate calculations i.e. Aggregate Memory consumption
+across multiple components; or string values i.e. the server
+directory path.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>OpenMetrics endpoint</strong></p>
+<p>RDFox can expose the above metrics in a format compatible with the <a class="reference external" href="https://github.com/prometheus/OpenMetrics">OpenMetrics
+1.0 specification</a>, enabling
+integration with monitoring systems such as Prometheus.</p>
+<p>Metrics can be retrieved at the server level (by querying the <code class="docutils literal notranslate"><span class="pre">/</span></code> endpoint) or
+for a specific data store (by querying the <code class="docutils literal notranslate"><span class="pre">/datastores/&lt;DataStoreName&gt;/info</span></code>
+endpoint). In both cases, the request must include the <code class="docutils literal notranslate"><span class="pre">Accept</span></code> header
+configured to <code class="docutils literal notranslate"><span class="pre">application/openmetrics-text</span></code>.</p>
+<p>Component information is organized hierarchically, with each internal subcomponent
+represented as a node in a tree. Subcomponents are uniquely identified by their
+path, which is exposed in OpenMetrics using the following labels:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">component_path_complete</span></code>      : The full path of the component.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">component_path_segment&lt;N&gt;</span></code>  : The N-th segment of the path (0 denotes root).</p></li>
+</ul>
+<p>Below is an example of the OpenMetrics output of the <code class="docutils literal notranslate"><span class="pre">DATA_STORE_VERSION</span></code>
+metric for a data store named <code class="docutils literal notranslate"><span class="pre">ExampleDataStore</span></code>. The component path segments
+indicate that ExampleDataStore is a child of the <code class="docutils literal notranslate"><span class="pre">DataStores</span></code> component, which
+is itself a child of the root <code class="docutils literal notranslate"><span class="pre">Server</span></code> component:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># HELP data_store_version The version of the Data store.
+# TYPE data_store_version gauge
+data_store_version{component_path_segment0=&quot;Server&quot;,component_path_segment1=&quot;DataStores&quot;,component_path_segment2=&quot;ExampleDataStore&quot;,component_path_complete=&quot;Server.DataStores.ExampleDataStore&quot;} 1
+</pre></div>
+</div>
+<p>If a component has additional <code class="docutils literal notranslate"><span class="pre">IDENTIFIER</span></code> metrics (other than <code class="docutils literal notranslate"><span class="pre">Component</span>
+<span class="pre">name</span></code>), these are also exposed as labels:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">component_path_segment&lt;N&gt;_&lt;IDENTIFIER&gt;</span></code> : The value of the <code class="docutils literal notranslate"><span class="pre">&lt;IDENTIFIER&gt;</span></code>
+for the <code class="docutils literal notranslate"><span class="pre">N</span></code>-th segment of the path.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">IDENTIFIER</span></code> properties exclusively contain immutable values and thus the
+label names do not change over time.</p>
+<p>Below is an example of the OpenMetrics output of the
+<code class="docutils literal notranslate"><span class="pre">TUPLE_LIST_ENTRIES_TOTAL</span></code> metric for a data store named <code class="docutils literal notranslate"><span class="pre">ExampleDataStore</span></code>.
+Note the <code class="docutils literal notranslate"><span class="pre">component_path_segment2_tuple_table_type</span></code> label, which indicates the
+string property for the metric <code class="docutils literal notranslate"><span class="pre">IDENTIFIER</span></code> with unique name <code class="docutils literal notranslate"><span class="pre">Tuple</span> <span class="pre">table</span>
+<span class="pre">type</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># HELP tuple_list_entries_total The number of entries in the tuple tables.
+# TYPE tuple_list_entries_total gauge
+tuple_list_entries_total{component_path_segment0=&quot;ExampleDataStore&quot;,component_path_segment1=&quot;TupleTables&quot;,component_path_segment2=&quot;DefaultTriples&quot;,component_path_segment2_tuple_table_type=&quot;TripleTable&quot;,component_path_segment3=&quot;TupleList&quot;,component_path_complete=&quot;ExampleDataStore.TupleTables.DefaultTriples.TupleList&quot;} 1
+tuple_list_entries_total{component_path_segment0=&quot;ExampleDataStore&quot;,component_path_segment1=&quot;TupleTables&quot;,component_path_segment2=&quot;Quads&quot;,component_path_segment2_tuple_table_type=&quot;QuadTable&quot;,component_path_segment3=&quot;TupleList&quot;,component_path_complete=&quot;ExampleDataStore.TupleTables.Quads.TupleList&quot;} 1
+</pre></div>
+</div>
+<p><strong>RESTful API</strong></p>
+<p>Information can be retrieved at the server level (by querying the <code class="docutils literal notranslate"><span class="pre">/</span></code>
+endpoint) or for a specific data store (by querying the
+<code class="docutils literal notranslate"><span class="pre">/datastores/&lt;DataStoreName&gt;/info</span></code> endpoint). In either case, the
+<code class="docutils literal notranslate"><span class="pre">component-info</span></code> request parameter can be specified with values <code class="docutils literal notranslate"><span class="pre">short</span></code> or
+<code class="docutils literal notranslate"><span class="pre">extended</span></code> to control the level of detail in the report.</p>
+<p>To represent this hierarchical data structure, the RESTful API serializes the
+component tree into a flat list. Each component is assigned an integer ID using
+depth-first traversal (the root is assigned ID 1). The output is formatted as a
+table with the following columns:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">?ComponentID</span></code>: The unique ID of the component.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">?Property</span></code>   : A string identifying the property being reported.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">?Value</span></code>      : The value of the property.</p></li>
+</ul>
+<p>For all components except the root, an additional row is included with
+<code class="docutils literal notranslate"><span class="pre">?Property=&quot;Parent</span> <span class="pre">component</span> <span class="pre">ID&quot;</span></code> and where <code class="docutils literal notranslate"><span class="pre">?Value</span></code> contains the ID of the
+parent component.</p>
 <p><strong>Request</strong></p>
 <div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/datastores/DataStore1/info?component-info=extended</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
@@ -1748,16 +1988,16 @@ contains the ID of the parent component.</p>
 <span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/csv; charset=UTF-8</span>
 
 ComponentID,Property,Value
-1,Component name,RDFStore
-1,Name,DataStore1
+1,Component name,DataStore1
 1,Unique ID,0123456789
-1,Data store version,2
+1,Data store version,1
+1,Data store version of the last snapshot,1
 1,End resource ID,1000000
 1,Persistent,no
-1,Requires incremental reasoning,no
+1,Reasoning algorithm,materialization
 ... etc ...
-2,Component name,Data store parameters
 2,Parent component ID,1
+2,Component name,Data store parameters
 2,max-data-pool-size,10000000
 2,max-resource-capacity,1000000
 2,max-tuple-capacity,1000000
@@ -1766,15 +2006,41 @@ ComponentID,Property,Value
 </pre></div>
 </div>
 <p>In the above example, diagnostic information is requested for data store
-<code class="docutils literal notranslate"><span class="pre">myStore</span></code>. The root result is component with ID <code class="docutils literal notranslate"><span class="pre">1</span></code> that represents the
-data store. Properties such as <code class="docutils literal notranslate"><span class="pre">Name</span></code>, <code class="docutils literal notranslate"><span class="pre">Unique</span> <span class="pre">ID</span></code>, and so on provide
+<code class="docutils literal notranslate"><span class="pre">DataStore1</span></code>. The root result is component with ID <code class="docutils literal notranslate"><span class="pre">1</span></code> that represents the
+data store. Properties such as <code class="docutils literal notranslate"><span class="pre">Component</span> <span class="pre">Name</span></code>, <code class="docutils literal notranslate"><span class="pre">Unique</span> <span class="pre">ID</span></code>, and so on provide
 information about the data store. Component with ID <code class="docutils literal notranslate"><span class="pre">2</span></code> is a subcomponent of
 the data store. It provides information about the data store parameters, such
 as <code class="docutils literal notranslate"><span class="pre">max-resource-capacity</span></code>, <code class="docutils literal notranslate"><span class="pre">max-data-pool-size</span></code>, and so on.</p>
 <p><strong>Java API</strong></p>
+<p>In Java, the component information can be retrieved using the
+<code class="docutils literal notranslate"><span class="pre">getComponentInfo</span></code> method on either a server connection or a data store
+connection. The method takes a Boolean parameter that determines whether
+extended information should be returned (if <code class="docutils literal notranslate"><span class="pre">true</span></code>) or short information
+(if <code class="docutils literal notranslate"><span class="pre">false</span></code>).</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ComponentInfo</span><span class="w"> </span><span class="n">componentInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sConn</span><span class="p">.</span><span class="na">getComponentInfo</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
 <span class="p">...</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="p">...</span>
 <span class="n">ComponentInfo</span><span class="w"> </span><span class="n">componentInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dsConn</span><span class="p">.</span><span class="na">getComponentInfo</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The ComponentInfo object provides methods to access subcomponents and
+properties of the component.</p>
+<p><strong>Subcomponents</strong></p>
+<p>Subcomponents are accessed by name (<code class="docutils literal notranslate"><span class="pre">getSubComponent(String)</span></code>) or by index
+(<code class="docutils literal notranslate"><span class="pre">getSubComponent(int)</span></code> - where indexes are assigned from <code class="docutils literal notranslate"><span class="pre">0</span></code> to
+<code class="docutils literal notranslate"><span class="pre">getNumberOfSubComponents()</span> <span class="pre">-</span> <span class="pre">1</span></code>):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ComponentInfo</span><span class="w"> </span><span class="n">deltaQueryManagerComponentInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">componentInfo</span><span class="p">.</span><span class="na">getSubComponent</span><span class="p">(</span><span class="s">&quot;DeltaQueryManager&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Properties</strong></p>
+<p>Each property is identified by its  Metric (<code class="docutils literal notranslate"><span class="pre">ComponentInfoMetric</span></code> enumeration)
+and unique name. Properties have a value, which be a String or a numeric value.
+Properties can be accessed by metric and unique name (<code class="docutils literal notranslate"><span class="pre">getProperty(Metric,</span>
+<span class="pre">String)</span></code>) or by index (<code class="docutils literal notranslate"><span class="pre">getProperty(int)</span></code> - where indexes are assigned from
+<code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">getNumberOfProperties()</span> <span class="pre">-</span> <span class="pre">1</span></code>):</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Property</span><span class="w"> </span><span class="n">componentNameProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">deltaQueryManagerComponentInfo</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="n">ComponentInfoMetric</span><span class="p">.</span><span class="na">IDENTIFIER</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Component name&quot;</span><span class="p">);</span>
+<span class="n">String</span><span class="w"> </span><span class="n">componentName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">componentNameProperty</span><span class="p">.</span><span class="na">getValue</span><span class="p">();</span>
+<span class="n">Property</span><span class="w"> </span><span class="n">numberOfSnapshotAnswersProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">deltaQueryManagerComponentInfo</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="n">ComponentInfoMetric</span><span class="p">.</span><span class="na">DELTA_QUERY_ANSWERS_TOTAL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Number of snapshot answers&quot;</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">numberOfSnapshotAnswers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">Number</span><span class="p">)</span><span class="w"> </span><span class="n">numberOfSnapshotAnswersProperty</span><span class="p">.</span><span class="na">getValue</span><span class="p">()).</span><span class="na">intValue</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -2398,14 +2664,15 @@ information.</p>
 <h4><span class="section-number">16.10.1.2. </span>Adding Triples to a Graph<a class="headerlink" href="#adding-triples-to-a-graph" title="Permalink to this headline">¶</a></h4>
 <p>The following request adds triples incrementally to a named graph
 <code class="docutils literal notranslate"><span class="pre">http://example.com/</span></code>.</p>
+<p><strong>Request</strong></p>
 <div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">POST</span> <span class="nn">/datastores/myStore/content?graph=http%3A%2F%2Fexample.com%2F</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
+
+[Triples of the default graph serialized according to the Turtle 1.1 specification]
 </pre></div>
 </div>
 <p><strong>Response</strong></p>
 <div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
-
-[Triples serialized according to the Turtle 1.1 specification]
 </pre></div>
 </div>
 </div>
@@ -2413,6 +2680,7 @@ information.</p>
 <h4><span class="section-number">16.10.1.3. </span>Replacing a Graph<a class="headerlink" href="#replacing-a-graph" title="Permalink to this headline">¶</a></h4>
 <p>The following request replaces all triples in a named graph
 <code class="docutils literal notranslate"><span class="pre">http://example.com/</span></code> with the triples specified in the request body.</p>
+<p><strong>Request</strong></p>
 <div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">PUT</span> <span class="nn">/datastores/myStore/content?graph=http%3A%2F%2Fexample.com%2F</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
 </pre></div>
@@ -2444,7 +2712,7 @@ statement, which achieves the same effect.</p>
 </div>
 </div>
 <div class="section" id="rdfox-update-protocol">
-<span id="id3"></span><h3><span class="section-number">16.10.2. </span>RDFox Update Protocol<a class="headerlink" href="#rdfox-update-protocol" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h3><span class="section-number">16.10.2. </span>RDFox Update Protocol<a class="headerlink" href="#rdfox-update-protocol" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">/content</span></code> key implements the RDFox Update Protocol when neither
 <code class="docutils literal notranslate"><span class="pre">default</span></code> nor <code class="docutils literal notranslate"><span class="pre">graph</span></code> request parameters are present.</p>
 <div class="section" id="retrieving-data-store-content">
@@ -3414,8 +3682,8 @@ data store connections. To use transactions in the RESTful API, one must
 explicitly create a connection (see
 <a class="reference internal" href="#rest-explicit-connection-management"><span class="std std-numref">Section 16.3.5</span></a>). To start, commit, or rollback a
 transaction, one can issue a <code class="docutils literal notranslate"><span class="pre">PATCH</span></code> request to the
-<code class="docutils literal notranslate"><span class="pre">/datastores/&lt;DSTRNAME&gt;/connections/&lt;DSCONN&gt;/transaction</span></code> key with the
-<code class="docutils literal notranslate"><span class="pre">operation</span></code> request parameter set to <code class="docutils literal notranslate"><span class="pre">begin-read-only-transaction</span></code>,
+<code class="docutils literal notranslate"><span class="pre">/datastores/&lt;DSTRNAME&gt;/connections/&lt;DSCONN&gt;</span></code> key with the <code class="docutils literal notranslate"><span class="pre">operation</span></code>
+request parameter set to <code class="docutils literal notranslate"><span class="pre">begin-read-only-transaction</span></code>,
 <code class="docutils literal notranslate"><span class="pre">begin-read-write-transaction</span></code>, <code class="docutils literal notranslate"><span class="pre">commit-transaction</span></code>, or
 <code class="docutils literal notranslate"><span class="pre">rollback-transaction</span></code>. After this, any operation evaluated on this
 connection (which can be achieved by including the <code class="docutils literal notranslate"><span class="pre">connection</span></code> request
@@ -3436,7 +3704,7 @@ transaction has been committed, the connection persists after the last request.<
 </pre></div>
 </div>
 <p><strong>Request</strong></p>
-<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">PATCH</span> <span class="nn">/datastores/myStore/connections/01234567890123456789/transaction?operation=begin-read-write-transaction</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">PATCH</span> <span class="nn">/datastores/myStore/connections/01234567890123456789?operation=begin-read-write-transaction</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
 </pre></div>
 </div>
@@ -3471,7 +3739,7 @@ transaction has been committed, the connection persists after the last request.<
 </pre></div>
 </div>
 <p><strong>Request</strong></p>
-<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">PATCH</span> <span class="nn">/datastores/myStore/connections/01234567890123456789/transaction?operation=commit-transaction</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">PATCH</span> <span class="nn">/datastores/myStore/connections/01234567890123456789?operation=commit-transaction</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
 </pre></div>
 </div>
@@ -3480,12 +3748,13 @@ transaction has been committed, the connection persists after the last request.<
 </pre></div>
 </div>
 <p>At any point, one can see whether a connection is associated with a transaction
-as follows. The response is written as the output of a SPARQL query that binds
-the variable <code class="docutils literal notranslate"><span class="pre">?Property</span></code> to the property name, variable <code class="docutils literal notranslate"><span class="pre">?Value</span></code> to the
-property value, and variable <code class="docutils literal notranslate"><span class="pre">?Mutable</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> if the value of the
-property can be changed and to <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+by querying the properties of a data store connection. The response is written
+as the output of a SPARQL query that binds the variable <code class="docutils literal notranslate"><span class="pre">?Property</span></code> to the
+property name, variable <code class="docutils literal notranslate"><span class="pre">?Value</span></code> to the property value, and variable
+<code class="docutils literal notranslate"><span class="pre">?Mutable</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> if the value of the property can be changed and to
+<code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 <p><strong>Request</strong></p>
-<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/datastores/myStore/connections/01234567890123456789/transaction</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/datastores/myStore/connections/01234567890123456789</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">localhost</span>
 <span class="na">Accept</span><span class="o">:</span> <span class="l">text/csv; charset=UTF-8</span>
 </pre></div>
@@ -3495,9 +3764,12 @@ property can be changed and to <code class="docutils literal notranslate"><span 
 <span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/csv; charset=UTF-8</span>
 
 Property,Value,Mutable
+agent-name,guest,false
+lock-timeout,2000,false
+data-store-version-after-last-operation,5,false
 transaction-state,read-write,false
 transaction-requires-rollback,false,false
-last-transaction-data-store-version,5,false
+incremental-reasoning-allowed,true,true
 </pre></div>
 </div>
 </div>
@@ -4183,8 +4455,8 @@ and compares the data store version before each request, is incorrect: a data
 store version can change in the interval between the user reading the version
 and issuing the request. RDFox addresses this by integrating these checks with
 its transaction processing.</p>
-<div class="section" id="id4">
-<h4><span class="section-number">16.18.2.1. </span>Java API<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id5">
+<h4><span class="section-number">16.18.2.1. </span>Java API<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
 <p>To support version checking, the <code class="docutils literal notranslate"><span class="pre">DataStoreConnection</span></code> class in Java API
 provides the <code class="docutils literal notranslate"><span class="pre">setNextOperationMustMatchDataStoreVersion()</span></code> and
 <code class="docutils literal notranslate"><span class="pre">setNextOperationMustNotMatchDataStoreVersion()</span></code> methods. Both methods take
@@ -4224,8 +4496,8 @@ used, for example, to avoid reevaluating a complex query unless the data store
 <em>has</em> changed. Successful updates will not change this parameter of the
 connection.</p>
 </div>
-<div class="section" id="id5">
-<h4><span class="section-number">16.18.2.2. </span>RESTful API<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id6">
+<h4><span class="section-number">16.18.2.2. </span>RESTful API<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <p>In the RESTful API, conditional requests are supported using standard HTTP
 <code class="docutils literal notranslate"><span class="pre">If-Match</span></code> and <code class="docutils literal notranslate"><span class="pre">If-None-Match</span></code> headers. Specifically, if a request contains
 an <code class="docutils literal notranslate"><span class="pre">If-Match</span></code> header with a particular ETag, the request will succeed only if

@@ -92,6 +92,9 @@ directories:
      how to call RDFox via the Java API. The ``examples/Java/build.xml`` Apache
      Ant script can be used to compile and run the program.
 
+- ``models``: a directory containing default text embedding models for use with 
+  RDFox's semantic search capabilities. 
+
 Interfaces
 ----------------
 
@@ -169,11 +172,11 @@ session. This means that RDFox can be deployed in the absence of these packages
 if the dependent functionality is not needed.
 
 `OpenSSL <https://www.openssl.org/>`__
-  Used to implement TLS for RDFox's HTTP client and server code, as well as for
-  persistence and session encryption. The search paths used to locate the DLLs
-  from this package when the endpoint is starting can be specified via the
-  ``RDFOX_LIBCRYPTO_PATH`` and ``RDFOX_LIBSSL_PATH`` environment variables. If
-  the environment variables are not set, the default values shown in the
+  RDFox requires OpenSSL to implement HTTPS and to encrypt data at rest,
+  including persisted data and session tokens. The search paths used to locate
+  the DLLs from this package when the endpoint is starting can be specified via
+  the ``RDFOX_LIBCRYPTO_PATH`` and ``RDFOX_LIBSSL_PATH`` environment variables.
+  If the environment variables are not set, the default values shown in the
   following table are used.
 
     .. table ::
@@ -192,10 +195,11 @@ if the dependent functionality is not needed.
   The resolved libraries must have version v3.0.0 or higher.
 
 `libpq <https://www.postgresql.org/docs/14/libpq.html>`__
-  Used to access PostgreSQL data sources. The search path used to locate
-  ``libpq`` when registering one of these data sources can be specified via the
-  ``RDFOX_LIBPQ_PATH`` environment variable. If the environment variable is not
-  set, the default value shown in the following table is used.
+  RDFox uses libpq to implement `PostgreSQL` data sources. The search path used
+  to locate ``libpq`` when registering one of these data sources can be
+  specified via the ``RDFOX_LIBPQ_PATH`` environment variable. If the
+  environment variable is not set, the default value shown in the following
+  table is used.
 
     .. table ::
         :widths: 20,30
@@ -217,12 +221,12 @@ if the dependent functionality is not needed.
   configuration and contact OST support as needed.
 
 `iODBC <https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/WelcomeVisitors>`__ or `unixODBC <http://www.unixodbc.org/>`__
-  Used to access external data sources via ODBC. The search path used to locate
-  the DLL that will manage drivers for accessing the ODBC source can be
-  specified via the ``RDFOX_ODBC_DRIVER_MANAGER_PATH`` environment variable. If
-  the environment variable is not set, RDFox will attempt to use the default
-  search paths shown in the following table to load unixODBC and, if that fails
-  and the platform is not Windows, iODBC.
+  RDFox uses either iODBC or unixODBC to implement `ODBC` data sources. The
+  search path used to locate the DLL that will manage drivers for accessing the
+  ODBC source can be specified via the ``RDFOX_ODBC_DRIVER_MANAGER_PATH``
+  environment variable. If the environment variable is not set, RDFox will
+  attempt to use the default search paths shown in the following table to load
+  unixODBC and, if that fails and the platform is not Windows, iODBC.
 
     .. table ::
         :widths: 20,30,30
@@ -243,10 +247,11 @@ if the dependent functionality is not needed.
   OST support as needed.
 
 `libsqlite3 <https://www.sqlite.org/>`__
-  Used to access SQLite data sources. The search path used to locate the
-  SQLite library can be specified via the ``RDFOX_LIBSQLITE_PATH`` environment
-  variable. If the environment variable is not set, RDFox will attempt to use
-  the default search paths shown in the following table.
+  RDFox uses libsqlite3 to implement `SQLite` data sources. The search path
+  used to locate the SQLite library can be specified via the
+  ``RDFOX_LIBSQLITE_PATH`` environment variable. If the environment variable is
+  not set, RDFox will attempt to use the default search paths shown in the
+  following table.
 
     .. table ::
         :widths: 20,30
@@ -268,37 +273,42 @@ if the dependent functionality is not needed.
   as needed.
 
 `Lucene <https://lucene.apache.org/>`__
-  Used to access Lucene data sources. The search path used to locate the
-  Lucene libraries when registering a Lucene data source can be specified via
-  the server parameter ``jvm.options`` or the environment variable 
-  ``RDFOX_JVM_OPTIONS``. The JVM options should include ``-Djava.class.path``
-  of the required Lucene libraries. The separator between the classpath is 
-  ``:`` (On Windows, ``;``). Any other JVM options can be specified as needed 
-  using the ``|`` separator.
-  If a Lucene data source is used with JRDFox, the required Lucene libraries
-  must be included in the classpath of the JVM running JRDFox.
-  The required JVM option and Lucene libraries are shown in the following table.
+  RDFox uses Lucene to implement `lucene` data sources. The search path used to
+  locate the Lucene libraries when registering a Lucene data source can be
+  specified via the server parameter ``jvm.options`` or the environment
+  variable ``RDFOX_JVM_OPTIONS``. The JVM options should include
+  ``-Djava.class.path`` of the required Lucene libraries. The separator between
+  the classpath is ``:`` (On Windows, ``;``). Any other JVM options can be
+  specified as needed using the ``|`` separator. If a Lucene data source is
+  used with JRDFox, the required Lucene libraries must be included in the
+  classpath of the JVM running JRDFox. The required Lucene libraries for
+  ``-Djava.class.path`` are shown in the following table with explanations of
+  their purpose.
 
   .. table ::
-        :widths: 25,40
+        :widths: 30, 40
 
-        +-----------------------+----------------------------------------+
-        |      JVM Option       | Lucene library search path             |
-        +=======================+========================================+
-        | ``-Djava.class.path`` | ``lucene-core-<version>.jar``          |
-        +-----------------------+----------------------------------------+
-        | ``-Djava.class.path`` | ``lucene-queryparser-<version>.jar``   |
-        +-----------------------+----------------------------------------+
+        +-------------------------------------------+-----------------------------------------------------+
+        | Lucene library search path                | Description                                         |
+        +===========================================+=====================================================+
+        | ``lucene-core-<version>.jar``             | (`Required`) Lucene core library.                   |
+        +-------------------------------------------+-----------------------------------------------------+
+        | ``lucene-queryparser-<version>.jar``      | (`Required`) Query parsers and parsing framework.   |
+        +-------------------------------------------+-----------------------------------------------------+
+        | ``lucene-backward-codecs-<version>.jar``  | (`Optional`) This library can be used to access     |
+        |                                           | Lucene indexes created with older major versions of |
+        |                                           | Lucene.                                             |
+        +-------------------------------------------+-----------------------------------------------------+
 
   The resolved libraries must have version v9.6.0 or higher.
 
 `libjvm <https://docs.oracle.com/en/java/index.html>`__
-  Used to access Lucene data sources with RDFox executable. The search path 
-  used to locate the JVM library can be specified via the ``RDFOX_LIBJVM_PATH``
-  environment variable. 
-  This is required to embed the Java Virtual Machine (JVM) within RDFox. 
-  If the environment variable is not set, RDFox will 
-  attempt to use the default search paths shown in the following table.
+  RDFox uses libjvm to implement `lucene` data sources when the RDFox server
+  was not created from the Java API. The search path used to locate the JVM
+  library can be specified via the ``RDFOX_LIBJVM_PATH`` environment variable.
+  This is required to embed the Java Virtual Machine (JVM) within RDFox. If the
+  environment variable is not set, RDFox will attempt to use the default search
+  paths shown in the following table.
 
     .. table ::
         :widths: 20,30

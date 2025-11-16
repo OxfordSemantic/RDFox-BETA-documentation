@@ -165,6 +165,64 @@ a new RDF graph in a store, drop an RDF graph from a store, copy (move or add)
 the content of one graph to another, and perform a group of update operations
 as a single action.
 
+.. _federated-queries:
+
+Federated Queries
+~~~~~~~~~~~~~~~~~
+
+RDFox supports the ``SERVICE`` operator in SPARQL 1.1, which allows RDFox to
+query remote SPARQL endpoints. The endpoint can be a RDFox server or any other
+SPARQL-compliant server. Execution of a ``SERVICE`` request is performed by
+sending a ``POST`` request to the path of the target SPARQL endpoint. The
+following example demonstrates the use of the ``SERVICE`` operator.
+
+.. container :: example
+
+   **Example:** The following query retrieves all pairs of people and their
+   names from a remote SPARQL endpoint, ``https://example.org/sparql``.
+
+   ::
+
+      SELECT ?p ?n
+      WHERE {
+          SERVICE <https://example.org/sparql> {
+              ?p rdf:type :Person .
+              ?p :forename ?n .
+          }
+      }
+
+Authentication credentials can be included in the HTTP request to the target
+endpoint by configuring ``http-remotes``. See :numref:`http-remotes` for
+details.
+
+.. container :: example
+
+   **Example:** The following configuration for ``http-remotes`` enables
+   sending basic authentication credentials when querying the remote SPARQL
+   endpoint ``https://example.org/sparql``.
+
+   ::
+
+        http-remotes "{                        \
+            \"https://example.org/sparql\": {  \
+            \"auth\": {                        \
+                \"type\": \"basic\",           \
+                \"username\": \"guest\",       \
+                \"password\": \"password\"     \
+            },                                 \
+            \"federationBatchSize\": \"512\"   \
+        }"
+
+There are some restrictions on the use of the ``SERVICE`` operator in RDFox.
+
+* `SERVICE Variables
+  <https://www.w3.org/TR/sparql11-federated-query/#variableService>`__ are
+  **not** supported.
+* The endpoint IRI must be a valid IRI.
+* If the query inside the ``SERVICE`` block has proprietary RDFox extensions
+  (e.g., ``TT`` expressions or ``EXPLICIT``), then the remote endpoint must be
+  a RDFox server.
+
 .. _built-in-functions:
 
 Built-In Functions
@@ -379,9 +437,9 @@ in the case of ``DATE_TIME_STAMP``.
     * - DURATION ( year, month, day, hours, minutes, seconds )
       - Constructs an ``xsd:duration`` value.
     * - YEAR_MONTH_DURATION ( year, month )
-      - Constructs an ``xsd:duration`` value.
+      - Constructs an ``xsd:yearMonthDuration`` value.
     * - DAY_TIME_DURATION ( day, hours, minutes, seconds )
-      - Constructs an ``xsd:duration`` value.
+      - Constructs an ``xsd:dayTimeDuration`` value.
     * - DATE_TIME ( year, month, day, hour, minute, second, offset )
       - Constructs an ``xsd:dateTime`` value.
     * - DATE_TIME_STAMP ( year, month, day, hour, minute, second, offset )
@@ -401,6 +459,7 @@ in the case of ``DATE_TIME_STAMP``.
     * - G_YEAR ( year, offset )
       - Constructs an ``xsd:gYear`` value.
 
+.. _iri-and-string-functions:
 
 IRI and String Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -428,8 +487,29 @@ overlap, and RDFox provides full support for them, with the exception of
       - `langMatches <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-langMatches>`__
       - `REGEX <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-regex>`__  |space| ( `fn:matches <https://www.w3.org/TR/xpath-functions/#func-matches>`__ )
     * - `REPLACE <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-replace>`__  |space| ( `fn:replace <https://www.w3.org/TR/xpath-functions/#func-replace>`__ )
+      - SEMSIM
       -
-      -
+
+**SEMSIM (EXPERIMENTAL)**
+
+RDFox supports semantic similarity computation between strings using the
+``SEMSIM`` function. This function takes two string arguments and returns an
+``xsd:float`` value between ``-1.0`` and ``1.0``, indicating how similar the
+two strings are. The similarity score is computed using an embedding model,
+which can be specified using the ``RDFOX_EMBEDDING_MODEL_PATH`` environment 
+variable. If no model path is set, the default embedding model provided with 
+RDFox is used. The default model and embedding library are described in
+:ref:`acknowledgments`.
+The ``SEMSIM`` function is experimental and its behavior may change in future 
+releases. Some restrictions apply when using this function as follows:
+
+  - The maximum number of input tokens is restricted to context size of the 
+    embedding model (e.g., 512 tokens for BERT-based models). For inputs 
+    exceeding this limit, this function returns ``UNDEF``.
+  - The performance of ``SEMSIM`` is dependent on the complexity of the
+    embedding model and the size of the input strings.
+  - The embedding model must be provided in 
+    `GGUF <https://huggingface.co/docs/hub/gguf>`__ format.
 
 Hash Functions
 ~~~~~~~~~~~~~~
@@ -556,7 +636,7 @@ date/time values.
         `fn:months-from-duration <https://www.w3.org/TR/xpath-functions/#func-months-from-duration>`__.
     * - DAYS
       - Returns the number of days in a duration:
-        `fn:days-from-duration <https://www.w3.org/TR/xpath-functions/#func-day-from-duration>`__.
+        `fn:days-from-duration <https://www.w3.org/TR/xpath-functions/#func-days-from-duration>`__.
     * - `HOURS <https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-hours>`__
       - Returns the hours component of a date/time value. Extends
         `fn:hours-from-dateTime <https://www.w3.org/TR/xpath-functions/#func-hours-from-dateTime>`__,

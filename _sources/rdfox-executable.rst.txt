@@ -50,8 +50,9 @@ development and testing:
   parameter to the empty string. This ensures that the server can access any
   files on the host system (subject to the OS's file permissions).
 
-- The ``allowed-schemes-on-load`` parameter is set to include all supported URL
-  schemes so that the server can load resources with any of these schemes.
+- The ``allowed-url-schemes-on-import`` parameter is set to include all
+  supported URL schemes so that the server can load resources with any of these
+  schemes.
 
 In addition the role and password are both defaulted to ``guest``. This allows
 full control of the system via the REST API without authentication, if the

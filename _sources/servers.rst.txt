@@ -324,8 +324,8 @@ that control the behavior of authentication managers, which are documented in
    |                                                  |                                 | begin in the offline state. The default         |
    |                                                  |                                 | value is ``true``.                              |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
-   | ``allowed-schemes-on-load``                      | a string containing a space-    | Specifies a space-separated list of             |
-   |                                                  | separated list of URI schemes   | schemes that are allowed to be used             |
+   | ``allowed-url-schemes-on-import``                | a string containing a space-    | Specifies a space-separated list of             |
+   |                                                  | separated list of URL schemes   | schemes that are allowed to be used             |
    |                                                  |                                 | in the SPARQL 1.1 ``LOAD`` update               |
    |                                                  |                                 | and to import from IRIs.                        |
    |                                                  |                                 | The default value is ``https rdfox``            |
@@ -365,7 +365,9 @@ that control the behavior of authentication managers, which are documented in
    |                                                  |                                 | The default value is ``role-name+password``.    |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
    | ``delta-queries.answers-directory``              | a string                        | The directory in which the delta query          |
-   |                                                  |                                 | answers will be stored.                         |
+   |                                                  |                                 | answers will be stored. If ommitted, RDFox      |
+   |                                                  |                                 | stores the delta query answers with the data    |
+   |                                                  |                                 | store content in the server directory.          |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
    | ``delta-queries.encryption.algorithm``           | a string                        | The name of an encryption algorithm             |
    |                                                  |                                 | supported by the available OpenSSL              |
@@ -388,6 +390,14 @@ that control the behavior of authentication managers, which are documented in
    |                                                  |                                 | This parameter may alternatively be             |
    |                                                  |                                 | supplied via the                                |
    |                                                  |                                 | ``RDFOX_DELTA_QUERIES_ENCRYPTION_KEY``          |
+   |                                                  |                                 | environment variable.                           |
+   |                                                  |                                 | By default, this parameter is unset.            |
+   +--------------------------------------------------+---------------------------------+-------------------------------------------------+
+   | ``http-remotes``                                 | a string                        | Specifies a JSON object as a string mapping     |
+   |                                                  |                                 | HTTP(S) endpoints to connection settings.       |
+   |                                                  |                                 | See :numref:`http-remotes` for more             |
+   |                                                  |                                 | information. This parameter may alternatively   |
+   |                                                  |                                 | be supplied via the ``RDFOX_HTTP_REMOTES``      |
    |                                                  |                                 | environment variable.                           |
    |                                                  |                                 | By default, this parameter is unset.            |
    +--------------------------------------------------+---------------------------------+-------------------------------------------------+
@@ -612,7 +622,7 @@ The following text block shows an example parameters file:
   persistence              file
 
   # Enable loading of file: and https: URLs only
-  allowed-schemes-on-load  "file https"
+  allowed-url-schemes-on-import  "file https"
 
   # Restrict importing, exporting and reading of shell scripts to the ``/data`` directory
   sandbox-directory        /data
@@ -630,3 +640,191 @@ optional unit specifier. The accepted unit specifiers are ``ms``, ``s`` (the
 default), ``h``, and ``d``. To specify an infinite waiting time the value can be
 set to the string ``unlimited`` although this is not accepted for all duration
 parameter names.
+
+.. _http-remotes:
+
+HTTP Remotes
+~~~~~~~~~~~~
+
+RDFox supports integration with external HTTP(S) endpoints for importing data
+and answering federated queries. These endpoints are configured using the
+``http-remotes`` server parameter, which accepts a JSON object that specifies 
+the cononection settings of each remote and has the following structure.
+
+.. code:: text
+
+  {
+    <REMOTE_ID>: {
+      "baseURL": <BASE_URL>,
+      "auth": {
+        "type": <TYPE>,
+        "username": <USERNAME>,
+        "password": <PASSWORD>,
+        "passwordVariable": <PASSWORD_VARIABLE>,
+        "clientId": <CLIENT_ID>,
+        "clientSecret": <CLIENT_SECRET>,
+        "clientSecretVariable": <CLIENT_SECRET_VARIABLE>,
+        "tokenEndpoint": <TOKEN_ENDPOINT>,
+        "tokenDefaultLifetime": <TOKEN_DEFAULT_LIFETIME>,
+        "scope": <SCOPE>
+      },
+      "federationBatchSize": <FEDERATION_BATCH_SIZE>
+    },
+  }
+
+- ``<REMOTE_ID>``: (`Required`) A string key representing a valid URL prefix for 
+  the remote server. The supported schemes are ``http`` and ``https``. If
+  ``baseURL`` isn't specified, RDFox uses this directly for network access. The
+  value associated with this key is the ``Remote Configuration``, described
+  below. When processing a target URL, RDFox first checks whether it begins with a
+  ``<REMOTE_ID>``; if so, the corresponding configuration is applied. If multiple 
+  ``<REMOTE_ID>`` values match, RDFox uses the first one that appears in the JSON 
+  object. Recursive references across different
+  configurations are not supported.
+
+- ``Remote Configuration``: (`Required`) An object value specifying how RDFox
+  should connect to the endpoint. The elements are:
+
+  - ``<BASE_URL>``: (`Optional`) A string value representing a URL. If
+    provided, RDFox uses this as the base URL when resolving request targets
+    whose URLs begin with the corresponding ``<REMOTE_ID>``. Before resolution,
+    the ``<REMOTE_ID>`` prefix is removed from the query or request URL, and
+    the remaining path (the URI reference) is resolved against ``<BASE_URL>``
+    according to `RFC3986 <https://www.rfc-editor.org/rfc/rfc3986#section-5>`__. 
+    This is path resolution rather than direct replacement, and a trailing 
+    ``/`` determines whether the final segment is interpreted as a directory or 
+    a file when resolving relative paths.
+    
+  - ``auth``: (`Optional`) An object specifying authentication details:
+
+    - ``<TYPE>``: (`Required`) A string value representing the authentication
+      method. Only ``basic`` and ``oauth`` are supported. ``basic`` refers to
+      `HTTP Basic Authentication <https://www.rfc-editor.org/rfc/rfc7617>`__,
+      while ``oauth`` refers to `OAuth 2.0 Client Credentials Flow
+      <https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4>`__. Exactly one
+      of these values must be specified.
+    
+    For ``basic`` authentication, the following fields are supported:
+
+    - ``<USERNAME>``: (`Required`) A string value representing the username for
+      authentication.
+    - ``<PASSWORD>`` (`Optional`): A string value representing the password for
+      authentication.
+    - ``<PASSWORD_VARIABLE>`` (`Optional`): A string value representing the
+      name of the environment variable containing the password.
+
+    At least one of ``password`` or ``passwordVariable`` must be provided. If
+    both are specified, the value of ``password`` takes precedence.
+
+    For ``oauth`` authentication, the following fields are supported:
+    
+    - ``<CLIENT_ID>``: (`Required`) A string value representing the OAuth
+      client identifier.
+    - ``<CLIENT_SECRET>``: (`Optional`) A string value representing the OAuth
+      client secret.
+    - ``<CLIENT_SECRET_VARIABLE>``: (`Optional`) A string value representing
+      the name of the environment variable containing the OAuth client secret.
+    - ``<TOKEN_ENDPOINT>``: (`Required`) A string value representing the URL of
+      the OAuth token endpoint. This must be an ``https`` URL.
+    - ``<TOKEN_DEFAULT_LIFETIME>``: (`Optional`) Specifies the default lifetime 
+      of OAuth tokens in seconds if the OAuth token endpoint does not provide one. 
+      The default value is ``3600``.
+    - ``<SCOPE>``: (`Optional`) A string value representing the OAuth scope.
+
+    At least one of ``clientSecret`` or ``clientSecretVariable`` must be
+    provided. If both are specified, the value of ``clientSecret`` takes
+    precedence.
+
+    OAuth tokens obtained from the token endpoint are reused by RDFox until they are 
+    within one minute of their expiration time. The expiration time is determined by 
+    the ``expires_in`` property in the token endpoint's response. If this property is 
+    not provided, RDFox falls back to the ``tokenDefaultLifetime`` setting in the HTTP 
+    remote configuration, if available. If neither is specified, a default lifetime 
+    of 3600 seconds is used. When RDFox detects that a previously acquired token 
+    has expired during communication with the HTTP remote server, it automatically 
+    requests a new token from the authorization server. For more details, refer to 
+    `RFC 6749, Section 4.1.4 <https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.4>`__ .
+    
+  - ``<FEDERATION_BATCH_SIZE>``: (`Optional`) An integer value representing the
+    maximum number of substitutions that RDFox will include in a single SPARQL
+    query sent to the remote endpoint during federated query processing. The
+    default value is ``1024``. Larger values may improve performance when the
+    network latency is high, but may increase the size of the remote query.
+    A value of ``0`` disables batching, causing RDFox to send each substitution
+    in a separate query.
+
+Consider the following example HTTP remotes configuration:
+
+.. code:: text
+
+  {
+    "http://service.com/guest/": {
+      "baseURL": "https://host.com:8080/guest/data/",
+      "auth": {
+        "type": "basic",
+        "username": "guest",
+        "password": "password"
+      }
+    },
+    "https://host.com:8081/admin/data": {
+      "auth": {
+        "type": "basic",
+        "username": "admin",
+        "passwordVariable": "ADMIN_PASSWORD"
+      }
+    },
+    "http://host.com:8081/guest/data": {
+      "auth": {
+        "type": "oauth",
+        "clientId": "client_id",
+        "clientSecret": "client_secret",
+        "tokenEndpoint": "https://idp.com/oauth2/v2.0/token",
+        "scope": "repo user"
+      }
+    }
+  }
+
+The first endpoint, with ``<REMOTE_ID>`` set to ``http://service.com/guest/``,
+uses basic authentication with a username and password, and specifies a
+``baseURL`` for data operations. For instance, if a user issues the command
+``LOAD <http://service.com/guest/input.ttl>``, RDFox will actually perform the
+operation as ``LOAD <https://host.com:8080/guest/data/input.ttl>`` because the
+``baseURL`` is specified and the path after the endpoint is appended to the
+base URL. The point to note is that if neither ``<REMOTE_ID>`` nor the
+``baseURL`` ends with a ``/``, then any additional path specified in a query
+will be placed directly after the host and port of the given ``baseURL``. For
+example, if ``<REMOTE_ID>`` is ``http://service.com/guest`` and ``baseURL`` is
+``https://host.com:8080/guest/data``, then ``LOAD <http://service.com/guest/input.ttl>`` 
+will actually be executed as ``LOAD <https://host.com:8080/input.ttl>``. This 
+behaviour follows the logic of resolving URL paths; see 
+`RFC3986 <https://www.rfc-editor.org/rfc/rfc3986#section-5>`__ for reference.
+
+The second endpoint, with ``<REMOTE_ID>`` set to
+``https://host.com:8081/admin/data``, uses basic authentication with a
+username, and retrieves the password from the ``ADMIN_PASSWORD`` environment
+variable. No ``baseURL`` is specified, so ``Endpoint URL`` is used directly for
+network access.
+
+The third endpoint, with ``<REMOTE_ID>`` set to
+``http://host.com:8081/guest/data``, uses OAuth with a client identifier and
+secret, and specifies the token endpoint and scope for obtaining access tokens
+from the identity provider.
+
+This server parameter can also be defined through an environment variable,
+``RDFOX_HTTP_REMOTES``, as shown in the following example:
+
+.. code:: text
+
+  export RDFOX_HTTP_REMOTES="{               \
+    "https://host.com:8081/admin/data": {    \
+      "auth": {                              \
+        "type": "basic",                     \
+        "username": "admin",                 \
+        "passwordVariable": "ADMIN_PASSWORD" \
+      }                                      \
+    }                                        \
+  }"
+  export ADMIN_PASSWORD="secret"
+
+If both the ``http-remotes`` server parameter and the ``RDFOX_HTTP_REMOTES``
+environment variable are set, only the server parameter is used.

@@ -769,7 +769,8 @@ parameters <server-parameters>`, prefixed with ``oidc.``.
    |                                |                                | OpenID Connect client, for use when authenticating itself  |
    |                                |                                | to the OpenID provider. This parameter has no default      |
    |                                |                                | value and must be specified if interactive OIDC login is   |
-   |                                |                                | desired.                                                   |
+   |                                |                                | desired. This parameter can also be set via the            |
+   |                                |                                | environment variable ``RDFOX_OIDC_CLIENT_SECRET``.         |
    +--------------------------------+--------------------------------+------------------------------------------------------------+
    | ``delete-refresh-token-after`` | a duration, specified          | The duration of time after which a refresh token is        |
    |                                | as described in                | deleted from disk. This value should be longer than the    |

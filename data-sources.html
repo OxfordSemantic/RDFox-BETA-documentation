@@ -465,7 +465,11 @@ RDFOX_JVM_OPTIONS=&quot;-Djava.class.path=/path/to/lucene-core-9.6.0.jar:/path/t
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>RDFox supports the Apache Lucene library starting from version 9.6.0, which requires Java 11 or higher.</p>
+<p>RDFox supports integration with the Apache Lucene library, starting from
+Lucene version 9.6.0 (which requires Java 11 or higher). For Apache
+Lucene version 10, Java 21 or higher is required. Please ensure that
+your Java version is compatible with the version of Apache Lucene you
+wish to use.</p>
 </div>
 <p>Lucene Data Sources are registered as type <code class="docutils literal notranslate"><span class="pre">lucene</span></code>. The parameters for
 registering this type of data source are described below.</p>
@@ -519,7 +523,16 @@ registering this type of data source are described below.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1024</span></code></p></td>
+<td><p>The maximum number of substitutions combined into
+a single query to the data source. Larger values
+reduce the number of round trips but may increase
+the size of each SQL query.</p>
+<p>A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
 <td><p>A duration specified as described in
 <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which determines
@@ -528,14 +541,14 @@ alive before they are closed. The <code class="docutils literal notranslate"><sp
 setting may not be used. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
 disables caching of database connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-string</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-string</span></code></p></td>
 <td><p>The empty string</p></td>
 <td><p>The connection string RDFox should use to connect
 to the ODBC instance.</p>
 <p>This parameter must be specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">default-schema</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">default-schema</span></code></p></td>
 <td><p>The empty string</p></td>
 <td><p>The name of the schema that the SQL database uses
 to interpret unqualified references to tables.
@@ -548,19 +561,19 @@ determined by running the
 Unfortunately, there is no standard way to
 retrieve the required value for this parameter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&quot;</span></code></p></td>
 <td><p>The character used as the quote mark for
 <cite>quoted identifiers</cite> in SQL statements used to
 interrogate the data source.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote-open</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote-open</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
 <td><p>The character used as the opening quote mark for
 <cite>quoted identifiers</cite> in SQL statements used to
 interrogate the data source.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote-close</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote-close</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">quoted-identifier-quote</span></code></p></td>
 <td><p>The character used as the closing quote mark for
 <cite>quoted identifiers</cite> in SQL statements used to
@@ -587,7 +600,16 @@ registering this type of data source are described below.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1024</span></code></p></td>
+<td><p>The maximum number of substitutions combined into
+a single query to the data source. Larger values
+reduce the number of round trips but may increase
+the size of each SQL query.</p>
+<p>A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
 <td><p>A duration specified as described in
 <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which determines
@@ -596,7 +618,7 @@ alive before they are closed. The <code class="docutils literal notranslate"><sp
 setting may not be used. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
 disables caching of database connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The path to the SQLite database file to add.</p>
 <p>This parameter must be specified.</p>
@@ -624,7 +646,16 @@ for registering this type of data source are described below.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1024</span></code></p></td>
+<td><p>The maximum number of substitutions combined into
+a single query to the data source. Larger values
+reduce the number of round trips but may increase
+the size of each SQL query.</p>
+<p>A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">s</span></code></p></td>
 <td><p>A duration specified as described in
 <a class="reference internal" href="servers.html#specifying-durations"><span class="std std-numref">Section 4.3.2</span></a>, which determines
@@ -633,7 +664,7 @@ alive before they are closed. The <code class="docutils literal notranslate"><sp
 setting may not be used. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
 disables caching of database connections.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">connection-string</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection-string</span></code></p></td>
 <td><p>The empty string</p></td>
 <td><p>The connection string RDFox should use to connect
 to the PostgreSQL instance.</p>
@@ -712,11 +743,18 @@ column <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</s
 <td><p>The lexical form of the value in the column with
 name <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> of the source table. This
 placeholder cannot be used with delimited file
-data sources that do not have a header.</p></td>
+data sources that do not have a header.
+The <code class="docutils literal notranslate"><span class="pre">solr</span></code> data source tables contain a special
+column <code class="docutils literal notranslate"><span class="pre">{score}</span></code> that represents the score of
+the document for the given query.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{row#}</span></code></p></td>
 <td><p>The index of the current row (<code class="docutils literal notranslate"><span class="pre">delimitedFile</span></code>
 and <code class="docutils literal notranslate"><span class="pre">solr</span></code> data sources only).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">{:score}</span></code></p></td>
+<td><p>The score of the document for the given query
+(<code class="docutils literal notranslate"><span class="pre">Lucene</span></code>  data sources only).</p></td>
 </tr>
 </tbody>
 </table>
@@ -1403,17 +1441,18 @@ can be created as follows.</p>
    &quot;query&quot; &quot;title:\&quot;return of the jedi\&quot;&quot; \
    &quot;max-rows&quot; 10                          \
    &quot;min-score&quot; 0.0                        \
-   &quot;columns&quot; 4                            \
+   &quot;columns&quot; 5                            \
    &quot;1&quot; &quot;{Title}&quot;                          \
    &quot;1.datatype&quot; &quot;string&quot;                  \
    &quot;2&quot; &quot;{Year}&quot;                           \
    &quot;2.datatype&quot; &quot;string&quot;                  \
    &quot;3&quot; &quot;{4}&quot;                              \
-   &quot;4&quot; &quot;{3}&quot;
+   &quot;4&quot; &quot;{3}&quot;                              \
+   &quot;5&quot; &quot;{:score}&quot;
 </pre></div>
 </div>
 <p>Querying this tuple table returns the following tuples.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;Star Wars: Return of the Jedi&quot; &quot;1983&quot; &quot;The Empire is confronted in a final battle.&quot; &quot;Sci-Fi&quot; .
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;Star Wars: Return of the Jedi&quot; &quot;1983&quot; &quot;The Empire is confronted in a final battle.&quot; &quot;Sci-Fi&quot; &quot;2.30862379E0&quot;^^xsd:float.
 </pre></div>
 </div>
 </div>
@@ -1674,24 +1713,34 @@ the source table.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code> of the data
+source</p></td>
+<td><p>The maximum number of substitutions combined into a
+single query to the data source. Larger values
+reduce the number of round trips but may increase
+the size of each SQL query.</p>
+<p>A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code></p></td>
 <td><p>The number of columns the data source tuple table
 will have.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The name of the data source.</p>
 <p>This parameter must be specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
 &lt;= <code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{&lt;k&gt;}</span></code></p></td>
 <td><p>Template for the lexical form of values in the
 <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. See below for details.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;n&gt;.datatype</span></code> if <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> is
 <code class="docutils literal notranslate"><span class="pre">{&lt;n&gt;}</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p></td>
 <td><p>The datatype of values in the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. The
@@ -1704,7 +1753,7 @@ Moreover, <code class="docutils literal notranslate"><span class="pre">xsd:strin
 <code class="docutils literal notranslate"><span class="pre">xsd:double</span></code> may be further abbreviated to
 <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code> and <code class="docutils literal notranslate"><span class="pre">integer</span></code> respectively.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">variable</span></code></p></td>
 <td><p>Specifies the type of the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th  column of the
 tuple table. Valid values are as follows.</p>
@@ -1714,7 +1763,7 @@ and values when the table is accessed.</p>
 when the table is accessed.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The name of a data source table to
 use as the source table for the tuple
@@ -1723,12 +1772,12 @@ table being created.</p>
 specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>Specifies the schema to which
 <code class="docutils literal notranslate"><span class="pre">table.name</span></code> belongs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.string-column-size</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.string-column-size</span></code></p></td>
 <td><p>Column width reported by
 the ODBC driver plus one,
 all multiplied by the
@@ -1739,7 +1788,7 @@ from the ODBC driver the string values in the
 <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column  of the table identified by
 <code class="docutils literal notranslate"><span class="pre">table.name</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
 <td><p>The value reported by the ODBC
 driver.</p></td>
 <td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
@@ -1747,14 +1796,14 @@ of the table identified by <code class="docutils literal notranslate"><span clas
 and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code> should be treated
 as nullable or not.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.time-zone</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.time-zone</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The time zone RDFox should apply to
 values that include times in the
 <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of the table identified
 by <code class="docutils literal notranslate"><span class="pre">table.name</span></code> and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>An SQL query used to generated the source
 table for the tuple table being created.</p>
@@ -1762,7 +1811,7 @@ table for the tuple table being created.</p>
 specified.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.string-column-size</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.string-column-size</span></code></p></td>
 <td><p>Column width reported by
 the ODBC driver plus one,
 all multiplied by the
@@ -1772,14 +1821,14 @@ in bytes.</p></td>
 from the ODBC driver the string values in the
 <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
 <td><p>The value reported by the ODBC
 driver.</p></td>
 <td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
 of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code> should
 be treated as nullable or not.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.time-zone</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.time-zone</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The time zone RDFox should apply to
 values that include times in the
@@ -1805,24 +1854,34 @@ values that include times in the
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code> of the data
+source</p></td>
+<td><p>The maximum number of substitutions combined into a
+single query to the data source. Larger values
+reduce the number of round trips but may increase
+the size of each SQL query.</p>
+<p>A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code></p></td>
 <td><p>The number of columns the data source tuple table
 will have.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The name of the data source.</p>
 <p>This parameter must be specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
 &lt;= <code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{&lt;k&gt;}</span></code></p></td>
 <td><p>Template for the lexical form of values in the
 <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. See below for details.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;n&gt;.datatype</span></code> if <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> is
 <code class="docutils literal notranslate"><span class="pre">{&lt;n&gt;}</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p></td>
 <td><p>The datatype of values in the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. The
@@ -1835,7 +1894,7 @@ Moreover, <code class="docutils literal notranslate"><span class="pre">xsd:strin
 <code class="docutils literal notranslate"><span class="pre">xsd:double</span></code> may be further abbreviated to
 <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code> and <code class="docutils literal notranslate"><span class="pre">integer</span></code> respectively.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">variable</span></code></p></td>
 <td><p>Specifies the type of the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th  column of the
 tuple table. Valid values are as follows.</p>
@@ -1845,7 +1904,7 @@ and values when the table is accessed.</p>
 when the table is accessed.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The name of a data source table to
 use as the source table for the tuple
@@ -1854,12 +1913,12 @@ table being created.</p>
 specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>Specifies the schema to which
 <code class="docutils literal notranslate"><span class="pre">table.name</span></code> belongs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
 <td><p>The value reported by the
 database.</p></td>
 <td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
@@ -1867,7 +1926,7 @@ of the table identified by <code class="docutils literal notranslate"><span clas
 and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code> should be treated
 as nullable or not.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.column-type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.column-type</span></code></p></td>
 <td><p>The type declared when
 creating the SQLite table</p></td>
 <td><p>Specifies the type of the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of the
@@ -1880,7 +1939,7 @@ numbers, or strings, respectively.</p>
 this parameter.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>An SQL query used to generated the source
 table for the tuple table being created.</p>
@@ -1888,13 +1947,13 @@ table for the tuple table being created.</p>
 specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
 of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code> should
 be treated as nullable or not.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.column-type</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.column-type</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>Specifies the type of the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of the
 answer to <code class="docutils literal notranslate"><span class="pre">query</span></code> and
@@ -2061,24 +2120,34 @@ will return the people whose ages are between 30 and 39:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">batch-size</span></code> of the data
+source</p></td>
+<td><p>The maximum number of substitutions combined into a
+single query to the data source. Larger values
+reduce the number of round trips but may increase
+the size of each SQL query.</p>
+<p>A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> disables batching.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;N&gt;</span></code></p></td>
 <td><p>The number of columns the data source tuple table
 will have.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data-source-name</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The name of the data source.</p>
 <p>This parameter must be specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> where 1 &lt;= <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>
 &lt;= <code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">{&lt;k&gt;}</span></code></p></td>
 <td><p>Template for the lexical form of values in the
 <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. See below for details.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.datatype</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">&lt;n&gt;.datatype</span></code> if <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code> is
 <code class="docutils literal notranslate"><span class="pre">{&lt;n&gt;}</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p></td>
 <td><p>The datatype of values in the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th column. The
@@ -2091,7 +2160,7 @@ Moreover, <code class="docutils literal notranslate"><span class="pre">xsd:strin
 <code class="docutils literal notranslate"><span class="pre">xsd:double</span></code> may be further abbreviated to
 <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code> and <code class="docutils literal notranslate"><span class="pre">integer</span></code> respectively.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;k&gt;.type</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">variable</span></code></p></td>
 <td><p>Specifies the type of the <code class="docutils literal notranslate"><span class="pre">&lt;k&gt;</span></code>-th  column of the
 tuple table. Valid values are as follows.</p>
@@ -2101,7 +2170,7 @@ and values when the table is accessed.</p>
 when the table is accessed.</p>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.name</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The name of a data source table to
 use as the source table for the tuple
@@ -2110,12 +2179,12 @@ table being created.</p>
 specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.schema</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>Specifies the schema to which
 <code class="docutils literal notranslate"><span class="pre">table.name</span></code> belongs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.nullable</span></code></p></td>
 <td><p>The value reported by the
 database.</p></td>
 <td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
@@ -2123,14 +2192,14 @@ of the table identified by <code class="docutils literal notranslate"><span clas
 and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code> should be treated
 as nullable or not.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.time-zone</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">table.&lt;n&gt;.time-zone</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The time zone RDFox should apply to
 values that include times in the
 <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column of the table identified
 by <code class="docutils literal notranslate"><span class="pre">table.name</span></code> and <code class="docutils literal notranslate"><span class="pre">table.schema</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>An SQL query used to generated the source
 table for the tuple table being created.</p>
@@ -2138,13 +2207,13 @@ table for the tuple table being created.</p>
 specified.</p>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.nullable</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>Specifies whether the <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code>-th column
 of an answer to query <code class="docutils literal notranslate"><span class="pre">query</span></code> should
 be treated as nullable or not.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.time-zone</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">query.&lt;n&gt;.time-zone</span></code></p></td>
 <td><p>(none)</p></td>
 <td><p>The time zone RDFox should apply to
 values that include times in the

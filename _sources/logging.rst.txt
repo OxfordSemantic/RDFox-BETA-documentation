@@ -102,14 +102,16 @@ HTTP Request Logging
 --------------------
 
 HTTP request logging provides standardized logging of HTTP requests serviced by
-the RDFox endpoint. Both the common and extended log formats are supported. In
-contrast to API logging, request logging has been implemented to minimize the
-impact on performance as much as possible, and so the use of HTTP request
-logging in production is recommended.
+the RDFox endpoint. Common log format (``clf``) and extended log format
+(``elf``) are supported, as well as ``elf-json``, a JSON compatible variant of
+the extended log format.  In contrast to API logging, request logging has been
+implemented to minimize the impact on performance as much as possible, and so
+the use of HTTP request logging in production is recommended.
 
 HTTP request logging is configured via the endpoint parameters
-``request-logger`` and, when the extended log format logger is active,
-``elf-logger-fields`` (see :numref:`endpoint-parameters`).
+``request-logger`` and, when an extended log format logger is active,
+``elf-logger-fields`` and ``elf-logger-recorded-events`` (see
+:numref:`endpoint-parameters`).
 
 Errors and Exceptions
 ~~~~~~~~~~~~~~~~~~~~~

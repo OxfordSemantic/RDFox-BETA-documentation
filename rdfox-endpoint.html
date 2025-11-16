@@ -254,6 +254,17 @@ effective, it should be set to some value lower than the maximum number of
 file descriptors for the RDFox process. On Window, the default value for this
 parameter is 1024. On Linux and macOS, the default value is set to 90% of the
 maximum number of file descriptors for the server process.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">connection-close-time</span></code> determines the maximum time that a server will try
+to gracefully close of a TCP connection. That is, when a connection is to be
+closed, if the server were to close the connection immediately, there is a
+risk that the client might not properly receive the end of the server’s
+response (see <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc9112.html#name-tear-down">Section 9.6 of RFC 9112</a>). To avoid
+this potential problem, the server will keep the connection alive as well as
+read any incoming data on it for <code class="docutils literal notranslate"><span class="pre">connection-close-time</span></code>, thus giving the
+client a chance to read the server’s response and close the connection
+gracefully. If connection closure is not completed in the specified amount of
+time, connection will be closed abruptly. The  <code class="docutils literal notranslate"><span class="pre">unlimited</span></code> setting may not
+be used and the default value is <code class="docutils literal notranslate"><span class="pre">15</span> <span class="pre">s</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">connection-keep-alive-time</span></code> determines the maximum time that an HTTP
 connection will be kept open between requests. That is, if a client opens a
 TCP connection to the endpoint and makes a request, the server will wait for
@@ -296,6 +307,10 @@ Otherwise the value should be a space-delimited list of origins such as
 <code class="docutils literal notranslate"><span class="pre">&quot;https://example.org</span> <span class="pre">http://localhost:8080&quot;</span></code> to allow requests from just
 those origins. When this option is unset (the default), RDFox will not add
 any CORS headers to its responses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">localhost-only</span></code> determines whether the endpoint will listen on the
+loopback interface only. If this option is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, the endpoint will
+only listen on the loopback interface (localhost), otherwise it will listen
+on all network interfaces. The default value is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">protocol</span></code> determines which network layer protocol the endpoint will use.</p>
 <blockquote>
 <div><ul class="simple">
@@ -375,10 +390,17 @@ All logging goes to standard output.</p>
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">none</span></code> disables request logging. This is the default value.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">clf</span></code> enables request logging using the <a class="reference external" href="https://www.w3.org/Daemon/User/Config/Logging.html#common-logfile-format">Common Log Format</a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">elf</span></code> enables request logging using the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">Extended Log Format</a>. The exact content of each
+<li><p><code class="docutils literal notranslate"><span class="pre">elf</span></code> enables request logging using the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">Extended Log Format</a>. Logs can be produced for
+request start, finish and error events (configured using the
+<code class="docutils literal notranslate"><span class="pre">elf-logger-recorded-events</span></code> parameter). The exact content of each
 log entry is determined by the <code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> parameter. Each
 log entry is limited to 10 KiB. Where an entry would exceed this limit,
 the elided fields are indicated with <code class="docutils literal notranslate"><span class="pre">...</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elf-json</span></code> enables request logging in JSON format, and can be
+configured using the same parameters as <code class="docutils literal notranslate"><span class="pre">elf</span></code>. Each log entry is
+limited to 10 KiB. When an entry would exceed this limit, key value
+pairs are removed from the end of the JSON object, and the key
+<code class="docutils literal notranslate"><span class="pre">log-truncated</span></code> with value <code class="docutils literal notranslate"><span class="pre">true</span></code> is added.</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -403,19 +425,33 @@ to use a server directory, the logs will be written within the
 required by other settings but no directory is available, the endpoint
 will fail to start.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> determines which fields are logged by the extended
-log format logger. This parameter has no effect unless <code class="docutils literal notranslate"><span class="pre">request-logger</span></code>
-is set to <code class="docutils literal notranslate"><span class="pre">elf</span></code>. The value for this parameter must be a space-delimited
-list of the following field identifiers: <code class="docutils literal notranslate"><span class="pre">date</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code>,
-<code class="docutils literal notranslate"><span class="pre">time-taken</span></code>, <code class="docutils literal notranslate"><span class="pre">c-ip</span></code>, <code class="docutils literal notranslate"><span class="pre">c-port</span></code>, <code class="docutils literal notranslate"><span class="pre">cs({HEADER})</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-bytes</span></code>,
-<code class="docutils literal notranslate"><span class="pre">cs-method</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-query</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-stem</span></code>,
+log format loggers. This parameter has no effect unless <code class="docutils literal notranslate"><span class="pre">request-logger</span></code>
+is set to <code class="docutils literal notranslate"><span class="pre">elf</span></code> or <code class="docutils literal notranslate"><span class="pre">elf-json</span></code>. The value for this parameter must be a
+space-delimited list of the following field identifiers: <code class="docutils literal notranslate"><span class="pre">date</span></code>,
+<code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">time-taken</span></code>, <code class="docutils literal notranslate"><span class="pre">c-ip</span></code>, <code class="docutils literal notranslate"><span class="pre">c-port</span></code>, <code class="docutils literal notranslate"><span class="pre">cs({HEADER})</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cs-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-method</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-query</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-stem</span></code>,
 <code class="docutils literal notranslate"><span class="pre">sc({HEADER})</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-status</span></code>, <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code>,
-<code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>. The identifier <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code> specifies the agent
-name with which the request was made. The identifier <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>
-specifies the textual description of any exception raised due to a
-protocol error while handling an attempted request. All other identifiers
-have the meanings defined in the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">draft specification</a>. The default value for this
-parameter is <code class="docutils literal notranslate"><span class="pre">date</span> <span class="pre">time</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">sc-status</span> <span class="pre">sc-bytes</span>
+<code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>, <code class="docutils literal notranslate"><span class="pre">x-request-state</span></code>, <code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code>. The identifier
+<code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code> specifies the agent name with which the request was made.
+The identifier <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code> specifies the textual description of
+any exception raised due to a protocol error while handling an attempted
+request. The identifier <code class="docutils literal notranslate"><span class="pre">x-request-state</span></code> specifies the state of the
+request at the time of logging, which can be one of <code class="docutils literal notranslate"><span class="pre">request_start</span></code>,
+<code class="docutils literal notranslate"><span class="pre">request_finish</span></code>, or <code class="docutils literal notranslate"><span class="pre">request_error</span></code>. The identifier <code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code>
+specifies the date, time and timezone as a single field. All other
+identifiers have the meanings defined in the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">draft specification</a>. The default value for this
+parameter is <code class="docutils literal notranslate"><span class="pre">x-timestamp</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">sc-status</span> <span class="pre">sc-bytes</span>
 <span class="pre">time-taken</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elf-logger-recorded-events</span></code> determines which events are logged by the
+extended log format loggers. This parameter has no effect unless
+<code class="docutils literal notranslate"><span class="pre">request-logger</span></code> is set to <code class="docutils literal notranslate"><span class="pre">elf</span></code> or <code class="docutils literal notranslate"><span class="pre">elf-json</span></code>. The value for this
+parameter must be a space-delimited list of the following event
+identifiers: <code class="docutils literal notranslate"><span class="pre">request_start</span></code>, <code class="docutils literal notranslate"><span class="pre">request_finish</span></code>, and <code class="docutils literal notranslate"><span class="pre">request_error</span></code>.
+Certain fields may not be available for all events; for example,
+<code class="docutils literal notranslate"><span class="pre">sc-bytes</span></code> (the size of the response in bytes) is not available for
+<code class="docutils literal notranslate"><span class="pre">request_start</span></code> events as the response is yet to be calculated. Such
+unavailable fields are omitted from the produced log entries. The default
+value for this parameter is <code class="docutils literal notranslate"><span class="pre">request_finish</span> <span class="pre">request_error</span></code>.</p></li>
 </ul>
 </div></blockquote>
 </li>

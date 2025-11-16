@@ -73,7 +73,7 @@ to create the first role.
        RDFoxServer.createFirstRole(roleName, password);
    }
 
-The server is now ready to accept connections.
+The server is now ready to process requests.
 
 When RDFox is no longer needed by the application, the server can be stopped
 which will remove all data stores from memory. Stopping the server will fail
@@ -148,6 +148,27 @@ before a transaction is committed, incremental reasoning is run only once.
 It is generally good practice to add all rules before the facts, or to add
 rules and facts in an arbitrary order but grouped in a single transaction. This
 will usually increase the performance of the first reasoning operation.
+
+Each data store connection has a property controlling whether incremental
+reasoning is allowed for updates performed via that connection. This property
+is by default set to ``true``, but it can be set to ``false`` using the
+``DataStoreConnection.setIncrementalReasoningAllowed()`` method. When the
+property value is ``true``, updates made via that connection will be processed
+using incremental reasoning whenever possible. In contrast, if the property
+value is ``false``, then updates will always be processed by throwing away all
+consequences computed previously and performing all reasoning "from scratch".
+Incremental reasoning is usually more efficient, particularly for small,
+localized updates. However, when a data store changes significantly, "from
+scratch" reasoning may be more efficient. This is illustrated by the following
+example.
+
+.. code:: java
+
+   DataStoreConnection dsConn = RDFoxServer.newDataStoreConnection(dataStoreName, roleName, password);
+   dsConn.setIncrementalReasoningAllowed(false);
+   dsConn.importData(...);     // <-- Performs "from scratch" reasoning.
+   dsConn.close();
+
 
 The ``logic`` package
 ~~~~~~~~~~~~~~~~~~~~~
@@ -383,7 +404,6 @@ The endpoint provides access to one RDFox server via the following API keys.
                    /<DSCONN>           : management of a data store connection (GET/PATCH/DELETE)
                        /cursors        : management of transaction cursors (GET/POST)
                            /<CURSID>   : management of a cursor (GET/PATCH/DELETE)
-                       /transaction    : management of the connection transaction (GET/PATCH)
                /content                : data store content (GET/PATCH/PUT/POST/DELETE)
                /datasources            : listing available data sources (GET)
                    /<DSRCNAME>         : management of a data source (GET/POST/DELETE)
@@ -536,11 +556,11 @@ This is demonstrated in the following example.
    Server: RDFox Endpoint
    Content-Type: text/tab-separated-values; charset=UTF-8
    Transfer-Encoding: chunked
-   
+
    ?SchemeName ?CredentialsSupported   ?SessionType
    "Basic"  true  "direct-login"
    "Bearer" true  "interactive-login"
-   
+
 There is no equivalent of this API in Java.
 
 .. _REST-sessions:
@@ -568,7 +588,7 @@ authentication scheme.
 
 .. table ::
    :align: center
-   :widths: 5,15
+   :widths: 10,15,15
 
    +-----------------------------+---------------------------------+-----------------------------------------------------+
    | Authentication Manager      | Supported Authentication Scheme | Documentation Section for Session Support           |
@@ -606,7 +626,7 @@ containing the login state. This step is demonstrated by the following example.
    Set-Cookie: RDFox-LoginID=fffffffff; Path=/; HttpOnly; SameSite=Strict; Secure
    Location: https://login.example.com/authorize?response_type=code...
    Content-Length: 24
-   
+
    ffffffffffffffffffffffff
 
 If the client wants to cancel the login attempt after an
@@ -739,7 +759,7 @@ the ``session.encryption.key`` and ``session.encryption.algorithm``
 parameters. If no key is specified by the above parameters, a key is randomly
 generated and used for the server session. This means that session tokens are
 invalidated when the server is restarted and users will be forced to log in
-again. This option requires 
+again.
 
 .. _REST-client-certificates:
 
@@ -1032,7 +1052,12 @@ with the connection.
    Content-Type: text/csv; charset=UTF-8
 
    Property,Value,Mutable
-   role-name,guest,false
+   agent-name,guest,false
+   lock-timeout,2000,false
+   data-store-version-after-last-operation,0,false
+   transaction-state,none,false
+   transaction-requires-rollback,false,false
+   incremental-reasoning-allowed,true,true
 
 A connection can be deleted using a ``DELETE`` request.
 
@@ -1129,6 +1154,43 @@ request accessed it) for a period longer than the value of the
 ``object-keep-alive-time`` endpoint parameter. That is, a connection will remain
 valid for at least that much time (but it may actually remain valid slightly
 longer).
+
+Choosing Between Incremental and "From Scratch" Reasoning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As in all other APIs, each connection used in the RESTful API has a property
+that determines whether an update performed on the connection can be performed
+incrementally, or whether reasoning must be performed "from scratch". This
+property can be set on each explicitly managed connection just like in all
+other APIs. To simplify setting this property on implicitly managed
+connections, all RESTful API calls that use a data store connection (managed
+either explicitly or implicitly) accept an optional
+``incremental-reasoning-allowed`` request parameter, with the allowed values
+``true`` and ``false``. Whenever this parameter is set, the property of the
+data store connection handling the request is set to the specified value, and
+it is reset after the request finishes. (Resetting this property on implicitly
+managed connections is not necessary since such connections are discarded after
+each request; however, for explicitly managed connections, this ensures that
+the connection is not altered permanently by the request.)
+
+For example, the following request adds triples to a data store and requests
+that any reasoning be performed "from scratch".
+
+**Request**
+
+.. code:: http
+
+   POST /datastores/myStore/content?incremental-reasoning-allowed=false HTTP/1.1
+   Host: localhost
+
+   [Triples of the default graph serialized according to the Turtle 1.1 specification]
+
+**Response**
+
+.. code:: http
+
+   HTTP/1.1 200 OK
+
 
 Management of RESTful Requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1608,45 +1670,205 @@ value.
    long dataStoreVersion = dsConn.getDataStoreVersionAfterLastOperation();
    bool requiresIncrementalReasoning = dsConn.requiresIncrementalReasoning();
 
-Querying Diagnostic Information
+.. _querying-component-information:
+
+Querying Component Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-RDFox can report extensive diagnostic information about its internal
-components, which is often useful during performance tuning and debugging.
-Please note that this call is intended for diagnostic purposes only. The
-information provided is determined by RDFox internals and is likely to change
-in future versions of RDFox. Thus, applications should not rely on this
-information being stable. Retrieval of diagnostic information cannot be 
-performed as part of an explicit transaction.
+RDFox can report detailed information about its internal components, which is
+useful for instance monitoring, performance tuning, and debugging.
 
-Diagnostic information can be retrieved at the level of the server (by querying
-the ``/`` key) or for a specific data store (by querying the ``/info`` subkey
-of the respective data store). In either case, the ``component-info`` request
-parameter can be specified with values ``short`` or ``extended`` to determine
-whether a shortened or an extended report should be returned. The result is
-organized in a tree of hierarchical components. The component at the root of
-this tree represents either the server or a data store (depending on which
-component the information was requested for), and contains a number of
-subcomponents that represent various parts of the root component. For example,
-the information returned for a data store contains a subcomponent for each
-tuple table, a subcomponent for each registered data source, and so on. The
-information returned for the server contains the information for all of the
-server's data stores. The state of each component in the tree is described
-using a list of property/value pairs, where values can be strings or numeric
-values.
+Component information can be retrieved either for the whole server or for an
+individual data store. The data is organized hierarchically: the root component
+represents the server or a specific data store, and contains subcomponents for
+various internal parts. For example, the server includes subcomponents for all
+its data stores, and each data store includes subcomponents for each tuple table
+and registered data source.
 
-To output this complex data structure, the RESTful API converts the component
-tree into a list as follows. Each component in the tree is assigned an integer
-component ID using depth-first traversal (with root being assigned ID one).
-Then, the tree is serialized as a result of a query containing three variables.
-In each result to the query, variable ``?ComponentID`` contains the ID of the
-component, variable ``?Property`` contains the name of the property describing
-the component with the ID stored in ``?ComponentID``, and variable ``?Value``
-represents the property value. For each component, the result contains a row
-with ``?Property="Component name"`` and where ``?Value`` contains the name of
-the component. Finally, for each component other than the root, the result
-contains a row with ``?Property="Parent component ID"`` and where ``?Value``
-contains the ID of the parent component.
+The state of each component is described by a list of properties. Each property
+is identified by a pair: a metric and a unique name. The Metric indicates the
+type of measurement being reported e.g. ``MEMORY_CONSUMED_IN_BYTES``. The unique
+name is a string that allows the property to be further specified. For example,
+the DeltaQueryManager component reports three properties for the
+``DELTA_QUERY_ANSWERS_TOTAL`` metric: "Number of snapshot answers", "Number of
+deletion answers", and "Number of addition answers".
+
+.. note::
+
+   Component information cannot be retrieved as part of an explicit transaction.
+
+**Reported Metrics**
+
+The following table shows the different metrics that are reported by RDFox.
+
++--------------------------------------------------------------+--------------------------------------------------------------+
+| Metric                                                       | Description                                                  |
++==============================================================+==============================================================+
+| ``MEMORY_CONSUMED_IN_BYTES``                                 | The memory (RAM) consumption of each component of RDFox      |
+|                                                              | measured in bytes.                                           |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``HASH_TABLE_BUCKETS_TOTAL``                                 | The number of hash table buckets.                            |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``HASH_TABLE_BUCKETS_USED``                                  | The number of hash table buckets that are currently used.    |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``HASH_TABLE_LOAD_FACTOR``                                   | The load factor of the hash table.                           |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``SERVER_VERSION``                                           | The version of the RDFox server.                             |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``DATA_STORE_VERSION``                                       | The version of the Data store.                               |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``LAST_SNAPSHOT_DATA_STORE_VERSION``                         | The data store version of the most recent data store         |
+|                                                              | snapshot.                                                    |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``END_RESOURCE_ID``                                          | The maximum valid resource ID usable in the data store.      |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``END_TUPLE_INDEX``                                          | The maximum valid tuple index usable in the data store.      |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``EXPLICIT_FACTS_TOTAL``                                     | The number of explicit facts.                                |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``FACTS_TOTAL``                                              | The number of all facts (both explicit and implicit).        |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``TUPLE_LIST_ENTRIES_TOTAL``                                 | The number of entries in the tuple tables.                   |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``ROLE_MANAGER_COMPONENT_VERSION``                           | The version of the role manager component.                   |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``ROLES_TOTAL``                                              | The number of roles in the role manager.                     |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``DICTIONARY_COMPONENT_VERSION``                             | The version of the dictionary component.                     |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``RESOURCE_IDS_TOTAL``                                       | The number of unique resources stored in the dictionary.     |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``DELTA_QUERIES_TOTAL``                                      | The number of delta queries registered.                      |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``DELTA_QUERY_ANSWERS_TOTAL``                                | The number of answers returned by delta queries.             |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``PATTERN_INDEXES_TOTAL``                                    | The number of pattern indexes in the data store.             |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``PATTERN_INDEX_MAXIMUM_SIZE``                               | The maximum size of any single pattern index in the data     |
+|                                                              | store.                                                       |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``REASONING_STRATA_TOTAL``                                   | The number of reasoning strata in the data store.            |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``MAXIMUM_MEMORY_USE_IN_BYTES``                              | The maximum limit of memory (RAM) RDFox is permitted to use  |
+|                                                              | measured in bytes.                                           |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``TOTAL_MEMORY_USE_IN_BYTES``                                | The total memory (RAM) use of RDFox measured in bytes.       |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``PERSISTENCE_NUMBER_OF_VERSIONS_RESTORED``                  | The number of versions restored from ``file-sequence``       |
+|                                                              | persistence (including both those loaded at startup and      |
+|                                                              | subsequently). Not reported for other types of persistence.  |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``PERSISTENCE_NUMBER_OF_VERSIONS_RESTORED_DURING_RUNTIME``   | The number of versions restored from ``file-sequence``       |
+|                                                              | persistence during runtime. Not reported for other types of  |
+|                                                              | persistence.                                                 |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``AVERAGE_REPLICATION_LAG_IN_SECONDS``                       | The average replication lag in seconds. Reported only when   |
+|                                                              | ``file-sequence`` persistence is enabled and this instance   |
+|                                                              | has restored one or more versions during runtime.            |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``LONGEST_REPLICATION_LAG_IN_SECONDS``                       | The longest replication lag in seconds. Reported only when   |
+|                                                              | ``file-sequence`` persistence is enabled and this instance   |
+|                                                              | has restored one or more versions during runtime.            |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``LONGEST_REPLICATION_LAG_SERVER_VERSION``                   | The server version corresponding to the longest replication  |
+|                                                              | lag. Reported only when ``file-sequence`` persistence is     |
+|                                                              | enabled and this instance has restored one or more versions  |
+|                                                              | during runtime.                                              |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``LONGEST_REPLICATION_LAG_DATA_STORE_VERSION``               | The data store version corresponding to the longest          |
+|                                                              | replication lag. Reported only when ``file-sequence``        |
+|                                                              | persistence is enabled and this instance has restored one or |
+|                                                              | more versions during runtime.                                |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``LAST_REPLICATION_LAG_IN_SECONDS``                          | The last replication lag in seconds. Reported only when      |
+|                                                              | ``file-sequence`` persistence is enabled and this instance   |
+|                                                              | has restored one or more versions during runtime.            |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``INSTANCES_TO_NOTIFY_TOTAL``                                | The total number of RDFox instances in the HA cluster which  |
+|                                                              | must be notified. Reported only when ``file-sequence``       |
+|                                                              | persistence is enabled.                                      |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``IDENTIFIER``                                               | Identifiers for the component (e.g. "Component name"         |
+|                                                              | (Required), "Tuple table type", "Data source type", etc.)    |
++--------------------------------------------------------------+--------------------------------------------------------------+
+| ``UNCATEGORIZED``                                            | Additional information not naturally representable to        |
+|                                                              | monitoring systems. This includes information such as        |
+|                                                              | aggregate calculations i.e. Aggregate Memory consumption     |
+|                                                              | across multiple components; or string values i.e. the server |
+|                                                              | directory path.                                              |
++--------------------------------------------------------------+--------------------------------------------------------------+
+
+**OpenMetrics endpoint**
+
+RDFox can expose the above metrics in a format compatible with the `OpenMetrics
+1.0 specification <https://github.com/prometheus/OpenMetrics>`__, enabling
+integration with monitoring systems such as Prometheus.
+
+Metrics can be retrieved at the server level (by querying the ``/`` endpoint) or
+for a specific data store (by querying the ``/datastores/<DataStoreName>/info``
+endpoint). In both cases, the request must include the ``Accept`` header
+configured to ``application/openmetrics-text``.
+
+Component information is organized hierarchically, with each internal subcomponent
+represented as a node in a tree. Subcomponents are uniquely identified by their
+path, which is exposed in OpenMetrics using the following labels:
+
+- ``component_path_complete``      : The full path of the component.
+- ``component_path_segment<N>``  : The N-th segment of the path (0 denotes root).
+
+Below is an example of the OpenMetrics output of the ``DATA_STORE_VERSION``
+metric for a data store named ``ExampleDataStore``. The component path segments
+indicate that ExampleDataStore is a child of the ``DataStores`` component, which
+is itself a child of the root ``Server`` component:
+
+.. code:: text
+
+   # HELP data_store_version The version of the Data store.
+   # TYPE data_store_version gauge
+   data_store_version{component_path_segment0="Server",component_path_segment1="DataStores",component_path_segment2="ExampleDataStore",component_path_complete="Server.DataStores.ExampleDataStore"} 1
+
+If a component has additional ``IDENTIFIER`` metrics (other than ``Component
+name``), these are also exposed as labels:
+
+- ``component_path_segment<N>_<IDENTIFIER>`` : The value of the ``<IDENTIFIER>``
+  for the ``N``-th segment of the path.
+
+``IDENTIFIER`` properties exclusively contain immutable values and thus the
+label names do not change over time.
+
+Below is an example of the OpenMetrics output of the
+``TUPLE_LIST_ENTRIES_TOTAL`` metric for a data store named ``ExampleDataStore``.
+Note the ``component_path_segment2_tuple_table_type`` label, which indicates the
+string property for the metric ``IDENTIFIER`` with unique name ``Tuple table
+type``.
+
+.. code:: text
+
+   # HELP tuple_list_entries_total The number of entries in the tuple tables.
+   # TYPE tuple_list_entries_total gauge
+   tuple_list_entries_total{component_path_segment0="ExampleDataStore",component_path_segment1="TupleTables",component_path_segment2="DefaultTriples",component_path_segment2_tuple_table_type="TripleTable",component_path_segment3="TupleList",component_path_complete="ExampleDataStore.TupleTables.DefaultTriples.TupleList"} 1
+   tuple_list_entries_total{component_path_segment0="ExampleDataStore",component_path_segment1="TupleTables",component_path_segment2="Quads",component_path_segment2_tuple_table_type="QuadTable",component_path_segment3="TupleList",component_path_complete="ExampleDataStore.TupleTables.Quads.TupleList"} 1
+
+**RESTful API**
+
+Information can be retrieved at the server level (by querying the ``/``
+endpoint) or for a specific data store (by querying the
+``/datastores/<DataStoreName>/info`` endpoint). In either case, the
+``component-info`` request parameter can be specified with values ``short`` or
+``extended`` to control the level of detail in the report.
+
+To represent this hierarchical data structure, the RESTful API serializes the
+component tree into a flat list. Each component is assigned an integer ID using
+depth-first traversal (the root is assigned ID 1). The output is formatted as a
+table with the following columns:
+
+- ``?ComponentID``: The unique ID of the component.
+- ``?Property``   : A string identifying the property being reported.
+- ``?Value``      : The value of the property.
+
+For all components except the root, an additional row is included with
+``?Property="Parent component ID"`` and where ``?Value`` contains the ID of the
+parent component.
 
 **Request**
 
@@ -1664,16 +1886,16 @@ contains the ID of the parent component.
    Content-Type: text/csv; charset=UTF-8
 
    ComponentID,Property,Value
-   1,Component name,RDFStore
-   1,Name,DataStore1
+   1,Component name,DataStore1
    1,Unique ID,0123456789
-   1,Data store version,2
+   1,Data store version,1
+   1,Data store version of the last snapshot,1
    1,End resource ID,1000000
    1,Persistent,no
-   1,Requires incremental reasoning,no
+   1,Reasoning algorithm,materialization
    ... etc ...
-   2,Component name,Data store parameters
    2,Parent component ID,1
+   2,Component name,Data store parameters
    2,max-data-pool-size,10000000
    2,max-resource-capacity,1000000
    2,max-tuple-capacity,1000000
@@ -1681,19 +1903,53 @@ contains the ID of the parent component.
    ... etc ...
 
 In the above example, diagnostic information is requested for data store
-``myStore``. The root result is component with ID ``1`` that represents the
-data store. Properties such as ``Name``, ``Unique ID``, and so on provide
+``DataStore1``. The root result is component with ID ``1`` that represents the
+data store. Properties such as ``Component Name``, ``Unique ID``, and so on provide
 information about the data store. Component with ID ``2`` is a subcomponent of
 the data store. It provides information about the data store parameters, such
 as ``max-resource-capacity``, ``max-data-pool-size``, and so on.
 
 **Java API**
 
+In Java, the component information can be retrieved using the
+``getComponentInfo`` method on either a server connection or a data store
+connection. The method takes a Boolean parameter that determines whether
+extended information should be returned (if ``true``) or short information
+(if ``false``).
+
 .. code:: java
 
    ComponentInfo componentInfo = sConn.getComponentInfo(true);
    ... or ...
    ComponentInfo componentInfo = dsConn.getComponentInfo(true);
+
+The ComponentInfo object provides methods to access subcomponents and
+properties of the component.
+
+**Subcomponents**
+
+Subcomponents are accessed by name (``getSubComponent(String)``) or by index
+(``getSubComponent(int)`` - where indexes are assigned from ``0`` to
+``getNumberOfSubComponents() - 1``):
+
+.. code:: java
+
+   ComponentInfo deltaQueryManagerComponentInfo = componentInfo.getSubComponent("DeltaQueryManager");
+
+**Properties**
+
+Each property is identified by its  Metric (``ComponentInfoMetric`` enumeration)
+and unique name. Properties have a value, which be a String or a numeric value.
+Properties can be accessed by metric and unique name (``getProperty(Metric,
+String)``) or by index (``getProperty(int)`` - where indexes are assigned from
+``0`` to ``getNumberOfProperties() - 1``):
+
+.. code:: java
+
+   Property componentNameProperty = deltaQueryManagerComponentInfo.getProperty(ComponentInfoMetric.IDENTIFIER, "Component name");
+   String componentName = componentNameProperty.getValue();
+   Property numberOfSnapshotAnswersProperty = deltaQueryManagerComponentInfo.getProperty(ComponentInfoMetric.DELTA_QUERY_ANSWERS_TOTAL, "Number of snapshot answers");
+   int numberOfSnapshotAnswers = ((Number) numberOfSnapshotAnswersProperty.getValue()).intValue()
 
 .. _REST-invoking-data-store-operations:
 
@@ -2477,10 +2733,14 @@ Adding Triples to a Graph
 The following request adds triples incrementally to a named graph
 ``http://example.com/``.
 
+**Request**
+
 .. code:: http
 
    POST /datastores/myStore/content?graph=http%3A%2F%2Fexample.com%2F HTTP/1.1
    Host: localhost
+
+   [Triples of the default graph serialized according to the Turtle 1.1 specification]
 
 **Response**
 
@@ -2488,13 +2748,13 @@ The following request adds triples incrementally to a named graph
 
    HTTP/1.1 200 OK
 
-   [Triples serialized according to the Turtle 1.1 specification]
-
 Replacing a Graph
 ^^^^^^^^^^^^^^^^^
 
 The following request replaces all triples in a named graph
 ``http://example.com/`` with the triples specified in the request body.
+
+**Request**
 
 .. code:: http
 
@@ -3128,7 +3388,7 @@ Deregistering a Data Source
 The following request deregisters a data source. The request succeeds if no
 tuple tables are mounted on the data source. Thus, to delete a data source, one
 must first delete all rules mentioning any tuple tables of the data source, and
-then delete all tuple tables mounted from the data source. Data source 
+then delete all tuple tables mounted from the data source. Data source
 deregistration cannot be performed as part of an explicit transaction.
 
 **Request**
@@ -3369,7 +3629,7 @@ The following request creates a new tuple table, which can be either an
 in-memory tuple table or a tuple table backed by a data source. Creating a
 tuple table requires specifying the table name via the query string of the URI.
 Optional tuple table parameters can also be provided in this way. For more
-details see :numref:`tuple-tables`. Tuple table creation cannot be 
+details see :numref:`tuple-tables`. Tuple table creation cannot be
 performed as part of an explicit transaction.
 
 **Request**
@@ -3733,12 +3993,12 @@ Transactions in the RESTful API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The RESTful API follows the same principles and associates transactions with
-data store connections. To use transactions in the RESTful API, one must 
+data store connections. To use transactions in the RESTful API, one must
 explicitly create a connection (see
 :numref:`REST-explicit-connection-management`). To start, commit, or rollback a
 transaction, one can issue a ``PATCH`` request to the
-``/datastores/<DSTRNAME>/connections/<DSCONN>/transaction`` key with the
-``operation`` request parameter set to ``begin-read-only-transaction``,
+``/datastores/<DSTRNAME>/connections/<DSCONN>`` key with the ``operation``
+request parameter set to ``begin-read-only-transaction``,
 ``begin-read-write-transaction``, ``commit-transaction``, or
 ``rollback-transaction``. After this, any operation evaluated on this
 connection (which can be achieved by including the ``connection`` request
@@ -3768,7 +4028,7 @@ transaction has been committed, the connection persists after the last request.
 
 .. code:: http
 
-   PATCH /datastores/myStore/connections/01234567890123456789/transaction?operation=begin-read-write-transaction HTTP/1.1
+   PATCH /datastores/myStore/connections/01234567890123456789?operation=begin-read-write-transaction HTTP/1.1
    Host: localhost
 
 **Response**
@@ -3815,7 +4075,7 @@ transaction has been committed, the connection persists after the last request.
 
 .. code:: http
 
-   PATCH /datastores/myStore/connections/01234567890123456789/transaction?operation=commit-transaction HTTP/1.1
+   PATCH /datastores/myStore/connections/01234567890123456789?operation=commit-transaction HTTP/1.1
    Host: localhost
 
 **Response**
@@ -3825,16 +4085,17 @@ transaction has been committed, the connection persists after the last request.
    HTTP/1.1 204 No Content
 
 At any point, one can see whether a connection is associated with a transaction
-as follows. The response is written as the output of a SPARQL query that binds
-the variable ``?Property`` to the property name, variable ``?Value`` to the
-property value, and variable ``?Mutable`` to ``true`` if the value of the
-property can be changed and to ``false`` otherwise.
+by querying the properties of a data store connection. The response is written
+as the output of a SPARQL query that binds the variable ``?Property`` to the
+property name, variable ``?Value`` to the property value, and variable
+``?Mutable`` to ``true`` if the value of the property can be changed and to
+``false`` otherwise.
 
 **Request**
 
 .. code:: http
 
-   GET /datastores/myStore/connections/01234567890123456789/transaction HTTP/1.1
+   GET /datastores/myStore/connections/01234567890123456789 HTTP/1.1
    Host: localhost
    Accept: text/csv; charset=UTF-8
 
@@ -3846,9 +4107,12 @@ property can be changed and to ``false`` otherwise.
    Content-Type: text/csv; charset=UTF-8
 
    Property,Value,Mutable
+   agent-name,guest,false
+   lock-timeout,2000,false
+   data-store-version-after-last-operation,5,false
    transaction-state,read-write,false
    transaction-requires-rollback,false,false
-   last-transaction-data-store-version,5,false
+   incremental-reasoning-allowed,true,true
 
 .. _APIs-cursors:
 

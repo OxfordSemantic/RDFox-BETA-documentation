@@ -19,7 +19,7 @@
 <script type="text/javascript" src="../../../../script-dir/jquery-ui.js"></script>
 </head>
 <body class="class-declaration">
-<script type="text/javascript">var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+<script type="text/javascript">var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -121,7 +121,8 @@ extends tech.oxfordsemantic.jrdfox.formats.internal.AbstractParser</pre>
 </thead>
 <tbody>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(tech.oxfordsemantic.jrdfox.logic.expression.Resource,tech.oxfordsemantic.jrdfox.Prefixes)">DatalogParser</a></span>&#8203;(<a href="../logic/expression/Resource.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">Resource</a>&nbsp;defaultGraph,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(tech.oxfordsemantic.jrdfox.logic.expression.Resource,java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes)">DatalogParser</a></span>&#8203;(<a href="../logic/expression/Resource.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">Resource</a>&nbsp;defaultGraph,
+java.lang.String&nbsp;baseIRI,
 <a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -164,16 +165,21 @@ extends tech.oxfordsemantic.jrdfox.formats.internal.AbstractParser</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor" id="i3">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isEOF()">isEOF</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor" id="i4">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#parse(tech.oxfordsemantic.jrdfox.formats.InputConsumer)">parse</a></span>&#8203;(<a href="InputConsumer.html" title="interface in tech.oxfordsemantic.jrdfox.formats">InputConsumer</a>&nbsp;inputConsumer)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor" id="i4">
+<tr class="rowColor" id="i5">
 <td class="colFirst"><code><a href="../logic/datalog/Rule.html" title="class in tech.oxfordsemantic.jrdfox.logic.datalog">Rule</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#parseRule()">parseRule</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor" id="i5">
+<tr class="altColor" id="i6">
 <td class="colFirst"><code><a href="../logic/datalog/TupleTableAtom.html" title="class in tech.oxfordsemantic.jrdfox.logic.datalog">TupleTableAtom</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#parseTupleTableAtom()">parseTupleTableAtom</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
@@ -202,8 +208,9 @@ extends tech.oxfordsemantic.jrdfox.formats.internal.AbstractParser</pre>
 <ul class="blockList">
 <li class="blockList">
 <section class="detail">
-<h3><a id="&lt;init&gt;(tech.oxfordsemantic.jrdfox.logic.expression.Resource,tech.oxfordsemantic.jrdfox.Prefixes)">DatalogParser</a></h3>
+<h3><a id="&lt;init&gt;(tech.oxfordsemantic.jrdfox.logic.expression.Resource,java.lang.String,tech.oxfordsemantic.jrdfox.Prefixes)">DatalogParser</a></h3>
 <div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="memberName">DatalogParser</span>&#8203;(<span class="arguments"><a href="../logic/expression/Resource.html" title="class in tech.oxfordsemantic.jrdfox.logic.expression">Resource</a>&nbsp;defaultGraph,
+java.lang.String&nbsp;baseIRI,
 <a href="../Prefixes.html" title="class in tech.oxfordsemantic.jrdfox">Prefixes</a>&nbsp;prefixes)</span></div>
 </section>
 </li>
@@ -267,6 +274,12 @@ java.io.IOException</span></div>
 <dd><code><a href="../exceptions/ParsingException.html" title="class in tech.oxfordsemantic.jrdfox.exceptions">ParsingException</a></code></dd>
 <dd><code>java.io.IOException</code></dd>
 </dl>
+</section>
+</li>
+<li class="blockList">
+<section class="detail">
+<h3><a id="isEOF()">isEOF</a></h3>
+<div class="memberSignature"><span class="modifiers">public</span>&nbsp;<span class="returnType">boolean</span>&nbsp;<span class="memberName">isEOF</span>()</div>
 </section>
 </li>
 <li class="blockList">

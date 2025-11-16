@@ -235,7 +235,12 @@ To register a Lucene data source, the following needs to be specified:
 
 .. note::
 
-   RDFox supports the Apache Lucene library starting from version 9.6.0, which requires Java 11 or higher.
+   RDFox supports integration with the Apache Lucene library, starting from 
+   Lucene version 9.6.0 (which requires Java 11 or higher). For Apache 
+   Lucene version 10, Java 21 or higher is required. Please ensure that 
+   your Java version is compatible with the version of Apache Lucene you 
+   wish to use.
+   
 
 Lucene Data Sources are registered as type ``lucene``. The parameters for
 registering this type of data source are described below.
@@ -282,6 +287,13 @@ registering this type of data source are described below.
    +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
    |       Parameter                   |                  Default value                  |               Description                         |
    +===================================+=================================================+===================================================+
+   | ``batch-size``                    | ``1024``                                        | The maximum number of substitutions combined into |
+   |                                   |                                                 | a single query to the data source. Larger values  |
+   |                                   |                                                 | reduce the number of round trips but may increase |
+   |                                   |                                                 | the size of each SQL query.                       |
+   |                                   |                                                 |                                                   |
+   |                                   |                                                 | A value of ``0`` disables batching.               |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
    | ``connection-keep-alive-time``    | ``60 s``                                        | A duration specified as described in              |
    |                                   |                                                 | :numref:`specifying-durations`, which determines  |
    |                                   |                                                 | how long unused database connections are kept     |
@@ -334,6 +346,13 @@ Registering this type of data source requires `libsqlite3 <https://www.sqlite.or
    +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
    |       Parameter                   |                  Default value                  |               Description                         |
    +===================================+=================================================+===================================================+
+   | ``batch-size``                    | ``1024``                                        | The maximum number of substitutions combined into |
+   |                                   |                                                 | a single query to the data source. Larger values  |
+   |                                   |                                                 | reduce the number of round trips but may increase |
+   |                                   |                                                 | the size of each SQL query.                       |
+   |                                   |                                                 |                                                   |
+   |                                   |                                                 | A value of ``0`` disables batching.               |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
    | ``connection-keep-alive-time``    | ``60 s``                                        | A duration specified as described in              |
    |                                   |                                                 | :numref:`specifying-durations`, which determines  |
    |                                   |                                                 | how long unused database connections are kept     |
@@ -364,6 +383,13 @@ Registering this type of data source requires `libpq
    +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
    |       Parameter                   |                  Default value                  |               Description                         |
    +===================================+=================================================+===================================================+
+   | ``batch-size``                    | ``1024``                                        | The maximum number of substitutions combined into |
+   |                                   |                                                 | a single query to the data source. Larger values  |
+   |                                   |                                                 | reduce the number of round trips but may increase |
+   |                                   |                                                 | the size of each SQL query.                       |
+   |                                   |                                                 |                                                   |
+   |                                   |                                                 | A value of ``0`` disables batching.               |
+   +-----------------------------------+-------------------------------------------------+---------------------------------------------------+
    | ``connection-keep-alive-time``    | ``60 s``                                        | A duration specified as described in              |
    |                                   |                                                 | :numref:`specifying-durations`, which determines  |
    |                                   |                                                 | how long unused database connections are kept     |
@@ -453,9 +479,15 @@ which RDFox will replace with the appropriate value for each row.
    |                                         | name ``<name>`` of the source table. This          |
    |                                         | placeholder cannot be used with delimited file     |
    |                                         | data sources that do not have a header.            |
+   |                                         | The ``solr`` data source tables contain a special  |
+   |                                         | column ``{score}`` that represents the score of    |
+   |                                         | the document for the given query.                  |
    +-----------------------------------------+----------------------------------------------------+
    | ``{row#}``                              | The index of the current row (``delimitedFile``    |
    |                                         | and ``solr`` data sources only).                   |
+   +-----------------------------------------+----------------------------------------------------+
+   | ``{:score}``                            | The score of the document for the given query      |
+   |                                         | (``Lucene``  data sources only).                   |
    +-----------------------------------------+----------------------------------------------------+
 
 The output of the transformation can be described as follows (although RDFox
@@ -1019,17 +1051,18 @@ Supported query syntax for the Lucene data source text search is based on the
          "query" "title:\"return of the jedi\"" \
          "max-rows" 10                          \
          "min-score" 0.0                        \
-         "columns" 4                            \
+         "columns" 5                            \
          "1" "{Title}"                          \
          "1.datatype" "string"                  \
          "2" "{Year}"                           \
          "2.datatype" "string"                  \
          "3" "{4}"                              \
-         "4" "{3}"                              
+         "4" "{3}"                              \
+         "5" "{:score}"
 
    Querying this tuple table returns the following tuples. ::
 
-      "Star Wars: Return of the Jedi" "1983" "The Empire is confronted in a final battle." "Sci-Fi" .
+      "Star Wars: Return of the Jedi" "1983" "The Empire is confronted in a final battle." "Sci-Fi" "2.30862379E0"^^xsd:float.
 
 The Lucene data source also supports the notion of *parameter* columns. 
 A column with index ``<k>`` may be specified as a parameter 
@@ -1335,6 +1368,13 @@ The parameters for creating a data source tuple table for a data source of type
    +----------------------------------+----------------------------------+-----------------------------------------------------+
    |       Parameter                  |    Default value                 |             Description                             |
    +==================================+==================================+=====================================================+
+   | ``batch-size``                   | ``batch-size`` of the data       | The maximum number of substitutions combined into a |
+   |                                  | source                           | single query to the data source. Larger values      |
+   |                                  |                                  | reduce the number of round trips but may increase   |
+   |                                  |                                  | the size of each SQL query.                         |
+   |                                  |                                  |                                                     |
+   |                                  |                                  | A value of ``0`` disables batching.                 |
+   +----------------------------------+----------------------------------+-----------------------------------------------------+
    | ``columns``                      | ``<N>``                          | The number of columns the data source tuple table   |
    |                                  |                                  | will have.                                          |
    +----------------------------------+----------------------------------+-----------------------------------------------------+
@@ -1424,6 +1464,13 @@ The parameters for creating a data source tuple table for a data source of type
    +----------------------------------+----------------------------------+-----------------------------------------------------+
    |       Parameter                  |    Default value                 |             Description                             |
    +==================================+==================================+=====================================================+
+   | ``batch-size``                   | ``batch-size`` of the data       | The maximum number of substitutions combined into a |
+   |                                  | source                           | single query to the data source. Larger values      |
+   |                                  |                                  | reduce the number of round trips but may increase   |
+   |                                  |                                  | the size of each SQL query.                         |
+   |                                  |                                  |                                                     |
+   |                                  |                                  | A value of ``0`` disables batching.                 |
+   +----------------------------------+----------------------------------+-----------------------------------------------------+
    | ``columns``                      | ``<N>``                          | The number of columns the data source tuple table   |
    |                                  |                                  | will have.                                          |
    +----------------------------------+----------------------------------+-----------------------------------------------------+
@@ -1638,6 +1685,13 @@ The parameters for creating a data source tuple table for a data source of type
    +----------------------------------+----------------------------------+-----------------------------------------------------+
    |       Parameter                  |    Default value                 |             Description                             |
    +==================================+==================================+=====================================================+
+   | ``batch-size``                   | ``batch-size`` of the data       | The maximum number of substitutions combined into a |
+   |                                  | source                           | single query to the data source. Larger values      |
+   |                                  |                                  | reduce the number of round trips but may increase   |
+   |                                  |                                  | the size of each SQL query.                         |
+   |                                  |                                  |                                                     |
+   |                                  |                                  | A value of ``0`` disables batching.                 |
+   +----------------------------------+----------------------------------+-----------------------------------------------------+
    | ``columns``                      | ``<N>``                          | The number of columns the data source tuple table   |
    |                                  |                                  | will have.                                          |
    +----------------------------------+----------------------------------+-----------------------------------------------------+

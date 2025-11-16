@@ -526,6 +526,8 @@ follows.
   successfully committed, provided that the data store has no active readers or
   writers at the point of commit.
 
+.. _auto-update-statistics-mode:
+
 ``auto-update-statistics-mode``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -535,8 +537,10 @@ statistics during query planning in order to identify an efficient plan, so
 query performance may be suboptimal if the statistics are not up to date. The
 allowed values are as follows.
 
-- ``off``: Statistics are never updated automatically, but they can be updated
-  manually using the ``stats update`` command or via one of the available APIs.
+- ``off``: Statistics are updated automatically only when strictly required, 
+  for example after an automatic or manual compaction of the data store. They 
+  can still be updated manually using the ``stats update`` command or through 
+  one of the available APIs.
 
 - ``balanced``: The cost of updating the statistics is balanced against the
   possibility of using outdated statistics. This is the default.

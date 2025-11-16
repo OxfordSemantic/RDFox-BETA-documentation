@@ -129,6 +129,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#query-language">9.1.1. Query Language</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#query-answer-formats">9.1.2. Query Answer Formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#update-language">9.1.3. Update Language</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#federated-queries">9.1.4. Federated Queries</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#built-in-functions">9.2. Built-In Functions</a><ul>
@@ -328,9 +329,58 @@ a new RDF graph in a store, drop an RDF graph from a store, copy (move or add)
 the content of one graph to another, and perform a group of update operations
 as a single action.</p>
 </div>
+<div class="section" id="federated-queries">
+<span id="id4"></span><h3><span class="section-number">9.1.4. </span>Federated Queries<a class="headerlink" href="#federated-queries" title="Permalink to this headline">¶</a></h3>
+<p>RDFox supports the <code class="docutils literal notranslate"><span class="pre">SERVICE</span></code> operator in SPARQL 1.1, which allows RDFox to
+query remote SPARQL endpoints. The endpoint can be a RDFox server or any other
+SPARQL-compliant server. Execution of a <code class="docutils literal notranslate"><span class="pre">SERVICE</span></code> request is performed by
+sending a <code class="docutils literal notranslate"><span class="pre">POST</span></code> request to the path of the target SPARQL endpoint. The
+following example demonstrates the use of the <code class="docutils literal notranslate"><span class="pre">SERVICE</span></code> operator.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> The following query retrieves all pairs of people and their
+names from a remote SPARQL endpoint, <code class="docutils literal notranslate"><span class="pre">https://example.org/sparql</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SELECT ?p ?n
+WHERE {
+    SERVICE &lt;https://example.org/sparql&gt; {
+        ?p rdf:type :Person .
+        ?p :forename ?n .
+    }
+}
+</pre></div>
+</div>
+</div>
+<p>Authentication credentials can be included in the HTTP request to the target
+endpoint by configuring <code class="docutils literal notranslate"><span class="pre">http-remotes</span></code>. See <a class="reference internal" href="servers.html#http-remotes"><span class="std std-numref">Section 4.3.3</span></a> for
+details.</p>
+<div class="example docutils container">
+<p><strong>Example:</strong> The following configuration for <code class="docutils literal notranslate"><span class="pre">http-remotes</span></code> enables
+sending basic authentication credentials when querying the remote SPARQL
+endpoint <code class="docutils literal notranslate"><span class="pre">https://example.org/sparql</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>http-remotes &quot;{                        \
+    \&quot;https://example.org/sparql\&quot;: {  \
+    \&quot;auth\&quot;: {                        \
+        \&quot;type\&quot;: \&quot;basic\&quot;,           \
+        \&quot;username\&quot;: \&quot;guest\&quot;,       \
+        \&quot;password\&quot;: \&quot;password\&quot;     \
+    },                                 \
+    \&quot;federationBatchSize\&quot;: \&quot;512\&quot;   \
+}&quot;
+</pre></div>
+</div>
+</div>
+<p>There are some restrictions on the use of the <code class="docutils literal notranslate"><span class="pre">SERVICE</span></code> operator in RDFox.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.w3.org/TR/sparql11-federated-query/#variableService">SERVICE Variables</a> are
+<strong>not</strong> supported.</p></li>
+<li><p>The endpoint IRI must be a valid IRI.</p></li>
+<li><p>If the query inside the <code class="docutils literal notranslate"><span class="pre">SERVICE</span></code> block has proprietary RDFox extensions
+(e.g., <code class="docutils literal notranslate"><span class="pre">TT</span></code> expressions or <code class="docutils literal notranslate"><span class="pre">EXPLICIT</span></code>), then the remote endpoint must be
+a RDFox server.</p></li>
+</ul>
+</div>
 </div>
 <div class="section" id="built-in-functions">
-<span id="id4"></span><h2><span class="section-number">9.2. </span>Built-In Functions<a class="headerlink" href="#built-in-functions" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2><span class="section-number">9.2. </span>Built-In Functions<a class="headerlink" href="#built-in-functions" title="Permalink to this headline">¶</a></h2>
 <p>RDFox supports a wide range of built-in operators and functions that can be
 used during query answering and reasoning. Concretely, RDFox supports all
 <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#expressions">SPARQL 1.1 Functions and Operators</a>, with
@@ -355,8 +405,8 @@ If present, short names will precede the IRI names. If a function name is part
 of the SPARQL 1.1 specification or the XPath and XQuery specification, the name
 will be given as a link pointing to the respective part of the specification.
 We will assume the following prefix definitions.</p>
-<table class="colwidths-given docutils align-center" id="id7">
-<caption><span class="caption-text">XPath/XQuery Function Name Prefixes</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-given docutils align-center" id="id9">
+<caption><span class="caption-text">XPath/XQuery Function Name Prefixes</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 20%" />
 <col style="width: 80%" />
@@ -381,8 +431,8 @@ determined by their arguments.</p>
 <h3><span class="section-number">9.2.1. </span>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h3>
 <p>The RDFox operators are listed in the following table and discussed in detail
 next.</p>
-<table class="docutils align-center" id="id8">
-<caption><span class="caption-text">RDFox Operators</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id10">
+<caption><span class="caption-text">RDFox Operators</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 33%" />
@@ -468,8 +518,8 @@ successfully evaluated. In particular, when the expression is a variable, its
 evaluation succeeds when the variable is bound. Finally, function <code class="docutils literal notranslate"><span class="pre">STREX</span></code>
 extends the SPARQL function <code class="docutils literal notranslate"><span class="pre">STR</span></code> with the ability to compute a string
 representation of arbitrary RDF terms.</p>
-<table class="docutils align-center" id="id9">
-<caption><span class="caption-text">Functions on terms</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id11">
+<caption><span class="caption-text">Functions on terms</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 25%" />
@@ -510,8 +560,8 @@ representation of arbitrary RDF terms.</p>
 <p>RDFox has a number of constructor functions that allow users to create a value
 of a particular type. The following table lists the constructor functions
 defined in <a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#FunctionMapping">SPARQL 1.1</a>.</p>
-<table class="docutils align-center" id="id10">
-<caption><span class="caption-text">RDFox Constructor Functions</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id12">
+<caption><span class="caption-text">RDFox Constructor Functions</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 25%" />
@@ -549,8 +599,8 @@ defined in <a class="reference external" href="https://www.w3.org/TR/2013/REC-sp
 <p>RDFox additionally provides the following constructor functions for the
 date/time datatypes. The offset parameter in all functions is optional except
 in the case of <code class="docutils literal notranslate"><span class="pre">DATE_TIME_STAMP</span></code>.</p>
-<table class="colwidths-given docutils align-center" id="id11">
-<caption><span class="caption-text">RDFox Constructor Functions for Date/Time datatypes.</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-given docutils align-center" id="id13">
+<caption><span class="caption-text">RDFox Constructor Functions for Date/Time datatypes.</span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 60%" />
 <col style="width: 40%" />
@@ -560,10 +610,10 @@ in the case of <code class="docutils literal notranslate"><span class="pre">DATE
 <td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
 </tr>
 <tr class="row-even"><td><p>YEAR_MONTH_DURATION ( year, month )</p></td>
-<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:yearMonthDuration</span></code> value.</p></td>
 </tr>
 <tr class="row-odd"><td><p>DAY_TIME_DURATION ( day, hours, minutes, seconds )</p></td>
-<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:duration</span></code> value.</p></td>
+<td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:dayTimeDuration</span></code> value.</p></td>
 </tr>
 <tr class="row-even"><td><p>DATE_TIME ( year, month, day, hour, minute, second, offset )</p></td>
 <td><p>Constructs an <code class="docutils literal notranslate"><span class="pre">xsd:dateTime</span></code> value.</p></td>
@@ -596,12 +646,12 @@ in the case of <code class="docutils literal notranslate"><span class="pre">DATE
 </table>
 </div>
 <div class="section" id="iri-and-string-functions">
-<h3><span class="section-number">9.2.4. </span>IRI and String Functions<a class="headerlink" href="#iri-and-string-functions" title="Permalink to this headline">¶</a></h3>
+<span id="id6"></span><h3><span class="section-number">9.2.4. </span>IRI and String Functions<a class="headerlink" href="#iri-and-string-functions" title="Permalink to this headline">¶</a></h3>
 <p>The IRI and string functions in SPARQL 1.1 and XPath/XQuery almost fully
 overlap, and RDFox provides full support for them, with the exception of
 <cite>fn:contains</cite>, which only supports the variant with two arguments.</p>
-<table class="docutils align-center" id="id12">
-<caption><span class="caption-text">IRI and String Functions</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id14">
+<caption><span class="caption-text">IRI and String Functions</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 33%" />
@@ -629,18 +679,40 @@ overlap, and RDFox provides full support for them, with the exception of
 <td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-regex">REGEX</a>  &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-matches">fn:matches</a> )</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-replace">REPLACE</a>  &nbsp;&nbsp;&nbsp;&nbsp; ( <a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-replace">fn:replace</a> )</p></td>
-<td></td>
+<td><p>SEMSIM</p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
+<p><strong>SEMSIM (EXPERIMENTAL)</strong></p>
+<p>RDFox supports semantic similarity computation between strings using the
+<code class="docutils literal notranslate"><span class="pre">SEMSIM</span></code> function. This function takes two string arguments and returns an
+<code class="docutils literal notranslate"><span class="pre">xsd:float</span></code> value between <code class="docutils literal notranslate"><span class="pre">-1.0</span></code> and <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, indicating how similar the
+two strings are. The similarity score is computed using an embedding model,
+which can be specified using the <code class="docutils literal notranslate"><span class="pre">RDFOX_EMBEDDING_MODEL_PATH</span></code> environment
+variable. If no model path is set, the default embedding model provided with
+RDFox is used. The default model and embedding library are described in
+<a class="reference internal" href="acknowledgments.html#acknowledgments"><span class="std std-ref">Acknowledgments</span></a>.
+The <code class="docutils literal notranslate"><span class="pre">SEMSIM</span></code> function is experimental and its behavior may change in future
+releases. Some restrictions apply when using this function as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The maximum number of input tokens is restricted to context size of the
+embedding model (e.g., 512 tokens for BERT-based models). For inputs
+exceeding this limit, this function returns <code class="docutils literal notranslate"><span class="pre">UNDEF</span></code>.</p></li>
+<li><p>The performance of <code class="docutils literal notranslate"><span class="pre">SEMSIM</span></code> is dependent on the complexity of the
+embedding model and the size of the input strings.</p></li>
+<li><p>The embedding model must be provided in
+<a class="reference external" href="https://huggingface.co/docs/hub/gguf">GGUF</a> format.</p></li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="hash-functions">
 <h3><span class="section-number">9.2.5. </span>Hash Functions<a class="headerlink" href="#hash-functions" title="Permalink to this headline">¶</a></h3>
 <p>The RDFox hash functions are the ones specified in SPARQL 1.1 and are given in
 the following table.</p>
-<table class="docutils align-center" id="id13">
-<caption><span class="caption-text">RDFox Hash Functions</span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id15">
+<caption><span class="caption-text">RDFox Hash Functions</span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 20%" />
 <col style="width: 20%" />
@@ -665,8 +737,8 @@ mathematical functions in XPath/XQuery. RDFox also provides additional
 functions that are useful in practice. The only nonstandard functions are
 <code class="docutils literal notranslate"><span class="pre">MAXFN</span></code> and <code class="docutils literal notranslate"><span class="pre">MINFN</span></code>, which take any number of arguments and return the
 maximum and the minimum value, respectively.</p>
-<table class="docutils align-center" id="id14">
-<caption><span class="caption-text">Basic Functions</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id16">
+<caption><span class="caption-text">Basic Functions</span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
@@ -689,8 +761,8 @@ maximum and the minimum value, respectively.</p>
 </tr>
 </tbody>
 </table>
-<table class="colwidths-given docutils align-center" id="id15">
-<caption><span class="caption-text">Exponential and Power Functions</span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-given docutils align-center" id="id17">
+<caption><span class="caption-text">Exponential and Power Functions</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 36%" />
 <col style="width: 36%" />
@@ -715,8 +787,8 @@ maximum and the minimum value, respectively.</p>
 </tr>
 </tbody>
 </table>
-<table class="docutils align-center" id="id16">
-<caption><span class="caption-text">Trigonometric Functions</span><a class="headerlink" href="#id16" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id18">
+<caption><span class="caption-text">Trigonometric Functions</span><a class="headerlink" href="#id18" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
@@ -736,8 +808,8 @@ maximum and the minimum value, respectively.</p>
 </tr>
 </tbody>
 </table>
-<table class="docutils align-center" id="id17">
-<caption><span class="caption-text">Hyperbolic Functions</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id19">
+<caption><span class="caption-text">Hyperbolic Functions</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 17%" />
 <col style="width: 17%" />
@@ -756,8 +828,8 @@ maximum and the minimum value, respectively.</p>
 </tr>
 </tbody>
 </table>
-<table class="docutils align-center" id="id18">
-<caption><span class="caption-text">Error and Gamma Functions</span><a class="headerlink" href="#id18" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-center" id="id20">
+<caption><span class="caption-text">Error and Gamma Functions</span><a class="headerlink" href="#id20" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 25%" />
@@ -779,8 +851,8 @@ maximum and the minimum value, respectively.</p>
 supports all SPARQL 1.1 date time functions and most XPath/XQuery date time
 functions. In RDFox, many of these functions have been extended to apply to all
 date/time values.</p>
-<table class="colwidths-given docutils align-center" id="id19">
-<caption><span class="caption-text">RDFox Date Time Functions</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-given docutils align-center" id="id21">
+<caption><span class="caption-text">RDFox Date Time Functions</span><a class="headerlink" href="#id21" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 17%" />
 <col style="width: 83%" />
@@ -817,7 +889,7 @@ to date/time datatypes with a valid day component.</p></td>
 </tr>
 <tr class="row-odd"><td><p>DAYS</p></td>
 <td><p>Returns the number of days in a duration:
-<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-day-from-duration">fn:days-from-duration</a>.</p></td>
+<a class="reference external" href="https://www.w3.org/TR/xpath-functions/#func-days-from-duration">fn:days-from-duration</a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#func-hours">HOURS</a></p></td>
 <td><p>Returns the hours component of a date/time value. Extends
@@ -886,15 +958,15 @@ taking place.</p>
 </div>
 </div>
 <div class="section" id="aggregate-functions">
-<span id="id5"></span><h2><span class="section-number">9.3. </span>Aggregate Functions<a class="headerlink" href="#aggregate-functions" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2><span class="section-number">9.3. </span>Aggregate Functions<a class="headerlink" href="#aggregate-functions" title="Permalink to this headline">¶</a></h2>
 <p>Aggregate functions differ from normal functions in that they perform
 computations on sets of values rather than on individual values. In SPARQL,
 aggregate functions are applied either to the set of results of a given query
 or to a subset of results obtained using the <code class="docutils literal notranslate"><span class="pre">GROUP_BY</span></code> construct. RDFox
 supports the following list of aggregate functions, which includes all
 aggregate functions in SPARQL 1.1.</p>
-<table class="colwidths-given docutils align-center" id="id20">
-<caption><span class="caption-text">RDFox Aggregate Functions</span><a class="headerlink" href="#id20" title="Permalink to this table">¶</a></caption>
+<table class="colwidths-given docutils align-center" id="id22">
+<caption><span class="caption-text">RDFox Aggregate Functions</span><a class="headerlink" href="#id22" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 40%" />
 <col style="width: 60%" />
@@ -952,7 +1024,7 @@ aggregate functions in SPARQL 1.1.</p>
 </table>
 </div>
 <div class="section" id="querying-tuple-tables">
-<span id="id6"></span><h2><span class="section-number">9.4. </span>Querying Tuple Tables<a class="headerlink" href="#querying-tuple-tables" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><h2><span class="section-number">9.4. </span>Querying Tuple Tables<a class="headerlink" href="#querying-tuple-tables" title="Permalink to this headline">¶</a></h2>
 <p>RDFox organizes information in a data store using tuple tables, as described in
 more detail in <a class="reference internal" href="servers.html#servers"><span class="std std-numref">Section 4</span></a>. There are two ways of referring to tuple
 tables in queries: one uses the proprietary operator <code class="docutils literal notranslate"><span class="pre">TT</span></code> and the other uses

@@ -100,17 +100,18 @@ an earlier version so that it can be used with the current version. Upgrade is
 possible for at least the immediately preceding persistence version and
 possibly from versions before that.
 
-RDFox stores all persisted content in the *current* subdirectory of the server
-directory. When performing an upgrade, RDFox creates a *new* subdirectory within
-the server directory and populates it with updated copies of any files from
-*current* that require changes to match the new persistence format. Files that
-do not need modification are hard-linked or copied into *new* to create a
-complete, upgraded version. Once the *new* subdirectory is ready, RDFox moves
-the existing *current* subdirectory to *saved*, then moves *new* to *current*.
-Finally, the *saved* subdirectory is deleted. This approach ensures that all
-upgrade operations are performed entirely within the server directory, and that
-the server directory is always in a recoverable state, even if the upgrade
-process is interrupted.
+RDFox stores all persisted content in a versioned *current* subdirectory of the
+server directory (e.g. /v00001). When performing an upgrade, RDFox creates a
+*temporary* subdirectory within the server directory and populates it with
+updated copies of any files from *current* that require changes to match the new
+persistence format. Files that do not need modification are hard-linked or
+copied into *temporary* to create a complete, upgraded version. Once the
+*temporary* subdirectory is ready, RDFox moves it into the next versioned
+*current* subdirectory, which is named according to the current server
+persistence version (e.g. /v00002). Finally, content from the previous *current*
+subdirectory is deleted. This approach ensures that all upgrade operations are
+performed entirely within the server directory, and that the server directory is
+always in a recoverable state, even if the upgrade process is interrupted.
 
 .. warning::
 

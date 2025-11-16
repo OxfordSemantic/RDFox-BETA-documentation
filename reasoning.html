@@ -567,7 +567,7 @@ of resources mentioned in the data.</p>
 <p>In RDFox we can enable the use of equality by initializing a store accordingly.
 For instance, using the shell, we can initialize a data store with equality
 reasoning turned on using the shell command</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>init seq equality noUNA
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dstore create myDataStore equality noUNA
 </pre></div>
 </div>
 <p>initializes a data store with equality reasoning and no UNA.</p>
@@ -2607,9 +2607,9 @@ by running the following shell command:</p>
 </div>
 <p>or through equivalent operations for importing from IRIs in REST and Java APIs (as described in <a class="reference internal" href="apis.html#apis-adding-data"><span class="std std-numref">Section 16.10.2.2</span></a>).</p>
 <p>Note that this requires the proprietary URL scheme <code class="docutils literal notranslate"><span class="pre">rdfox</span></code> to appear in the
-<code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code> setting for the containing RDFox Server (as it does
-by default). See <a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a> for more information about this
-and other server parameters.</p>
+<code class="docutils literal notranslate"><span class="pre">allowed-url-schemes-on-import</span></code> setting for the containing RDFox Server (as it
+does by default). See <a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a> for more information about
+this and other server parameters.</p>
 <p>The rules of <code class="docutils literal notranslate"><span class="pre">&lt;rdfox:TBoxReasoning&gt;</span></code> partially encode the semantics of the RDFS
 and OWL vocabularies; in particular, it will add rules representing the
 relation <code class="docutils literal notranslate"><span class="pre">rdfs:subClassOf</span></code> as transitive and reflexive, and also saying that
@@ -2953,46 +2953,92 @@ operations, we can simply issue the following <code class="docutils literal notr
 </div>
 <p>The command will produce the following table.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Producing rule statistics; rules will not be printed.
-================================ RULES STATISTICS ================================
-Component    Nonrecursive rules    Recursive rules    Total rules
-        1                     3                  0              3
-        2                     2                  0              2
-        3                     1                  0              1
+==================================================================================
+Number of rules: 6
+------------------------ STATISTICS FOR RULE HEAD ATOMS ------------------------
+Stratum    Nonrecursive    Recursive    Total
+      1               3            0        3
+      2               2            0        2
+      3               1            0        1
 ----------------------------------------------------------------------------------
-Total:                        6                  0              6
+Total:                6            0        6
 ==================================================================================
 </pre></div>
 </div>
-<p>One can observe that the current datastore contains a total of 13 rules.
-Furthermore, the rules have been partitioned internally into four components
-according to how they <strong>depend on</strong> each other: rules in components with higher
-indexes only depend on rules in components with lower indexes. Intuitively, a
-rule <code class="docutils literal notranslate"><span class="pre">r1</span></code> depends on a rule <code class="docutils literal notranslate"><span class="pre">r2</span></code>, if facts matching a head atom in <code class="docutils literal notranslate"><span class="pre">r2</span></code>
-also match a body atom in <code class="docutils literal notranslate"><span class="pre">r1</span></code>.  In this example, the component with index
-<code class="docutils literal notranslate"><span class="pre">0</span></code> contains six <strong>recursive</strong> rules, i.e. rules that depend on each other.
-The remaining components contain rules that are <strong>non-recursive</strong>, i.e. they
-only depend on rules from components with lower indexes.</p>
-<p>In addition to the above statistics, one can also list the rules in the current
-datastore grouped by components. To this end, we can simply issue the following
-command:</p>
+<p>One can see that the current datastore contains a total of six rules.
+Furthermore, the rules have been partitioned internally into three strata
+according to how they <strong>depend on</strong> each other. Roughly speaking, a head atom
+of a rule rule <code class="docutils literal notranslate"><span class="pre">r1</span></code> depends on a head atom of a rule <code class="docutils literal notranslate"><span class="pre">r2</span></code> if facts matching
+the head atom of <code class="docutils literal notranslate"><span class="pre">r2</span></code> can also be matched to some body atom of <code class="docutils literal notranslate"><span class="pre">r1</span></code>.
+Furthermore, a head atom is said to be <strong>recursive</strong> if it, possibly indirectly
+via other rules, depends on itself; otherwise, a head atom is said to be
+<strong>non-recursive</strong>. Thus, a non-recursive head atom can depend only on the head
+atoms from strata with lower indexes, whereas a recursive head atom can
+additionally depend on the head atoms from its own stratum. In this example,
+all six rules are non-recursive.</p>
+<p>If all head atoms in a rule are recursive, one often says that the rule is
+recursive too, and analogously if all head atoms are non-recursive. In
+contrast, one cannot say whether a rule is (non-)recursive if the status of
+head atoms of a rule is not uniform.</p>
+<p>In addition to the above statistics, one can also list the rules in a data
+store grouped by strata using the following command.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>info rulestats print-rules
 </pre></div>
 </div>
-<p>which will produce the following output for the component with index <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>...
+<p>This produces the following output, where the rules are grouped by strata and
+body size, and where recursive and non-recursive atoms in a stratum are marked
+using <code class="docutils literal notranslate"><span class="pre">==&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">--&gt;</span></code>, respectively.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Producing rule statistics; rules will be printed.
+==================================================================================
+Number of rules: 6
+------------------------ STATISTICS FOR RULE HEAD ATOMS ------------------------
+Stratum    Nonrecursive    Recursive    Total
+      1               3            0        3
+      2               2            0        2
+      3               1            0        1
 ----------------------------------------------------------------------------------
--- COMPONENT:          1
--- NONRECURSIVE RULES: 3
--- RECURSIVE RULES:    0
-**********************************************************************************
-** BODY SIZE:          1
-** NONRECURSIVE RULES: 3
+Total:                6            0        6
+----------------------------------------------------------------------------------
+    STRATUM:      1
+    BODY SIZE:    1
+--&gt; NONRECURSIVE: 3
 
-&lt;https://rdfox.com/examples/f1/hasRacedIn&gt;[?driver,?race] :- &lt;https://rdfox.com/examples/f1/result_race&gt;[?result,?race], &lt;https://rdfox.com/examples/f1/result_driver&gt;[?result,?driver] .
-&lt;https://rdfox.com/examples/f1/hasPodiumInRace&gt;[?driver,?race] :- &lt;https://rdfox.com/examples/f1/result_race&gt;[?result,?race], &lt;https://rdfox.com/examples/f1/result_driver&gt;[?result,?driver], &lt;https://rdfox.com/examples/f1/result_positionOrder&gt;[?result,?positionOrder], FILTER(?positionOrder &lt; 4) .
-&lt;https://rdfox.com/examples/f1/hasRaceWinCount&gt;[?driver,?raceWinCount] :- AGGREGATE(&lt;https://rdfox.com/examples/f1/result_driver&gt;[?result,?driver], &lt;https://rdfox.com/examples/f1/result_positionOrder&gt;[?result,1] ON ?driver BIND COUNT(?result) AS ?raceWinCount) .
+--&gt; &lt;https://rdfox.com/examples/f1/hasRacedIn&gt;[?driver, ?race] :-
+        &lt;https://rdfox.com/examples/f1/result_race&gt;[?result, ?race] ,
+        &lt;https://rdfox.com/examples/f1/result_driver&gt;[?result, ?driver] .
+
+--&gt; &lt;https://rdfox.com/examples/f1/hasPodiumInRace&gt;[?driver, ?race] :-
+        &lt;https://rdfox.com/examples/f1/result_race&gt;[?result, ?race] ,
+        &lt;https://rdfox.com/examples/f1/result_driver&gt;[?result, ?driver] ,
+        &lt;https://rdfox.com/examples/f1/result_positionOrder&gt;[?result, ?positionOrder] ,
+        FILTER(?positionOrder &lt; 4) .
+
+--&gt; &lt;https://rdfox.com/examples/f1/hasRaceWinCount&gt;[?driver, ?raceWinCount] :-
+        AGGREGATE(&lt;https://rdfox.com/examples/f1/result_driver&gt;[?result, ?driver], &lt;https://rdfox.com/examples/f1/result_positionOrder&gt;[?result, 1] ON ?driver BIND COUNT(?result) AS ?raceWinCount) .
+
 ----------------------------------------------------------------------------------
-...
+    STRATUM:      2
+    BODY SIZE:    1
+--&gt; NONRECURSIVE: 2
+
+--&gt; &lt;https://rdfox.com/examples/f1/DriverWithoutPodiums&gt;[?driver] :-
+        &lt;https://rdfox.com/examples/f1/driver&gt;[?driver] ,
+        NOT EXISTS ?race IN &lt;https://rdfox.com/examples/f1/hasPodiumInRace&gt;[?driver, ?race] .
+
+--&gt; &lt;https://rdfox.com/examples/f1/hasRaceCount&gt;[?driver, ?raceCount] :-
+        AGGREGATE(&lt;https://rdfox.com/examples/f1/hasRacedIn&gt;[?driver, ?race] ON ?driver BIND COUNT(?race) AS ?raceCount) .
+
+----------------------------------------------------------------------------------
+    STRATUM:      3
+    BODY SIZE:    1
+--&gt; NONRECURSIVE: 1
+
+--&gt; &lt;https://rdfox.com/examples/f1/hasWinPercentage&gt;[?driver, ?percentage] :-
+        &lt;https://rdfox.com/examples/f1/hasRaceCount&gt;[?driver, ?raceCount] ,
+        &lt;https://rdfox.com/examples/f1/hasRaceWinCount&gt;[?driver, ?raceWinCount] ,
+        BIND(?raceWinCount / ?raceCount AS ?percentage) .
+
+==================================================================================
 </pre></div>
 </div>
 </div>

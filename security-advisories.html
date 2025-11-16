@@ -149,11 +149,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Security Advisories</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#rd-2210-2-3-low">RD-2210 - 2.3 (Low)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rd-2389-6-0-medium">RD-2389 - 6.0 (Medium)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mitigations">Mitigations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#affected-versions">Affected Versions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#resolution">Resolution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cvss-score">CVSS Score</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rd-2210-2-3-low">RD-2210 - 2.3 (Low)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Mitigations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Affected Versions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Resolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">CVSS Score</a></li>
 </ul>
 </li>
 </ul>
@@ -187,6 +194,42 @@
   <div class="section" id="security-advisories">
 <span id="id1"></span><h1>Security Advisories<a class="headerlink" href="#security-advisories" title="Permalink to this headline">¶</a></h1>
 <p>This section documents security advisories for RDFox.</p>
+<div class="section" id="rd-2389-6-0-medium">
+<span id="security-advisories-rd-2389"></span><h2>RD-2389 - 6.0 (Medium)<a class="headerlink" href="#rd-2389-6-0-medium" title="Permalink to this headline">¶</a></h2>
+<p>RDFox’s access control system allows administrators to specify which named
+graphs each agent is allowed to read and write. In the versions affected by
+this bug, authorization checks were not performed when RDFox’s syntax
+extensions for accessing tuple tables (see <a class="reference internal" href="querying.html#querying-tuple-tables"><span class="std std-numref">Section 9.4</span></a>)
+were used to query the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> tuple table where RDFox stores all named graph
+facts. This would allow an attacker to read triples in any named graph even
+while authenticated as an agent with no named graph access privileges.</p>
+<p>Note that this bug affected only reading from named graphs: authorization
+checks for writing to named graphs were performed correctly. Note also that, in
+order to exploit this vulnerability, an agent must hold a read privilege over the
+<code class="docutils literal notranslate"><span class="pre">Quads</span></code> tuple table.</p>
+<div class="section" id="mitigations">
+<h3>Mitigations<a class="headerlink" href="#mitigations" title="Permalink to this headline">¶</a></h3>
+<p>As an interim measure to secure sensitive data, administrators can revoke read
+privileges over the <code class="docutils literal notranslate"><span class="pre">Quads</span></code> tuple table from any user who should not have
+access to all named graphs, until they can upgrade to a fixed version.</p>
+</div>
+<div class="section" id="affected-versions">
+<h3>Affected Versions<a class="headerlink" href="#affected-versions" title="Permalink to this headline">¶</a></h3>
+<p>This issue affects all versions from 6.1 to 7.2d inclusive, 7.3 to 7.3d
+inclusive, and 7.4.</p>
+</div>
+<div class="section" id="resolution">
+<h3>Resolution<a class="headerlink" href="#resolution" title="Permalink to this headline">¶</a></h3>
+<p>This issue is fixed in patch releases v7.2e, v7.3e, and v7.4a. Users of the
+affected versions are advised to upgrade to a fixed version as soon as possible
+to prevent exploitation of this issue. Upgrading to a patched version provides
+protection from this issue immediately without need for further action.</p>
+</div>
+<div class="section" id="cvss-score">
+<h3>CVSS Score<a class="headerlink" href="#cvss-score" title="Permalink to this headline">¶</a></h3>
+<p>CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N. – 6.0 (Medium)</p>
+</div>
+</div>
 <div class="section" id="rd-2210-2-3-low">
 <span id="security-advisories-rd-2210"></span><h2>RD-2210 - 2.3 (Low)<a class="headerlink" href="#rd-2210-2-3-low" title="Permalink to this headline">¶</a></h2>
 <p>A logic error in the SKOLEM built-in tuple table could allow a remotely
@@ -202,17 +245,17 @@ incorrect identifiers back into the dictionary to be harvested at a later date
 using rules or SPARQL updates. Once the necessary IRIs or any faulty SKOLEM
 identifiers are present in the dictionary, an attacker with read privileges
 could read them by querying.</p>
-<div class="section" id="mitigations">
-<h3>Mitigations<a class="headerlink" href="#mitigations" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Mitigations<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>There are no advised mitigations for this issue. Please see the resolution
 section below.</p>
 </div>
-<div class="section" id="affected-versions">
-<h3>Affected Versions<a class="headerlink" href="#affected-versions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Affected Versions<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>This issue affects versions v7.3, v7.3a, and v7.3c.</p>
 </div>
-<div class="section" id="resolution">
-<h3>Resolution<a class="headerlink" href="#resolution" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Resolution<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>This issue is fixed in v7.3d and later versions. Users of one of the affected
 versions are advised to upgrade to a fixed version as soon as possible to
 prevent new exploitation of this issue. After upgrading, they should also
@@ -220,8 +263,8 @@ follow the <a class="reference external" href="https://rdfox-distribution.s3.eu-
 to ensure that their system is free of any incorrect SKOLEM identifiers created
 by this issue.</p>
 </div>
-<div class="section" id="cvss-score">
-<h3>CVSS Score<a class="headerlink" href="#cvss-score" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>CVSS Score<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N. – 2.3 (Low)</p>
 </div>
 </div>

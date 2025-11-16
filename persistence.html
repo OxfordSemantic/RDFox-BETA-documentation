@@ -272,17 +272,18 @@ endpoint are also captured and written to the endpoint parameters file (see
 an earlier version so that it can be used with the current version. Upgrade is
 possible for at least the immediately preceding persistence version and
 possibly from versions before that.</p>
-<p>RDFox stores all persisted content in the <em>current</em> subdirectory of the server
-directory. When performing an upgrade, RDFox creates a <em>new</em> subdirectory within
-the server directory and populates it with updated copies of any files from
-<em>current</em> that require changes to match the new persistence format. Files that
-do not need modification are hard-linked or copied into <em>new</em> to create a
-complete, upgraded version. Once the <em>new</em> subdirectory is ready, RDFox moves
-the existing <em>current</em> subdirectory to <em>saved</em>, then moves <em>new</em> to <em>current</em>.
-Finally, the <em>saved</em> subdirectory is deleted. This approach ensures that all
-upgrade operations are performed entirely within the server directory, and that
-the server directory is always in a recoverable state, even if the upgrade
-process is interrupted.</p>
+<p>RDFox stores all persisted content in a versioned <em>current</em> subdirectory of the
+server directory (e.g. /v00001). When performing an upgrade, RDFox creates a
+<em>temporary</em> subdirectory within the server directory and populates it with
+updated copies of any files from <em>current</em> that require changes to match the new
+persistence format. Files that do not need modification are hard-linked or
+copied into <em>temporary</em> to create a complete, upgraded version. Once the
+<em>temporary</em> subdirectory is ready, RDFox moves it into the next versioned
+<em>current</em> subdirectory, which is named according to the current server
+persistence version (e.g. /v00002). Finally, content from the previous <em>current</em>
+subdirectory is deleted. This approach ensures that all upgrade operations are
+performed entirely within the server directory, and that the server directory is
+always in a recoverable state, even if the upgrade process is interrupted.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>While the above procedure has been designed for safety, operators should

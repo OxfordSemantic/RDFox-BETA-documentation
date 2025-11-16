@@ -373,7 +373,7 @@ dsconn
 
 ::
 
-   dsconn {list | active [<name>] | open [name] to <data_store_name> [as <role>] | close [<name>|to <data_store_name>]}
+   dsconn {list | active [<name>] | open [<name>] to <data_store_name> [as <role>] | close [<name> | to <data_store_name>] | incremental-reasoning-allowed [true | false]}
 
 **Description:** Manages data store connections belonging to the current shell.
 See also :numref:`connection-management-shell`.
@@ -397,6 +397,11 @@ See also :numref:`connection-management-shell`.
    is given, or all connections to the data store with name
    ``<data_store_name>`` if the arguments ``to`` and ``<data_store_name>`` are
    given in that order.
+
+- Option ``incremental-reasoning-allowed`` determines whether incremental
+  reasoning is allowed to be used when processing requests initiated on the
+  active data store connection. If no value is specified, then the current
+  value of this property is printed, and the value is set otherwise.
 
 .. _dsource-command:
 
@@ -1349,7 +1354,7 @@ stats
 
 ::
 
-   stats {list | show <name> | create <name> [<parameter_key> <parameter_value>] ... | delete <name> [force] | update [<name>]}
+   stats {list | show <name> | create <name> [<parameter_key> <parameter_value>] ... | delete <name> [force] | update [<name>] | extract <name> {! <statement_text> | <statement_file_name>}  | merge <name> <file>}}
 
 **Description:** This command maintains the statistics that RDFox uses
 internally for tasks such as query planning.
@@ -1370,6 +1375,17 @@ internally for tasks such as query planning.
    ``auto-update-statistics`` option is set to ``true``, then statistics will
    be updated automatically whenever the number of facts in the system changes
    by more than 10%.
+
+- Option ``extract`` extracts the subset of ``<name>`` statistics relevant for the
+  resources used in the provided statement. The extracted statistics are from the
+  current data store in the current RDFox instance. The result is produced as
+  specified by the ``output`` shell variable.
+
+- Option ``merge`` merges the statistics information from the file ``<file>`` into the
+  statistics ``<name>`` of the current data store. This operation affects only the
+  data store in the current RDFox instance. The statistics will continue to be updated
+  during subsequent write transactions in accordence with the data store property
+  ``auto-update-statistics-mode`` (see :numref:`auto-update-statistics-mode`).
 
 threads
 ~~~~~~~

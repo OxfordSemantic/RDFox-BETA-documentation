@@ -528,7 +528,7 @@ criteria. The subcommand uses the same parameters as <code class="docutils liter
 <div class="section" id="dsconn">
 <span id="dsconn-command"></span><h3><span class="section-number">15.2.14. </span>dsconn<a class="headerlink" href="#dsconn" title="Permalink to this headline">¶</a></h3>
 <p><strong>Syntax:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dsconn {list | active [&lt;name&gt;] | open [name] to &lt;data_store_name&gt; [as &lt;role&gt;] | close [&lt;name&gt;|to &lt;data_store_name&gt;]}
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dsconn {list | active [&lt;name&gt;] | open [&lt;name&gt;] to &lt;data_store_name&gt; [as &lt;role&gt;] | close [&lt;name&gt; | to &lt;data_store_name&gt;] | incremental-reasoning-allowed [true | false]}
 </pre></div>
 </div>
 <p><strong>Description:</strong> Manages data store connections belonging to the current shell.
@@ -550,6 +550,10 @@ given, the data store connection with name <code class="docutils literal notrans
 is given, or all connections to the data store with name
 <code class="docutils literal notranslate"><span class="pre">&lt;data_store_name&gt;</span></code> if the arguments <code class="docutils literal notranslate"><span class="pre">to</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;data_store_name&gt;</span></code> are
 given in that order.</p></li>
+<li><p>Option <code class="docutils literal notranslate"><span class="pre">incremental-reasoning-allowed</span></code> determines whether incremental
+reasoning is allowed to be used when processing requests initiated on the
+active data store connection. If no value is specified, then the current
+value of this property is printed, and the value is set otherwise.</p></li>
 </ul>
 </div>
 <div class="section" id="dsource">
@@ -1316,7 +1320,7 @@ or the server connection with name <code class="docutils literal notranslate"><s
 <div class="section" id="stats">
 <h3><span class="section-number">15.2.48. </span>stats<a class="headerlink" href="#stats" title="Permalink to this headline">¶</a></h3>
 <p><strong>Syntax:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>stats {list | show &lt;name&gt; | create &lt;name&gt; [&lt;parameter_key&gt; &lt;parameter_value&gt;] ... | delete &lt;name&gt; [force] | update [&lt;name&gt;]}
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>stats {list | show &lt;name&gt; | create &lt;name&gt; [&lt;parameter_key&gt; &lt;parameter_value&gt;] ... | delete &lt;name&gt; [force] | update [&lt;name&gt;] | extract &lt;name&gt; {! &lt;statement_text&gt; | &lt;statement_file_name&gt;}  | merge &lt;name&gt; &lt;file&gt;}}
 </pre></div>
 </div>
 <p><strong>Description:</strong> This command maintains the statistics that RDFox uses
@@ -1334,6 +1338,15 @@ it updates the statistics with name <code class="docutils literal notranslate"><
 <code class="docutils literal notranslate"><span class="pre">auto-update-statistics</span></code> option is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, then statistics will
 be updated automatically whenever the number of facts in the system changes
 by more than 10%.</p></li>
+<li><p>Option <code class="docutils literal notranslate"><span class="pre">extract</span></code> extracts the subset of <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> statistics relevant for the
+resources used in the provided statement. The extracted statistics are from the
+current data store in the current RDFox instance. The result is produced as
+specified by the <code class="docutils literal notranslate"><span class="pre">output</span></code> shell variable.</p></li>
+<li><p>Option <code class="docutils literal notranslate"><span class="pre">merge</span></code> merges the statistics information from the file <code class="docutils literal notranslate"><span class="pre">&lt;file&gt;</span></code> into the
+statistics <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> of the current data store. This operation affects only the
+data store in the current RDFox instance. The statistics will continue to be updated
+during subsequent write transactions in accordence with the data store property
+<code class="docutils literal notranslate"><span class="pre">auto-update-statistics-mode</span></code> (see <a class="reference internal" href="data-stores.html#auto-update-statistics-mode"><span class="std std-numref">Section 5.4.2.2</span></a>).</p></li>
 </ul>
 </div>
 <div class="section" id="threads">

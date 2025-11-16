@@ -270,13 +270,15 @@ as <code class="docutils literal notranslate"><span class="pre">/home/user1/data
 <div class="section" id="http-request-logging">
 <span id="request-logging"></span><h2><span class="section-number">20.2. </span>HTTP Request Logging<a class="headerlink" href="#http-request-logging" title="Permalink to this headline">¶</a></h2>
 <p>HTTP request logging provides standardized logging of HTTP requests serviced by
-the RDFox endpoint. Both the common and extended log formats are supported. In
-contrast to API logging, request logging has been implemented to minimize the
-impact on performance as much as possible, and so the use of HTTP request
-logging in production is recommended.</p>
+the RDFox endpoint. Common log format (<code class="docutils literal notranslate"><span class="pre">clf</span></code>) and extended log format
+(<code class="docutils literal notranslate"><span class="pre">elf</span></code>) are supported, as well as <code class="docutils literal notranslate"><span class="pre">elf-json</span></code>, a JSON compatible variant of
+the extended log format.  In contrast to API logging, request logging has been
+implemented to minimize the impact on performance as much as possible, and so
+the use of HTTP request logging in production is recommended.</p>
 <p>HTTP request logging is configured via the endpoint parameters
-<code class="docutils literal notranslate"><span class="pre">request-logger</span></code> and, when the extended log format logger is active,
-<code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> (see <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p>
+<code class="docutils literal notranslate"><span class="pre">request-logger</span></code> and, when an extended log format logger is active,
+<code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> and <code class="docutils literal notranslate"><span class="pre">elf-logger-recorded-events</span></code> (see
+<a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>).</p>
 <div class="section" id="errors-and-exceptions">
 <h3><span class="section-number">20.2.1. </span>Errors and Exceptions<a class="headerlink" href="#errors-and-exceptions" title="Permalink to this headline">¶</a></h3>
 <p>The endpoint attempts to ensure that, when a logger is configured, a single log

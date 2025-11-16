@@ -196,7 +196,96 @@ the normal channels.</p>
 <div class="section" id="releases">
 <h2>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>Release 7.4 (????????????????)</dt><dd><ul class="simple">
+<dt>Release 7.5 (TBC)</dt><dd><ul class="simple">
+<li><p>Federated queries are now supported in accordance with the <a class="reference external" href="https://www.w3.org/TR/sparql11-federated-query/">SPARQL 1.1
+Federated Query</a>
+specification.</p></li>
+<li><p>The existing <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/</span></code> and <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datastores/&lt;DataStoreName&gt;/info</span></code> REST
+APIs, which provide information about the whole server or a particular data
+store respectively, now support the <a class="reference external" href="https://github.com/prometheus/OpenMetrics">OpenMetrics 1.0</a> response format, enabling
+monitoring of RDFox servers using Prometheus or compatible systems
+(RD-2377). To improve the clarity and consistency of metrics for the newly
+supported format, the properties returned by these APIs (and by the
+<code class="docutils literal notranslate"><span class="pre">serverinfo</span> <span class="pre">extended</span></code> shell command and the equivalent JRDFox and C/C++
+APIs) have been renamed and their meanings documented (see
+<a class="reference internal" href="apis.html#querying-component-information"><span class="std std-numref">Section 16.5.7</span></a>). Java APIs have additionally been
+updated to include enum types, allowing for further client side
+calculation/aggregation using these values.</p></li>
+<li><p>Added a new server parameter <code class="docutils literal notranslate"><span class="pre">http-remotes</span></code> to enable integration with
+external HTTP(S) endpoints that require authentication. See
+<a class="reference internal" href="servers.html#http-remotes"><span class="std std-numref">Section 4.3.3</span></a> for details (RD-2374).</p></li>
+<li><p>Added an EXPERIMENTAL built-in function, <code class="docutils literal notranslate"><span class="pre">SEMSIM</span></code>, for semantic
+similarity search over text embeddings (RD-2437). See
+<a class="reference internal" href="querying.html#iri-and-string-functions"><span class="std std-numref">Section 9.2.4</span></a> for details.</p></li>
+<li><p>Changes to HTTP request logging (RD-2431 and RD-2421):</p>
+<ul>
+<li><p>Enhanced the endpoint’s extended logging format (ELF) to optionally record
+request start events, configurable via the new
+<code class="docutils literal notranslate"><span class="pre">elf-logger-recorded-events</span></code> server parameter.</p></li>
+<li><p>Added new elf-logger fields: <code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code> (the timestamp at log creation)
+and <code class="docutils literal notranslate"><span class="pre">x-request-state</span></code> (the request state at time of logging, e.g.,
+“request_start”, “request_finish”, “request_error”).</p></li>
+<li><p>Updated the default value of the <code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> parameter from
+<code class="docutils literal notranslate"><span class="pre">date</span> <span class="pre">time</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">sc-status</span> <span class="pre">sc-bytes</span> <span class="pre">time-taken</span></code> to
+<code class="docutils literal notranslate"><span class="pre">x-timestamp</span> <span class="pre">c-ip</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">cs(RDFox-Request-ID)</span> <span class="pre">sc-status</span>
+<span class="pre">sc-bytes</span> <span class="pre">time-taken</span> <span class="pre">x-protocol-error</span></code> .</p></li>
+<li><p>Introduced a new request logging format, <code class="docutils literal notranslate"><span class="pre">elf-json</span></code>, which records
+logs in JSON. The fields and events logged by this logger are configured
+with the same parameters (<code class="docutils literal notranslate"><span class="pre">elf-logger-fields</span></code> and
+<code class="docutils literal notranslate"><span class="pre">elf-logger-recorded-events</span></code>) as the existing <code class="docutils literal notranslate"><span class="pre">elf</span></code> format.</p></li>
+<li><p>See documentation for these changes in <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a>.</p></li>
+</ul>
+</li>
+<li><p>One can now extract and merge statistics for individual queries, enabling
+troubleshooting of query plans without access to user data (RD-2405).</p></li>
+<li><p>Added an endpoint parameter, <code class="docutils literal notranslate"><span class="pre">localhost-only</span></code> to specify whether RDFox
+should listen on all network interfaces or only on the loopback interface
+(RD-2406). See <a class="reference internal" href="rdfox-endpoint.html#endpoint-parameters"><span class="std std-numref">Section 19.2</span></a> for details.</p></li>
+<li><p>Deletions and additions in a transaction now cancel out precisely during
+reasoning (RD-1985).</p></li>
+<li><p>All APIs now support a way to determine whether an update should be handled
+using incremental or “from scratch” reasoning (RD-1987).</p></li>
+<li><p>The functionality of the <code class="docutils literal notranslate"><span class="pre">&lt;DSCONN&gt;/transaction</span></code> REST API key was merged
+into <code class="docutils literal notranslate"><span class="pre">&lt;DSCONN&gt;</span></code>; moreover, the <code class="docutils literal notranslate"><span class="pre">/transaction</span></code> key was deprecated and
+will be removed in future (RD-2353).</p></li>
+<li><p>The existing <code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code> server parameter has been renamed
+to <code class="docutils literal notranslate"><span class="pre">allowed-url-schemes-on-import</span></code>. This parameter is used to control
+which schemes are allowed when importing data from external sources
+(RD-2374).</p></li>
+<li><p>Fixed an issue where numeric (Integer, Decimal and Double) values equal to
+the lower numeric limit (e.g. Integer -2^63) were wrongly reported as outside
+the supported range (RD-2388).</p></li>
+<li><p>Fixed an issue where JRDFox Rule object creation may introduce additional
+expression nesting, leading to unexpected results when listing or deleting
+rules (RD-2388).</p></li>
+</ul>
+</dd>
+<dt>Release 7.4b (11th September 2025)</dt><dd><ul class="simple">
+<li><p>Stopped the endpoint from responding with <code class="docutils literal notranslate"><span class="pre">429</span> <span class="pre">-</span> <span class="pre">Too</span> <span class="pre">Many</span> <span class="pre">Requests</span></code> when
+the number of potentially long-running requests exceeds the number of
+threads available for this class of request (RD-2415 &amp; RD-2430). Instead,
+potentially long-running requests are now queued. This behavior is similar
+to pre-v7.4 versions of RDFox, with the difference that requests to
+<cite>/health</cite>, <cite>/requests</cite> and <cite>/console</cite> are still processed with higher
+priority.</p></li>
+</ul>
+</dd>
+<dt>Release 7.4a (6th August 2025)</dt><dd><ul class="simple">
+<li><p>Fixed a bug in the implementation of RDFox’s proprietary SPARQL extensions
+for accessing tuple tables that made it possible to bypass named graph
+access control for read operations (RD-2389). See the security advisory
+<a class="reference internal" href="security-advisories.html#security-advisories-rd-2389"><span class="std std-ref">RD-2389 - 6.0 (Medium)</span></a> for more details.</p></li>
+<li><p>Fixed a bug in the implementation of the <code class="docutils literal notranslate"><span class="pre">SKOLEM</span></code> built-in tuple table
+that prevented some valid SKOLEM identifiers from being decoded correctly
+(RD-2390). Users should rematerialize any data store that contains a rule
+with one or more SKOLEM atoms after upgrading to a fixed version. This can
+be achieved with the <cite>remat</cite> shell command or an equivalent API call.</p></li>
+<li><p>Fixed a bug in the implementation of the <code class="docutils literal notranslate"><span class="pre">SQLite</span></code> data source tuple table,
+where parameter columns with the <code class="docutils literal notranslate"><span class="pre">iri</span></code> datatype were not handled correctly
+(RD-2397).</p></li>
+</ul>
+</dd>
+<dt>Release 7.4 (4th July 2025)</dt><dd><ul class="simple">
 <li><p>Added a data source type <code class="docutils literal notranslate"><span class="pre">lucene</span></code> for integrating with Apache Lucene
 (RD-2270). See <a class="reference internal" href="data-sources.html#registering-lucene-data-sources"><span class="std std-numref">Section 7.1.3</span></a> for details.</p></li>
 <li><p>Added a data source type <code class="docutils literal notranslate"><span class="pre">SQLite</span></code> for integrating with SQLite (RD-2181).
@@ -217,13 +306,19 @@ controlling how new snapshots are restored by an instance using
 parameter within <a class="reference internal" href="servers.html#server-parameters"><span class="std std-numref">Section 4.3</span></a> for details.</p></li>
 <li><p>Replaced the SPARQL <code class="docutils literal notranslate"><span class="pre">ORDER</span> <span class="pre">BY</span></code> implementation to provide consistent
 performance across all Operating Systems (RD-2167).</p></li>
-<li><p>RDFox server directory files are now stored in a subdirectory named
-<code class="docutils literal notranslate"><span class="pre">current</span></code> and include human-readable file headers (RD-2275 &amp; RD-2276).
-This addresses a previous issue where version upgrades could result in files
+<li><p>RDFox server directory files are now stored in a versioned subdirectory
+(RD-2348) and include human-readable file headers (RD-2275 &amp; RD-2276). This
+addresses a previous issue where version upgrades could result in files
 being created outside the server directory.</p></li>
 <li><p>The data store parameter <code class="docutils literal notranslate"><span class="pre">init-resource-capacity</span></code> was removed.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">init</span></code> mode now requires a <code class="docutils literal notranslate"><span class="pre">channel</span></code> endpoint parameter to be
 explicitly supplied.</p></li>
+<li><p>The implementation of Solr data sources has been updated to handle larger
+queries (RD-1915). This change introduces a persistence incompatibility
+that is not handled by RDFox’s persistence upgrade functionality. If you
+have a persistent server with Solr data sources registered, you will need
+to deregister them and then compact the data store before upgrading to this
+version.</p></li>
 <li><p>Fixed a bug in the <code class="docutils literal notranslate"><span class="pre">ODBC</span></code> data source, where if the ODBC driver
 miss-reported the width of a column, data within that column could be
 improperly truncated during transmission (RD-2339).</p></li>

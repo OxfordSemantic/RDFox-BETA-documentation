@@ -226,8 +226,9 @@ content.</p></li>
 <li><p>Filesystem sandboxing is disabled by setting the <code class="docutils literal notranslate"><span class="pre">sandbox-directory</span></code>
 parameter to the empty string. This ensures that the server can access any
 files on the host system (subject to the OS’s file permissions).</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">allowed-schemes-on-load</span></code> parameter is set to include all supported URL
-schemes so that the server can load resources with any of these schemes.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">allowed-url-schemes-on-import</span></code> parameter is set to include all
+supported URL schemes so that the server can load resources with any of these
+schemes.</p></li>
 </ul>
 <p>In addition the role and password are both defaulted to <code class="docutils literal notranslate"><span class="pre">guest</span></code>. This allows
 full control of the system via the REST API without authentication, if the

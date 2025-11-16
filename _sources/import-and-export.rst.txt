@@ -106,8 +106,8 @@ Add or Delete
 Content Sources
   For each import operation, the source or sources of the content to add or
   delete must be specified. All interfaces provide ways to supply the content
-  directly, or as a list of file paths or URIs. Please refer to the
-  ``allowed-schemes-on-load`` and ``sandbox-directory`` :ref:`server parameters
+  directly, or as a list of file paths or URLs. Please refer to the
+  ``allowed-url-schemes-on-import`` and ``sandbox-directory`` :ref:`server parameters
   <server-parameters>` that, for security purposes, restrict the URI schemes
   and file paths that can be used in an import operation.
 
