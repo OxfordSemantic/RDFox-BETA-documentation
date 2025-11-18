@@ -429,19 +429,20 @@ log format loggers. This parameter has no effect unless <code class="docutils li
 is set to <code class="docutils literal notranslate"><span class="pre">elf</span></code> or <code class="docutils literal notranslate"><span class="pre">elf-json</span></code>. The value for this parameter must be a
 space-delimited list of the following field identifiers: <code class="docutils literal notranslate"><span class="pre">date</span></code>,
 <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">time-taken</span></code>, <code class="docutils literal notranslate"><span class="pre">c-ip</span></code>, <code class="docutils literal notranslate"><span class="pre">c-port</span></code>, <code class="docutils literal notranslate"><span class="pre">cs({HEADER})</span></code>,
-<code class="docutils literal notranslate"><span class="pre">cs-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-method</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-query</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-stem</span></code>,
-<code class="docutils literal notranslate"><span class="pre">sc({HEADER})</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-status</span></code>, <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code>,
-<code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>, <code class="docutils literal notranslate"><span class="pre">x-request-state</span></code>, <code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code>. The identifier
-<code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code> specifies the agent name with which the request was made.
-The identifier <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code> specifies the textual description of
-any exception raised due to a protocol error while handling an attempted
-request. The identifier <code class="docutils literal notranslate"><span class="pre">x-request-state</span></code> specifies the state of the
-request at the time of logging, which can be one of <code class="docutils literal notranslate"><span class="pre">request_start</span></code>,
-<code class="docutils literal notranslate"><span class="pre">request_finish</span></code>, or <code class="docutils literal notranslate"><span class="pre">request_error</span></code>. The identifier <code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code>
-specifies the date, time and timezone as a single field. All other
-identifiers have the meanings defined in the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">draft specification</a>. The default value for this
-parameter is <code class="docutils literal notranslate"><span class="pre">x-timestamp</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">sc-status</span> <span class="pre">sc-bytes</span>
-<span class="pre">time-taken</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">cs-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-method</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri</span></code>, <code class="docutils literal notranslate"><span class="pre">cs-uri-query</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cs-uri-stem</span></code>, <code class="docutils literal notranslate"><span class="pre">sc({HEADER})</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">sc-status</span></code>,
+<code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code>, <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>, <code class="docutils literal notranslate"><span class="pre">x-request-state</span></code>,
+<code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code>. The identifier <code class="docutils literal notranslate"><span class="pre">x-agent-name</span></code> specifies the agent name
+with which the request was made. The identifier <code class="docutils literal notranslate"><span class="pre">x-protocol-error</span></code>
+specifies the textual description of any exception raised due to a
+protocol error while handling an attempted request. The identifier
+<code class="docutils literal notranslate"><span class="pre">x-request-state</span></code> specifies the state of the request at the time of
+logging, which can be one of <code class="docutils literal notranslate"><span class="pre">request_start</span></code>, <code class="docutils literal notranslate"><span class="pre">request_finish</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">request_error</span></code>. The identifier <code class="docutils literal notranslate"><span class="pre">x-timestamp</span></code> specifies the date, time
+and timezone as a single field. All other identifiers have the meanings
+defined in the <a class="reference external" href="https://www.w3.org/TR/WD-logfile.html">draft specification</a>. The default value for this
+parameter is <code class="docutils literal notranslate"><span class="pre">x-timestamp</span> <span class="pre">c-ip</span> <span class="pre">cs-method</span> <span class="pre">cs-uri-stem</span> <span class="pre">cs(RDFox-Request-ID)</span>
+<span class="pre">sc-status</span> <span class="pre">sc-bytes</span> <span class="pre">time-taken</span> <span class="pre">x-protocol-error</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">elf-logger-recorded-events</span></code> determines which events are logged by the
 extended log format loggers. This parameter has no effect unless
 <code class="docutils literal notranslate"><span class="pre">request-logger</span></code> is set to <code class="docutils literal notranslate"><span class="pre">elf</span></code> or <code class="docutils literal notranslate"><span class="pre">elf-json</span></code>. The value for this

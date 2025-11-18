@@ -267,20 +267,21 @@ The configuration of the endpoint is determined by the parameters below.
      is set to ``elf`` or ``elf-json``. The value for this parameter must be a
      space-delimited list of the following field identifiers: ``date``,
      ``time``, ``time-taken``, ``c-ip``, ``c-port``, ``cs({HEADER})``,
-     ``cs-bytes``, ``cs-method``, ``cs-uri``, ``cs-uri-query``, ``cs-uri-stem``,
-     ``sc({HEADER})``, ``sc-bytes``, ``sc-status``, ``x-agent-name``,
-     ``x-protocol-error``, ``x-request-state``, ``x-timestamp``. The identifier
-     ``x-agent-name`` specifies the agent name with which the request was made.
-     The identifier ``x-protocol-error`` specifies the textual description of
-     any exception raised due to a protocol error while handling an attempted
-     request. The identifier ``x-request-state`` specifies the state of the
-     request at the time of logging, which can be one of ``request_start``,
-     ``request_finish``, or ``request_error``. The identifier ``x-timestamp``
-     specifies the date, time and timezone as a single field. All other
-     identifiers have the meanings defined in the `draft specification
+     ``cs-bytes``, ``cs-method``, ``cs-uri``, ``cs-uri-query``,
+     ``cs-uri-stem``, ``sc({HEADER})``, ``sc-bytes``, ``sc-status``,
+     ``x-agent-name``, ``x-protocol-error``, ``x-request-state``,
+     ``x-timestamp``. The identifier ``x-agent-name`` specifies the agent name
+     with which the request was made. The identifier ``x-protocol-error``
+     specifies the textual description of any exception raised due to a
+     protocol error while handling an attempted request. The identifier
+     ``x-request-state`` specifies the state of the request at the time of
+     logging, which can be one of ``request_start``, ``request_finish``, or
+     ``request_error``. The identifier ``x-timestamp`` specifies the date, time
+     and timezone as a single field. All other identifiers have the meanings
+     defined in the `draft specification
      <https://www.w3.org/TR/WD-logfile.html>`__. The default value for this
-     parameter is ``x-timestamp cs-method cs-uri-stem sc-status sc-bytes
-     time-taken``.
+     parameter is ``x-timestamp c-ip cs-method cs-uri-stem cs(RDFox-Request-ID)
+     sc-status sc-bytes time-taken x-protocol-error``.
 
    - ``elf-logger-recorded-events`` determines which events are logged by the
      extended log format loggers. This parameter has no effect unless
